@@ -30,6 +30,7 @@ if (project.hasProperty("composeCompilerReports")) {
 }
 
 dependencies {
+    implementation(platform(libs.compose.bom.alpha))
     implementation(libs.bundles.compose)
     implementation(libs.cashapp.molecule.runtime)
 

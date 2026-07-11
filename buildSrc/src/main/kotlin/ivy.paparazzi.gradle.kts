@@ -3,6 +3,11 @@ plugins {
     id("app.cash.paparazzi")
 }
 
+tasks.withType<Test>().configureEach {
+    // https://github.com/cashapp/paparazzi/issues/2111
+    reports.html.required = false
+}
+
 // TODO Remove when https://github.com/google/guava/issues/6567 is fixed.
 // See also: https://github.com/google/guava/issues/6801.
 dependencies.constraints {

@@ -1,7 +1,6 @@
 plugins {
     org.jetbrains.kotlin.plugin.compose
     id("ivy.module")
-    id("app.cash.molecule")
 }
 
 android {
@@ -23,13 +22,16 @@ android {
     }
 }
 
-composeCompiler {
-    reportsDestination = layout.buildDirectory.dir("compose_compiler")
-    metricsDestination = layout.buildDirectory.dir("compose_compiler")
+if (project.hasProperty("composeCompilerReports")) {
+    composeCompiler {
+        reportsDestination = layout.buildDirectory.dir("compose_compiler")
+        metricsDestination = layout.buildDirectory.dir("compose_compiler")
+    }
 }
 
 dependencies {
     implementation(libs.bundles.compose)
+    implementation(libs.cashapp.molecule.runtime)
 
     lintChecks(libs.slack.lint.compose)
 }

@@ -11,6 +11,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.ivy.design.system.colors.IvyColors
 import com.materialkolor.rememberDynamicColorScheme
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -38,7 +39,7 @@ private fun ivyColorScheme(colorSource: IvyColorSource, dark: Boolean): ColorSch
             val context = LocalContext.current
             if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         } else {
-            ivyBrandColorScheme(IvyColorSource.BrandSeed(), dark)
+            ivyBrandColorScheme(IvyColorSource.BrandSeed(IvyColors.Purple.primary), dark)
         }
 
         is IvyColorSource.BrandSeed -> ivyBrandColorScheme(colorSource, dark)

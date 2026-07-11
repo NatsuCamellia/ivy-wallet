@@ -5,6 +5,7 @@ import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.ivy.design.system.IvyColorSource
 import com.ivy.design.system.IvyMaterial3Theme
+import com.ivy.design.system.colors.IvyColors
 import org.junit.Rule
 
 open class PaparazziScreenshotTest {
@@ -26,7 +27,7 @@ open class PaparazziScreenshotTest {
                     PaparazziTheme.Dark -> true
                 },
                 isTrueBlack = false,
-                colorSource = IvyColorSource.BrandSeed(),
+                colorSource = IvyColorSource.BrandSeed(IvyColors.Purple.primary),
             ) {
                 content()
             }

@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -129,7 +128,6 @@ private fun AttributionCard(attribution: AttributionItem.Attribution) {
     val browser = LocalUriHandler.current
 
     Card(
-        shape = RoundedCornerShape(12.dp),
         onClick = {
             browser.openUri(attribution.link)
         }

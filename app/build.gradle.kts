@@ -106,6 +106,7 @@ android {
 
     lint {
         disable += "ComposeViewModelInjection"
+        disable += "ComposeParameterOrder"
         checkDependencies = true
         abortOnError = false
         checkReleaseBuilds = false

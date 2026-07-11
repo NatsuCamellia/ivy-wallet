@@ -544,6 +544,8 @@ git commit -m "feat: add Open Sans Expressive typography"
 
 ### Task 7: Rewrite IvyMaterial3Theme to wire color/shape/typography/motion tokens
 
+**Important context from Task 4**: while investigating Paparazzi crashes, Task 4 root-caused (via bytecode decompilation, independently verified by review) a real, pre-existing bug that this task's rewrite is expected to fix as a side effect: the *current* `IvyMaterial3Theme.kt` builds `ColorScheme(...)` via the legacy ~29-parameter compatibility constructor, which leaves 19 newer color roles (`surfaceContainer`, `surfaceContainerHigh/Low/Lowest/Highest`, `surfaceBright`, `surfaceDim`, the `*Fixed` roles, etc.) as `Color.Unspecified`. `material3 1.5.0-alpha23`'s `TopAppBar` reads `surfaceContainer` for its default scrolled-state color, and feeding it `Color.Unspecified` crashes (a real compose-ui-graphics bug converting `Unspecified` to a "color long" — reproduces on real Android devices, not just Paparazzi/Layoutlib). This currently crashes `feature:attributions`, `feature:contributors`, `feature:disclaimer`, `feature:poll:impl`'s Paparazzi tests (all use a bare `TopAppBar(...)` with no explicit `colors`), and those 4 modules were deliberately left unbaselined by Task 4 pending this fix. The rewrite below uses `dynamicLightColorScheme`/`dynamicDarkColorScheme`/`rememberDynamicColorScheme` — all "full" scheme generators that populate every `ColorScheme` field, not the legacy partial constructor — so this bug should be fixed as a natural side effect, not something requiring extra code. **Step 3 below adds an explicit check that it actually is.**
+
 **Files:**
 - Modify: `shared/ui/core/src/main/java/com/ivy/design/system/IvyMaterial3Theme.kt`
 
@@ -617,6 +619,13 @@ Expected: `BUILD SUCCESSFUL`. If `rememberDynamicColorScheme` requires an experi
 
 Run: `./gradlew :app:compileDebugKotlin`
 Expected: `BUILD SUCCESSFUL` — this confirms `RootActivity.kt`'s existing `IvyMaterial3Theme(dark = ..., isTrueBlack = ...)` call still compiles unchanged against the new signature (relying on the `colorSource` default).
+
+- [ ] **Step 3.5: Confirm Task 4's `ColorSpace` crash is actually resolved**
+
+Run: `./gradlew :feature:attributions:testDebugUnitTest :feature:contributors:testDebugUnitTest :feature:disclaimer:testDebugUnitTest :feature:poll:impl:testDebugUnitTest`
+Expected: these 4 modules — left crashing by Task 4 with `java.lang.IllegalArgumentException: Invalid ID: 60` in `AppBarKt`, because the *old* `IvyMaterial3Theme` left `surfaceContainer` as `Color.Unspecified` — now run without that crash (snapshot *mismatches* are fine and expected here, since the whole point of this task is changing colors/shapes/typography/motion; a hard crash is not).
+
+If any of the 4 still crash with the same signature: `dynamicLightColorScheme`/`dynamicDarkColorScheme`/`rememberDynamicColorScheme` are documented to populate every `ColorScheme` field, so a persisting crash likely means `ivyBrandColorScheme`'s fallback path (pre-Android-12 devices/tests) isn't actually being exercised the way expected in the test environment — check which branch of `ivyColorScheme` the test harness hits (Task 8 will pin it to `IvyColorSource.BrandSeed()` explicitly; until Task 8 lands, the test harness still calls the *old* `IvyMaterial3Theme` signature's default, so this check may need to wait for Task 8's harness update to be meaningful — if so, note that in your report and defer final confirmation to Task 8's own verification step instead of blocking this task on it).
 
 - [ ] **Step 4: Commit**
 
@@ -699,6 +708,8 @@ Expected: `BUILD SUCCESSFUL`. This rewrites snapshots under every module's `src/
 - [ ] **Step 4: Spot-check the diffs**
 
 Run: `git status --short -- '**/src/test/snapshots/**'` to list every changed snapshot PNG, then open a handful (at least `AttributionsScreenPaparazziTest`'s and 2–3 others) to confirm they look like sane M3 Expressive renders (new colors, new shapes, no broken/blank/crashed layouts) — not just diff noise. A blank or garbled snapshot means a runtime crash was silently swallowed by Paparazzi; investigate before proceeding rather than committing a broken baseline.
+
+**Give `AttributionsScreenPaparazziTest`, `ContributorsScreenPaparazziTest`, `DisclaimerScreenPaparazziTest`, and `PollScreenshotTest` extra scrutiny here specifically**: Task 4 left these 4 unbaselined (they were crashing with `Invalid ID: 60` due to the old theme's incomplete `ColorScheme`, per Task 7's fix). This is their *first* successful baseline under the new theme, not a re-record of a known-good image — if Task 7's Step 3.5 check passed, this should just work, but confirm each of the 4 actually shows real rendered UI (not the blank dark-gray rectangle Task 4 found and deleted for one of these exact modules).
 
 - [ ] **Step 5: Verify the new baselines are stable**
 

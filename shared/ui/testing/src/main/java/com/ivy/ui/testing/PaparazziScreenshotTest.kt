@@ -15,7 +15,10 @@ open class PaparazziScreenshotTest {
         Locale.setDefault(Locale.US)
     }
 
-    @get:Rule
+    @get:Rule(order = 0)
+    val posixNicenessWorkaround = PosixNicenessWorkaroundRule()
+
+    @get:Rule(order = 1)
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_6_PRO,
         showSystemUi = true,

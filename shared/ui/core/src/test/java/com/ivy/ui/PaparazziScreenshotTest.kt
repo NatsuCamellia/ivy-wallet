@@ -7,7 +7,10 @@ import com.ivy.design.system.IvyMaterial3Theme
 import org.junit.Rule
 
 open class PaparazziScreenshotTest {
-    @get:Rule
+    @get:Rule(order = 0)
+    val posixNicenessWorkaround = PosixNicenessWorkaroundRule()
+
+    @get:Rule(order = 1)
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_6_PRO,
         showSystemUi = true,

@@ -3,6 +3,7 @@ package com.ivy.ui
 import androidx.compose.runtime.Composable
 import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
+import com.ivy.design.system.IvyColorSource
 import com.ivy.design.system.IvyMaterial3Theme
 import org.junit.Rule
 
@@ -24,7 +25,8 @@ open class PaparazziScreenshotTest {
                     PaparazziTheme.Light -> false
                     PaparazziTheme.Dark -> true
                 },
-                isTrueBlack = false
+                isTrueBlack = false,
+                colorSource = IvyColorSource.BrandSeed(),
             ) {
                 content()
             }

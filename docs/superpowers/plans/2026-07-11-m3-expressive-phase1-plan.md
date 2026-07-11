@@ -263,41 +263,70 @@ git commit -m "build: migrate Compose to compose-bom-alpha, pin material3 to 1.5
 
 ---
 
-### Task 4: Bump Paparazzi and verify existing screenshot baselines still render
+### Task 4: Fix the 5 Paparazzi crashes surfaced by Task 3, then establish a clean baseline
+
+**Revised during Task 3** (this supersedes the original version of this task below): Paparazzi could not stay at `1.3.3`/wait for this task — its Gradle plugin hard-fails at Gradle/AGP-9 configuration time (depends on the removed `TestedExtension` DSL), so Task 3 had to bump it just to get the project to configure at all. It landed on `2.0.0-alpha05` (`gradle/libs.versions.toml`, already committed in `91be14ef`) — newer than this task's original `2.0.0-alpha02` target, because `alpha02`–`alpha04` don't fix `TestedExtension` under this toolchain. **There is nothing left to bump.** Running the full-repo suite after Task 3's commit surfaces 5 real crashes (not rendering diffs) that must be root-caused and fixed before any baseline is meaningful:
+
+1. `feature:attributions`, `feature:disclaimer`, `feature:contributors`, `feature:poll:impl` (4 modules, likely more once the full suite runs — Task 3 only ran a partial pass): `java.lang.IllegalArgumentException: Invalid ID: 60` in `android.graphics.ColorSpace.get`, thrown from `androidx.compose.material3.AppBarKt`'s draw path. All 4 modules use `Scaffold`/`TopAppBar`. Likely cause: `material3 1.5.0-alpha23`'s `TopAppBar` uses a `ColorSpace` that Paparazzi `2.0.0-alpha05`'s bundled Layoutlib doesn't recognize.
+2. `feature:search`: `java.lang.NoSuchMethodError: 'int java.lang.Thread.setPosixNicenessInternal(int)'`. Reproduces in isolation (`./gradlew :feature:search:testDebugUnitTest`). Unrelated to material3/ColorSpace — a separate Paparazzi-alpha05-on-this-JVM issue.
 
 **Files:**
-- Modify: `gradle/libs.versions.toml:15` (`paparazzi`)
+- Unknown until investigated — likely `buildSrc/src/main/kotlin/ivy.paparazzi.gradle.kts` (Paparazzi/Layoutlib configuration) and/or `gradle/libs.versions.toml` (if a different Paparazzi alpha turns out necessary), possibly JVM/test-runner flags. Do not assume; the investigation steps below determine this.
 
 **Interfaces:**
-- Consumes: Task 1–3's toolchain.
-- Produces: a working `verifyPaparazziDebug` baseline (before any theme-token changes), so Task 8's later re-record has a clean starting point.
+- Consumes: Task 3's toolchain (Gradle 9.3.1, AGP 9.1.1, compileSdk 37, Paparazzi 2.0.0-alpha05, material3 1.5.0-alpha23).
+- Produces: a working `verifyPaparazziDebug` across the whole repo (before any theme-token changes), so Task 8's later re-record has a clean starting point.
 
-- [ ] **Step 1: Bump Paparazzi**
+- [ ] **Step 1: Reproduce and isolate both crash signatures**
 
-In `gradle/libs.versions.toml:15`, change:
-```toml
-paparazzi = "1.3.3"
-```
-to:
-```toml
-paparazzi = "2.0.0-alpha02"
-```
+Run: `./gradlew :feature:attributions:testDebugUnitTest :feature:search:testDebugUnitTest`
+Expected: both fail, reproducing the `ColorSpace`/`AppBarKt` crash and the `Thread.setPosixNicenessInternal` crash respectively, matching the signatures above. Capture full stack traces for both — they're the starting point for root-causing.
 
-- [ ] **Step 2: Run the full existing Paparazzi suite**
+- [ ] **Step 2: Investigate the ColorSpace/AppBarKt crash**
 
-Run: `./gradlew verifyPaparazziDebug`
-Expected: `BUILD SUCCESSFUL`, no snapshot diffs — this bump is toolchain-only, no visual change yet.
+This needs real investigation, not a guess. Things to try, in order, stopping at the first that works:
+- Check the Paparazzi GitHub issue tracker (`github.com/cashapp/paparazzi/issues`) for `ColorSpace` + `Invalid ID` reports against Layoutlib versions bundled with `2.0.0-alpha03`/`alpha04`/`alpha05` — this is exactly the kind of Layoutlib/material3-version compatibility gap Paparazzi tracks issues for.
+- If a specific Paparazzi patch (newer or, if the alpha05 Layoutlib is the regression, an older 2.0.0-alphaNN) fixes it without reintroducing the `TestedExtension` AGP-9 failure Task 3 hit, use that version instead of alpha05 and update `gradle/libs.versions.toml` accordingly.
+- If it's a Paparazzi `DeviceConfig` issue (e.g. a color-mode/night-mode flag), check `shared/ui/testing/.../PaparazziScreenshotTest.kt` and `shared/ui/core/src/test/java/com/ivy/ui/PaparazziScreenshotTest.kt`'s `Paparazzi(...)` rule configuration for a `DeviceConfig` that might need adjusting for this Layoutlib version.
+- If none of the above resolves it, treat it as a genuine upstream Paparazzi/material3-alpha compatibility bug: file the minimal repro info in the report and escalate (NEEDS_CONTEXT) rather than silently working around it with something fragile.
 
-If diffs appear (rendering-engine drift between Paparazzi versions is possible), run `./gradlew recordPaparazziDebug` to accept the new baselines as the pre-theme-change starting point, and note in the commit body-less message that this is expected (the commit message itself stays single-line; if you need to explain, put it in the PR description later, not the commit).
+- [ ] **Step 3: Investigate the Thread.setPosixNicenessInternal crash**
 
-- [ ] **Step 3: Commit**
+This is a JVM/Robolectric-shadow-layer issue, not a Compose/material3 one — likely fixed by a JVM flag (e.g. an `--add-opens`/`--add-exports` the newer JDK needs that Paparazzi's test JVM args don't yet include) or a Paparazzi/JUnit runner version detail. Check Paparazzi's own CI configuration or issue tracker for `setPosixNicenessInternal` — this is a known class of "newer JDK breaks reflection into java.lang.Thread internals" issue.
+
+- [ ] **Step 4: Verify both fixes**
+
+Run: `./gradlew :feature:attributions:testDebugUnitTest :feature:search:testDebugUnitTest`
+Expected: `BUILD SUCCESSFUL`, no crashes (snapshot mismatches are fine and expected at this point — Task 3's toolchain changes will have shifted rendering; crashes are not).
+
+- [ ] **Step 5: Run the full existing Paparazzi suite and establish the clean baseline**
+
+Run: `./gradlew testDebugUnitTest --continue` (full repo) to confirm the other modules flagged in Task 3's report (`feature:contributors`, `feature:poll:impl`, `feature:disclaimer`, and check for others Task 3 didn't reach) are also fixed by the same change, not separate issues.
+
+Then run: `./gradlew recordPaparazziDebug` (full repo) to establish new baselines against the Task 3 toolchain — expect essentially every module's baseline to change at least slightly (new Layoutlib rendering engine), not just the 5 that crashed.
+
+Then run: `./gradlew verifyPaparazziDebug` to confirm the recorded baselines are stable and reproducible.
+
+- [ ] **Step 6: Spot-check a sample of the newly-recorded baselines**
+
+Same standard as Task 8's spot-check below: open a handful of the changed snapshot PNGs (at least one from each of the 5 previously-crashing modules, plus 2-3 others) and confirm they render sane UI, not blank/garbled/partial frames — a silent renderer failure can produce a "valid" but empty image that `recordPaparazziDebug` would happily accept as a new baseline.
+
+- [ ] **Step 7: Commit**
 
 ```bash
-git add gradle/libs.versions.toml
-# if baselines were re-recorded in Step 2:
 git add '**/src/test/snapshots/**'
-git commit -m "build: bump Paparazzi to 2.0.0-alpha02"
+# plus whatever files Step 2/3's actual fix touched
+git commit -m "fix: resolve Paparazzi crashes under Gradle 9/material3 1.5.0-alpha23 and re-record baselines"
 ```
+
+---
+
+<details>
+<summary>Original Task 4 (superseded — kept for history, do not execute)</summary>
+
+Bump Paparazzi from `1.3.3` to `2.0.0-alpha02` in `gradle/libs.versions.toml:15`, run `./gradlew verifyPaparazziDebug`, expect no diffs since this was meant to be toolchain-only with no visual change yet. This assumed Paparazzi would still be at `1.3.3` when this task started and that the only needed change was a routine version bump — both assumptions were invalidated by Task 3.
+
+</details>
 
 ---
 

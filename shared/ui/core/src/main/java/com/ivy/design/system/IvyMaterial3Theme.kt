@@ -1,89 +1,49 @@
 package com.ivy.design.system
 
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MotionScheme
+import androidx.compose.material3.Shapes
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
-import com.ivy.design.system.colors.IvyColors
+import androidx.compose.ui.platform.LocalContext
+import com.materialkolor.rememberDynamicColorScheme
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun IvyMaterial3Theme(
     isTrueBlack: Boolean,
     dark: Boolean = isSystemInDarkTheme(),
+    colorSource: IvyColorSource = IvyColorSource.Dynamic,
     content: @Composable () -> Unit
 ) {
-    MaterialTheme(
-        colorScheme = if (dark) ivyDarkColorScheme(isTrueBlack) else ivyLightColorScheme(),
+    val colorScheme = ivyColorScheme(colorSource, dark).applyTrueBlack(isTrueBlack)
+    MaterialExpressiveTheme(
+        colorScheme = colorScheme,
+        motionScheme = MotionScheme.expressive(),
+        shapes = Shapes(),
+        typography = ivyExpressiveTypography(),
         content = content,
     )
 }
 
-private fun ivyLightColorScheme(): ColorScheme = ColorScheme(
-    primary = IvyColors.Purple.primary,
-    onPrimary = IvyColors.White,
-    primaryContainer = IvyColors.Purple.light,
-    onPrimaryContainer = IvyColors.White,
-    inversePrimary = IvyColors.Purple.dark,
-    secondary = IvyColors.Green.primary,
-    onSecondary = IvyColors.White,
-    secondaryContainer = IvyColors.Green.light,
-    onSecondaryContainer = IvyColors.White,
-    tertiary = IvyColors.Green.primary,
-    onTertiary = IvyColors.White,
-    tertiaryContainer = IvyColors.Green.light,
-    onTertiaryContainer = IvyColors.White,
+@Composable
+private fun ivyColorScheme(colorSource: IvyColorSource, dark: Boolean): ColorScheme =
+    when (colorSource) {
+        is IvyColorSource.Dynamic -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val context = LocalContext.current
+            if (dark) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        } else {
+            ivyBrandColorScheme(IvyColorSource.BrandSeed(), dark)
+        }
 
-    error = IvyColors.Red.primary,
-    onError = IvyColors.White,
-    errorContainer = IvyColors.Red.light,
-    onErrorContainer = IvyColors.White,
+        is IvyColorSource.BrandSeed -> ivyBrandColorScheme(colorSource, dark)
+    }
 
-    background = IvyColors.White,
-    onBackground = IvyColors.Black,
-    surface = IvyColors.White,
-    onSurface = IvyColors.Black,
-    surfaceVariant = IvyColors.ExtraLightGray,
-    onSurfaceVariant = IvyColors.Black,
-    surfaceTint = IvyColors.Black,
-    inverseSurface = IvyColors.DarkGray,
-    inverseOnSurface = IvyColors.White,
-
-    outline = IvyColors.Gray,
-    outlineVariant = IvyColors.DarkGray,
-    scrim = IvyColors.ExtraDarkGray.copy(alpha = 0.8f)
-)
-
-private fun ivyDarkColorScheme(isTrueBlack: Boolean): ColorScheme = ColorScheme(
-    primary = IvyColors.Purple.primary,
-    onPrimary = IvyColors.White,
-    primaryContainer = IvyColors.Purple.light,
-    onPrimaryContainer = IvyColors.White,
-    inversePrimary = IvyColors.Purple.dark,
-    secondary = IvyColors.Green.primary,
-    onSecondary = IvyColors.White,
-    secondaryContainer = IvyColors.Green.light,
-    onSecondaryContainer = IvyColors.White,
-    tertiary = IvyColors.Green.primary,
-    onTertiary = IvyColors.White,
-    tertiaryContainer = IvyColors.Green.light,
-    onTertiaryContainer = IvyColors.White,
-
-    error = IvyColors.Red.primary,
-    onError = IvyColors.White,
-    errorContainer = IvyColors.Red.light,
-    onErrorContainer = IvyColors.White,
-
-    background = if (isTrueBlack) IvyColors.TrueBlack else IvyColors.Black,
-    onBackground = IvyColors.White,
-    surface = if (isTrueBlack) IvyColors.TrueBlack else IvyColors.Black,
-    onSurface = IvyColors.White,
-    surfaceVariant = IvyColors.ExtraDarkGray,
-    onSurfaceVariant = IvyColors.White,
-    surfaceTint = IvyColors.White,
-    inverseSurface = IvyColors.LightGray,
-    inverseOnSurface = if (isTrueBlack) IvyColors.TrueBlack else IvyColors.Black,
-
-    outline = IvyColors.Gray,
-    outlineVariant = IvyColors.LightGray,
-    scrim = IvyColors.ExtraLightGray.copy(alpha = 0.8f)
-)
+@Composable
+private fun ivyBrandColorScheme(brandSeed: IvyColorSource.BrandSeed, dark: Boolean): ColorScheme =
+    rememberDynamicColorScheme(seedColor = brandSeed.seedColor, isDark = dark)

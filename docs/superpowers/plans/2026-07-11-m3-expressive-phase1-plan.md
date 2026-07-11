@@ -6,11 +6,25 @@
 
 **Architecture:** `IvyMaterial3Theme` (in `shared/ui/core`) is the single theme entry point every non-legacy screen (and the Paparazzi test harness) already wraps its content in. This plan upgrades the toolchain those APIs require, then rewrites that one function to source colors from either the device wallpaper (`Dynamic`, production default) or a seeded tonal palette (`BrandSeed`, used by tests and pre-Android-12 devices), while wiring Expressive shapes, an Open-Sans-flavored Expressive type scale, and `MotionScheme.expressive()`.
 
-**Tech Stack:** Kotlin 2.2.0, AGP 8.13.0, Jetpack Compose (`compose-bom-alpha` 2026.06.01), `androidx.compose.material3:material3:1.5.0-alpha23`, `com.materialkolor:material-kolor:4.1.1`, Paparazzi 2.0.0-alpha02.
+**Tech Stack:** Kotlin 2.2.10+, AGP 9.1.x, Gradle 9.1.x, Jetpack Compose (`compose-bom-alpha` 2026.06.01), `androidx.compose.material3:material3:1.5.0-alpha23`, `com.materialkolor:material-kolor:4.1.1`, Paparazzi 2.0.0-alpha02.
 
 Spec: `docs/superpowers/specs/2026-07-11-m3-expressive-phase1-design.md`
 
-## Global Constraints
+## Toolchain revision (recorded during Task 3, supersedes the original Global Constraints below)
+
+Task 1 originally targeted `compileSdk 36` / AGP `8.13.0` on the belief that `material3 1.5.0-alpha23` had dropped its `compileSdk 37` requirement. During Task 3, direct inspection of the published AARs' `aar-metadata.properties` (not release-note prose) showed this was wrong: every `material3-android` release from `1.5.0-alpha19` through the current latest (`1.5.0-alpha23`) requires `minCompileSdk=37` / `minAndroidGradlePluginVersion=9.1.0`. Only `1.5.0-alpha18` and earlier work with compileSdk ≤36/AGP 8.x, and alpha18 lacks a clean public API gate for `MaterialExpressiveTheme`/`MotionScheme` (marked `@Material3ExpressiveApi`/`@RestrictTo(LIBRARY_GROUP_PREFIX)`, a lint-only restriction, not `@RequiresOptIn`).
+
+Human decision: keep the literal `material3 1.5.0-alpha23` pin and bump the floor instead. Revised targets for the remainder of this plan:
+
+- `compileSdk` / `targetSdk`: **37** (was 36). `minSdk` stays 28.
+- AGP: **9.1.x** (was 8.13.0). Gradle wrapper: **9.1.x** (AGP 9.1.0's documented minimum; Gradle 9 itself requires JDK 17 minimum, already satisfied by this environment's `JAVA_HOME`).
+- Kotlin: **2.2.10 or newer** (was 2.2.0) — AGP 9.0+ has a runtime dependency on KGP 2.2.10 minimum and will force-upgrade anything lower.
+- AGP 9.0+ has a documented breaking DSL change: `CommonExtension` parameterization was removed, so any convention-plugin code written against the parameterized `CommonExtension<...>` type needs updating to the per-variant extension types (`ApplicationExtension`, `LibraryExtension`, etc.). Check every file under `buildSrc/src/main/kotlin/ivy.*.gradle.kts` for this pattern.
+- AGP 9.0+ also builds in first-class Kotlin support and no longer requires applying `org.jetbrains.kotlin.android`/`kotlin-android` separately — this may or may not need to be removed from existing `plugins {}` blocks; verify empirically rather than assuming.
+- Every dependency already bumped in Task 1/2 (Room `2.8.4`, Hilt `2.58`, KSP `2.2.0-2.0.2`, Molecule `2.2.0`) needs re-verifying against the new Gradle 9/AGP 9 floor. In particular, **Hilt was deliberately capped at `2.58` in Task 2 specifically to avoid requiring AGP 9** (`2.59+` hard-requires AGP `9.0.0`+ for the Hilt Gradle plugin) — now that AGP 9 is happening anyway, re-evaluate whether Hilt should move to a newer release; do not leave it stale at 2.58 for a reason that no longer applies without checking.
+- Everything else in the original Global Constraints below (Paparazzi, material-kolor, commit-per-dependency discipline, `JAVA_HOME`, out-of-scope list) still applies unchanged.
+
+## Global Constraints (original; see revision above for the toolchain floor actually in effect)
 
 - `compileSdk` / `targetSdk`: 36 (`minSdk` stays 28).
 - AGP: `8.13.0`. Gradle wrapper: `8.13` (AGP 8.13.0's documented minimum).

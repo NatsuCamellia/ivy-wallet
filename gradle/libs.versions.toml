@@ -124,6 +124,7 @@ androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version
 
 # Material
 material = { module = "com.google.android.material:material", version = "1.12.0" }
+materialkolor = { module = "com.materialkolor:material-kolor", version = "4.1.1" }
 
 # Logging
 timber = { module = "com.jakewharton.timber:timber", version = "5.0.1" }

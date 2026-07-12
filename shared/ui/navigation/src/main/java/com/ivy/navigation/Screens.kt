@@ -92,7 +92,7 @@ data object CategoriesScreen : Screen {
 
 data object SettingsScreen : Screen {
     override val isLegacy: Boolean
-        get() = true
+        get() = false
 }
 
 data class ImportScreen(

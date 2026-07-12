@@ -12,6 +12,9 @@ android {
     lint {
         disable += "MissingTranslation"
         disable += "ComposeViewModelInjection"
+        // Slack's ParameterOrderDetector throws a NullPointerException under this toolchain
+        // (getText(...) must not be null); crashes lintAnalyzeRelease outright rather than
+        // reporting findings. See github.com/slackhq/compose-lint-rules.
         disable += "ComposeParameterOrder"
         abortOnError = false
     }

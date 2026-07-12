@@ -6,7 +6,7 @@
 
 **Architecture:** `IvyMaterial3Theme` (in `shared/ui/core`) is the single theme entry point every non-legacy screen (and the Paparazzi test harness) already wraps its content in. This plan upgrades the toolchain those APIs require, then rewrites that one function to source colors from either the device wallpaper (`Dynamic`, production default) or a seeded tonal palette (`BrandSeed`, used by tests and pre-Android-12 devices), while wiring Expressive shapes, an Open-Sans-flavored Expressive type scale, and `MotionScheme.expressive()`.
 
-**Tech Stack:** Kotlin 2.2.10+, AGP 9.1.x, Gradle 9.1.x, Jetpack Compose (`compose-bom-alpha` 2026.06.01), `androidx.compose.material3:material3:1.5.0-alpha23`, `com.materialkolor:material-kolor:4.1.1`, Paparazzi 2.0.0-alpha02.
+**Tech Stack (final, as implemented):** Kotlin 2.2.10, AGP 9.1.1, Gradle 9.3.1, compileSdk/targetSdk 37, Jetpack Compose (`compose-bom-alpha` 2026.06.01), `androidx.compose.material3:material3:1.5.0-alpha23`, `com.materialkolor:material-kolor:4.1.1`, Paparazzi 2.0.0-alpha05, KSP 2.3.6, Hilt 2.60.1, Room 2.8.4.
 
 Spec: `docs/superpowers/specs/2026-07-11-m3-expressive-phase1-design.md`
 
@@ -812,3 +812,38 @@ Run: `./gradlew assembleDebug`, install the resulting APK on an emulator or devi
 4. Toggle the device's dark/light theme (or the app's own theme setting, if reachable) and confirm both render correctly without crashing.
 
 There is no scripted assertion for this step — it's a human check that the Expressive tokens actually look and behave like Expressive M3 on a real render target, not just in Paparazzi's Layoutlib-based rendering.
+
+---
+
+## Phase 1 completion notes — what Phase 2 inherits
+
+All 10 tasks above are complete and merged. Final toolchain state is captured in the
+"Tech Stack" line at the top of this document (Gradle 9.3.1, AGP 9.1.1, Kotlin 2.2.10,
+compileSdk/targetSdk 37, material3 1.5.0-alpha23, Paparazzi 2.0.0-alpha05, KSP 2.3.6,
+Hilt 2.60.1, Room 2.8.4) — treat that line, not the per-task step text above it, as the
+source of truth for exact versions, since several tasks landed on different versions than
+originally planned after real build failures forced corrections.
+
+Known items deliberately deferred, not forgotten:
+
+- `feature:search` and `feature:transactions`'s Paparazzi tests route through the legacy
+  `IvyComponentPreview`/`IvyWalletPreview` design system, not `IvyMaterial3Theme` — they
+  don't exercise the Expressive tokens at all. Pre-existing gap, not introduced by Phase 1.
+- `ComposeParameterOrder` Android Lint check is disabled repo-wide
+  (`buildSrc/src/main/kotlin/ivy.compose.gradle.kts`, `app/build.gradle.kts`) — works
+  around a `NullPointerException` in Slack's `compose-lint-checks` 1.3.1 under this
+  toolchain, unrelated to this migration's own code. Revisit if a newer
+  `compose-lint-checks` release fixes it upstream.
+- `PosixNicenessWorkaroundRule` (`shared/ui/testing`, duplicated in `shared/ui/core`'s test
+  sources — the module dependency direction forbids sharing one copy) works around a
+  Paparazzi 2.0.0-alpha05 / layoutlib 16.2.1 bug (`cashapp/paparazzi#2342`). Has its own
+  removal TODO; drop it once Paparazzi ships a release with the fix.
+- `IvyColorSource.BrandSeed`'s seed color (`IvyColors.Purple.primary`) is passed explicitly
+  at 3 call sites (`IvyMaterial3Theme.kt`'s pre-API-31 fallback, both Paparazzi harnesses)
+  rather than centralized behind a named default — `data class` default values are
+  disallowed by this project's detekt config. Fine at 3 call sites; worth a named constant
+  if more accumulate.
+- Phase 1 only migrated `AttributionsScreen`'s content off legacy shape hardcoding; every
+  other screen remains `isLegacy = true` and unaffected in appearance. This is intentional
+  — see this document's own "Roadmap beyond Phase 1" intent described in the design spec
+  (`docs/superpowers/specs/2026-07-11-m3-expressive-phase1-design.md`), not a gap.

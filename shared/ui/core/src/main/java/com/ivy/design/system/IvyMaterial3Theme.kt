@@ -19,7 +19,7 @@ import com.materialkolor.rememberDynamicColorScheme
 fun IvyMaterial3Theme(
     isTrueBlack: Boolean,
     dark: Boolean = isSystemInDarkTheme(),
-    colorSource: IvyColorSource = IvyColorSource.Dynamic,
+    colorSource: IvyColorSource = LocalIvyColorSource.current,
     content: @Composable () -> Unit
 ) {
     val colorScheme = ivyColorScheme(colorSource, dark).applyTrueBlack(isTrueBlack)

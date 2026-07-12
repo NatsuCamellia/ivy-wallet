@@ -92,6 +92,7 @@
     <string name="confirm_account_change">Confirm Account Change</string>
     <string name="confirm_account_change_description">Note: You are attempting to change the account associated with the loan to an account in a different currency.\nAll loan records will be recalculated based on today’s exchange rates.</string>
     <string name="confirm">Confirm</string>
+    <string name="cancel">Cancel</string>
     <string name="created_on">Created on</string>
     <string name="hi">Hi</string>
     <string name="hi_name">Hi %1$s</string>

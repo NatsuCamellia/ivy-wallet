@@ -87,7 +87,7 @@ fun BoxWithConstraintsScope.SettingsScreen() {
         currencyCode = uiState.currencyCode,
         theme = uiState.currentTheme,
         onSwitchTheme = {
-            viewModel.onEvent(SettingsEvent.SwitchTheme)
+            viewModel.onEvent(SettingsEvent.SetTheme(uiState.currentTheme))
         },
         lockApp = uiState.lockApp,
         showNotifications = uiState.showNotifications,

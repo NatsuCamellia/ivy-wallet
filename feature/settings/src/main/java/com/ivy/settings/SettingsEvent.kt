@@ -1,5 +1,6 @@
 package com.ivy.settings
 
+import com.ivy.base.legacy.Theme
 import com.ivy.domain.RootScreen
 
 sealed interface SettingsEvent {
@@ -7,7 +8,8 @@ sealed interface SettingsEvent {
     data class SetName(val newName: String) : SettingsEvent
     data class ExportToCsv(val rootScreen: RootScreen) : SettingsEvent
     data class BackupData(val rootScreen: RootScreen) : SettingsEvent
-    data object SwitchTheme : SettingsEvent
+    data class SetTheme(val theme: Theme) : SettingsEvent
+    data class SetDynamicColor(val enabled: Boolean) : SettingsEvent
     data class SetLockApp(val lockApp: Boolean) : SettingsEvent
     data class SetShowNotifications(val showNotifications: Boolean) : SettingsEvent
     data class SetHideCurrentBalance(val hideCurrentBalance: Boolean) : SettingsEvent

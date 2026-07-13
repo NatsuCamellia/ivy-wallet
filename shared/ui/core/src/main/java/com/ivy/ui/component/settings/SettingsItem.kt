@@ -24,17 +24,26 @@ private const val DisabledAlpha = 0.5f
 @Composable
 fun SettingsItem(
     title: String,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     description: String? = null,
     enabled: Boolean = true,
     titleColor: Color = Color.Unspecified,
     trailing: (@Composable () -> Unit)? = null,
 ) {
+    // onClick is nullable so callers that need different interaction semantics (e.g. a toggleable
+    // switch row) can pass null here and supply their own `Modifier.toggleable(...)` via `modifier`
+    // instead, avoiding two stacked click/toggle handlers (and split accessibility focus targets)
+    // on the same row.
+    val clickableModifier = if (onClick != null) {
+        Modifier.clickable(enabled = enabled, onClick = onClick)
+    } else {
+        Modifier
+    }
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(enabled = enabled, onClick = onClick)
+            .then(clickableModifier)
             .alpha(if (enabled) 1f else DisabledAlpha)
             .padding(start = 24.dp, top = 16.dp, end = 16.dp, bottom = 16.dp),
         verticalAlignment = Alignment.CenterVertically,

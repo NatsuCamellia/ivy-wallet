@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
@@ -213,11 +215,16 @@ private fun LazyListScope.appearanceSection(
             SettingsItem(
                 title = stringResource(R.string.dynamic_color),
                 description = stringResource(R.string.dynamic_color_description),
-                onClick = { onEvent(SettingsEvent.SetDynamicColor(!uiState.dynamicColorEnabled)) },
+                onClick = null,
+                modifier = Modifier.toggleable(
+                    value = uiState.dynamicColorEnabled,
+                    role = Role.Switch,
+                    onValueChange = { onEvent(SettingsEvent.SetDynamicColor(it)) },
+                ),
             ) {
                 Switch(
                     checked = uiState.dynamicColorEnabled,
-                    onCheckedChange = { onEvent(SettingsEvent.SetDynamicColor(it)) },
+                    onCheckedChange = null,
                 )
             }
         }
@@ -438,9 +445,14 @@ private fun SwitchItem(
     SettingsItem(
         title = title,
         description = description,
-        onClick = { onCheckedChange(!checked) },
+        onClick = null,
+        modifier = Modifier.toggleable(
+            value = checked,
+            role = Role.Switch,
+            onValueChange = onCheckedChange,
+        ),
     ) {
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
+        Switch(checked = checked, onCheckedChange = null)
     }
 }
 

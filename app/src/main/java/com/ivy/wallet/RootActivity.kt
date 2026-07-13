@@ -109,7 +109,7 @@ class RootActivity : AppCompatActivity(), RootScreen {
             val viewModel: RootViewModel = viewModel()
             val isSystemInDarkTheme = isSystemInDarkTheme()
 
-            LaunchedEffect(isSystemInDarkTheme) {
+            LaunchedEffect(viewModel, isSystemInDarkTheme) {
                 viewModel.start(isSystemInDarkTheme, intent)
             }
 

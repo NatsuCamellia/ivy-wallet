@@ -3,7 +3,6 @@ package com.ivy.navigation
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -20,15 +19,9 @@ fun NavigationRoot(
     CompositionLocalProvider(
         LocalNavigation provides navigation,
     ) {
-        val viewModelStore = LocalViewModelStoreOwner.current
-        DisposableEffect(navigation.currentScreen) {
-            onDispose {
-                // Destroy viewModels only for non-legacy screens
-                if (navigation.lastScreen?.isLegacy == false) {
-                    viewModelStore?.viewModelStore?.clear()
-                }
-            }
-        }
+        // Do NOT clear LocalViewModelStoreOwner's store here: it is the Activity's store and
+        // also holds RootViewModel — clearing it blanks the app on the next root recomposition.
+        // Screen-scoped ViewModel destruction needs a per-screen ViewModelStoreOwner instead.
         navGraph(navigation.currentScreen)
     }
 }
@@ -39,10 +32,10 @@ fun navigation(): Navigation {
 }
 
 /**
- * Provides a [ViewModel] instance scoped the screen's life.
- * When the user navigates away from the screen all screen scoped
- * viewModels are destroyed.
- * Does not apply for legacy screens.
+ * Provides a [ViewModel] instance from the current [LocalViewModelStoreOwner]
+ * (in practice the Activity), so it currently lives until the Activity is destroyed.
+ * True per-screen scoping requires a per-screen ViewModelStoreOwner and is not
+ * implemented yet.
  */
 @Composable
 inline fun <reified T : ViewModel> screenScopedViewModel(

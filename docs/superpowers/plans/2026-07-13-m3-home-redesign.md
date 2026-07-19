@@ -1807,3 +1807,17 @@ Expected: BUILD SUCCESSFUL.
 git add feature/main/src/main/java/com/ivy/main/MainBottomBar.kt feature/main/src/test/snapshots/
 git commit -m "feat: replace notch FAB with a floating toolbar and a corner FAB"
 ```
+
+---
+
+### Task 9 (further post-review revision): Attach the add-transaction FAB to a floating toolbar
+
+**Context:** After Task 8 landed, the user clarified their intent further: keep the plain `NavigationBar` for Home/Accounts (don't replace it with a toolbar), and instead move the *add-transaction FAB's content* onto a toolbar — i.e. use `HorizontalFloatingToolbar`'s other overload, the one that takes a `floatingActionButton` slot directly attached to the toolbar body, with the 4 actions as icon-only toolbar items (no text labels) inside it. This is exactly `HorizontalFloatingToolbar(expanded, floatingActionButton, ..., content: RowScope.() -> Unit)`, verified against the same pinned `material3:1.5.0-alpha23` sources as Task 8, and matches the API's own `HorizontalFloatingToolbarWithFabSample`/`CenteredHorizontalFloatingToolbarWithFabSample` samples closely. This resolves the earlier "`FloatingActionButtonMenu` doesn't nest cleanly inside a toolbar's FAB slot" friction from Task 8's brief — because `FloatingActionButtonMenu` is dropped entirely in favor of the toolbar's own native `expanded`/`floatingActionButton`/`content` mechanism, which is what the slot is designed for.
+
+Net result: `NavigationBar`/`NavigationBarItem` (Task 5's original) come back for the tab row. `ToolbarTab` (Task 8's tab-row replacement) is deleted — no longer needed. `FloatingActionButtonMenu`/`FloatingActionButtonMenuItem` are replaced by `HorizontalFloatingToolbar(floatingActionButton = { ToggleFloatingActionButton(...) }, content = { 4× IconButton(...) })`, positioned bottom-end (corner), raised above the `NavigationBar`'s height (`BottomBarClearance = 88.dp`, a constant added to keep the two floating elements visually separated — confirmed by rendering and visually inspecting both the collapsed and expanded Paparazzi snapshots directly, not just trusting the build) so it doesn't overlap the nav bar.
+
+**Files:**
+- Modify: `feature/main/src/main/java/com/ivy/main/MainBottomBar.kt` (full rewrite of the tab-row + FAB sections; `BottomBar`'s public signature and `BoxWithConstraintsScope` receiver unchanged, `MainScreen.kt` needs no changes)
+- Test: re-record `feature/main/src/test/java/com/ivy/main/MainBottomBarPaparazziTest.kt` baselines (test file itself unchanged)
+
+This task was implemented directly (not via a fresh implementer dispatch) given the fast back-and-forth clarification round already in progress; a task reviewer still independently checked the diff per the project's normal quality bar. See the progress ledger for the outcome.

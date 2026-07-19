@@ -10,6 +10,7 @@ import androidx.compose.material3.Shapes
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import com.ivy.design.system.colors.IvyColors
 import com.materialkolor.rememberDynamicColorScheme
@@ -23,13 +24,17 @@ fun IvyMaterial3Theme(
     content: @Composable () -> Unit
 ) {
     val colorScheme = ivyColorScheme(colorSource, dark).applyTrueBlack(isTrueBlack)
-    MaterialExpressiveTheme(
-        colorScheme = colorScheme,
-        motionScheme = MotionScheme.expressive(),
-        shapes = Shapes(),
-        typography = ivyExpressiveTypography(),
-        content = content,
-    )
+    CompositionLocalProvider(
+        LocalIvyExtendedColors provides if (dark) DarkExtendedColors else LightExtendedColors
+    ) {
+        MaterialExpressiveTheme(
+            colorScheme = colorScheme,
+            motionScheme = MotionScheme.expressive(),
+            shapes = Shapes(),
+            typography = ivyExpressiveTypography(),
+            content = content,
+        )
+    }
 }
 
 @Composable

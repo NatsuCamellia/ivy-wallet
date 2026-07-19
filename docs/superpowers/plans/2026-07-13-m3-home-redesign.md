@@ -1650,3 +1650,160 @@ Install `assembleDebug` on an emulator and verify:
 - [ ] **Step 3: Report**
 
 Summarize results (with any deviations) to the user. **Do not push** — the user decides when and where to push.
+
+---
+
+### Task 8 (post-review revision): Replace the notch-FAB with a floating toolbar + a corner FAB
+
+**Context:** After Task 6's review, the user asked to remove the FAB embedded in/overlapping the `NavigationBar`'s notch, and to try M3 Expressive's floating-toolbar pattern as the nav-bar replacement instead, falling back to "a traditional big FAB in the lower right corner" if combining the toolbar with the existing FAB menu proves too awkward.
+
+Verified directly against the pinned `material3:1.5.0-alpha23` sources: `HorizontalFloatingToolbar` exists (two overloads — a plain one with `leadingContent`/`trailingContent`/`content`, and one that also takes a `floatingActionButton` slot), gated only behind `@OptIn(ExperimentalMaterial3Api::class)` (same opt-in Task 4 already needed for `ModalBottomSheet`, not a new toolchain requirement). However, the `floatingActionButton`-slot overload expects a single plain FAB whose "size is controlled by the floating toolbar and animates according to its state" — nesting the existing `FloatingActionButtonMenu` (which does its own internal layout/positioning for its button + expanding item column) inside that slot fights with the toolbar's own FAB sizing/animation. So this task takes the explicitly-authorized fallback for the FAB specifically, while still adopting the toolbar for the tab row (which isn't the hard part):
+
+- The tab row moves from `NavigationBar`/`NavigationBarItem` onto the **plain** `HorizontalFloatingToolbar` overload (no `floatingActionButton` param), centered at the bottom, containing two custom tab items (icon + label-when-selected, replacing `NavigationBarItem`).
+- The existing `FloatingActionButtonMenu`/`ToggleFloatingActionButton`/`FloatingActionButtonMenuItem` block (built in Task 5) is **kept exactly as-is internally** — same 4 menu items, same tab-switch-collapse `LaunchedEffect`, same Home/Accounts branching — just repositioned from `Alignment.BottomCenter` (overlapping the old nav bar's notch) to `Alignment.BottomEnd` (a standalone corner FAB), and its `horizontalAlignment` override is dropped so the expanding item list uses the default `Alignment.End` (stacking above a corner FAB reads naturally; centering it no longer makes sense once the FAB isn't centered).
+
+**Files:**
+- Modify: `feature/main/src/main/java/com/ivy/main/MainBottomBar.kt`
+- Test: re-record `feature/main/src/test/java/com/ivy/main/MainBottomBarPaparazziTest.kt` baselines (no code change to the test file itself — it already exercises `BottomBar` for both tabs)
+
+**Interfaces:** `BottomBar`'s signature is unchanged; `MainScreen.kt`'s call site needs no changes (same as Task 5).
+
+- [ ] **Step 1: Replace the `NavigationBar` block with `HorizontalFloatingToolbar`**
+
+In `feature/main/src/main/java/com/ivy/main/MainBottomBar.kt`, replace:
+
+```kotlin
+    NavigationBar(
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .fillMaxWidth(),
+    ) {
+        NavigationBarItem(
+            selected = tab == MainTab.HOME,
+            onClick = { selectTab(MainTab.HOME) },
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_home),
+                    contentDescription = stringResource(R.string.home),
+                )
+            },
+            label = { Text(text = stringResource(R.string.home)) },
+            modifier = Modifier.testTag("home"),
+        )
+
+        Spacer(modifier = Modifier.weight(1f, fill = true))
+
+        NavigationBarItem(
+            selected = tab == MainTab.ACCOUNTS,
+            onClick = { selectTab(MainTab.ACCOUNTS) },
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_accounts),
+                    contentDescription = stringResource(R.string.accounts),
+                )
+            },
+            label = { Text(text = stringResource(R.string.accounts)) },
+            modifier = Modifier.testTag("accounts"),
+        )
+    }
+```
+
+with:
+
+```kotlin
+    HorizontalFloatingToolbar(
+        expanded = true,
+        modifier = Modifier
+            .align(Alignment.BottomCenter)
+            .navigationBarsPadding()
+            .padding(bottom = 16.dp),
+    ) {
+        ToolbarTab(
+            icon = R.drawable.ic_home,
+            label = stringResource(R.string.home),
+            selected = tab == MainTab.HOME,
+            onClick = { selectTab(MainTab.HOME) },
+        )
+        ToolbarTab(
+            icon = R.drawable.ic_accounts,
+            label = stringResource(R.string.accounts),
+            selected = tab == MainTab.ACCOUNTS,
+            onClick = { selectTab(MainTab.ACCOUNTS) },
+        )
+    }
+```
+
+Add the `ToolbarTab` composable (new, private, replaces `NavigationBarItem`'s job inside the toolbar's plain `RowScope` content):
+
+```kotlin
+@Composable
+private fun RowScope.ToolbarTab(
+    @DrawableRes icon: Int,
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .clip(MaterialTheme.shapes.extraLarge)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .testTag(label.lowercase()),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = label,
+            tint = if (selected) MaterialTheme.colorScheme.primary else LocalContentColor.current,
+        )
+        if (selected) {
+            Spacer(Modifier.width(8.dp))
+            Text(text = label, color = MaterialTheme.colorScheme.primary)
+        }
+    }
+}
+```
+
+Treat the exact padding/offset values (`bottom = 16.dp`, the toolbar's internal `contentPadding`/`shape` defaults) as a starting point, not a pixel-exact requirement — `HorizontalFloatingToolbar` positions itself as a raw floating overlay here (there's no `Scaffold` in this screen to hand inset/offset handling to), so use the recorded Paparazzi snapshot in Step 4 to visually confirm the toolbar and the corner FAB (Step 2) sit at a consistent, sensible height above the screen edge, and adjust the padding if the snapshot looks cramped or misaligned.
+
+- [ ] **Step 2: Move the FAB to the bottom-right corner**
+
+Change the `FloatingActionButtonMenu` call's `modifier` and drop its `horizontalAlignment` override:
+
+```kotlin
+    FloatingActionButtonMenu(
+        modifier = Modifier
+            .align(Alignment.BottomEnd)
+            .navigationBarsPadding()
+            .padding(16.dp),
+        expanded = fabMenuExpanded && tab == MainTab.HOME,
+        button = {
+```
+
+(i.e. remove `horizontalAlignment = Alignment.CenterHorizontally,` entirely — the default `Alignment.End` is correct for a corner FAB — and change `.align(Alignment.BottomCenter)` to `.align(Alignment.BottomEnd)` plus add `.navigationBarsPadding().padding(16.dp)` so it doesn't sit flush against the screen edge or under the system gesture bar). Everything else inside `FloatingActionButtonMenu` (the `button` slot, the 4 `FloatingActionButtonMenuItem`s) stays exactly as Task 5 built it.
+
+- [ ] **Step 3: Update imports**
+
+Remove (no longer used): `androidx.compose.material3.NavigationBar`, `androidx.compose.material3.NavigationBarItem`, `androidx.compose.foundation.layout.fillMaxWidth`.
+
+Add: `androidx.activity.compose.BackHandler` (already present, no change), `androidx.compose.foundation.clickable`, `androidx.compose.foundation.layout.Row`, `androidx.compose.foundation.layout.RowScope` (already present), `androidx.compose.foundation.layout.navigationBarsPadding`, `androidx.compose.foundation.layout.padding`, `androidx.compose.foundation.layout.width` (already present), `androidx.compose.material3.ExperimentalMaterial3Api`, `androidx.compose.material3.FloatingToolbarDefaults` (only if you use it explicitly — the plain overload's defaults resolve on their own, so this import is only needed if you reference `FloatingToolbarDefaults` directly), `androidx.compose.material3.HorizontalFloatingToolbar`, `androidx.compose.material3.LocalContentColor`, `androidx.compose.material3.MaterialTheme`, `androidx.compose.ui.draw.clip`, `androidx.annotation.DrawableRes`.
+
+Add `@OptIn(ExperimentalMaterial3Api::class)` on the `BottomBar` function itself (same pattern Task 4 used for `MoreMenu` and `ModalBottomSheet` — if the compiler says a different/no opt-in is actually required, trust the compiler over this brief, exactly as Task 4 and Task 5's implementers already had to do twice each).
+
+- [ ] **Step 4: Record + verify**
+
+Run: `./gradlew :feature:main:recordPaparazziDebug`
+Then: `./gradlew :feature:main:verifyPaparazziDebug :feature:main:testDebugUnitTest detekt`
+Expected: BUILD SUCCESSFUL both times. Look at the updated `bottom_bar_-_home_tab`/`bottom_bar_-_accounts_tab` snapshots (light and dark) to confirm the toolbar and the corner FAB read as two distinct, sensibly-spaced floating elements — not overlapping, not flush against the screen edges.
+
+- [ ] **Step 5: Full app build**
+
+Run: `./gradlew :app:assembleDebug`
+Expected: BUILD SUCCESSFUL.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add feature/main/src/main/java/com/ivy/main/MainBottomBar.kt feature/main/src/test/snapshots/
+git commit -m "feat: replace notch FAB with a floating toolbar and a corner FAB"
+```

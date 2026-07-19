@@ -10,10 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalFloatingToolbar
+import androidx.compose.material3.FloatingActionButtonMenu
+import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
@@ -39,11 +38,10 @@ import com.ivy.ui.R
 
 private const val FabIconSwitchProgressThreshold = 0.5f
 
-// Raises the toolbar+FAB corner control above the NavigationBar so the two floating elements
-// don't visually overlap (NavigationBar's own height + a small gap).
+// Raises the FAB above the NavigationBar so the two floating elements don't visually overlap
+// (NavigationBar's own height + a small gap).
 private val BottomBarClearance = 88.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BoxWithConstraintsScope.BottomBar(
     tab: MainTab,
@@ -64,9 +62,9 @@ fun BoxWithConstraintsScope.BottomBar(
 
     BackHandler(fabMenuExpanded) { fabMenuExpanded = false }
 
-    // Anchors this composable's bounds to the full available size so that the toolbar corner
-    // control below (which isn't full-width) aligns against the real screen edges rather than
-    // shrink-wrapping around just itself.
+    // Anchors this composable's bounds to the full available size so that the FAB below (which
+    // isn't full-width) aligns against the real screen edges rather than shrink-wrapping around
+    // just itself.
     Spacer(modifier = Modifier.fillMaxSize())
 
     NavigationBar(
@@ -100,17 +98,15 @@ fun BoxWithConstraintsScope.BottomBar(
         )
     }
 
-    HorizontalFloatingToolbar(
+    FloatingActionButtonMenu(
         modifier = Modifier
             .align(Alignment.BottomEnd)
             .navigationBarsPadding()
             .padding(bottom = BottomBarClearance, end = 16.dp),
         expanded = fabMenuExpanded && tab == MainTab.HOME,
-        floatingActionButton = {
+        button = {
             ToggleFloatingActionButton(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .testTag("fab_add"),
+                modifier = Modifier.testTag("fab_add"),
                 checked = fabMenuExpanded,
                 onCheckedChange = {
                     if (tab == MainTab.HOME) {
@@ -137,49 +133,48 @@ fun BoxWithConstraintsScope.BottomBar(
             }
         },
     ) {
-        IconButton(
+        FloatingActionButtonMenuItem(
             onClick = {
                 fabMenuExpanded = false
                 onAddIncome()
             },
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_income),
-                contentDescription = stringResource(R.string.income),
-            )
-        }
-        IconButton(
+            icon = {
+                Icon(painter = painterResource(R.drawable.ic_income), contentDescription = null)
+            },
+            text = { Text(text = stringResource(R.string.add_income_uppercase)) },
+        )
+        FloatingActionButtonMenuItem(
             onClick = {
                 fabMenuExpanded = false
                 onAddExpense()
             },
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_expense),
-                contentDescription = stringResource(R.string.expenses),
-            )
-        }
-        IconButton(
+            icon = {
+                Icon(painter = painterResource(R.drawable.ic_expense), contentDescription = null)
+            },
+            text = { Text(text = stringResource(R.string.add_expense_uppercase)) },
+        )
+        FloatingActionButtonMenuItem(
             onClick = {
                 fabMenuExpanded = false
                 onAddTransfer()
             },
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_transfer),
-                contentDescription = stringResource(R.string.transfer),
-            )
-        }
-        IconButton(
+            icon = {
+                Icon(painter = painterResource(R.drawable.ic_transfer), contentDescription = null)
+            },
+            text = { Text(text = stringResource(R.string.account_transfer)) },
+        )
+        FloatingActionButtonMenuItem(
             onClick = {
                 fabMenuExpanded = false
                 onAddPlannedPayment()
             },
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_planned_payments),
-                contentDescription = stringResource(R.string.add_planned_payment),
-            )
-        }
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_planned_payments),
+                    contentDescription = null,
+                )
+            },
+            text = { Text(text = stringResource(R.string.add_planned_payment)) },
+        )
     }
 }

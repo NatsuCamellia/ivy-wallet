@@ -1835,3 +1835,16 @@ This task was implemented directly (not via a fresh implementer dispatch) given 
 **Interfaces:** `BottomBar`'s signature and `MainScreen.kt`'s call site are unaffected, same as every prior revision of this file.
 
 Implemented directly again (fast iteration), verified via compile + `recordPaparazziDebug`/`verifyPaparazziDebug`/`testDebugUnitTest`/`detekt` + full `:app:assembleDebug`, and visually confirmed via the recorded PNGs (collapsed and, temporarily, expanded-state) that the labeled items stack cleanly above the corner FAB with no overlap against the restored `NavigationBar`. See the progress ledger for the review outcome.
+
+---
+
+### Task 11 (feature addition): Dim the screen behind the expanded FAB menu, dismiss on tap-outside
+
+**Context:** The user asked for two additional behaviors around the corner FAB menu from Task 10: (1) when it's expanded, the rest of the screen should visibly dim; (2) tapping anywhere outside the menu should close it. Neither `FloatingActionButtonMenu` nor `ToggleFloatingActionButton` provides a scrim or tap-outside dismissal on its own (verified: it's purely a layout/animation component for the button + item column, unlike `ModalBottomSheet`/`AlertDialog` which manage their own scrim). This is new, additive behavior, not a revert.
+
+**Files:**
+- Modify: `feature/main/src/main/java/com/ivy/main/MainBottomBar.kt`
+
+**Implementation:** A `Box` scrim is composed right after the existing bounds-anchor `Spacer(Modifier.fillMaxSize())` and *before* `NavigationBar`/`FloatingActionButtonMenu` — so it draws underneath both (Compose z-orders same-`Box` siblings by composition order) and never covers the nav bar or the FAB/menu items. Its background uses `MaterialTheme.colorScheme.scrim.copy(alpha = ScrimAlpha)` with `ScrimAlpha = 0.32f` (matching the opacity M3's own modal scrims use), animated via `animateFloatAsState` keyed on `fabMenuExpanded && tab == MainTab.HOME` so it fades in/out rather than popping. The `Box` is only composed while `scrimAlpha > 0f` and carries a `.clickable(indication = null, ...) { fabMenuExpanded = false }` so any tap on it (i.e. anywhere outside the nav bar/FAB) collapses the menu — reusing the same `fabMenuExpanded` state the existing `BackHandler`/tab-switch-collapse logic already drives, so all three dismissal paths (back button, tab switch, tap-outside) stay consistent with each other.
+
+Implemented and verified directly (compile, `recordPaparazziDebug`/`verifyPaparazziDebug`/`testDebugUnitTest`/`detekt`, full `:app:assembleDebug`), and visually confirmed via a temporarily-forced-expanded Paparazzi snapshot that the scrim visibly darkens the screen while the FAB/menu items/nav bar stay at full brightness. The collapsed-state snapshots are unchanged (scrim alpha is 0 there), confirming this is purely additive. See the progress ledger for the review outcome.

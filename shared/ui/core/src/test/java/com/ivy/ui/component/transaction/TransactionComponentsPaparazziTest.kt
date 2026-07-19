@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -29,77 +30,79 @@ class TransactionComponentsPaparazziTest(
     @Test
     fun `snapshot transaction items`() {
         snapshot(theme) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                TransactionItem(
-                    ui = expense.copy(title = "Lidl groceries"),
-                    position = TransactionItemPosition.First,
-                    onClick = {},
-                    icon = { CategoryIcon() },
-                )
-                TransactionItem(
-                    ui = expense.copy(
-                        id = "2",
-                        title = "Salary — July",
-                        supportingText = "Salary · DSK Bank",
-                        categoryColor = Color(0xFF14CC9E),
-                        amountText = "+8,049.70 USD",
-                        amountKind = TransactionAmountKind.Income,
-                    ),
-                    position = TransactionItemPosition.Middle,
-                    onClick = {},
-                    icon = { CategoryIcon() },
-                )
-                TransactionItem(
-                    ui = expense.copy(
-                        id = "3",
-                        title = "Top-up Revolut",
-                        supportingText = "Cash → Revolut",
-                        categoryColor = null,
-                        amountText = "40.00 USD",
-                        amountKind = TransactionAmountKind.Transfer,
-                        secondaryText = "36.50 EUR",
-                    ),
-                    position = TransactionItemPosition.Last,
-                    onClick = {},
-                    icon = { TransferIcon() },
-                )
-                TransactionItem(
-                    ui = expense.copy(
-                        id = "4",
-                        title = "Rent",
-                        supportingText = null,
-                        amountText = "-500.00 USD",
-                        amountKind = TransactionAmountKind.Upcoming,
-                        secondaryText = null,
-                        dueText = "Due on Fri, Jul 24",
-                    ),
-                    position = TransactionItemPosition.Single,
-                    onClick = {},
-                    onSkip = {},
-                    onPayOrGet = {},
-                    payOrGetText = "Pay",
-                    icon = { CategoryIcon() },
-                )
-                TransactionItem(
-                    ui = expense.copy(
-                        id = "5",
-                        title = "Spotify",
-                        supportingText = null,
-                        amountText = "-5.99 USD",
-                        amountKind = TransactionAmountKind.Overdue,
-                        secondaryText = null,
-                        dueText = "Due on Jul 15",
-                    ),
-                    position = TransactionItemPosition.Single,
-                    onClick = {},
-                    onSkip = {},
-                    onPayOrGet = {},
-                    payOrGetText = "Pay",
-                    icon = { CategoryIcon() },
-                )
+            Surface(color = MaterialTheme.colorScheme.surface) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    TransactionItem(
+                        ui = expense.copy(title = "Lidl groceries"),
+                        position = TransactionItemPosition.First,
+                        onClick = {},
+                        icon = { CategoryIcon() },
+                    )
+                    TransactionItem(
+                        ui = expense.copy(
+                            id = "2",
+                            title = "Salary — July",
+                            supportingText = "Salary · DSK Bank",
+                            categoryColor = Color(0xFF14CC9E),
+                            amountText = "+8,049.70 USD",
+                            amountKind = TransactionAmountKind.Income,
+                        ),
+                        position = TransactionItemPosition.Middle,
+                        onClick = {},
+                        icon = { CategoryIcon() },
+                    )
+                    TransactionItem(
+                        ui = expense.copy(
+                            id = "3",
+                            title = "Top-up Revolut",
+                            supportingText = "Cash → Revolut",
+                            categoryColor = null,
+                            amountText = "40.00 USD",
+                            amountKind = TransactionAmountKind.Transfer,
+                            secondaryText = "36.50 EUR",
+                        ),
+                        position = TransactionItemPosition.Last,
+                        onClick = {},
+                        icon = { TransferIcon() },
+                    )
+                    TransactionItem(
+                        ui = expense.copy(
+                            id = "4",
+                            title = "Rent",
+                            supportingText = null,
+                            amountText = "-500.00 USD",
+                            amountKind = TransactionAmountKind.Upcoming,
+                            secondaryText = null,
+                            dueText = "Due on Fri, Jul 24",
+                        ),
+                        position = TransactionItemPosition.Single,
+                        onClick = {},
+                        onSkip = {},
+                        onPayOrGet = {},
+                        payOrGetText = "Pay",
+                        icon = { CategoryIcon() },
+                    )
+                    TransactionItem(
+                        ui = expense.copy(
+                            id = "5",
+                            title = "Spotify",
+                            supportingText = null,
+                            amountText = "-5.99 USD",
+                            amountKind = TransactionAmountKind.Overdue,
+                            secondaryText = null,
+                            dueText = "Due on Jul 15",
+                        ),
+                        position = TransactionItemPosition.Single,
+                        onClick = {},
+                        onSkip = {},
+                        onPayOrGet = {},
+                        payOrGetText = "Pay",
+                        icon = { CategoryIcon() },
+                    )
+                }
             }
         }
     }
@@ -107,25 +110,27 @@ class TransactionComponentsPaparazziTest(
     @Test
     fun `snapshot headers`() {
         snapshot(theme) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                TransactionDayHeader(title = "Today", netText = "-83.26 USD")
-                TransactionSectionHeader(
-                    title = "Upcoming",
-                    titleColor = LocalIvyExtendedColors.current.warning,
-                    subtitle = "+120.00 USD · -500.00 USD",
-                    expanded = false,
-                    onExpandedChange = {},
-                )
-                TransactionSectionHeader(
-                    title = "Overdue",
-                    titleColor = MaterialTheme.colorScheme.error,
-                    subtitle = "-5.99 USD",
-                    expanded = true,
-                    onExpandedChange = {},
-                    trailing = {
-                        TextButton(onClick = {}) { Text("Skip all") }
-                    },
-                )
+            Surface(color = MaterialTheme.colorScheme.surface) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    TransactionDayHeader(title = "Today", netText = "-83.26 USD")
+                    TransactionSectionHeader(
+                        title = "Upcoming",
+                        titleColor = LocalIvyExtendedColors.current.warning,
+                        subtitle = "+120.00 USD · -500.00 USD",
+                        expanded = false,
+                        onExpandedChange = {},
+                    )
+                    TransactionSectionHeader(
+                        title = "Overdue",
+                        titleColor = MaterialTheme.colorScheme.error,
+                        subtitle = "-5.99 USD",
+                        expanded = true,
+                        onExpandedChange = {},
+                        trailing = {
+                            TextButton(onClick = {}) { Text("Skip all") }
+                        },
+                    )
+                }
             }
         }
     }

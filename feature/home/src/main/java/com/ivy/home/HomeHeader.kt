@@ -16,7 +16,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -25,22 +29,18 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ivy.base.model.TransactionType
 import com.ivy.design.api.LocalTimeConverter
 import com.ivy.design.api.LocalTimeFormatter
 import com.ivy.design.api.LocalTimeProvider
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.design.utils.thenIf
 import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.component.transaction.TransactionsDividerLine
 import com.ivy.legacy.utils.clickableNoIndication
-import com.ivy.legacy.utils.drawColoredShadow
 import com.ivy.legacy.utils.format
 import com.ivy.legacy.utils.horizontalSwipeListener
 import com.ivy.legacy.utils.isNotNullOrBlank
@@ -51,15 +51,8 @@ import com.ivy.legacy.utils.verticalSwipeListener
 import com.ivy.navigation.PieChartStatisticScreen
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Gradient
-import com.ivy.wallet.ui.theme.GradientGreen
-import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.Green
-import com.ivy.wallet.ui.theme.White
 import com.ivy.wallet.ui.theme.components.BalanceRow
 import com.ivy.wallet.ui.theme.components.BalanceRowMini
-import com.ivy.wallet.ui.theme.components.IvyIcon
-import com.ivy.wallet.ui.theme.components.IvyOutlinedButton
 import com.ivy.wallet.ui.theme.wallet.AmountCurrencyB1
 import kotlin.math.absoluteValue
 
@@ -152,10 +145,8 @@ private fun HeaderStickyRow(
                 } else {
                     stringResource(R.string.hi)
                 },
-                style = UI.typo.b1.style(
-                    fontWeight = FontWeight.ExtraBold,
-                    color = UI.colors.pureInverse,
-                ),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
             )
@@ -181,7 +172,7 @@ private fun HeaderStickyRow(
             }
         }
 
-        IvyOutlinedButton(
+        OutlinedButton(
             modifier = Modifier.horizontalSwipeListener(
                 sensitivity = 75,
                 state = rememberSwipeListenerState(),
@@ -192,16 +183,21 @@ private fun HeaderStickyRow(
                     onSelectPreviousMonth()
                 },
             ),
-            iconStart = R.drawable.ic_calendar,
-            text = period.toDisplayShort(
-                startDateOfMonth = ivyWalletCtx().startDayOfMonth,
-                timeConverter = LocalTimeConverter.current,
-                timeProvider = LocalTimeProvider.current,
-                timeFormatter = LocalTimeFormatter.current,
-            ),
-            minWidth = 130.dp,
+            onClick = onShowMonthModal,
         ) {
-            onShowMonthModal()
+            Icon(
+                painter = painterResource(R.drawable.ic_calendar),
+                contentDescription = null,
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = period.toDisplayShort(
+                    startDateOfMonth = ivyWalletCtx().startDayOfMonth,
+                    timeConverter = LocalTimeConverter.current,
+                    timeProvider = LocalTimeProvider.current,
+                    timeFormatter = LocalTimeFormatter.current,
+                ),
+            )
         }
 
         Spacer(Modifier.width(12.dp))
@@ -222,7 +218,6 @@ fun CashFlowInfo(
     onHiddenIncomeClick: () -> Unit,
     onOpenMoreMenu: () -> Unit,
     onBalanceClick: () -> Unit,
-    percentExpanded: Float,
     onHiddenBalanceClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -256,7 +251,6 @@ fun CashFlowInfo(
         Spacer(modifier = Modifier.height(24.dp))
 
         IncomeExpenses(
-            percentExpanded = percentExpanded,
             currency = currency,
             monthlyIncome = monthlyIncome,
             monthlyExpenses = monthlyExpenses,
@@ -278,9 +272,12 @@ fun CashFlowInfo(
                     cashflow.format(currency),
                     currency,
                 ),
-                style = UI.typo.nB2.style(
-                    color = if (cashflow < 0) Gray else Green,
-                ),
+                style = MaterialTheme.typography.labelLarge,
+                color = if (cashflow < 0) {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.primary
+                },
             )
 
             Spacer(Modifier.height(4.dp))
@@ -292,7 +289,6 @@ fun CashFlowInfo(
 
 @Composable
 private fun IncomeExpenses(
-    percentExpanded: Float,
     currency: String,
     monthlyIncome: Double,
     monthlyExpenses: Double,
@@ -308,10 +304,8 @@ private fun IncomeExpenses(
         val nav = navigation()
 
         HeaderCard(
-            percentVisible = percentExpanded,
             icon = R.drawable.ic_income,
-            backgroundGradient = GradientGreen,
-            textColor = White,
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
             label = stringResource(R.string.income),
             currency = currency,
             amount = monthlyIncome,
@@ -331,10 +325,8 @@ private fun IncomeExpenses(
         Spacer(Modifier.width(12.dp))
 
         HeaderCard(
-            percentVisible = percentExpanded,
             icon = R.drawable.ic_expense,
-            backgroundGradient = Gradient(UI.colors.pureInverse, UI.colors.gray),
-            textColor = UI.colors.pure,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
             label = stringResource(R.string.expenses),
             currency = currency,
             amount = monthlyExpenses.absoluteValue,
@@ -354,23 +346,19 @@ private fun IncomeExpenses(
 @Composable
 private fun RowScope.HeaderCard(
     @DrawableRes icon: Int,
-    backgroundGradient: Gradient,
-    percentVisible: Float,
-    textColor: Color,
+    containerColor: Color,
     label: String,
     currency: String,
     amount: Double,
     testTag: String,
     onClick: () -> Unit,
 ) {
+    val contentColor = contentColorFor(containerColor)
     Column(
         modifier = Modifier
             .weight(1f)
-            .thenIf(percentVisible == 1f) {
-                drawColoredShadow(backgroundGradient.startColor)
-            }
-            .clip(UI.shapes.r4)
-            .background(backgroundGradient.asHorizontalBrush())
+            .clip(MaterialTheme.shapes.large)
+            .background(containerColor)
             .testTag(testTag)
             .clickable(
                 onClick = onClick,
@@ -383,19 +371,18 @@ private fun RowScope.HeaderCard(
         ) {
             Spacer(Modifier.width(16.dp))
 
-            IvyIcon(
-                icon = icon,
-                tint = textColor,
+            Icon(
+                painter = painterResource(icon),
+                contentDescription = null,
+                tint = contentColor,
             )
 
             Spacer(Modifier.width(4.dp))
 
             Text(
                 text = label,
-                style = UI.typo.c.style(
-                    color = textColor,
-                    fontWeight = FontWeight.ExtraBold,
-                ),
+                style = MaterialTheme.typography.labelMedium,
+                color = contentColor,
             )
         }
 
@@ -412,7 +399,7 @@ private fun RowScope.HeaderCard(
             AmountCurrencyB1(
                 amount = amount,
                 currency = currency,
-                textColor = textColor,
+                textColor = contentColor,
                 shortenBigNumbers = true,
             )
 

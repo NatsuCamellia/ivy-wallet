@@ -1065,7 +1065,7 @@ formatting:
 Compose:
   CompositionLocalAllowlist:
     active: true
-    allowedCompositionLocals: 'LocalIvyColorSource'
+    allowedCompositionLocals: 'LocalIvyColorSource,LocalIvyExtendedColors'
   ContentEmitterReturningValues:
     active: true
   DefaultsVisibility:

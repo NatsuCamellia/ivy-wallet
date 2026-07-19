@@ -4,6 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -11,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import com.ivy.design.system.LocalIvyExtendedColors
 import com.ivy.ui.PaparazziScreenshotTest
 import com.ivy.ui.PaparazziTheme
 import com.ivy.ui.R
@@ -95,6 +99,32 @@ class TransactionComponentsPaparazziTest(
                     onPayOrGet = {},
                     payOrGetText = "Pay",
                     icon = { CategoryIcon() },
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `snapshot headers`() {
+        snapshot(theme) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                TransactionDayHeader(title = "Today", netText = "-83.26 USD")
+                TransactionSectionHeader(
+                    title = "Upcoming",
+                    titleColor = LocalIvyExtendedColors.current.warning,
+                    subtitle = "+120.00 USD · -500.00 USD",
+                    expanded = false,
+                    onExpandedChange = {},
+                )
+                TransactionSectionHeader(
+                    title = "Overdue",
+                    titleColor = MaterialTheme.colorScheme.error,
+                    subtitle = "-5.99 USD",
+                    expanded = true,
+                    onExpandedChange = {},
+                    trailing = {
+                        TextButton(onClick = {}) { Text("Skip all") }
+                    },
                 )
             }
         }

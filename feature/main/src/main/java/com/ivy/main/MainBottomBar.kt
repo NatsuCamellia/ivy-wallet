@@ -82,7 +82,10 @@ fun BoxWithConstraintsScope.BottomBar(
         targetValue = if (fabMenuExpanded && tab == MainTab.HOME) ScrimAlpha else 0f,
         label = "FAB menu scrim alpha",
     )
-    if (scrimAlpha > 0f) {
+    // Gate on `tab == MainTab.HOME` directly, not just the animated alpha: switching tabs via
+    // the NavigationBar while the menu is expanded should remove the scrim immediately, not let
+    // it fade out (and keep consuming taps) over the Accounts tab's content underneath.
+    if (tab == MainTab.HOME && scrimAlpha > 0f) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

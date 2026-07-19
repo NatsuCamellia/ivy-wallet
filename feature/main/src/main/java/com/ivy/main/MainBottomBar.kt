@@ -1,6 +1,11 @@
 package com.ivy.main
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +18,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
@@ -37,6 +43,9 @@ import com.ivy.legacy.data.model.MainTab
 import com.ivy.ui.R
 
 private const val FabIconSwitchProgressThreshold = 0.5f
+
+// Matches the opacity M3 itself uses for modal scrims (dialogs, bottom sheets).
+private const val ScrimAlpha = 0.32f
 
 // Raises the FAB above the NavigationBar so the two floating elements don't visually overlap
 // (NavigationBar's own height + a small gap).
@@ -66,6 +75,27 @@ fun BoxWithConstraintsScope.BottomBar(
     // isn't full-width) aligns against the real screen edges rather than shrink-wrapping around
     // just itself.
     Spacer(modifier = Modifier.fillMaxSize())
+
+    // Dims the rest of the screen while the FAB menu is expanded; tapping anywhere on it closes
+    // the menu. Composed before the NavigationBar/FAB below so it draws underneath them.
+    val scrimAlpha by animateFloatAsState(
+        targetValue = if (fabMenuExpanded && tab == MainTab.HOME) ScrimAlpha else 0f,
+        label = "FAB menu scrim alpha",
+    )
+    if (scrimAlpha > 0f) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.scrim.copy(alpha = scrimAlpha))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                ) {
+                    fabMenuExpanded = false
+                }
+                .testTag("fab_menu_scrim"),
+        )
+    }
 
     NavigationBar(
         modifier = Modifier

@@ -145,7 +145,7 @@ fun BoxWithConstraintsScope.BottomBar(
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_income),
-                contentDescription = stringResource(R.string.add_income_uppercase),
+                contentDescription = stringResource(R.string.income),
             )
         }
         IconButton(
@@ -156,7 +156,7 @@ fun BoxWithConstraintsScope.BottomBar(
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_expense),
-                contentDescription = stringResource(R.string.add_expense_uppercase),
+                contentDescription = stringResource(R.string.expenses),
             )
         }
         IconButton(
@@ -167,7 +167,7 @@ fun BoxWithConstraintsScope.BottomBar(
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_transfer),
-                contentDescription = stringResource(R.string.account_transfer),
+                contentDescription = stringResource(R.string.transfer),
             )
         }
         IconButton(

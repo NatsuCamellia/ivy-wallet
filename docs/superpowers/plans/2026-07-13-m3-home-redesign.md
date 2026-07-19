@@ -1821,3 +1821,17 @@ Net result: `NavigationBar`/`NavigationBarItem` (Task 5's original) come back fo
 - Test: re-record `feature/main/src/test/java/com/ivy/main/MainBottomBarPaparazziTest.kt` baselines (test file itself unchanged)
 
 This task was implemented directly (not via a fresh implementer dispatch) given the fast back-and-forth clarification round already in progress; a task reviewer still independently checked the diff per the project's normal quality bar. See the progress ledger for the outcome.
+
+---
+
+### Task 10 (final revision): Revert to NavigationBar; move the labeled FAB menu to the corner
+
+**Context:** After Task 9's review, the user clarified once more: revert `MainBottomBar.kt` to the state right after Task 5 (plain `NavigationBar` for tabs, `FloatingActionButtonMenu` for the add-transaction actions — i.e. undo both Task 8's and Task 9's structural changes), then apply one small, targeted change on top of that reverted baseline: move the `FloatingActionButtonMenu` from centered/overlapping the `NavigationBar`'s notch to the bottom-right corner, and **keep** the `FloatingActionButtonMenuItem`s' text labels (unlike Task 9, which went icon-only).
+
+**Files:**
+- Modify: `feature/main/src/main/java/com/ivy/main/MainBottomBar.kt` (content restored from commit `9dc45366` — the last commit of Task 5 — then: dropped the `NavigationBar`'s center notch `Spacer(Modifier.weight(1f))` since the FAB no longer sits in it; changed `FloatingActionButtonMenu`'s `modifier` from `Alignment.BottomCenter` to `Alignment.BottomEnd` with `navigationBarsPadding()` + a `BottomBarClearance = 88.dp` bottom offset (same clearance constant and rationale as Tasks 8/9, to keep the corner FAB from overlapping the now-full-width `NavigationBar`) + `end = 16.dp`; dropped the `horizontalAlignment = Alignment.CenterHorizontally` override so the expanding item list uses the default `Alignment.End`, correct for a corner FAB; kept the `Spacer(Modifier.fillMaxSize())` bounds-anchor (needed for the isolated Paparazzi test, same as Tasks 8/9)).
+- Test: re-record `feature/main/src/test/java/com/ivy/main/MainBottomBarPaparazziTest.kt` baselines (test file itself unchanged).
+
+**Interfaces:** `BottomBar`'s signature and `MainScreen.kt`'s call site are unaffected, same as every prior revision of this file.
+
+Implemented directly again (fast iteration), verified via compile + `recordPaparazziDebug`/`verifyPaparazziDebug`/`testDebugUnitTest`/`detekt` + full `:app:assembleDebug`, and visually confirmed via the recorded PNGs (collapsed and, temporarily, expanded-state) that the labeled items stack cleanly above the corner FAB with no overlap against the restored `NavigationBar`. See the progress ledger for the review outcome.

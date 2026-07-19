@@ -2,7 +2,6 @@ package com.ivy.main
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -11,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.ivy.legacy.data.model.MainTab
 import com.ivy.ui.R
@@ -81,12 +82,14 @@ fun BoxWithConstraintsScope.BottomBar(
         ToolbarTab(
             icon = R.drawable.ic_home,
             label = stringResource(R.string.home),
+            testTag = "home",
             selected = tab == MainTab.HOME,
             onClick = { selectTab(MainTab.HOME) },
         )
         ToolbarTab(
             icon = R.drawable.ic_accounts,
             label = stringResource(R.string.accounts),
+            testTag = "accounts",
             selected = tab == MainTab.ACCOUNTS,
             onClick = { selectTab(MainTab.ACCOUNTS) },
         )
@@ -177,15 +180,16 @@ fun BoxWithConstraintsScope.BottomBar(
 private fun RowScope.ToolbarTab(
     @DrawableRes icon: Int,
     label: String,
+    testTag: String,
     selected: Boolean,
     onClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .clip(MaterialTheme.shapes.extraLarge)
-            .clickable(onClick = onClick)
+            .selectable(selected = selected, onClick = onClick, role = Role.Tab)
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .testTag(label.lowercase()),
+            .testTag(testTag),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(

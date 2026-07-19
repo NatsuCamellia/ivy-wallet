@@ -24,6 +24,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import com.ivy.base.legacy.Theme
 import com.ivy.base.legacy.Transaction
 import com.ivy.base.legacy.TransactionHistoryItem
@@ -60,7 +64,6 @@ import com.ivy.wallet.ui.theme.modal.BufferModalData
 import com.ivy.wallet.ui.theme.modal.ChoosePeriodModal
 import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalData
 import com.ivy.wallet.ui.theme.modal.CurrencyModal
-import com.ivy.wallet.ui.theme.modal.DeleteModal
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.math.BigDecimal
@@ -266,16 +269,30 @@ fun BoxWithConstraintsScope.HomeUi(
         } then2 onEvent
     )
 
-    DeleteModal(
-        visible = skipAllModalVisible,
-        title = stringResource(R.string.confirm_skip_all),
-        description = stringResource(R.string.confirm_skip_all_description),
-        dismiss = {
-            skipAllModalVisible = false
-        }
-    ) {
-        onEvent(HomeEvent.SkipAllPlanned(uiState.overdue.trns))
-        skipAllModalVisible = false
+    if (skipAllModalVisible) {
+        AlertDialog(
+            onDismissRequest = { skipAllModalVisible = false },
+            title = { Text(text = stringResource(R.string.confirm_skip_all)) },
+            text = { Text(text = stringResource(R.string.confirm_skip_all_description)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onEvent(HomeEvent.SkipAllPlanned(uiState.overdue.trns))
+                        skipAllModalVisible = false
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.confirm),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { skipAllModalVisible = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            },
+        )
     }
 }
 

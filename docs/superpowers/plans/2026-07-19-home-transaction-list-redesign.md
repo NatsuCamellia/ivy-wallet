@@ -546,7 +546,7 @@ fun TransactionSectionHeader(
     titleColor: Color,
     subtitle: String?,
     expanded: Boolean,
-    onSetExpanded: (Boolean) -> Unit,
+    onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     trailing: (@Composable () -> Unit)? = null,
 )
@@ -628,7 +628,7 @@ fun TransactionSectionHeader(
     titleColor: Color,
     subtitle: String?,
     expanded: Boolean,
-    onSetExpanded: (Boolean) -> Unit,
+    onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     trailing: (@Composable () -> Unit)? = null,
 ) {
@@ -636,7 +636,7 @@ fun TransactionSectionHeader(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .clickable { onSetExpanded(!expanded) }
+            .clickable { onExpandedChange(!expanded) }
             .padding(horizontal = 10.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -686,14 +686,14 @@ Add a second test to `TransactionComponentsPaparazziTest`:
                     titleColor = LocalIvyExtendedColors.current.warning,
                     subtitle = "+120.00 USD · -500.00 USD",
                     expanded = false,
-                    onSetExpanded = {},
+                    onExpandedChange = {},
                 )
                 TransactionSectionHeader(
                     title = "Overdue",
                     titleColor = MaterialTheme.colorScheme.error,
                     subtitle = "-5.99 USD",
                     expanded = true,
-                    onSetExpanded = {},
+                    onExpandedChange = {},
                     trailing = {
                         TextButton(onClick = {}) { Text("Skip all") }
                     },
@@ -1331,7 +1331,7 @@ fun LazyListScope.homeTransactionsList(
                 titleColor = LocalIvyExtendedColors.current.warning,
                 subtitle = upcomingSubtitle,
                 expanded = upcoming.expanded,
-                onSetExpanded = setUpcomingExpanded,
+                onExpandedChange = setUpcomingExpanded,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp),
             )
         }
@@ -1348,7 +1348,7 @@ fun LazyListScope.homeTransactionsList(
                 titleColor = MaterialTheme.colorScheme.error,
                 subtitle = overdueSubtitle,
                 expanded = overdue.expanded,
-                onSetExpanded = setOverdueExpanded,
+                onExpandedChange = setOverdueExpanded,
                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 20.dp),
                 trailing = {
                     TextButton(onClick = { onSkipAllTransactions(overdueTrns) }) {

@@ -1,16 +1,30 @@
 package com.ivy.settings
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -20,9 +34,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,12 +50,10 @@ import com.ivy.base.legacy.Theme
 import com.ivy.legacy.Constants
 import com.ivy.legacy.rootScreen
 import com.ivy.navigation.AttributionsScreen
-import com.ivy.navigation.ContributorsScreen
 import com.ivy.navigation.ExchangeRatesScreen
 import com.ivy.navigation.FeaturesScreen
 import com.ivy.navigation.ImportScreen
 import com.ivy.navigation.IvyPreview
-import com.ivy.navigation.ReleasesScreen
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
@@ -46,10 +63,9 @@ import com.ivy.ui.component.dialog.RadioSelectionDialog
 import com.ivy.ui.component.dialog.TextInputDialog
 import com.ivy.ui.component.settings.ScreenDisplayTitle
 import com.ivy.ui.component.settings.SettingsItem
-import com.ivy.ui.component.settings.SettingsSectionTitle
-import java.util.Locale
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import java.util.Locale
 
 private const val DaysInMonth = 31
 
@@ -61,13 +77,28 @@ fun SettingsScreen() {
 
     SettingsUi(
         uiState = uiState,
-        versionText = "${rootScreen.buildVersionName} (${rootScreen.buildVersionCode})",
+        versionName = rootScreen.buildVersionName,
         onEvent = viewModel::onEvent,
         onBackupData = { viewModel.onEvent(SettingsEvent.BackupData(rootScreen)) },
         onExportToCsv = { viewModel.onEvent(SettingsEvent.ExportToCsv(rootScreen)) },
-        onRateUs = { rootScreen.reviewIvyWallet(dismissReviewCard = false) },
         onShareIvyWallet = { rootScreen.shareIvyWallet() },
     )
+}
+
+/**
+ * ReadYou-style settings: the first page only lists categories, each drilling down into its own
+ * page. This is UI-only navigation kept local to the screen (not the app's [com.ivy.navigation]
+ * back stack) since every category shares the same [SettingsState]/[SettingsViewModel].
+ */
+private enum class SettingsPage {
+    Categories,
+    Profile,
+    Appearance,
+    Behavior,
+    Privacy,
+    ImportExport,
+    AboutSupport,
+    DangerZone,
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,14 +106,15 @@ fun SettingsScreen() {
 @Suppress("LongMethod", "LongParameterList")
 private fun SettingsUi(
     uiState: SettingsState,
-    versionText: String,
+    versionName: String,
     onEvent: (SettingsEvent) -> Unit,
     onBackupData: () -> Unit,
     onExportToCsv: () -> Unit,
-    onRateUs: () -> Unit,
     onShareIvyWallet: () -> Unit,
 ) {
     val nav = navigation()
+
+    var page by remember { mutableStateOf(SettingsPage.Categories) }
 
     var nameDialogVisible by remember { mutableStateOf(false) }
     var currencyDialogVisible by remember { mutableStateOf(false) }
@@ -91,64 +123,78 @@ private fun SettingsUi(
     var deleteAllDataDialogVisible by remember { mutableStateOf(false) }
     var deleteAllDataFinalDialogVisible by remember { mutableStateOf(false) }
 
+    BackHandler(enabled = page != SettingsPage.Categories) {
+        page = SettingsPage.Categories
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    BackButton(onClick = { nav.onBackPressed() })
+                    BackButton(
+                        onClick = {
+                            if (page != SettingsPage.Categories) {
+                                page = SettingsPage.Categories
+                            } else {
+                                nav.onBackPressed()
+                            }
+                        },
+                    )
+                },
+                actions = {
+                    if (page == SettingsPage.AboutSupport) {
+                        IconButton(onClick = { nav.navigateTo(AttributionsScreen) }) {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_vue_edu_book),
+                                contentDescription = stringResource(R.string.open_source_licenses),
+                            )
+                        }
+                    }
                 },
             )
         },
     ) { padding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .testTag("settings_lazy_column"),
-        ) {
-            item {
-                ScreenDisplayTitle(
-                    text = stringResource(R.string.settings),
-                    description = versionText,
-                    onDescriptionClick = { nav.navigateTo(ReleasesScreen) },
+        Box(modifier = Modifier.padding(padding)) {
+            when (page) {
+                SettingsPage.Categories -> CategoriesPage(onNavigate = { page = it })
+                SettingsPage.Profile -> ProfilePage(
+                    uiState = uiState,
+                    onNameClick = { nameDialogVisible = true },
+                    onCurrencyClick = { currencyDialogVisible = true },
                 )
-            }
-            profileSection(
-                uiState = uiState,
-                onNameClick = { nameDialogVisible = true },
-                onCurrencyClick = { currencyDialogVisible = true },
-            )
-            appearanceSection(
-                uiState = uiState,
-                onEvent = onEvent,
-                onThemeClick = { themeDialogVisible = true },
-            )
-            behaviorSection(
-                uiState = uiState,
-                onEvent = onEvent,
-                onStartDateClick = { startDateDialogVisible = true },
-                onExchangeRatesClick = { nav.navigateTo(ExchangeRatesScreen) },
-                onAdvancedFeaturesClick = { nav.navigateTo(FeaturesScreen) },
-            )
-            privacySection(uiState = uiState, onEvent = onEvent)
-            importExportSection(
-                onImportClick = {
-                    nav.navigateTo(ImportScreen(launchedFromOnboarding = false))
-                },
-                onBackupData = onBackupData,
-                onExportToCsv = onExportToCsv,
-            )
-            aboutSection(
-                onRateUs = onRateUs,
-                onShareIvyWallet = onShareIvyWallet,
-                onReleasesClick = { nav.navigateTo(ReleasesScreen) },
-                onContributorsClick = { nav.navigateTo(ContributorsScreen) },
-                onAttributionsClick = { nav.navigateTo(AttributionsScreen) },
-            )
-            dangerZoneSection(onDeleteAllData = { deleteAllDataDialogVisible = true })
-            item {
-                Spacer(modifier = Modifier.height(96.dp))
+
+                SettingsPage.Appearance -> AppearancePage(
+                    uiState = uiState,
+                    onEvent = onEvent,
+                    onThemeClick = { themeDialogVisible = true },
+                )
+
+                SettingsPage.Behavior -> BehaviorPage(
+                    uiState = uiState,
+                    onEvent = onEvent,
+                    onStartDateClick = { startDateDialogVisible = true },
+                    onExchangeRatesClick = { nav.navigateTo(ExchangeRatesScreen) },
+                    onAdvancedFeaturesClick = { nav.navigateTo(FeaturesScreen) },
+                )
+
+                SettingsPage.Privacy -> PrivacyPage(uiState = uiState, onEvent = onEvent)
+                SettingsPage.ImportExport -> ImportExportPage(
+                    onImportClick = {
+                        nav.navigateTo(ImportScreen(launchedFromOnboarding = false))
+                    },
+                    onBackupData = onBackupData,
+                    onExportToCsv = onExportToCsv,
+                )
+
+                SettingsPage.AboutSupport -> AboutSupportPage(
+                    versionName = versionName,
+                    onShareIvyWallet = onShareIvyWallet,
+                )
+
+                SettingsPage.DangerZone -> DangerZonePage(
+                    onDeleteAllData = { deleteAllDataDialogVisible = true },
+                )
             }
         }
     }
@@ -171,266 +217,400 @@ private fun SettingsUi(
     )
 }
 
-private fun LazyListScope.profileSection(
+@Composable
+private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag("settings_lazy_column"),
+    ) {
+        item {
+            ScreenDisplayTitle(text = stringResource(R.string.settings))
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.profile),
+                description = stringResource(R.string.profile_settings_desc),
+                icon = painterResource(R.drawable.ic_profile),
+                onClick = { onNavigate(SettingsPage.Profile) },
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.appearance),
+                description = stringResource(R.string.appearance_settings_desc),
+                icon = painterResource(R.drawable.ic_custom_palette_m),
+                onClick = { onNavigate(SettingsPage.Appearance) },
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.behavior),
+                description = stringResource(R.string.behavior_settings_desc),
+                icon = painterResource(R.drawable.ic_custom_gears_m),
+                onClick = { onNavigate(SettingsPage.Behavior) },
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.privacy),
+                description = stringResource(R.string.privacy_settings_desc),
+                icon = painterResource(R.drawable.ic_vue_security_shield),
+                onClick = { onNavigate(SettingsPage.Privacy) },
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.import_export),
+                description = stringResource(R.string.import_export_settings_desc),
+                icon = painterResource(R.drawable.ic_export_csv),
+                onClick = { onNavigate(SettingsPage.ImportExport) },
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.about_and_support),
+                description = stringResource(R.string.about_and_support_desc),
+                icon = painterResource(R.drawable.ic_vue_support_star),
+                onClick = { onNavigate(SettingsPage.AboutSupport) },
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.danger_zone),
+                description = stringResource(R.string.danger_zone_desc),
+                icon = painterResource(R.drawable.ic_delete),
+                titleColor = MaterialTheme.colorScheme.error,
+                onClick = { onNavigate(SettingsPage.DangerZone) },
+            )
+        }
+        item {
+            Spacer(modifier = Modifier.height(96.dp))
+        }
+    }
+}
+
+@Composable
+private fun ProfilePage(
     uiState: SettingsState,
     onNameClick: () -> Unit,
     onCurrencyClick: () -> Unit,
 ) {
-    item {
-        SettingsSectionTitle(text = stringResource(R.string.profile))
-    }
-    item {
-        SettingsItem(
-            title = stringResource(R.string.name),
-            description = uiState.name.ifBlank { stringResource(R.string.anonymous) },
-            onClick = onNameClick,
-        )
-    }
-    item {
-        SettingsItem(
-            title = stringResource(R.string.currency),
-            description = uiState.currencyCode,
-            onClick = onCurrencyClick,
-        )
-    }
-}
-
-private fun LazyListScope.appearanceSection(
-    uiState: SettingsState,
-    onEvent: (SettingsEvent) -> Unit,
-    onThemeClick: () -> Unit,
-) {
-    item {
-        SettingsSectionTitle(text = stringResource(R.string.appearance))
-    }
-    item {
-        SettingsItem(
-            title = stringResource(R.string.theme),
-            description = themeLabel(uiState.currentTheme),
-            onClick = onThemeClick,
-        )
-    }
-    if (uiState.dynamicColorAvailable) {
+    DetailPageColumn {
         item {
-            SettingsItem(
-                title = stringResource(R.string.dynamic_color),
-                description = stringResource(R.string.dynamic_color_description),
-                onClick = null,
-                modifier = Modifier.toggleable(
-                    value = uiState.dynamicColorEnabled,
-                    role = Role.Switch,
-                    onValueChange = { onEvent(SettingsEvent.SetDynamicColor(it)) },
-                ),
-            ) {
-                Switch(
-                    checked = uiState.dynamicColorEnabled,
-                    onCheckedChange = null,
-                )
-            }
+            ScreenDisplayTitle(text = stringResource(R.string.profile))
         }
-    }
-    if (uiState.languageOptionVisible) {
         item {
             SettingsItem(
-                title = stringResource(R.string.language),
-                description = Locale.getDefault().displayName,
-                onClick = { onEvent(SettingsEvent.SwitchLanguage) },
+                title = stringResource(R.string.name),
+                description = uiState.name.ifBlank { stringResource(R.string.anonymous) },
+                onClick = onNameClick,
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.currency),
+                description = uiState.currencyCode,
+                onClick = onCurrencyClick,
             )
         }
     }
 }
 
-private fun LazyListScope.behaviorSection(
+@Composable
+private fun AppearancePage(
+    uiState: SettingsState,
+    onEvent: (SettingsEvent) -> Unit,
+    onThemeClick: () -> Unit,
+) {
+    DetailPageColumn {
+        item {
+            ScreenDisplayTitle(text = stringResource(R.string.appearance))
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.theme),
+                description = themeLabel(uiState.currentTheme),
+                onClick = onThemeClick,
+            )
+        }
+        if (uiState.dynamicColorAvailable) {
+            item {
+                SettingsItem(
+                    title = stringResource(R.string.dynamic_color),
+                    description = stringResource(R.string.dynamic_color_description),
+                    onClick = null,
+                    modifier = Modifier.toggleable(
+                        value = uiState.dynamicColorEnabled,
+                        role = Role.Switch,
+                        onValueChange = { onEvent(SettingsEvent.SetDynamicColor(it)) },
+                    ),
+                ) {
+                    Switch(
+                        checked = uiState.dynamicColorEnabled,
+                        onCheckedChange = null,
+                    )
+                }
+            }
+        }
+        if (uiState.languageOptionVisible) {
+            item {
+                SettingsItem(
+                    title = stringResource(R.string.language),
+                    description = Locale.getDefault().displayName,
+                    onClick = { onEvent(SettingsEvent.SwitchLanguage) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BehaviorPage(
     uiState: SettingsState,
     onEvent: (SettingsEvent) -> Unit,
     onStartDateClick: () -> Unit,
     onExchangeRatesClick: () -> Unit,
     onAdvancedFeaturesClick: () -> Unit,
 ) {
-    item {
-        SettingsSectionTitle(text = stringResource(R.string.behavior))
-    }
-    item {
-        SettingsItem(
-            title = stringResource(R.string.start_date_of_month),
-            description = uiState.startDateOfMonth,
-            onClick = onStartDateClick,
-        )
-    }
-    item {
-        SwitchItem(
-            title = stringResource(R.string.transfers_as_income_expense),
-            description = stringResource(R.string.transfers_as_income_expense_description),
-            checked = uiState.treatTransfersAsIncomeExpense,
-            onCheckedChange = { onEvent(SettingsEvent.SetTransfersAsIncomeExpense(it)) },
-        )
-    }
-    item {
-        SettingsItem(
-            title = stringResource(R.string.exchange_rates),
-            onClick = onExchangeRatesClick,
-        )
-    }
-    item {
-        SettingsItem(
-            title = stringResource(R.string.advanced_features),
-            onClick = onAdvancedFeaturesClick,
-        )
+    DetailPageColumn {
+        item {
+            ScreenDisplayTitle(text = stringResource(R.string.behavior))
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.start_date_of_month),
+                description = uiState.startDateOfMonth,
+                onClick = onStartDateClick,
+            )
+        }
+        item {
+            SwitchItem(
+                title = stringResource(R.string.transfers_as_income_expense),
+                description = stringResource(R.string.transfers_as_income_expense_description),
+                checked = uiState.treatTransfersAsIncomeExpense,
+                onCheckedChange = { onEvent(SettingsEvent.SetTransfersAsIncomeExpense(it)) },
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.exchange_rates),
+                onClick = onExchangeRatesClick,
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.advanced_features),
+                onClick = onAdvancedFeaturesClick,
+            )
+        }
     }
 }
 
-private fun LazyListScope.privacySection(
+@Composable
+private fun PrivacyPage(
     uiState: SettingsState,
     onEvent: (SettingsEvent) -> Unit,
 ) {
-    item {
-        SettingsSectionTitle(text = stringResource(R.string.privacy))
-    }
-    item {
-        SwitchItem(
-            title = stringResource(R.string.lock_app),
-            checked = uiState.lockApp,
-            onCheckedChange = { onEvent(SettingsEvent.SetLockApp(it)) },
-        )
-    }
-    item {
-        SwitchItem(
-            title = stringResource(R.string.show_notifications),
-            checked = uiState.showNotifications,
-            onCheckedChange = { onEvent(SettingsEvent.SetShowNotifications(it)) },
-        )
-    }
-    item {
-        SwitchItem(
-            title = stringResource(R.string.hide_balance),
-            description = stringResource(R.string.hide_balance_description),
-            checked = uiState.hideCurrentBalance,
-            onCheckedChange = { onEvent(SettingsEvent.SetHideCurrentBalance(it)) },
-        )
-    }
-    item {
-        SwitchItem(
-            title = stringResource(R.string.hide_income),
-            description = stringResource(R.string.hide_income_description),
-            checked = uiState.hideIncome,
-            onCheckedChange = { onEvent(SettingsEvent.SetHideIncome(it)) },
-        )
+    DetailPageColumn {
+        item {
+            ScreenDisplayTitle(text = stringResource(R.string.privacy))
+        }
+        item {
+            SwitchItem(
+                title = stringResource(R.string.lock_app),
+                checked = uiState.lockApp,
+                onCheckedChange = { onEvent(SettingsEvent.SetLockApp(it)) },
+            )
+        }
+        item {
+            SwitchItem(
+                title = stringResource(R.string.show_notifications),
+                checked = uiState.showNotifications,
+                onCheckedChange = { onEvent(SettingsEvent.SetShowNotifications(it)) },
+            )
+        }
+        item {
+            SwitchItem(
+                title = stringResource(R.string.hide_balance),
+                description = stringResource(R.string.hide_balance_description),
+                checked = uiState.hideCurrentBalance,
+                onCheckedChange = { onEvent(SettingsEvent.SetHideCurrentBalance(it)) },
+            )
+        }
+        item {
+            SwitchItem(
+                title = stringResource(R.string.hide_income),
+                description = stringResource(R.string.hide_income_description),
+                checked = uiState.hideIncome,
+                onCheckedChange = { onEvent(SettingsEvent.SetHideIncome(it)) },
+            )
+        }
     }
 }
 
-private fun LazyListScope.importExportSection(
+@Composable
+private fun ImportExportPage(
     onImportClick: () -> Unit,
     onBackupData: () -> Unit,
     onExportToCsv: () -> Unit,
 ) {
-    item {
-        SettingsSectionTitle(text = stringResource(R.string.import_export))
-    }
-    item {
-        SettingsItem(
-            title = stringResource(R.string.import_data),
-            onClick = onImportClick,
-        )
-    }
-    item {
-        SettingsItem(
-            title = stringResource(R.string.backup_data),
-            onClick = onBackupData,
-        )
-    }
-    item {
-        SettingsItem(
-            title = stringResource(R.string.export_to_csv),
-            description = stringResource(R.string.do_not_use_for_backup_purposes),
-            onClick = onExportToCsv,
-        )
+    DetailPageColumn {
+        item {
+            ScreenDisplayTitle(text = stringResource(R.string.import_export))
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.import_data),
+                onClick = onImportClick,
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.backup_data),
+                onClick = onBackupData,
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.export_to_csv),
+                description = stringResource(R.string.do_not_use_for_backup_purposes),
+                onClick = onExportToCsv,
+            )
+        }
     }
 }
 
-private fun LazyListScope.aboutSection(
-    onRateUs: () -> Unit,
+@Composable
+private fun DangerZonePage(onDeleteAllData: () -> Unit) {
+    DetailPageColumn {
+        item {
+            ScreenDisplayTitle(text = stringResource(R.string.danger_zone))
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.delete_all_user_data),
+                titleColor = MaterialTheme.colorScheme.error,
+                onClick = onDeleteAllData,
+            )
+        }
+    }
+}
+
+@Composable
+private fun DetailPageColumn(content: LazyListScope.() -> Unit) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        content = content,
+    )
+}
+
+private const val AboutIconSize = 120
+private const val AboutIconGlyphSize = 56
+private const val RoundButtonSize = 64
+private const val RoundButtonIconSize = 26
+private const val VersionBadgeCornerPercent = 50
+
+@Composable
+private fun AboutSupportPage(
+    versionName: String,
     onShareIvyWallet: () -> Unit,
-    onReleasesClick: () -> Unit,
-    onContributorsClick: () -> Unit,
-    onAttributionsClick: () -> Unit,
 ) {
-    item {
-        SettingsSectionTitle(text = stringResource(R.string.about_and_support))
-    }
-    item {
-        SettingsItem(title = stringResource(R.string.rate_us_on_google_play), onClick = onRateUs)
-    }
-    item {
-        SettingsItem(title = stringResource(R.string.share_ivy_wallet), onClick = onShareIvyWallet)
-    }
-    item {
-        UrlItem(
-            title = stringResource(R.string.ivy_wallet_is_opensource),
-            url = Constants.URL_IVY_WALLET_REPO,
-        )
-    }
-    item {
-        UrlItem(
-            title = stringResource(R.string.ivy_telegram),
-            url = Constants.URL_IVY_TELEGRAM_INVITE,
-        )
-    }
-    item {
-        UrlItem(
-            title = stringResource(R.string.help_center),
-            url = Constants.URL_HELP_CENTER,
-        )
-    }
-    item {
-        SettingsItem(title = stringResource(R.string.releases), onClick = onReleasesClick)
-    }
-    item {
-        UrlItem(
-            title = stringResource(R.string.report_bug),
-            url = Constants.URL_GITHUB_NEW_ISSUE,
-        )
-    }
-    item {
-        UrlItem(
-            title = stringResource(R.string.request_a_feature),
-            url = Constants.URL_GITHUB_NEW_ISSUE,
-        )
-    }
-    item {
-        UrlItem(
-            title = stringResource(R.string.contact_support),
-            url = Constants.URL_IVY_TELEGRAM_INVITE,
-        )
-    }
-    item {
-        SettingsItem(
-            title = stringResource(R.string.project_contributors),
-            onClick = onContributorsClick,
-        )
-    }
-    item {
-        SettingsItem(title = stringResource(R.string.attributions), onClick = onAttributionsClick)
-    }
-    item {
-        UrlItem(title = stringResource(R.string.terms_conditions), url = Constants.URL_TC)
-    }
-    item {
-        UrlItem(title = stringResource(R.string.privacy_policy), url = Constants.URL_PRIVACY_POLICY)
+    val uriHandler = LocalUriHandler.current
+
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 48.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            ScreenDisplayTitle(text = stringResource(R.string.about_and_support))
+            Spacer(modifier = Modifier.height(24.dp))
+            Box(
+                modifier = Modifier
+                    .size(AboutIconSize.dp)
+                    .clip(RoundedCornerShape(36.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    modifier = Modifier.size(AboutIconGlyphSize.dp),
+                    painter = painterResource(R.drawable.ic_logo),
+                    contentDescription = stringResource(R.string.ivy_wallet),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.ivy_wallet),
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Surface(
+                shape = RoundedCornerShape(VersionBadgeCornerPercent),
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                    text = versionName,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                )
+            }
+            Spacer(modifier = Modifier.height(40.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                AboutRoundIconButton(
+                    icon = painterResource(R.drawable.github_logo),
+                    contentDescription = stringResource(R.string.github),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    onClick = { uriHandler.openUri(Constants.URL_IVY_WALLET_REPO) },
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                AboutRoundIconButton(
+                    icon = painterResource(R.drawable.ic_share),
+                    contentDescription = stringResource(R.string.share_ivy_wallet),
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    onClick = onShareIvyWallet,
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                AboutRoundIconButton(
+                    icon = painterResource(R.drawable.ic_vue_messages_msg),
+                    contentDescription = stringResource(R.string.help_center),
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    onClick = { uriHandler.openUri(Constants.URL_HELP_CENTER) },
+                )
+            }
+        }
     }
 }
 
-private fun LazyListScope.dangerZoneSection(onDeleteAllData: () -> Unit) {
-    item {
-        SettingsSectionTitle(
-            text = stringResource(R.string.danger_zone),
-            color = MaterialTheme.colorScheme.error,
-        )
-    }
-    item {
-        SettingsItem(
-            title = stringResource(R.string.delete_all_user_data),
-            titleColor = MaterialTheme.colorScheme.error,
-            onClick = onDeleteAllData,
+@Composable
+private fun AboutRoundIconButton(
+    icon: Painter,
+    contentDescription: String,
+    containerColor: Color,
+    contentColor: Color,
+    onClick: () -> Unit,
+) {
+    IconButton(
+        modifier = Modifier
+            .size(RoundButtonSize.dp)
+            .background(color = containerColor, shape = CircleShape),
+        onClick = onClick,
+    ) {
+        Icon(
+            modifier = Modifier.size(RoundButtonIconSize.dp),
+            painter = icon,
+            contentDescription = contentDescription,
+            tint = contentColor,
         )
     }
 }
@@ -454,15 +634,6 @@ private fun SwitchItem(
     ) {
         Switch(checked = checked, onCheckedChange = null)
     }
-}
-
-@Composable
-private fun UrlItem(title: String, url: String) {
-    val uriHandler = LocalUriHandler.current
-    SettingsItem(
-        title = title,
-        onClick = { uriHandler.openUri(url) },
-    )
 }
 
 @Composable
@@ -628,11 +799,10 @@ private fun Preview(dark: Boolean = false) {
                 dynamicColorEnabled = true,
                 dynamicColorAvailable = true,
             ),
-            versionText = "1.0.0 (100)",
+            versionName = "1.0.0",
             onEvent = {},
             onBackupData = {},
             onExportToCsv = {},
-            onRateUs = {},
             onShareIvyWallet = {},
         )
     }
@@ -642,4 +812,21 @@ private fun Preview(dark: Boolean = false) {
 @Composable
 fun SettingsUiTest(isDark: Boolean) {
     Preview(dark = isDark)
+}
+
+@Preview
+@Composable
+private fun AboutSupportPreview(dark: Boolean = false) {
+    IvyPreview(dark = dark) {
+        AboutSupportPage(
+            versionName = "1.0.0",
+            onShareIvyWallet = {},
+        )
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun AboutSupportUiTest(isDark: Boolean) {
+    AboutSupportPreview(dark = isDark)
 }

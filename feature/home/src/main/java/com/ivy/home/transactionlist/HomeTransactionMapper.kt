@@ -29,7 +29,7 @@ class HomeTransactionMapper(
     private val incomeFallback: String,
     private val transferFallback: String,
     private val formatAmount: (Double, String) -> String = { amount, currency ->
-        amount.format(currency)
+        "${amount.format(currency)} $currency"
     },
 ) {
     fun mapHistory(history: List<TransactionHistoryItem>): ImmutableList<HomeTrnListItem> {

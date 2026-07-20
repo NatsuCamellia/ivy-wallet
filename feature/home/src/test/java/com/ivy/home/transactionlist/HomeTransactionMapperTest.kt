@@ -16,6 +16,8 @@ import com.ivy.ui.time.TimeFormatter
 import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
 import com.ivy.wallet.domain.pure.data.IncomeExpensePair
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldEndWith
+import io.kotest.matchers.string.shouldStartWith
 import io.mockk.every
 import io.mockk.mockk
 import java.math.BigDecimal
@@ -62,6 +64,35 @@ class HomeTransactionMapperTest {
         transferFallback = "Transfer",
         formatAmount = { amount, currency -> "$amount $currency" },
     )
+
+    private fun mapperWithDefaultFormatAmount(): HomeTransactionMapper = HomeTransactionMapper(
+        baseData = AppBaseData(
+            baseCurrency = "USD",
+            accounts = persistentListOf(cash),
+            categories = persistentListOf(food),
+        ),
+        timeConverter = timeConverter,
+        timeFormatter = timeFormatter,
+        deletedText = "deleted",
+        dueOnFormat = "Due on %1\$s",
+        expenseFallback = "Expense",
+        incomeFallback = "Income",
+        transferFallback = "Transfer",
+    )
+
+    @Test
+    fun `default formatAmount appends the currency code`() {
+        // Given
+        val mapper = mapperWithDefaultFormatAmount()
+
+        // When
+        val item = mapper.mapHistory(listOf(divider(0.0, 10.0), expenseTrn("a")))[1]
+            as HomeTrnListItem.Trn
+
+        // Then
+        item.ui.amountText shouldStartWith "-"
+        item.ui.amountText shouldEndWith " USD"
+    }
 
     @Test
     fun `assigns First Middle Last positions within a day`() {

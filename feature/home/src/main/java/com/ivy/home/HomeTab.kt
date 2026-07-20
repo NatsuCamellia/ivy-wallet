@@ -48,12 +48,15 @@ import com.ivy.legacy.data.model.MainTab
 import com.ivy.legacy.data.model.Month
 import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.ivyWalletCtx
+import com.ivy.home.transactionlist.homeTransactionsList
+import com.ivy.home.transactionlist.rememberHomeTransactionMapper
 import com.ivy.legacy.ui.component.transaction.TransactionsDividerLine
-import com.ivy.legacy.ui.component.transaction.transactions
 import com.ivy.legacy.utils.horizontalSwipeListener
 import com.ivy.legacy.utils.rememberSwipeListenerState
 import com.ivy.legacy.utils.verticalSwipeListener
+import com.ivy.navigation.EditTransactionScreen
 import com.ivy.navigation.IvyPreview
+import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
 import com.ivy.ui.rememberScrollPositionListState
@@ -192,7 +195,6 @@ fun BoxWithConstraintsScope.HomeUi(
             history = uiState.history,
 
             customerJourneyCards = uiState.customerJourneyCards,
-            shouldShowAccountSpecificColorInTransactions = uiState.shouldShowAccountSpecificColorInTransactions,
 
             onPayOrGet = forward<Transaction>() then2 {
                 HomeEvent.PayOrGetPlanned(it)
@@ -307,7 +309,6 @@ fun HomeLazyColumn(
     period: TimePeriod,
 
     baseData: AppBaseData,
-    shouldShowAccountSpecificColorInTransactions: Boolean,
 
     upcoming: LegacyDueSection,
     overdue: LegacyDueSection,
@@ -349,6 +350,23 @@ fun HomeLazyColumn(
     val timeProvider = LocalTimeProvider.current
     val timeConverter = LocalTimeConverter.current
     val timeFormatter = LocalTimeFormatter.current
+
+    val mapper = rememberHomeTransactionMapper(baseData)
+    val historyItems = remember(mapper, history) { mapper.mapHistory(history) }
+    val upcomingRows = remember(mapper, upcoming) {
+        mapper.mapDueSection(upcoming.trns, overdue = false)
+    }
+    val overdueRows = remember(mapper, overdue) {
+        mapper.mapDueSection(overdue.trns, overdue = true)
+    }
+    val upcomingSubtitle = remember(mapper, upcoming) {
+        mapper.sectionSubtitle(upcoming.stats, baseData.baseCurrency)
+    }
+    val overdueSubtitle = remember(mapper, overdue) {
+        mapper.sectionSubtitle(overdue.stats, baseData.baseCurrency)
+    }
+    val nav = navigation()
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -386,14 +404,14 @@ fun HomeLazyColumn(
             )
         }
 
-        transactions(
-            baseData = baseData,
+        homeTransactionsList(
+            historyItems = historyItems,
             upcoming = upcoming,
-            setUpcomingExpanded = setUpcomingExpanded,
+            upcomingRows = upcomingRows,
+            upcomingSubtitle = upcomingSubtitle,
             overdue = overdue,
-            setOverdueExpanded = setOverdueExpanded,
-            history = history,
-            onPayOrGet = onPayOrGet,
+            overdueRows = overdueRows,
+            overdueSubtitle = overdueSubtitle,
             emptyStateTitle = stringRes(R.string.no_transactions),
             emptyStateText = stringRes(
                 R.string.no_transactions_description,
@@ -404,9 +422,16 @@ fun HomeLazyColumn(
                     timeFormatter = timeFormatter,
                 )
             ),
-            shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions,
+            onTransactionClick = { trn ->
+                nav.navigateTo(
+                    EditTransactionScreen(initialTransactionId = trn.id, type = trn.type)
+                )
+            },
+            onPayOrGet = onPayOrGet,
             onSkipTransaction = onSkipTransaction,
-            onSkipAllTransactions = onSkipAllTransactions
+            onSkipAllTransactions = onSkipAllTransactions,
+            setUpcomingExpanded = setUpcomingExpanded,
+            setOverdueExpanded = setOverdueExpanded,
         )
     }
 }

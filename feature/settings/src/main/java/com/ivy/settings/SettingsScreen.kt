@@ -1,27 +1,28 @@
 package com.ivy.settings
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.ImportExport
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MenuBook
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -34,14 +35,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,9 +59,9 @@ import com.ivy.ui.component.dialog.RadioSelectionDialog
 import com.ivy.ui.component.dialog.TextInputDialog
 import com.ivy.ui.component.settings.ScreenDisplayTitle
 import com.ivy.ui.component.settings.SettingsItem
+import java.util.Locale
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
-import java.util.Locale
 
 private const val DaysInMonth = 31
 
@@ -81,7 +77,6 @@ fun SettingsScreen() {
         onEvent = viewModel::onEvent,
         onBackupData = { viewModel.onEvent(SettingsEvent.BackupData(rootScreen)) },
         onExportToCsv = { viewModel.onEvent(SettingsEvent.ExportToCsv(rootScreen)) },
-        onShareIvyWallet = { rootScreen.shareIvyWallet() },
     )
 }
 
@@ -110,9 +105,9 @@ private fun SettingsUi(
     onEvent: (SettingsEvent) -> Unit,
     onBackupData: () -> Unit,
     onExportToCsv: () -> Unit,
-    onShareIvyWallet: () -> Unit,
 ) {
     val nav = navigation()
+    val uriHandler = LocalUriHandler.current
 
     var page by remember { mutableStateOf(SettingsPage.Categories) }
 
@@ -141,16 +136,6 @@ private fun SettingsUi(
                             }
                         },
                     )
-                },
-                actions = {
-                    if (page == SettingsPage.AboutSupport) {
-                        IconButton(onClick = { nav.navigateTo(AttributionsScreen) }) {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_vue_edu_book),
-                                contentDescription = stringResource(R.string.open_source_licenses),
-                            )
-                        }
-                    }
                 },
             )
         },
@@ -189,7 +174,10 @@ private fun SettingsUi(
 
                 SettingsPage.AboutSupport -> AboutSupportPage(
                     versionName = versionName,
-                    onShareIvyWallet = onShareIvyWallet,
+                    onGitHubClick = { uriHandler.openUri(Constants.URL_IVY_WALLET_REPO) },
+                    onAttributionsClick = { nav.navigateTo(AttributionsScreen) },
+                    onTermsClick = { uriHandler.openUri(Constants.URL_TC) },
+                    onPrivacyClick = { uriHandler.openUri(Constants.URL_PRIVACY_POLICY) },
                 )
 
                 SettingsPage.DangerZone -> DangerZonePage(
@@ -231,7 +219,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.profile),
                 description = stringResource(R.string.profile_settings_desc),
-                icon = painterResource(R.drawable.ic_profile),
+                icon = Icons.Filled.Person,
                 onClick = { onNavigate(SettingsPage.Profile) },
             )
         }
@@ -239,7 +227,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.appearance),
                 description = stringResource(R.string.appearance_settings_desc),
-                icon = painterResource(R.drawable.ic_custom_palette_m),
+                icon = Icons.Filled.Palette,
                 onClick = { onNavigate(SettingsPage.Appearance) },
             )
         }
@@ -247,7 +235,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.behavior),
                 description = stringResource(R.string.behavior_settings_desc),
-                icon = painterResource(R.drawable.ic_custom_gears_m),
+                icon = Icons.Filled.Tune,
                 onClick = { onNavigate(SettingsPage.Behavior) },
             )
         }
@@ -255,7 +243,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.privacy),
                 description = stringResource(R.string.privacy_settings_desc),
-                icon = painterResource(R.drawable.ic_vue_security_shield),
+                icon = Icons.Filled.Lock,
                 onClick = { onNavigate(SettingsPage.Privacy) },
             )
         }
@@ -263,7 +251,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.import_export),
                 description = stringResource(R.string.import_export_settings_desc),
-                icon = painterResource(R.drawable.ic_export_csv),
+                icon = Icons.Filled.ImportExport,
                 onClick = { onNavigate(SettingsPage.ImportExport) },
             )
         }
@@ -271,7 +259,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.about_and_support),
                 description = stringResource(R.string.about_and_support_desc),
-                icon = painterResource(R.drawable.ic_vue_support_star),
+                icon = Icons.Filled.Info,
                 onClick = { onNavigate(SettingsPage.AboutSupport) },
             )
         }
@@ -279,7 +267,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.danger_zone),
                 description = stringResource(R.string.danger_zone_desc),
-                icon = painterResource(R.drawable.ic_delete),
+                icon = Icons.Filled.Delete,
                 titleColor = MaterialTheme.colorScheme.error,
                 onClick = { onNavigate(SettingsPage.DangerZone) },
             )
@@ -505,113 +493,54 @@ private fun DetailPageColumn(content: LazyListScope.() -> Unit) {
     )
 }
 
-private const val AboutIconSize = 120
-private const val AboutIconGlyphSize = 56
-private const val RoundButtonSize = 64
-private const val RoundButtonIconSize = 26
-private const val VersionBadgeCornerPercent = 50
-
 @Composable
 private fun AboutSupportPage(
     versionName: String,
-    onShareIvyWallet: () -> Unit,
+    onGitHubClick: () -> Unit,
+    onAttributionsClick: () -> Unit,
+    onTermsClick: () -> Unit,
+    onPrivacyClick: () -> Unit,
 ) {
-    val uriHandler = LocalUriHandler.current
-
-    Surface(color = MaterialTheme.colorScheme.background) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 48.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+    DetailPageColumn {
+        item {
             ScreenDisplayTitle(text = stringResource(R.string.about_and_support))
-            Spacer(modifier = Modifier.height(24.dp))
-            Box(
-                modifier = Modifier
-                    .size(AboutIconSize.dp)
-                    .clip(RoundedCornerShape(36.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    modifier = Modifier.size(AboutIconGlyphSize.dp),
-                    painter = painterResource(R.drawable.ic_logo),
-                    contentDescription = stringResource(R.string.ivy_wallet),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = stringResource(R.string.ivy_wallet),
-                style = MaterialTheme.typography.displaySmall,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Surface(
-                shape = RoundedCornerShape(VersionBadgeCornerPercent),
-                color = MaterialTheme.colorScheme.tertiaryContainer,
-            ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-                    text = versionName,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer,
-                )
-            }
-            Spacer(modifier = Modifier.height(40.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                AboutRoundIconButton(
-                    icon = painterResource(R.drawable.github_logo),
-                    contentDescription = stringResource(R.string.github),
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    onClick = { uriHandler.openUri(Constants.URL_IVY_WALLET_REPO) },
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                AboutRoundIconButton(
-                    icon = painterResource(R.drawable.ic_share),
-                    contentDescription = stringResource(R.string.share_ivy_wallet),
-                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    onClick = onShareIvyWallet,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                AboutRoundIconButton(
-                    icon = painterResource(R.drawable.ic_vue_messages_msg),
-                    contentDescription = stringResource(R.string.help_center),
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    onClick = { uriHandler.openUri(Constants.URL_HELP_CENTER) },
-                )
-            }
         }
-    }
-}
-
-@Composable
-private fun AboutRoundIconButton(
-    icon: Painter,
-    contentDescription: String,
-    containerColor: Color,
-    contentColor: Color,
-    onClick: () -> Unit,
-) {
-    IconButton(
-        modifier = Modifier
-            .size(RoundButtonSize.dp)
-            .background(color = containerColor, shape = CircleShape),
-        onClick = onClick,
-    ) {
-        Icon(
-            modifier = Modifier.size(RoundButtonIconSize.dp),
-            painter = icon,
-            contentDescription = contentDescription,
-            tint = contentColor,
-        )
+        item {
+            SettingsItem(
+                title = stringResource(R.string.version),
+                description = versionName,
+                icon = Icons.Filled.Info,
+                onClick = null,
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.github),
+                icon = Icons.Filled.Code,
+                onClick = onGitHubClick,
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.attributions),
+                icon = Icons.Filled.MenuBook,
+                onClick = onAttributionsClick,
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.terms_conditions),
+                icon = Icons.Filled.Description,
+                onClick = onTermsClick,
+            )
+        }
+        item {
+            SettingsItem(
+                title = stringResource(R.string.privacy_policy),
+                icon = Icons.Filled.PrivacyTip,
+                onClick = onPrivacyClick,
+            )
+        }
     }
 }
 
@@ -803,7 +732,6 @@ private fun Preview(dark: Boolean = false) {
             onEvent = {},
             onBackupData = {},
             onExportToCsv = {},
-            onShareIvyWallet = {},
         )
     }
 }
@@ -818,10 +746,15 @@ fun SettingsUiTest(isDark: Boolean) {
 @Composable
 private fun AboutSupportPreview(dark: Boolean = false) {
     IvyPreview(dark = dark) {
-        AboutSupportPage(
-            versionName = "1.0.0",
-            onShareIvyWallet = {},
-        )
+        Surface(color = MaterialTheme.colorScheme.background) {
+            AboutSupportPage(
+                versionName = "1.0.0",
+                onGitHubClick = {},
+                onAttributionsClick = {},
+                onTermsClick = {},
+                onPrivacyClick = {},
+            )
+        }
     }
 }
 

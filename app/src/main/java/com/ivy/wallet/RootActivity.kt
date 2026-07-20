@@ -10,6 +10,7 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
@@ -105,6 +106,7 @@ class RootActivity : AppCompatActivity(), RootScreen {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setupApp()
+        setupBackHandling()
         setContent {
             val viewModel: RootViewModel = viewModel()
             val isSystemInDarkTheme = isSystemInDarkTheme()
@@ -181,6 +183,17 @@ class RootActivity : AppCompatActivity(), RootScreen {
         AddTransactionWidget.updateBroadcast(this)
         AddTransactionWidgetCompact.updateBroadcast(this)
         WalletBalanceWidgetReceiver.updateBroadcast(this)
+    }
+
+    private fun setupBackHandling() {
+        onBackPressedDispatcher.addCallback(this) {
+            val handled = !viewModel.isAppLocked() && navigation.onBackPressed()
+            if (!handled) {
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+                isEnabled = true
+            }
+        }
     }
 
     private companion object {
@@ -364,16 +377,6 @@ class RootActivity : AppCompatActivity(), RootScreen {
             .build()
 
         biometricPrompt.authenticate(promptInfo)
-    }
-
-    override fun onBackPressed() {
-        if (viewModel.isAppLocked()) {
-            super.onBackPressed()
-        } else {
-            if (!navigation.onBackPressed()) {
-                super.onBackPressed()
-            }
-        }
     }
 
     @Suppress("TooGenericExceptionCaught", "PrintStackTrace")

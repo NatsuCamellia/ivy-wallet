@@ -750,7 +750,7 @@ class HomeTransactionMapper(
     expenseFallback: String,      // R.string.expense
     incomeFallback: String,       // R.string.income
     transferFallback: String,     // R.string.transfer
-    formatAmount: (Double, String) -> String = { amount, currency -> amount.format(currency) },
+    formatAmount: (Double, String) -> String = { amount, currency -> "${amount.format(currency)} $currency" },
 ) {
     fun mapHistory(history: List<TransactionHistoryItem>): ImmutableList<HomeTrnListItem>
     fun mapDueSection(trns: List<Transaction>, overdue: Boolean): ImmutableList<HomeTrnListItem.Trn>
@@ -1049,7 +1049,7 @@ class HomeTransactionMapper(
     private val incomeFallback: String,
     private val transferFallback: String,
     private val formatAmount: (Double, String) -> String = { amount, currency ->
-        amount.format(currency)
+        "${amount.format(currency)} $currency"
     },
 ) {
     fun mapHistory(history: List<TransactionHistoryItem>): ImmutableList<HomeTrnListItem> {
@@ -1091,10 +1091,10 @@ class HomeTransactionMapper(
     fun sectionSubtitle(stats: IncomeExpensePair, currency: String): String? {
         val parts = buildList {
             if (stats.income > BigDecimal.ZERO) {
-                add("+${formatAmount(stats.income.toDouble(), currency)} $currency")
+                add("+${formatAmount(stats.income.toDouble(), currency)}")
             }
             if (stats.expense > BigDecimal.ZERO) {
-                add("-${formatAmount(stats.expense.abs().toDouble(), currency)} $currency")
+                add("-${formatAmount(stats.expense.abs().toDouble(), currency)}")
             }
         }
         return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
@@ -1110,8 +1110,7 @@ class HomeTransactionMapper(
                     TimeFormatter.Style.DateOnly(includeWeekDay = true)
                 )
             },
-            netText = "$sign${formatAmount(kotlin.math.abs(net), baseData.baseCurrency)} " +
-                baseData.baseCurrency,
+            netText = "$sign${formatAmount(kotlin.math.abs(net), baseData.baseCurrency)}",
         )
     }
 
@@ -1158,12 +1157,12 @@ class HomeTransactionMapper(
             trn.type == TransactionType.INCOME -> "+"
             else -> ""
         }
-        val amountText = "$amountSign${formatAmount(trn.amount.toDouble(), currency)} $currency"
+        val amountText = "$amountSign${formatAmount(trn.amount.toDouble(), currency)}"
 
         val secondaryText = when {
             dueKind != null -> null
             isTransfer && toCurrency != currency ->
-                "${formatAmount(trn.toAmount.toDouble(), toCurrency)} $toCurrency"
+                formatAmount(trn.toAmount.toDouble(), toCurrency)
             else -> trn.dateTime?.let { instant ->
                 with(timeFormatter) {
                     with(timeConverter) { instant.toLocalTime() }.format()

@@ -132,10 +132,10 @@ class HomeTransactionMapper(
             TransactionType.EXPENSE -> TransactionAmountKind.Expense
             TransactionType.TRANSFER -> TransactionAmountKind.Transfer
         }
-        val amountSign = when {
-            dueKind != null || trn.type == TransactionType.EXPENSE -> "-"
-            trn.type == TransactionType.INCOME -> "+"
-            else -> ""
+        val amountSign = when (trn.type) {
+            TransactionType.EXPENSE -> "-"
+            TransactionType.INCOME -> "+"
+            TransactionType.TRANSFER -> ""
         }
         val amountText = "$amountSign${formatAmount(trn.amount.toDouble(), currency)}"
 

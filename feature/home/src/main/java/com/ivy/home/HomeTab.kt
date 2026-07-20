@@ -473,7 +473,6 @@ private fun BoxWithConstraintsScope.PreviewHomeTab(isDark: Boolean = false) {
                 hideBalance = false,
                 hideIncome = false,
                 expanded = false,
-                shouldShowAccountSpecificColorInTransactions = false
             ),
             onEvent = {}
         )

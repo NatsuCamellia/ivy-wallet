@@ -190,6 +190,19 @@ class HomeTransactionMapperTest {
     }
 
     @Test
+    fun `due section rows for income transactions carry a plus sign and upcoming or overdue kind`() {
+        val due = incomeTrn("a").copy(dateTime = null, dueDate = Instant.EPOCH)
+
+        val upcoming = mapper().mapDueSection(listOf(due), overdue = false).first()
+        val overdue = mapper().mapDueSection(listOf(due), overdue = true).first()
+
+        upcoming.ui.amountText shouldStartWith "+"
+        upcoming.ui.amountKind shouldBe TransactionAmountKind.Upcoming
+        overdue.ui.amountText shouldStartWith "+"
+        overdue.ui.amountKind shouldBe TransactionAmountKind.Overdue
+    }
+
+    @Test
     fun `unknown account renders deleted text`() {
         val trn = expenseTrn("a").copy(accountId = UUID.randomUUID())
 
@@ -230,6 +243,15 @@ class HomeTransactionMapperTest {
         private fun expenseTrn(seed: String): Transaction = Transaction(
             accountId = cash.id,
             type = TransactionType.EXPENSE,
+            amount = BigDecimal("32.51"),
+            title = "Trn $seed",
+            categoryId = food.id.value,
+            dateTime = Instant.EPOCH,
+        )
+
+        private fun incomeTrn(seed: String): Transaction = Transaction(
+            accountId = cash.id,
+            type = TransactionType.INCOME,
             amount = BigDecimal("32.51"),
             title = "Trn $seed",
             categoryId = food.id.value,

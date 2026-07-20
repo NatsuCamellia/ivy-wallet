@@ -10,17 +10,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.ImportExport
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PrivacyTip
-import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.ImportExport
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material.icons.outlined.MenuBook
+import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.PrivacyTip
+import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -219,7 +219,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.profile),
                 description = stringResource(R.string.profile_settings_desc),
-                icon = Icons.Filled.Person,
+                icon = Icons.Outlined.Person,
                 onClick = { onNavigate(SettingsPage.Profile) },
             )
         }
@@ -227,7 +227,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.appearance),
                 description = stringResource(R.string.appearance_settings_desc),
-                icon = Icons.Filled.Palette,
+                icon = Icons.Outlined.Palette,
                 onClick = { onNavigate(SettingsPage.Appearance) },
             )
         }
@@ -235,7 +235,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.behavior),
                 description = stringResource(R.string.behavior_settings_desc),
-                icon = Icons.Filled.Tune,
+                icon = Icons.Outlined.Tune,
                 onClick = { onNavigate(SettingsPage.Behavior) },
             )
         }
@@ -243,7 +243,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.privacy),
                 description = stringResource(R.string.privacy_settings_desc),
-                icon = Icons.Filled.Lock,
+                icon = Icons.Outlined.Lock,
                 onClick = { onNavigate(SettingsPage.Privacy) },
             )
         }
@@ -251,7 +251,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.import_export),
                 description = stringResource(R.string.import_export_settings_desc),
-                icon = Icons.Filled.ImportExport,
+                icon = Icons.Outlined.ImportExport,
                 onClick = { onNavigate(SettingsPage.ImportExport) },
             )
         }
@@ -259,7 +259,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.about_and_support),
                 description = stringResource(R.string.about_and_support_desc),
-                icon = Icons.Filled.Info,
+                icon = Icons.Outlined.Info,
                 onClick = { onNavigate(SettingsPage.AboutSupport) },
             )
         }
@@ -267,7 +267,7 @@ private fun CategoriesPage(onNavigate: (SettingsPage) -> Unit) {
             SettingsItem(
                 title = stringResource(R.string.danger_zone),
                 description = stringResource(R.string.danger_zone_desc),
-                icon = Icons.Filled.Delete,
+                icon = Icons.Outlined.Delete,
                 titleColor = MaterialTheme.colorScheme.error,
                 onClick = { onNavigate(SettingsPage.DangerZone) },
             )
@@ -509,35 +509,35 @@ private fun AboutSupportPage(
             SettingsItem(
                 title = stringResource(R.string.version),
                 description = versionName,
-                icon = Icons.Filled.Info,
+                icon = Icons.Outlined.Info,
                 onClick = null,
             )
         }
         item {
             SettingsItem(
                 title = stringResource(R.string.github),
-                icon = Icons.Filled.Code,
+                icon = Icons.Outlined.Code,
                 onClick = onGitHubClick,
             )
         }
         item {
             SettingsItem(
                 title = stringResource(R.string.attributions),
-                icon = Icons.Filled.MenuBook,
+                icon = Icons.Outlined.MenuBook,
                 onClick = onAttributionsClick,
             )
         }
         item {
             SettingsItem(
                 title = stringResource(R.string.terms_conditions),
-                icon = Icons.Filled.Description,
+                icon = Icons.Outlined.Description,
                 onClick = onTermsClick,
             )
         }
         item {
             SettingsItem(
                 title = stringResource(R.string.privacy_policy),
-                icon = Icons.Filled.PrivacyTip,
+                icon = Icons.Outlined.PrivacyTip,
                 onClick = onPrivacyClick,
             )
         }

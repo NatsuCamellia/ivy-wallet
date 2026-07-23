@@ -27,7 +27,6 @@ fun IncomeExpensesRow(
     expenses: Double,
     currency: String,
     modifier: Modifier = Modifier,
-    textColor: Color = UI.colors.pureInverse,
     dividerColor: Color = UI.colors.medium,
     incomeLabel: String = stringResource(R.string.income_uppercase),
     expensesLabel: String = stringResource(R.string.expenses_uppercase),
@@ -43,7 +42,6 @@ fun IncomeExpensesRow(
         }
 
         LabelAmountColumn(
-            textColor = textColor,
             label = incomeLabel,
             amount = income,
             currency = currency,
@@ -61,7 +59,7 @@ fun IncomeExpensesRow(
         // Divider
         Spacer(
             modifier = Modifier
-                .width(2.dp)
+                .width(1.dp)
                 .height(48.dp)
                 .background(dividerColor, UI.shapes.rFull)
         )
@@ -75,7 +73,6 @@ fun IncomeExpensesRow(
         }
 
         LabelAmountColumn(
-            textColor = textColor,
             label = expensesLabel,
             amount = expenses,
             currency = currency,
@@ -93,7 +90,6 @@ private fun LabelAmountColumn(
     label: String,
     amount: Double,
     currency: String,
-    textColor: Color,
     center: Boolean
 ) {
     Column(
@@ -102,7 +98,6 @@ private fun LabelAmountColumn(
         Text(
             text = label,
             style = UI.typo.c.style(
-                color = textColor,
                 fontWeight = FontWeight.ExtraBold
             )
         )
@@ -113,7 +108,6 @@ private fun LabelAmountColumn(
             verticalAlignment = Alignment.CenterVertically
         ) {
             AmountCurrencyB1(
-                textColor = textColor,
                 amount = amount,
                 currency = currency
             )

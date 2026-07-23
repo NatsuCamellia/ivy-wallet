@@ -1,23 +1,28 @@
 package com.ivy.accounts
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,6 +32,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,9 +63,9 @@ import com.ivy.wallet.ui.theme.components.BalanceRowMini
 import com.ivy.wallet.ui.theme.components.ItemIconSDefaultIcon
 import com.ivy.wallet.ui.theme.components.ReorderButton
 import com.ivy.wallet.ui.theme.components.ReorderModalSingleType
-import com.ivy.wallet.ui.theme.dynamicContrast
 import com.ivy.wallet.ui.theme.findContrastTextColor
 import com.ivy.wallet.ui.theme.toComposeColor
+import com.ivy.wallet.ui.theme.wallet.AmountCurrencyB1
 import kotlinx.collections.immutable.persistentListOf
 import java.util.UUID
 
@@ -136,16 +142,12 @@ private fun BoxWithConstraintsScope.UI(
                 Spacer(Modifier.width(24.dp))
             }
             if (!state.hideTotalBalance) {
-                Column {
-                    Spacer(Modifier.height(16.dp))
-                    IncomeExpensesRow(
-                        currency = state.baseCurrency,
-                        incomeLabel = stringResource(id = R.string.total_balance),
-                        income = state.totalBalanceWithoutExcluded.toDoubleOrNull() ?: 0.00,
-                        expensesLabel = stringResource(id = R.string.total_balance_excluded),
-                        expenses = state.totalBalanceWithExcluded.toDoubleOrNull() ?: 0.00
-                    )
-                }
+                Spacer(Modifier.height(16.dp))
+                TotalBalanceCards(
+                    currency = state.baseCurrency,
+                    totalBalance = state.totalBalanceWithoutExcluded.toDoubleOrNull() ?: 0.00,
+                    totalBalanceExcluded = state.totalBalanceWithExcluded.toDoubleOrNull() ?: 0.00
+                )
                 Spacer(Modifier.height(16.dp))
             }
         }
@@ -203,6 +205,90 @@ private fun BoxWithConstraintsScope.UI(
 }
 
 @Composable
+private fun TotalBalanceCards(
+    currency: String,
+    totalBalance: Double,
+    totalBalanceExcluded: Double,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Spacer(Modifier.width(16.dp))
+
+        TotalBalanceCard(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            label = stringResource(R.string.total_balance),
+            currency = currency,
+            amount = totalBalance
+        )
+
+        Spacer(Modifier.width(12.dp))
+
+        TotalBalanceCard(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            label = stringResource(R.string.total_balance_excluded),
+            currency = currency,
+            amount = totalBalanceExcluded
+        )
+
+        Spacer(Modifier.width(16.dp))
+    }
+}
+
+@Composable
+private fun RowScope.TotalBalanceCard(
+    containerColor: Color,
+    label: String,
+    currency: String,
+    amount: Double,
+) {
+    val contentColor = contentColorFor(containerColor)
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .clip(MaterialTheme.shapes.large)
+            .background(containerColor)
+    ) {
+        Spacer(Modifier.height(12.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(Modifier.width(16.dp))
+
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = contentColor
+            )
+        }
+
+        Spacer(Modifier.height(4.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(Modifier.width(20.dp))
+
+            AmountCurrencyB1(
+                amount = amount,
+                currency = currency,
+                textColor = contentColor,
+                shortenBigNumbers = true
+            )
+
+            Spacer(Modifier.width(4.dp))
+        }
+
+        Spacer(Modifier.height(20.dp))
+    }
+}
+
+@Composable
 private fun AccountCard(
     baseCurrency: String,
     accountData: AccountData,
@@ -215,24 +301,30 @@ private fun AccountCard(
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .clip(UI.shapes.r4)
-            .border(2.dp, UI.colors.medium, UI.shapes.r4)
+            .background(MaterialTheme.colorScheme.surfaceContainer, UI.shapes.r4)
             .clickable(
                 onClick = onClick
             )
     ) {
         val account = accountData.account
-        val contrastColor = findContrastTextColor(account.color.value.toComposeColor())
         val currency = account.asset.code
 
         AccountHeader(
             accountData = accountData,
             currency = currency,
             baseCurrency = baseCurrency,
-            contrastColor = contrastColor,
             onBalanceClick = onBalanceClick
         )
 
         if (!compactModeEnabled) {
+            Spacer(
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(UI.colors.pureInverse.copy(alpha = 0.1f))
+            )
+
             Spacer(Modifier.height(12.dp))
 
             IncomeExpensesRow(
@@ -240,7 +332,8 @@ private fun AccountCard(
                 incomeLabel = stringResource(R.string.month_income),
                 income = accountData.monthlyIncome,
                 expensesLabel = stringResource(R.string.month_expenses),
-                expenses = accountData.monthlyExpenses
+                expenses = accountData.monthlyExpenses,
+                dividerColor = UI.colors.pureInverse.copy(alpha = 0.15f)
             )
 
             Spacer(Modifier.height(12.dp))
@@ -253,15 +346,14 @@ private fun AccountHeader(
     accountData: AccountData,
     currency: String,
     baseCurrency: String,
-    contrastColor: Color,
     onBalanceClick: () -> Unit
 ) {
     val account = accountData.account
+    val accountColor = account.color.value.toComposeColor()
+    val iconTint = findContrastTextColor(accountColor)
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(account.color.value.toComposeColor(), UI.shapes.r4Top)
+        modifier = Modifier.fillMaxWidth()
     ) {
         Spacer(Modifier.height(16.dp))
 
@@ -270,35 +362,48 @@ private fun AccountHeader(
         ) {
             Spacer(Modifier.width(20.dp))
 
-            ItemIconSDefaultIcon(
-                iconName = account.icon?.id,
-                defaultIcon = R.drawable.ic_custom_account_s,
-                tint = contrastColor
-            )
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(accountColor),
+                contentAlignment = Alignment.Center
+            ) {
+                ItemIconSDefaultIcon(
+                    iconName = account.icon?.id,
+                    defaultIcon = R.drawable.ic_custom_account_s,
+                    tint = iconTint
+                )
+            }
 
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(12.dp))
 
             Text(
+                modifier = Modifier.weight(1f),
                 text = account.name.value,
                 style = UI.typo.b1.style(
-                    color = contrastColor,
+                    color = UI.colors.pureInverse,
                     fontWeight = FontWeight.ExtraBold
-                )
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
 
             if (!account.includeInBalance) {
-                Spacer(Modifier.width(8.dp))
-
                 Text(
                     text = stringResource(R.string.excluded),
                     style = UI.typo.c.style(
-                        color = account.color.value.toComposeColor().dynamicContrast()
+                        color = UI.colors.gray
                     )
                 )
+
+                Spacer(Modifier.width(4.dp))
             }
+
+            Spacer(Modifier.width(16.dp))
         }
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(12.dp))
 
         BalanceRow(
             modifier = Modifier
@@ -306,7 +411,6 @@ private fun AccountHeader(
                 .clickableNoIndication(rememberInteractionSource()) {
                     onBalanceClick()
                 },
-            textColor = contrastColor,
             currency = currency,
             balance = accountData.balance,
 
@@ -324,7 +428,7 @@ private fun AccountHeader(
                         onBalanceClick()
                     }
                     .testTag("baseCurrencyEquivalent"),
-                textColor = account.color.value.toComposeColor().dynamicContrast(),
+                textColor = UI.colors.gray,
                 currency = baseCurrency,
                 balance = accountData.balanceBaseCurrency!!,
                 currencyUpfront = false

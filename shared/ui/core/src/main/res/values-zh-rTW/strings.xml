@@ -92,6 +92,7 @@
     <string name="confirm_account_change">確認帳戶更改</string>
     <string name="confirm_account_change_description">注意: 您正在嘗試將與借貸關聯的帳戶更改為不同貨幣的帳戶，\n所有借貸記錄將根據今天的匯率重新計算</string>
     <string name="confirm">確認</string>
+    <string name="cancel">取消</string>
     <string name="created_on">創建於</string>
     <string name="hi">你好</string>
     <string name="hi_name">你好 %1$s</string>
@@ -100,6 +101,8 @@
     <string name="ivy_wallet_open_source">Ivy wallet 是開源的</string>
     <string name="savings_goal">儲蓄目標</string>
     <string name="quick_access">快速存取</string>
+    <string name="add_transaction">新增交易</string>
+    <string name="more_options">更多選項</string>
     <string name="settings">設定</string>
     <string name="light_mode">亮色主題</string>
     <string name="dark_mode">暗色主題</string>
@@ -110,6 +113,7 @@
     <string name="reports">報表</string>
     <string name="loans">借貸</string>
     <string name="set_currency">設定貨幣</string>
+    <string name="crypto_currencies">加密貨幣</string>
     <string name="no_transactions">沒有交易</string>
     <string name="no_transactions_description">您沒有 %1$s 的任何交易。\n您可以點選 \"+\" 按鈕新增一個。</string>
     <string name="add_loan">增加借貸</string>
@@ -495,4 +499,23 @@
     <string name="bill_paid">您的 %1$s %2$s 帳單已支付</string>
     <string name="language">語言</string>
     <string name="advanced_features">進階功能</string>
+    <string name="currency">貨幣</string>
+    <string name="theme">主題</string>
+    <string name="dynamic_color">動態色彩</string>
+    <string name="version">版本</string>
+    <string name="name">名稱</string>
+    <string name="behavior_settings_desc">起始日期、匯率</string>
+    <string name="privacy_settings_desc">鎖定、通知</string>
+    <string name="import_export_settings_desc">備份、匯入、匯出</string>
+    <string name="about_and_support_desc">版本、GitHub、條款</string>
+    <string name="danger_zone_desc">刪除所有資料</string>
+    <string name="profile">帳戶</string>
+    <string name="appearance">外觀</string>
+    <string name="behavior">行為</string>
+    <string name="privacy">隱私</string>
+    <string name="about_and_support">關於與支援</string>
+    <string name="profile_settings_desc">名稱、貨幣</string>
+    <string name="appearance_settings_desc">主題、顏色、語言</string>
+    <string name="search">搜尋</string>
+    <string name="fiat_currencies">法定貨幣</string>
 </resources>

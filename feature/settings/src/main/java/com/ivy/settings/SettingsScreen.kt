@@ -326,7 +326,6 @@ private fun AppearancePage(
             item {
                 SettingsItem(
                     title = stringResource(R.string.dynamic_color),
-                    description = stringResource(R.string.dynamic_color_description),
                     onClick = null,
                     modifier = Modifier.toggleable(
                         value = uiState.dynamicColorEnabled,

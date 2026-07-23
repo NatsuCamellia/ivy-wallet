@@ -125,13 +125,12 @@
     <string name="import_export_settings_desc">Backup, import, export</string>
     <string name="about_and_support_desc">Version, GitHub, legal</string>
     <string name="danger_zone_desc">Delete all data</string>
-    <string name="github">GitHub</string>
+    <string name="github" translatable="false">GitHub</string>
     <string name="version">Version</string>
     <string name="name">Name</string>
     <string name="currency">Currency</string>
     <string name="theme">Theme</string>
     <string name="dynamic_color">Dynamic color</string>
-    <string name="dynamic_color_description">Use colors from your wallpaper (Material You)</string>
     <string name="search">Search</string>
     <string name="fiat_currencies">Fiat</string>
     <string name="crypto_currencies">Crypto</string>

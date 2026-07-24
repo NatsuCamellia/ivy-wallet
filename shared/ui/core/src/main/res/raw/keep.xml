@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Icons in ChooseIconModal are resolved at runtime by name via
+    Resources.getIdentifier() (see ItemIcon.kt: getCustomIconId /
+    fallbackToNewIconFormat). AGP's resource shrinker can't trace that
+    reflective lookup, so release builds strip most of these drawables
+    unless explicitly kept here.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@drawable/ic_custom_*,@drawable/ic_vue_*" />

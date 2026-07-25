@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
-          java-version: '18'
+          java-version: '21'
 
       - name: Setup Ruby (for Fastlane)
         uses: ruby/setup-ruby@v1
@@ -104,7 +104,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'adopt'
-          java-version: '18'
+          java-version: '21'
 
       - name: Enable Gradle Wrapper caching (optimization)
         uses: actions/cache@v4

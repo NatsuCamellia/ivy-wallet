@@ -26,7 +26,12 @@ android {
     }
 }
 
-if (project.hasProperty("composeCompilerReports")) {
+// :temp:old-design crashes the Compose compiler's composables.txt printer with a
+// NoSuchElementException in IrSourcePrinter.printReceiver (a compiler bug, not a real
+// compile error - `compileReleaseKotlin` succeeds fine without report generation). Since
+// it's legacy/temp code slated for removal, skip report generation for it instead of
+// working around the upstream compiler bug.
+if (project.hasProperty("composeCompilerReports") && project.path != ":temp:old-design") {
     composeCompiler {
         reportsDestination = layout.buildDirectory.dir("compose_compiler")
         metricsDestination = layout.buildDirectory.dir("compose_compiler")

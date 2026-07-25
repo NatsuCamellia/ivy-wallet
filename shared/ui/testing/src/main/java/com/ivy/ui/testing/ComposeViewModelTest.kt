@@ -7,6 +7,7 @@ import app.cash.turbine.test
 import com.ivy.ui.ComposeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.Rule
@@ -30,7 +31,7 @@ fun <UiState, UiEvent> ComposeViewModel<UiState, UiEvent>.runTest(
     try {
         Dispatchers.setMain(Dispatchers.Unconfined)
         val viewModel = this
-        kotlinx.coroutines.test.runTest {
+        kotlinx.coroutines.test.runTest(UnconfinedTestDispatcher()) {
             moleculeFlow(mode = RecompositionMode.Immediate) {
                 viewModel.uiState()
             }.test {

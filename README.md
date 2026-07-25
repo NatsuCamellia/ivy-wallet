@@ -1,18 +1,12 @@
 >[!IMPORTANT]
->**🚨 Notice: Project No Longer Maintained 🚨**
+>**🎨 Material 3 Expressive Fork of [Ivy Wallet](https://github.com/Ivy-Apps/ivy-wallet)**
 >
->As of **Nov 5th, 2024**, this project is no longer maintained by the original developers. No further updates, bug fixes, or support will be provided.
+>This repository is a fork of Ivy Wallet dedicated to refreshing the user interface using **Material 3 Expressive** design system.
 >
->- **Pull Requests and Issues**: We will not be reviewing or merging pull requests, nor responding to issues or discussions.
->
->- **Forking and Future Development**: In accordance with the [GPL-3.0 License](LICENSE), you are encouraged to **fork this repository** to continue development independently. You are free to modify, distribute, and release your own versions under the same license.
->
->- **Disclaimer of Liability**:
->  - **"As-Is" Basis**: This software is provided on an "as-is" basis without any warranties or conditions of any kind, either express or implied.
->  - **No Liability**: The original maintainers shall not be liable for any claims, damages, or other liabilities arising from the use, modification, or distribution of this software.
->  - **User Responsibility**: Users and developers who choose to use or fork this project assume all risks and responsibilities associated with its use and further development.
->
->For more information, please refer to the [LICENSE](LICENSE) file.
+>- **UI-Only Redesign**: Focuses purely on modernizing the user interface, layout, animations, and design tokens with Material 3 Expressive.
+>- **100% Data & Feature Compatibility**: Preserves all core money management features, business logic, and database structures exactly as in the original Ivy Wallet.
+>- **Seamless Interoperability**: Users can freely switch back and forth between the original Ivy Wallet and this fork without data loss.
+>- **Project Status**: The upstream repository was archived by the original maintainers on **Nov 5th, 2024**. Development continues independently here under the [GPL-3.0 License](LICENSE).
 
 [![Latest Release](https://img.shields.io/github/v/release/Ivy-Apps/ivy-wallet)](https://github.com/Ivy-Apps/ivy-wallet/releases)
 [![APK](https://github.com/Ivy-Apps/ivy-wallet/actions/workflows/apk.yml/badge.svg)](https://github.com/Ivy-Apps/ivy-wallet/actions/workflows/apk.yml)
@@ -22,7 +16,7 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/Ivy-Apps/ivy-wallet?style=social)](https://github.com/Ivy-Apps/ivy-wallet/stargazers)
 [![Fork Ivy Wallet](https://img.shields.io/github/forks/Ivy-Apps/ivy-wallet?logo=github&style=social)](https://github.com/Ivy-Apps/ivy-wallet/fork)
 
-# [Ivy Wallet: money manager](https://play.google.com/store/apps/details?id=com.ivy.wallet)
+# Ivy Wallet: money manager
 
 |                                                                                                            |                                                                                                            |                                                                                                            |                                                                                                            |
 |:----------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------:|
@@ -45,10 +39,6 @@ A money management app can help you answer these questions.
 
 Ivy Wallet may lack some of the features you're looking for, but it truly shines in its user interface and experience, as well as its simplicity and customization options. This was recognized in the ["Top/Best Android App in 2021/2022 charts"](https://youtube.com/playlist?list=PLguJN0waG1-eSzKMuFMIULrR3MlqJ3cAE) by the YouTube tech community.
 
-<a href='https://play.google.com/store/apps/details?id=com.ivy.wallet&utm_source=github&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' width="323" height="125"/></a>
-
-> Join our **[private Telegram Community](https://t.me/+ETavgioAvWg4NThk)**.
-
 > To support our free open source project, please give it a star. ⭐
 > This means a lot to us. Thank you so much! [![GitHub Repo stars](https://img.shields.io/github/stars/Ivy-Apps/ivy-wallet?style=social)](https://github.com/Ivy-Apps/ivy-wallet/stargazers)
 
@@ -62,12 +52,6 @@ Ivy Wallet may lack some of the features you're looking for, but it truly shines
 **1. Fork and clone the repo**
 
 Instructions in [CONTRIBUTING.md](./CONTRIBUTING.md).
-
-### Need help?
-
-Join our Telegram community and drop a message in the "Development" topic.
-
-[![Telegram Group](https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white)](https://t.me/+ETavgioAvWg4NThk)
 
 ## Learning Materials
 
@@ -164,14 +148,3 @@ Folks that helped Ivy Wallet in a non-dev creative ways that can't be captured o
     <strong><a href="https://github.com/SHYMOM" >Shymom</a> </strong><br>
     <br/>
 </div>
-
-
-## Community Projects
-
-> ⚠️ Disclaimer: The community projects listed are independently developed and not affiliated with Ivy Apps Ltd. Consequently, we cannot vouch for their functionality, security or intentions. Your engagement with these projects is solely at your own discretion and risk. Ivy Apps Ltd explicitly disclaims any warranties, express or implied, and shall not be held liable for any damages or losses resulting from the use of these community-developed projects.
-> 
-### [ivy-wallet-web](https://github.com/pratikkabade/ivy-wallet-web) by [Pratik Kabade](https://github.com/pratikkabade)
-
-This community-developed project allows users to conveniently access Ivy Wallet through their **web browsers**, ensuring a smooth experience across multiple platforms.
-- [GitHub URL](https://github.com/pratikkabade/ivy-wallet-web)
-- [Web app URL](https://ivy-wallet-web.vercel.app/)

@@ -110,3 +110,9 @@ com.ivy.reports.AccountsFilter
 com.ivy.reports.CategoriesFilter
 com.ivy.reports.AmountFilter
 com.ivy.reports.KeywordsFilter
+com.ivy.design.system.ivyColorScheme
+com.ivy.design.system.ivyBrandColorScheme
+com.ivy.design.system.ivyExpressiveTypography
+com.ivy.ui.component.transaction.amountColor
+com.ivy.settings.themeLabel
+com.ivy.home.transactionlist.rememberHomeTransactionMapper

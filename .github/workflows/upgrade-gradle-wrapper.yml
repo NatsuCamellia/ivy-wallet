@@ -8,6 +8,8 @@ on:
 jobs:
   upgrade-gradle-wrapper:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       WRAPPER_UPGRADE_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:

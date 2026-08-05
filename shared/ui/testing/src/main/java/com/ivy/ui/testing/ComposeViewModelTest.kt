@@ -37,7 +37,13 @@ fun <UiState, UiEvent> ComposeViewModel<UiState, UiEvent>.runTest(
             }.test {
                 events.onEach(viewModel::onEvent)
                 verify(expectMostRecentItem())
-                cancel()
+                // Use cancelAndIgnoreRemainingEvents() instead of cancel(): ViewModels can keep
+                // recomposing after we've sampled the state we care about (e.g. onStart() work
+                // that hops onto the real Dispatchers.IO and lands after expectMostRecentItem()
+                // returns). Plain cancel() still runs Turbine's ensureAllEventsConsumed() check,
+                // so any such late, uninteresting recomposition fails the test with a
+                // TurbineAssertionError even though verify() already got the state it wanted.
+                cancelAndIgnoreRemainingEvents()
             }
         }
     } finally {

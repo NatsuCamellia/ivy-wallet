@@ -6,39 +6,40 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
 import com.ivy.base.model.TransactionType
 import com.ivy.data.model.Category
+import com.ivy.data.model.CategoryId
 import com.ivy.data.model.Tag
 import com.ivy.data.model.TagId
+import com.ivy.data.model.primitive.ColorInt
+import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.design.api.LocalTimeConverter
+import com.ivy.design.l0_system.Blue
+import com.ivy.design.l0_system.Green
 import com.ivy.design.l0_system.Orange
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
+import com.ivy.design.l0_system.Purple
+import com.ivy.design.l0_system.Red
 import com.ivy.design.utils.hideKeyboard
 import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.data.EditTransactionDisplayLoan
@@ -54,30 +55,27 @@ import com.ivy.navigation.EditTransactionScreen
 import com.ivy.navigation.IvyPreview
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
+import com.ivy.transaction.components.AmountCard
+import com.ivy.transaction.components.EditTransactionTopBar
+import com.ivy.transaction.components.SaveBar
+import com.ivy.transaction.components.SelectableChipRow
+import com.ivy.transaction.components.TitleField
+import com.ivy.transaction.components.TransactionTypeSwitch
 import com.ivy.ui.R
 import com.ivy.wallet.domain.data.CustomExchangeRateState
 import com.ivy.wallet.domain.data.IvyCurrency
 import com.ivy.wallet.domain.deprecated.logic.model.CreateAccountData
 import com.ivy.wallet.domain.deprecated.logic.model.CreateCategoryData
-import com.ivy.wallet.ui.edit.core.Category
 import com.ivy.wallet.ui.edit.core.DueDate
-import com.ivy.wallet.ui.edit.core.EditBottomSheet
-import com.ivy.wallet.ui.edit.core.Title
-import com.ivy.wallet.ui.edit.core.Toolbar
 import com.ivy.wallet.ui.theme.components.AddPrimaryAttributeButton
-import com.ivy.wallet.ui.theme.components.ChangeTransactionTypeModal
 import com.ivy.wallet.ui.theme.components.CustomExchangeRateCard
 import com.ivy.wallet.ui.theme.modal.DeleteModal
-import com.ivy.wallet.ui.theme.modal.ModalAdd
-import com.ivy.wallet.ui.theme.modal.ModalCheck
-import com.ivy.wallet.ui.theme.modal.ModalSave
 import com.ivy.wallet.ui.theme.modal.ProgressModal
 import com.ivy.wallet.ui.theme.modal.edit.AccountModal
 import com.ivy.wallet.ui.theme.modal.edit.AccountModalData
 import com.ivy.wallet.ui.theme.modal.edit.AmountModal
 import com.ivy.wallet.ui.theme.modal.edit.CategoryModal
 import com.ivy.wallet.ui.theme.modal.edit.CategoryModalData
-import com.ivy.wallet.ui.theme.modal.edit.ChooseCategoryModal
 import com.ivy.wallet.ui.theme.modal.edit.DescriptionModal
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
@@ -87,7 +85,6 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.UUID
-import kotlin.math.roundToInt
 
 @ExperimentalFoundationApi
 @Composable
@@ -235,13 +232,11 @@ private fun BoxWithConstraintsScope.UI(
     hasChanges: Boolean = false,
 
     ) {
-    var chooseCategoryModalVisible by remember { mutableStateOf(false) }
-    var tagModelVisible by remember { mutableStateOf(false) }
     var categoryModalData: CategoryModalData? by remember { mutableStateOf(null) }
     var accountModalData: AccountModalData? by remember { mutableStateOf(null) }
     var descriptionModalVisible by remember { mutableStateOf(false) }
     var deleteTrnModalVisible by remember { mutableStateOf(false) }
-    var changeTransactionTypeModalVisible by remember { mutableStateOf(false) }
+    var tagModalVisible by remember { mutableStateOf(false) }
     var amountModalShown by remember { mutableStateOf(false) }
     var exchangeRateAmountModalShown by remember { mutableStateOf(false) }
     var accountChangeModal by remember { mutableStateOf(false) }
@@ -267,166 +262,214 @@ private fun BoxWithConstraintsScope.UI(
     val titleFocus = FocusRequester()
     val scrollState = rememberScrollState()
 
-    // This is to scroll the column to the customExchangeCard composable when it is shown
-    var customExchangeRatePosition by remember { mutableFloatStateOf(0F) }
-    LaunchedEffect(key1 = customExchangeRateState.showCard) {
-        val scrollInt =
-            if (customExchangeRateState.showCard) customExchangeRatePosition.roundToInt() else 0
-        scrollState.animateScrollTo(scrollInt)
-    }
+    val nav = navigation()
+    val ivyContext = ivyWalletCtx()
+    val timeConverter = LocalTimeConverter.current
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .verticalScroll(scrollState)
-    ) {
-        Spacer(Modifier.height(16.dp))
+    // Loan records always display (and can only be) a transfer; the type switch is hidden for them.
+    val displayType = if (loanData.isLoanRecord) TransactionType.TRANSFER else transactionType
 
-        Toolbar(
-            // Setting the transaction type to TransactionType.TRANSFER for transactions associated
-            // with loan record to hide the ChangeTransactionType Button
-            type = if (loanData.isLoanRecord) TransactionType.TRANSFER else transactionType,
-            initialTransactionId = screen.initialTransactionId,
-            onDeleteTrnModal = {
-                deleteTrnModalVisible = true
-            },
-            onChangeTransactionTypeModal = {
-                changeTransactionTypeModalVisible = true
-            },
-            showDuplicateButton = true,
-            onDuplicate = onDuplicate
-        )
+    val (saveLabel, onSaveClick) = saveBarAction(
+        hasExistingTransaction = screen.initialTransactionId != null,
+        dueDate = dueDate,
+        hasChanges = hasChanges,
+        transactionType = transactionType,
+        onSave = onSave,
+        onSetHasChanges = onSetHasChanges,
+        onPayPlannedPayment = onPayPlannedPayment,
+    )
 
-        Spacer(Modifier.height(32.dp))
+    Scaffold(
+        topBar = {
+            EditTransactionTopBar(
+                title = topBarTitle(
+                    isNewTransaction = screen.initialTransactionId == null,
+                    type = displayType,
+                ),
+                onClose = { nav.back() },
+                showDuplicateButton = screen.initialTransactionId != null,
+                onDuplicate = onDuplicate,
+                showDeleteButton = screen.initialTransactionId != null,
+                onDelete = { deleteTrnModalVisible = true },
+            )
+        },
+        bottomBar = {
+            SaveBar(label = saveLabel, onClick = onSaveClick)
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .verticalScroll(scrollState)
+                .padding(horizontal = 16.dp)
+        ) {
+            Spacer(Modifier.height(8.dp))
 
-        Title(
-            type = transactionType,
-            titleFocus = titleFocus,
-            initialTransactionId = screen.initialTransactionId,
+            if (!loanData.isLoanRecord) {
+                TransactionTypeSwitch(
+                    selected = transactionType,
+                    onSelected = onSetTransactionType,
+                )
+                Spacer(Modifier.height(16.dp))
+            }
 
-            titleTextFieldValue = titleTextFieldValue,
-            setTitleTextFieldValue = {
-                titleTextFieldValue = it
-            },
-            suggestions = titleSuggestions,
-            scrollState = scrollState,
+            AmountCard(
+                amount = amount,
+                currency = baseCurrency,
+                onClick = { amountModalShown = true },
+            )
 
-            onTitleChanged = onTitleChange,
-            onNext = {
-                when {
-                    shouldFocusAmount(amount = amount) -> {
+            Spacer(Modifier.height(16.dp))
+
+            TitleField(
+                type = transactionType,
+                value = titleTextFieldValue,
+                onValueChange = {
+                    titleTextFieldValue = it
+                    onTitleChange(it.text)
+                },
+                suggestions = titleSuggestions,
+                focusRequester = titleFocus,
+                onNext = {
+                    when {
+                        shouldFocusAmount(amount = amount) -> amountModalShown = true
+                        else -> onSave(true)
+                    }
+                },
+            )
+
+            if (loanData.loanCaption != null) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = loanData.loanCaption!!,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            SelectableChipRow(
+                label = stringResource(R.string.category),
+                items = categories,
+                selectedItem = category,
+                itemLabel = { it.name.value },
+                onItemSelected = { newCategory ->
+                    onCategoryChange(newCategory)
+                    if (shouldFocusTitle(titleTextFieldValue, transactionType)) {
+                        titleFocus.requestFocus()
+                    } else if (shouldFocusAmount(amount = amount)) {
                         amountModalShown = true
                     }
-
-                    else -> {
-                        onSave(true)
-                    }
-                }
-            }
-        )
-
-        if (loanData.loanCaption != null) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                modifier = Modifier.padding(horizontal = 24.dp),
-                text = loanData.loanCaption!!,
-                style = UI.typo.nB2.style(
-                    color = UI.colors.mediumInverse,
-                    fontWeight = FontWeight.Normal
-                )
-            )
-        }
-
-        Spacer(Modifier.height(32.dp))
-
-        Category(category = category, onChooseCategory = {
-            chooseCategoryModalVisible = true
-        })
-
-        Spacer(Modifier.height(16.dp))
-
-        AddTagButton(transactionAssociatedTags = transactionAssociatedTags, onClick = {
-            tagModelVisible = true
-        })
-
-        Spacer(Modifier.height(32.dp))
-
-        val ivyContext = ivyWalletCtx()
-
-        val timeConverter = LocalTimeConverter.current
-        if (dueDate != null) {
-            DueDate(dueDate = dueDate) {
-                ivyContext.datePicker(
-                    initialDate = with(timeConverter) {
-                        dueDate.toLocalDate()
-                    }
-                ) {
-                    onDueDateChange(it.atTime(12, 0))
-                }
-            }
-
-            Spacer(Modifier.height(12.dp))
-        }
-
-        Description(
-            description = description,
-            onAddDescription = { descriptionModalVisible = true },
-            onEditDescription = { descriptionModalVisible = true }
-        )
-
-        TransactionDateTime(
-            dateTime = dateTime,
-            dueDateTime = dueDate,
-            onEditDate = onSetDate,
-            onEditTime = onSetTime,
-        )
-
-        if (transactionType == TransactionType.TRANSFER && customExchangeRateState.showCard) {
-            Spacer(Modifier.height(12.dp))
-            CustomExchangeRateCard(
-                fromCurrencyCode = baseCurrency,
-                toCurrencyCode = customExchangeRateState.toCurrencyCode ?: baseCurrency,
-                exchangeRate = customExchangeRateState.exchangeRate,
-                onRefresh = {
-                    // Set exchangeRate to null to reset
-                    onExchangeRateChange(null)
                 },
-                modifier = Modifier.onGloballyPositioned { coordinates ->
-                    customExchangeRatePosition = coordinates.positionInParent().y * 0.3f
-                }
-            ) {
-                exchangeRateAmountModalShown = true
-            }
-        }
+                onAddNew = { categoryModalData = CategoryModalData(null) },
+                addNewContentDescription = stringResource(R.string.add_category),
+            )
 
-        if (dueDate == null && transactionType != TransactionType.TRANSFER && dateTime == null) {
             Spacer(Modifier.height(12.dp))
 
-            val nav = navigation()
-            AddPrimaryAttributeButton(
-                icon = R.drawable.ic_planned_payments,
-                text = stringResource(R.string.add_planned_date_payment),
-                onClick = {
-                    nav.back()
-                    nav.navigateTo(
-                        EditPlannedScreen(
-                            plannedPaymentRuleId = null,
-                            type = transactionType,
-                            amount = amount,
-                            accountId = account?.id,
-                            categoryId = category?.id?.value,
-                            title = titleTextFieldValue.text,
-                            description = description,
-                        )
-                    )
-                }
+            SelectableChipRow(
+                label = stringResource(R.string.account),
+                items = accounts,
+                selectedItem = account,
+                itemLabel = { it.name },
+                onItemSelected = { newAccount ->
+                    if (loanData.isLoan && account?.currency != newAccount.currency) {
+                        selectedAcc = newAccount
+                        accountChangeModal = true
+                    } else {
+                        onAccountChange(newAccount)
+                    }
+                },
+                onAddNew = {
+                    accountModalData = AccountModalData(account = null, baseCurrency = baseCurrency, balance = 0.0)
+                },
+                addNewContentDescription = stringResource(R.string.add_account),
             )
-        }
 
-        Spacer(Modifier.height(600.dp)) // scroll hack
+            if (transactionType == TransactionType.TRANSFER) {
+                Spacer(Modifier.height(12.dp))
+
+                SelectableChipRow(
+                    label = stringResource(R.string.to_account),
+                    items = accounts,
+                    selectedItem = toAccount,
+                    itemLabel = { it.name },
+                    onItemSelected = onToAccountChange,
+                    onAddNew = {
+                        accountModalData = AccountModalData(account = null, baseCurrency = baseCurrency, balance = 0.0)
+                    },
+                    addNewContentDescription = stringResource(R.string.add_account),
+                )
+
+                if (customExchangeRateState.showCard) {
+                    Spacer(Modifier.height(12.dp))
+                    CustomExchangeRateCard(
+                        fromCurrencyCode = baseCurrency,
+                        toCurrencyCode = customExchangeRateState.toCurrencyCode ?: baseCurrency,
+                        exchangeRate = customExchangeRateState.exchangeRate,
+                        onRefresh = { onExchangeRateChange(null) },
+                    ) {
+                        exchangeRateAmountModalShown = true
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            AddTagButton(transactionAssociatedTags = transactionAssociatedTags, onClick = { tagModalVisible = true })
+
+            Spacer(Modifier.height(16.dp))
+
+            if (dueDate != null) {
+                DueDate(dueDate = dueDate) {
+                    ivyContext.datePicker(
+                        initialDate = with(timeConverter) { dueDate.toLocalDate() }
+                    ) {
+                        onDueDateChange(it.atTime(12, 0))
+                    }
+                }
+                Spacer(Modifier.height(12.dp))
+            }
+
+            Description(
+                description = description,
+                onAddDescription = { descriptionModalVisible = true },
+                onEditDescription = { descriptionModalVisible = true }
+            )
+
+            TransactionDateTime(
+                dateTime = dateTime,
+                dueDateTime = dueDate,
+                onEditDate = onSetDate,
+                onEditTime = onSetTime,
+            )
+
+            if (dueDate == null && transactionType != TransactionType.TRANSFER && dateTime == null) {
+                Spacer(Modifier.height(12.dp))
+                AddPrimaryAttributeButton(
+                    icon = R.drawable.ic_planned_payments,
+                    text = stringResource(R.string.add_planned_date_payment),
+                    onClick = {
+                        nav.back()
+                        nav.navigateTo(
+                            EditPlannedScreen(
+                                plannedPaymentRuleId = null,
+                                type = transactionType,
+                                amount = amount,
+                                accountId = account?.id,
+                                categoryId = category?.id?.value,
+                                title = titleTextFieldValue.text,
+                                description = description,
+                            )
+                        )
+                    }
+                )
+            }
+
+            Spacer(Modifier.height(24.dp))
+        }
     }
 
     onScreenStart {
@@ -435,107 +478,23 @@ private fun BoxWithConstraintsScope.UI(
         }
     }
 
-    EditBottomSheet(
-        initialTransactionId = screen.initialTransactionId,
-        type = transactionType,
-        accounts = accounts,
-        selectedAccount = account,
-        toAccount = toAccount,
-        amount = amount,
+    AmountModal(
+        id = amountModalId,
+        visible = amountModalShown,
         currency = baseCurrency,
-        convertedAmount = customExchangeRateState.convertedAmount,
-        convertedAmountCurrencyCode = customExchangeRateState.toCurrencyCode,
-
-        ActionButton = {
-            if (screen.initialTransactionId != null) {
-                // Edit mode
-                if (dueDate != null) {
-                    // due date stuff
-                    if (hasChanges) {
-                        // has changes
-                        ModalSave {
-                            onSave(false)
-                            onSetHasChanges(false)
-                        }
-                    } else {
-                        // no changes, pay
-                        ModalCheck(
-                            label = if (transactionType == TransactionType.EXPENSE) {
-                                stringResource(
-                                    R.string.pay
-                                )
-                            } else {
-                                stringResource(R.string.get)
-                            }
-                        ) {
-                            onPayPlannedPayment()
-                        }
-                    }
-                } else {
-                    // normal transaction
-                    ModalSave {
-                        onSave(true)
-                    }
-                }
-            } else {
-                // create new mode
-                ModalAdd {
-                    onSave(true)
-                }
-            }
-        },
-
-        amountModalShown = amountModalShown,
-        setAmountModalShown = {
-            amountModalShown = it
-        },
-
+        initialAmount = amount.takeIf { it > 0 },
+        dismiss = { amountModalShown = false },
         onAmountChanged = {
             onAmountChange(it)
-            if (shouldFocusCategory(category)) {
-                chooseCategoryModalVisible = true
-            } else if (shouldFocusTitle(titleTextFieldValue, transactionType)) {
+            if (shouldFocusTitle(titleTextFieldValue, transactionType)) {
                 titleFocus.requestFocus()
             }
-        },
-        onSelectedAccountChanged = {
-            if (loanData.isLoan && account?.currency != it.currency) {
-                selectedAcc = it
-                accountChangeModal = true
-            } else {
-                onAccountChange(it)
-            }
-        },
-        onToAccountChanged = onToAccountChange,
-        onAddNewAccount = {
-            accountModalData = AccountModalData(
-                account = null, baseCurrency = baseCurrency, balance = 0.0
-            )
         }
     )
 
     // Modals
-    ChooseCategoryModal(
-        visible = chooseCategoryModalVisible,
-        initialCategory = category,
-        categories = categories,
-        showCategoryModal = { categoryModalData = CategoryModalData(it) },
-        onCategoryChanged = {
-            onCategoryChange(it)
-            if (shouldFocusTitle(titleTextFieldValue, transactionType)) {
-                titleFocus.requestFocus()
-            } else if (shouldFocusAmount(amount = amount)) {
-                amountModalShown = true
-            }
-        },
-        dismiss = {
-            chooseCategoryModalVisible = false
-        }
-    )
-
     CategoryModal(modal = categoryModalData, onCreateCategory = { createData ->
         onCreateCategory(createData)
-        chooseCategoryModalVisible = false
     }, onEditCategory = onEditCategory, dismiss = {
         categoryModalData = null
     })
@@ -565,17 +524,6 @@ private fun BoxWithConstraintsScope.UI(
         dismiss = { deleteTrnModalVisible = false }
     ) {
         onDelete()
-    }
-
-    ChangeTransactionTypeModal(
-        visible = changeTransactionTypeModalVisible,
-        includeTransferType = true,
-        initialType = transactionType,
-        dismiss = {
-            changeTransactionTypeModalVisible = false
-        }
-    ) {
-        onSetTransactionType(it)
     }
 
     DeleteModal(
@@ -613,9 +561,9 @@ private fun BoxWithConstraintsScope.UI(
     )
 
     ShowTagModal(
-        visible = tagModelVisible,
+        visible = tagModalVisible,
         onDismiss = {
-            tagModelVisible = false
+            tagModalVisible = false
             // Reset TagList, avoids showing incorrect tag list when user has searched for a tag
             onTagOperation(EditTransactionViewEvent.TagEvent.OnTagSearch(""))
         },
@@ -642,9 +590,50 @@ private fun BoxWithConstraintsScope.UI(
     )
 }
 
-private fun shouldFocusCategory(
-    category: Category?,
-): Boolean = category == null
+@Composable
+private fun topBarTitle(isNewTransaction: Boolean, type: TransactionType): String = stringResource(
+    if (isNewTransaction) {
+        when (type) {
+            TransactionType.EXPENSE -> R.string.new_expense
+            TransactionType.INCOME -> R.string.new_income
+            TransactionType.TRANSFER -> R.string.new_transfer
+        }
+    } else {
+        when (type) {
+            TransactionType.EXPENSE -> R.string.edit_expense
+            TransactionType.INCOME -> R.string.edit_income
+            TransactionType.TRANSFER -> R.string.edit_transfer
+        }
+    }
+)
+
+@Composable
+private fun saveBarAction(
+    hasExistingTransaction: Boolean,
+    dueDate: Instant?,
+    hasChanges: Boolean,
+    transactionType: TransactionType,
+    onSave: (closeScreen: Boolean) -> Unit,
+    onSetHasChanges: (hasChanges: Boolean) -> Unit,
+    onPayPlannedPayment: () -> Unit,
+): Pair<String, () -> Unit> = when {
+    hasExistingTransaction && dueDate != null && hasChanges ->
+        stringResource(R.string.save) to {
+            onSave(false)
+            onSetHasChanges(false)
+        }
+
+    hasExistingTransaction && dueDate != null && !hasChanges ->
+        stringResource(if (transactionType == TransactionType.EXPENSE) R.string.pay else R.string.get) to {
+            onPayPlannedPayment()
+        }
+
+    hasExistingTransaction ->
+        stringResource(R.string.save) to { onSave(true) }
+
+    else ->
+        stringResource(R.string.save_transaction) to { onSave(true) }
+}
 
 private fun shouldFocusTitle(
     titleTextFieldValue: TextFieldValue,
@@ -657,30 +646,51 @@ private fun shouldFocusAmount(amount: Double) = amount == 0.0
 private val testDateTime = LocalDateTime.of(2023, 4, 27, 0, 35)
     .toInstant(ZoneOffset.UTC)
 
+private fun previewCategory(name: String, color: Int) = Category(
+    name = NotBlankTrimmedString.unsafe(name),
+    color = ColorInt(color),
+    icon = null,
+    id = CategoryId(UUID.randomUUID()),
+    orderNum = 0.0,
+)
+
 @ExperimentalFoundationApi
 @Preview
 @Composable
 private fun BoxWithConstraintsScope.Preview(isDark: Boolean = false) {
+    val groceries = previewCategory("Groceries", Green.toArgb())
+    val cash = Account(name = "Cash", Orange.toArgb())
+
     IvyPreview(isDark) {
         UI(
-            screen = EditTransactionScreen(null, TransactionType.EXPENSE),
-            initialTitle = "",
+            // A non-null id keeps the amount keypad closed by default, matching edit mode.
+            screen = EditTransactionScreen(UUID.randomUUID(), TransactionType.EXPENSE),
+            initialTitle = "Weekly grocery run",
             titleSuggestions = persistentSetOf(),
             tags = persistentListOf(),
             transactionAssociatedTags = persistentListOf(),
-            baseCurrency = "BGN",
+            baseCurrency = "USD",
             dateTime = testDateTime,
             description = null,
-            category = null,
-            account = Account(name = "phyre", Orange.toArgb()),
+            category = groceries,
+            account = cash,
             toAccount = null,
-            amount = 0.0,
+            amount = 128.4,
             dueDate = null,
-            transactionType = TransactionType.INCOME,
+            transactionType = TransactionType.EXPENSE,
             customExchangeRateState = CustomExchangeRateState(),
 
-            categories = persistentListOf(),
-            accounts = persistentListOf(),
+            categories = persistentListOf(
+                groceries,
+                previewCategory("Transport", Blue.toArgb()),
+                previewCategory("Entertainment", Purple.toArgb()),
+                previewCategory("Shopping", Red.toArgb()),
+            ),
+            accounts = persistentListOf(
+                cash,
+                Account(name = "Revolut", Blue.toArgb()),
+                Account(name = "DSK", Purple.toArgb()),
+            ),
 
             onDueDateChange = {},
             onCategoryChange = {},

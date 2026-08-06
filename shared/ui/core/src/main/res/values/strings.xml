@@ -519,4 +519,17 @@
     <string name="bill_paid">Your bill for %1$s %2$s has been paid</string>
     <string name="language">Language</string>
     <string name="advanced_features">Advanced features</string>
+    <string name="new_expense">New expense</string>
+    <string name="new_income">New income</string>
+    <string name="new_transfer">New transfer</string>
+    <string name="edit_expense">Edit expense</string>
+    <string name="edit_income">Edit income</string>
+    <string name="edit_transfer">Edit transfer</string>
+    <string name="tap_to_enter_amount">Tap to enter amount</string>
+    <string name="category">Category</string>
+    <string name="date">Date</string>
+    <string name="to_account">To account</string>
+    <string name="save_transaction">Save transaction</string>
+    <string name="close">Close</string>
+    <string name="duplicate">Duplicate</string>
 </resources>

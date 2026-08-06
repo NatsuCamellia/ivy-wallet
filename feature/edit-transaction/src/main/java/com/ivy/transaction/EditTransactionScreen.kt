@@ -47,6 +47,7 @@ import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.component.edit.TransactionDateTime
 import com.ivy.legacy.ui.component.edit.core.Description
+import com.ivy.legacy.utils.format
 import com.ivy.legacy.ui.component.tags.AddTagButton
 import com.ivy.legacy.ui.component.tags.ShowTagModal
 import com.ivy.legacy.utils.onScreenStart
@@ -318,6 +319,7 @@ private fun BoxWithConstraintsScope.UI(
                 amount = amount,
                 currency = baseCurrency,
                 onClick = { amountModalShown = true },
+                convertedAmountText = convertedAmountText(customExchangeRateState, transactionType),
             )
 
             Spacer(Modifier.height(16.dp))
@@ -633,6 +635,19 @@ private fun saveBarAction(
 
     else ->
         stringResource(R.string.save_transaction) to { onSave(true) }
+}
+
+private fun convertedAmountText(
+    customExchangeRateState: CustomExchangeRateState,
+    transactionType: TransactionType,
+): String? {
+    val convertedAmount = customExchangeRateState.convertedAmount
+    val convertedCurrencyCode = customExchangeRateState.toCurrencyCode
+    return if (transactionType == TransactionType.TRANSFER && convertedAmount != null && convertedCurrencyCode != null) {
+        "${convertedAmount.format(IvyCurrency.getDecimalPlaces(convertedCurrencyCode))} $convertedCurrencyCode"
+    } else {
+        null
+    }
 }
 
 private fun shouldFocusTitle(

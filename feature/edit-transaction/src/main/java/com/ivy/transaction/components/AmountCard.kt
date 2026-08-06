@@ -24,6 +24,7 @@ fun AmountCard(
     currency: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    convertedAmountText: String? = null,
 ) {
     ElevatedCard(
         onClick = onClick,
@@ -43,6 +44,13 @@ fun AmountCard(
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                 textAlign = TextAlign.Center,
             )
+            if (convertedAmountText != null) {
+                Text(
+                    text = convertedAmountText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
             Text(
                 text = stringResource(R.string.tap_to_enter_amount),
                 style = MaterialTheme.typography.labelMedium,

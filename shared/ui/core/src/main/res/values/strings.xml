@@ -527,7 +527,6 @@
     <string name="edit_transfer">Edit transfer</string>
     <string name="tap_to_enter_amount">Tap to enter amount</string>
     <string name="category">Category</string>
-    <string name="date">Date</string>
     <string name="to_account">To account</string>
     <string name="save_transaction">Save transaction</string>
     <string name="close">Close</string>

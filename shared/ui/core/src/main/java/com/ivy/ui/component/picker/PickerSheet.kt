@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.design.system.IvyMaterial3Theme
@@ -156,12 +157,16 @@ private fun PickerRow(
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
             )
             if (supportingText != null) {
                 Text(
                     text = supportingText,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -224,7 +229,12 @@ fun PickerUiTest(accounts: Boolean) {
 }
 
 private val PreviewCategoryItems = persistentListOf(
-    PickerItemUi(id = "1", title = "Groceries", color = Color(0xFF4CAF50), selected = false),
+    PickerItemUi(
+        id = "1",
+        title = "Groceries, household and pet supplies",
+        color = Color(0xFF4CAF50),
+        selected = false,
+    ),
     PickerItemUi(id = "2", title = "Rent", color = Color(0xFF2196F3), selected = true),
     PickerItemUi(id = "3", title = "Entertainment", color = Color(0xFFFF9800), selected = false),
     PickerItemUi(id = "4", title = "Transport", color = Color(0xFF9C27B0), selected = false),

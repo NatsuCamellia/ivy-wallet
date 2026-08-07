@@ -103,6 +103,7 @@ node_modules/*
 /ci-actions/compose-stability/ivy-compose-stability-report.txt
 
 # Kotlin Compiler
+.kotlin/
 .kotlin/sessions/*
 /.idea/AndroidProjectSystem.xml
 /.idea/runConfigurations.xml

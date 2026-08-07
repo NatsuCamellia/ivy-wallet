@@ -31,7 +31,7 @@ data class EditTransactionScreen(
     val categoryId: UUID? = null
 ) : Screen {
     override val isLegacy: Boolean
-        get() = true
+        get() = false
 }
 
 data class TransactionsScreen(

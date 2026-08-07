@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Notes
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CurrencyExchange
 import androidx.compose.material.icons.outlined.Event
 import androidx.compose.material.icons.outlined.Refresh
@@ -126,11 +127,18 @@ fun AccountRow(
     )
 }
 
+/**
+ * The row body picks the date; the trailing clock picks the time. Two targets, because the
+ * screen has two separate events for them ([EditTransactionViewEvent.OnChangeDate] and
+ * [EditTransactionViewEvent.OnChangeTime]) and the legacy row they replace was likewise
+ * split into a date half and a time half.
+ */
 @Composable
 fun DateTimeRow(
     dateTimeText: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onTimeClick: (() -> Unit)? = null,
 ) {
     SettingsItem(
         title = dateTimeText ?: stringResource(R.string.set_date_and_time),
@@ -142,7 +150,18 @@ fun DateTimeRow(
         } else {
             Color.Unspecified
         },
-        icon = Icons.Outlined.Schedule,
+        icon = Icons.Outlined.CalendarMonth,
+        trailing = onTimeClick?.let { onTime ->
+            {
+                IconButton(onClick = onTime) {
+                    Icon(
+                        imageVector = Icons.Outlined.Schedule,
+                        contentDescription = stringResource(R.string.change_time),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        },
     )
 }
 
@@ -273,7 +292,7 @@ private fun RowsFilledPreview() {
                     label = stringResource(R.string.account),
                     onClick = {},
                 )
-                DateTimeRow(dateTimeText = "Today, 14:20", onClick = {})
+                DateTimeRow(dateTimeText = "Today, 14:20", onClick = {}, onTimeClick = {})
                 DueDateRow(dueDateText = "Aug 12, 2026", onClick = {})
                 DescriptionRow(description = "Weekly shop", onClick = {})
                 TagsRow(tagCount = 3, onClick = {})
@@ -301,7 +320,7 @@ private fun RowsEmptyPreview() {
                     label = stringResource(R.string.account),
                     onClick = {},
                 )
-                DateTimeRow(dateTimeText = null, onClick = {})
+                DateTimeRow(dateTimeText = null, onClick = {}, onTimeClick = {})
                 DescriptionRow(description = null, onClick = {})
                 TagsRow(tagCount = 0, onClick = {})
             }

@@ -531,6 +531,9 @@
     <string name="new_category">New category</string>
     <string name="category">Category</string>
     <string name="due_date">Due date</string>
+    <string name="change_time">Change time</string>
+    <string name="duplicate">Duplicate</string>
+    <string name="exchange_rate_value">1 %1$s = %2$s %3$s</string>
     <plurals name="tag_count">
         <item quantity="one">%d tag</item>
         <item quantity="other">%d tags</item>

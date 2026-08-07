@@ -596,7 +596,7 @@ class AmountKeypadPaparazziTest(
 }
 ```
 
-Check `shared/ui/core/src/test/java/com/ivy/ui/component/transaction/TransactionComponentsPaparazziTest.kt` for how it wraps content on a `Surface` and copy that wrapping — snapshots must not render on a transparent background.
+Note: in `shared/ui/core` the harness is `com.ivy.ui.PaparazziScreenshotTest` / `com.ivy.ui.PaparazziTheme` (this module's own test source set), not `com.ivy.ui.testing.*` — `shared/ui/core` cannot depend on `shared/ui/testing`, which depends on core. Check `shared/ui/core/src/test/java/com/ivy/ui/component/transaction/TransactionComponentsPaparazziTest.kt` for how it wraps content on a `Surface` and copy that wrapping — snapshots must not render on a transparent background.
 
 - [ ] **Step 5: Record and verify the goldens**
 
@@ -657,7 +657,7 @@ fun PickerUiTest(accounts: Boolean) { /* renders the matching PickerContent */ }
 
 - [ ] **Step 3: Write the screenshot test**
 
-Create `shared/ui/core/src/test/java/com/ivy/ui/component/picker/PickerPaparazziTest.kt`, same shape as `AmountKeypadPaparazziTest` from Task 3, with two tests: `snapshot category picker` (`PickerUiTest(accounts = false)`) and `snapshot account picker` (`PickerUiTest(accounts = true)`), both parameterised over `PaparazziTheme` and wrapped on a `Surface` the same way.
+Create `shared/ui/core/src/test/java/com/ivy/ui/component/picker/PickerPaparazziTest.kt`, same shape as `AmountKeypadPaparazziTest` from Task 3 — note the harness for this module is `com.ivy.ui.PaparazziScreenshotTest` / `com.ivy.ui.PaparazziTheme` (in `shared/ui/core`'s own test source set), NOT `com.ivy.ui.testing.*`: `shared/ui/core` cannot depend on `shared/ui/testing` because that module depends on core, with two tests: `snapshot category picker` (`PickerUiTest(accounts = false)`) and `snapshot account picker` (`PickerUiTest(accounts = true)`), both parameterised over `PaparazziTheme` and wrapped on a `Surface` the same way.
 
 - [ ] **Step 4: Record and verify**
 

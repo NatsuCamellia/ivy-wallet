@@ -11,4 +11,5 @@ dependencies {
     implementation(projects.shared.domain)
 
     implementation(libs.materialkolor)
+    implementation(libs.keval)
 }

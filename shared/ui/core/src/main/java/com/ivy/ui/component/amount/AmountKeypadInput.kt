@@ -2,6 +2,7 @@ package com.ivy.ui.component.amount
 
 import androidx.compose.runtime.Immutable
 import com.notkamui.keval.Keval
+import java.math.BigDecimal
 
 private const val Operators = "+-*/"
 
@@ -50,7 +51,7 @@ fun amountKeypadInputOf(amount: Double?, decimalSeparator: Char): AmountKeypadIn
     val plain = if (amount % 1.0 == 0.0) {
         amount.toLong().toString()
     } else {
-        amount.toString()
+        BigDecimal.valueOf(amount).toPlainString()
     }
     return AmountKeypadInput(plain.replace('.', decimalSeparator))
 }

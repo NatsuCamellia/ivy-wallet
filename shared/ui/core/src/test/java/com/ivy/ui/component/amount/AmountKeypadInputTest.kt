@@ -1,6 +1,7 @@
 package com.ivy.ui.component.amount
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldNotContain
 import org.junit.Test
 
 class AmountKeypadInputTest {
@@ -106,5 +107,33 @@ class AmountKeypadInputTest {
     fun `amountKeypadInputOf maps null and zero to empty input`() {
         amountKeypadInputOf(null, '.').text shouldBe ""
         amountKeypadInputOf(0.0, '.').text shouldBe ""
+    }
+
+    @Test
+    fun `amountKeypadInputOf renders a large fractional amount as plain decimal`() {
+        // 12345678.5 is >= 1e7, the threshold where Double#toString switches to
+        // scientific notation ("1.23456785E7"); it must still render plainly.
+        amountKeypadInputOf(12345678.5, sep).text shouldBe "12345678.5"
+    }
+
+    @Test
+    fun `amountKeypadInputOf renders a small fractional amount as plain decimal`() {
+        // 0.0005 is < 1e-3, the threshold where Double#toString switches to
+        // scientific notation ("5.0E-4"); it must still render plainly.
+        amountKeypadInputOf(0.0005, sep).text shouldBe "0.00050"
+    }
+
+    @Test
+    fun `amountKeypadInputOf never emits scientific notation`() {
+        amountKeypadInputOf(12345678.5, sep).text shouldNotContain "E"
+        amountKeypadInputOf(12345678.5, sep).text shouldNotContain "e"
+        amountKeypadInputOf(0.0005, sep).text shouldNotContain "E"
+        amountKeypadInputOf(0.0005, sep).text shouldNotContain "e"
+    }
+
+    @Test
+    fun `amountKeypadInputOf output round-trips back to the original amount`() {
+        amountKeypadInputOf(12345678.5, sep).evaluate(sep) shouldBe 12345678.5
+        amountKeypadInputOf(0.0005, sep).evaluate(sep) shouldBe 0.0005
     }
 }

@@ -521,4 +521,12 @@
     <string name="bill_paid">Your bill for %1$s %2$s has been paid</string>
     <string name="language">Language</string>
     <string name="advanced_features">Advanced features</string>
+    <string name="select_account">Select account</string>
+    <string name="date_and_time">Date &amp; time</string>
+    <string name="set_date_and_time">Set date &amp; time</string>
+    <string name="custom_exchange_rate">Custom exchange rate</string>
+    <string name="reset_exchange_rate">Reset exchange rate</string>
+    <string name="make_it_planned">Make it planned</string>
+    <string name="no_category">No category</string>
+    <string name="new_category">New category</string>
 </resources>

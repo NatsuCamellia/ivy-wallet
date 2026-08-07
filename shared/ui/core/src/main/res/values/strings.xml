@@ -483,7 +483,7 @@
     <string name="tags">Tags</string>
     <string name="search_tags">Search Tags</string>
     <string name="exchange_rates">Exchange rates</string>
-    <string name="add_tags">Add Tags</string>
+    <string name="add_tags">Add tags</string>
     <string name="this_transaction_is_associated_with_loan">* This transaction is associated with Loan : %1$s</string>
     <string name="this_transaction_is_associated_with_loan_record">* This transaction is associated with a Loan Record of Loan : %1$s</string>
     <string name="note_transaction_associated_with_loan_record_of_loan">Note: This transaction is associated with a Loan Record of Loan : %1$s\nYou are trying to change the account associated with the loan record to an account of different currency\n The Loan Record will be re-calculated based on today\'s currency exchanges rates</string>

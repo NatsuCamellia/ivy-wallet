@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -140,7 +141,9 @@ fun TitleField(
             onValueChange = onValueChange,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                // 8dp here plus the field's own 16dp of content padding lands the text on the
+                // screen's 24dp start edge, shared with the amount headline and the rows below.
+                .padding(horizontal = 8.dp)
                 .focusRequester(focusRequester),
             textStyle = MaterialTheme.typography.headlineSmall,
             placeholder = { Text(text = stringResource(type.titleRes)) },
@@ -148,14 +151,21 @@ fun TitleField(
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.Transparent,
                 unfocusedContainerColor = Color.Transparent,
-                focusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant,
-                unfocusedIndicatorColor = MaterialTheme.colorScheme.outlineVariant,
+                // The rule beneath is drawn separately, so its inset stays independent of the
+                // text's and doesn't thicken on focus.
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                disabledIndicatorColor = Color.Transparent,
             ),
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Sentences,
                 imeAction = ImeAction.Next,
             ),
             keyboardActions = KeyboardActions(onNext = { onNext() }),
+        )
+        HorizontalDivider(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            color = MaterialTheme.colorScheme.outlineVariant,
         )
         if (suggestions.isNotEmpty()) {
             FlowRow(

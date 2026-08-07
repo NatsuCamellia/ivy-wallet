@@ -27,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -369,28 +370,32 @@ private fun EditTransactionUi(
                 hasChanges = hasChanges,
                 type = transactionType,
             )
-            Button(
-                onClick = {
-                    when (action) {
-                        CommitAction.Add -> onSave(true)
-                        CommitAction.Save -> if (dueDateText != null) {
-                            // Planned payment with unsaved edits: keep the screen open, exactly
-                            // as the legacy ModalSave did.
-                            onSave(false)
-                            onSetHasChanges(false)
-                        } else {
-                            onSave(true)
-                        }
+            // A container colour, rather than the bare background, so the edge where the scrolling
+            // form ends reads as a boundary with more content behind it instead of a clipped row.
+            Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
+                Button(
+                    onClick = {
+                        when (action) {
+                            CommitAction.Add -> onSave(true)
+                            CommitAction.Save -> if (dueDateText != null) {
+                                // Planned payment with unsaved edits: keep the screen open,
+                                // exactly as the legacy ModalSave did.
+                                onSave(false)
+                                onSetHasChanges(false)
+                            } else {
+                                onSave(true)
+                            }
 
-                        CommitAction.Pay, CommitAction.Get -> onPayPlannedPayment()
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime))
-                    .padding(horizontal = 24.dp, vertical = 12.dp),
-            ) {
-                Text(text = stringResource(action.labelRes))
+                            CommitAction.Pay, CommitAction.Get -> onPayPlannedPayment()
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime))
+                        .padding(horizontal = 24.dp, vertical = 12.dp),
+                ) {
+                    Text(text = stringResource(action.labelRes))
+                }
             }
         },
     ) { padding ->

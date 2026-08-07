@@ -22,6 +22,18 @@
 - **Paparazzi cannot render `ModalBottomSheet`** (it composes into a separate window). Every sheet is split into a public `XxxContent` composable (snapshot-tested) and a thin `XxxSheet` wrapper that puts `XxxContent` inside `ModalBottomSheet` (not snapshot-tested).
 - **Commit style:** conventional commits, single-line subject, no body. Example: `feat: add M3 amount keypad sheet`.
 - **Every task ends green:** the task's own tests pass before committing.
+- **`detekt` cannot run in this environment.** The repo's detekt setup pulls the
+  `com.github.Ivy-Apps:detekt-explicit` rule set from `jitpack.io`, which this
+  session's egress policy blocks (403 on CONNECT). `detekt` is also a
+  root-project task, not a per-module one — `:module:detekt` does not exist.
+  Where a task step below says to run detekt, run
+  `./gradlew :<module>:compileDebugKotlin` instead and note in your report that
+  detekt was skipped for this reason. Static analysis runs in CI on push, where
+  jitpack is reachable. Do not attempt to work around the block, and do not
+  remove the rule set from the build config.
+- **Only one Gradle build at a time.** Concurrent builds in this project
+  corrupt each other's KSP outputs (`Failed to create MD5 hash for file ...`).
+  Never start a Gradle command while another is running.
 
 ## File Structure
 
@@ -154,10 +166,10 @@ Remove the private `CategoryIconBubble` function and the `ContainerAlpha` / `Con
 Run: `./gradlew :shared:ui:core:verifyPaparazziDebug`
 Expected: PASS with no re-recorded images. If any image differs, the move was not verbatim — fix the code, do not re-record.
 
-- [ ] **Step 5: Lint**
+- [ ] **Step 5: Compile check**
 
-Run: `./gradlew :shared:ui:core:detekt`
-Expected: PASS
+Run: `./gradlew :shared:ui:core:compileDebugKotlin`
+Expected: PASS (detekt is skipped — see Global Constraints)
 
 - [ ] **Step 6: Commit**
 
@@ -437,10 +449,10 @@ fun AmountKeypadInput.evaluate(decimalSeparator: Char): Double? {
 Run: `./gradlew :shared:ui:core:testDebugUnitTest --tests "*AmountKeypadInputTest*"`
 Expected: PASS (19 tests). If `division by zero` returns `Infinity` rather than throwing, the `isFinite()` filter already handles it; if `12+` throws a Keval exception, `runCatching` handles it. Do not weaken a test to make it pass — fix the implementation.
 
-- [ ] **Step 6: Lint**
+- [ ] **Step 6: Compile check**
 
-Run: `./gradlew :shared:ui:core:detekt`
-Expected: PASS
+Run: `./gradlew :shared:ui:core:compileDebugKotlin`
+Expected: PASS (detekt is skipped — see Global Constraints)
 
 - [ ] **Step 7: Commit**
 
@@ -592,10 +604,10 @@ Run: `./gradlew :shared:ui:core:recordPaparazziDebug --tests "*AmountKeypadPapar
 Then: `./gradlew :shared:ui:core:verifyPaparazziDebug`
 Expected: PASS. Open the recorded PNGs and confirm: keys aligned in a 4-column grid, no clipped text, both themes legible.
 
-- [ ] **Step 6: Lint**
+- [ ] **Step 6: Compile check**
 
-Run: `./gradlew :shared:ui:core:detekt`
-Expected: PASS
+Run: `./gradlew :shared:ui:core:compileDebugKotlin`
+Expected: PASS (detekt is skipped — see Global Constraints)
 
 - [ ] **Step 7: Commit**
 
@@ -653,10 +665,10 @@ Run: `./gradlew :shared:ui:core:recordPaparazziDebug --tests "*PickerPaparazziTe
 Then: `./gradlew :shared:ui:core:verifyPaparazziDebug`
 Expected: PASS. Confirm in the PNGs: corner rhythm reads as one grouped block (large corners only at the ends), 4dp gaps, check mark on the selected item only.
 
-- [ ] **Step 5: Lint**
+- [ ] **Step 5: Compile check**
 
-Run: `./gradlew :shared:ui:core:detekt`
-Expected: PASS
+Run: `./gradlew :shared:ui:core:compileDebugKotlin`
+Expected: PASS (detekt is skipped — see Global Constraints)
 
 - [ ] **Step 6: Commit**
 
@@ -941,10 +953,10 @@ A `Column` with `Modifier.fillMaxWidth().clickable(onClickLabel = stringResource
 
 Three `@Preview`s wrapped in `IvyPreview(dark = false)` (`com.ivy.navigation.IvyPreview`, the wrapper `SettingsScreen.kt` uses) inside a `Surface(color = MaterialTheme.colorScheme.background)`: an expense header with amount and suggestions, an income header, a transfer header. Verify them by running the preview-less check in the next step; visual confirmation happens in Task 8's screen snapshots.
 
-- [ ] **Step 6: Compile and lint**
+- [ ] **Step 6: Compile check**
 
-Run: `./gradlew :feature:edit-transaction:compileDebugKotlin :feature:edit-transaction:detekt`
-Expected: PASS
+Run: `./gradlew :feature:edit-transaction:compileDebugKotlin`
+Expected: PASS (detekt is skipped — see Global Constraints)
 
 - [ ] **Step 7: Commit**
 
@@ -1009,10 +1021,10 @@ A `Row` on `LocalIvyExtendedColors.current.warningContainer`, `MaterialTheme.sha
 
 One `@Preview` in `IvyPreview(dark = false)` + `Surface` rendering every row in a column, filled state; one rendering the empty states. These get snapshotted as part of the screen in Task 8.
 
-- [ ] **Step 5: Compile and lint**
+- [ ] **Step 5: Compile check**
 
-Run: `./gradlew :feature:edit-transaction:compileDebugKotlin :feature:edit-transaction:detekt`
-Expected: PASS
+Run: `./gradlew :feature:edit-transaction:compileDebugKotlin`
+Expected: PASS (detekt is skipped — see Global Constraints)
 
 - [ ] **Step 6: Commit**
 
@@ -1216,8 +1228,7 @@ Expected: PASS
 
 - [ ] **Step 4: Static analysis**
 
-Run: `./gradlew detekt lint`
-Expected: PASS. If `lint` reports new baseline entries, fix the code rather than regenerating the baseline.
+`detekt` cannot run here (jitpack blocked — see Global Constraints); it runs in CI on push. Run `./gradlew lint` and report the result. If `lint` itself fails on a blocked dependency, record that and move on — do not work around the egress policy. If `lint` runs and reports new baseline entries, fix the code rather than regenerating the baseline.
 
 - [ ] **Step 5: Compose stability**
 

@@ -42,6 +42,9 @@ import com.ivy.wallet.domain.deprecated.logic.SUGGESTIONS_LIMIT
 import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentSetOf
 
+/** Expense-first: the overwhelmingly common case on this screen. */
+private val TypeSelectorOrder = listOf(TransactionType.EXPENSE, TransactionType.INCOME, TransactionType.TRANSFER)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionTypeSelector(
@@ -49,7 +52,7 @@ fun TransactionTypeSelector(
     onTypeChange: (TransactionType) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val entries = TransactionType.entries
+    val entries = TypeSelectorOrder
     SingleChoiceSegmentedButtonRow(
         modifier = modifier
             .fillMaxWidth()

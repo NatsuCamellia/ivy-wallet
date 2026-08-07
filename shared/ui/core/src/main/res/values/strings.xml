@@ -529,4 +529,10 @@
     <string name="make_it_planned">Make it planned</string>
     <string name="no_category">No category</string>
     <string name="new_category">New category</string>
+    <string name="category">Category</string>
+    <string name="due_date">Due date</string>
+    <plurals name="tag_count">
+        <item quantity="one">%d tag</item>
+        <item quantity="other">%d tags</item>
+    </plurals>
 </resources>

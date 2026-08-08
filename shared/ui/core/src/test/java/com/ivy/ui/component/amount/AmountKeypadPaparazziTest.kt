@@ -32,4 +32,22 @@ class AmountKeypadPaparazziTest(
             }
         }
     }
+
+    @Test
+    fun `snapshot amount keypad expression`() {
+        snapshot(theme) {
+            Surface(color = MaterialTheme.colorScheme.surface) {
+                AmountKeypadExpressionUiTest(complete = true)
+            }
+        }
+    }
+
+    @Test
+    fun `snapshot amount keypad incomplete expression`() {
+        snapshot(theme) {
+            Surface(color = MaterialTheme.colorScheme.surface) {
+                AmountKeypadExpressionUiTest(complete = false)
+            }
+        }
+    }
 }

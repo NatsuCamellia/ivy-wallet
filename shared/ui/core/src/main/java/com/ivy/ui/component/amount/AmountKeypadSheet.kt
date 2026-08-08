@@ -292,6 +292,26 @@ fun AmountKeypadUiTest(withAccounts: Boolean) {
     )
 }
 
+/**
+ * For screenshot testing of the keypad's expression mode — the whole justification for deleting
+ * `CalculatorModal`. [complete] picks between an expression that evaluates (sub-line filled, *Done*
+ * enabled) and one left mid-operator (no sub-line, *Done* disabled).
+ */
+@Composable
+fun AmountKeypadExpressionUiTest(complete: Boolean) {
+    AmountKeypadContent(
+        currency = "USD",
+        input = AmountKeypadInput(if (complete) "12.5+3" else "12.5+"),
+        onInputChange = {},
+        accounts = persistentListOf(),
+        onAccountClick = {},
+        onAddAccountClick = {},
+        onDone = {},
+        decimalCountMax = 2,
+        decimalSeparator = '.',
+    )
+}
+
 private val PreviewAccounts = persistentListOf(
     KeypadAccountUi(id = "1", name = "Cash", selected = true),
     KeypadAccountUi(id = "2", name = "Revolut", selected = false),

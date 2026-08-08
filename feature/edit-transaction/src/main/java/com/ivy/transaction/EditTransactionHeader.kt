@@ -57,6 +57,7 @@ fun TransactionTypeSelector(
     type: TransactionType,
     onTypeChange: (TransactionType) -> Unit,
     modifier: Modifier = Modifier,
+    locked: Boolean = false,
 ) {
     val entries = TypeSelectorOrder
     SingleChoiceSegmentedButtonRow(
@@ -69,6 +70,9 @@ fun TransactionTypeSelector(
                 shape = SegmentedButtonDefaults.itemShape(index = index, count = entries.size),
                 selected = type == entry,
                 onClick = { onTypeChange(entry) },
+                // The selected segment stays enabled so it keeps its normal, checked appearance;
+                // only the unreachable alternatives grey out.
+                enabled = !locked || type == entry,
                 label = { Text(text = stringResource(entry.labelRes)) },
             )
         }
@@ -268,7 +272,12 @@ private fun TransferHeaderPreview() {
     IvyPreview(dark = false) {
         Surface(color = MaterialTheme.colorScheme.background) {
             Column {
-                TransactionTypeSelector(type = TransactionType.TRANSFER, onTypeChange = {})
+                // A saved transfer: the other two types are locked out.
+                TransactionTypeSelector(
+                    type = TransactionType.TRANSFER,
+                    onTypeChange = {},
+                    locked = true,
+                )
                 AmountHeadline(
                     amountText = "100.00",
                     currency = "EUR",

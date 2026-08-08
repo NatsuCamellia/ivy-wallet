@@ -431,6 +431,12 @@ private fun EditTransactionUi(
                     TransactionTypeSelector(
                         type = transactionType,
                         onTypeChange = onSetTransactionType,
+                        // Switching a saved transfer to expense/income drops its destination leg
+                        // (`toAccountId`/`toAmount`) on the very next write, with no undo. The
+                        // legacy toolbar made that unreachable by hiding the control for transfers;
+                        // this keeps the control visible but locks it. New transfers and saved
+                        // income/expense transactions stay free to change type, as they were.
+                        locked = !isNewTransaction && transactionType == TransactionType.TRANSFER,
                     )
                 }
                 AmountHeadline(
@@ -930,8 +936,10 @@ private fun EditTransactionPreview(
                 ),
             )
 
+            // A *saved* transfer, so this also pixel-verifies the locked type selector: switching
+            // a persisted transfer to expense/income would silently drop its destination leg.
             EditTransactionPreviewState.TransferWithRate -> PreviewEditTransactionUi(
-                isNewTransaction = true,
+                isNewTransaction = false,
                 transactionType = TransactionType.TRANSFER,
                 amount = 250.0,
                 account = PreviewRevolut,

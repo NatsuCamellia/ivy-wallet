@@ -1,6 +1,7 @@
 package com.ivy.transaction
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -305,428 +306,431 @@ private fun EditTransactionUi(
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {},
-                navigationIcon = { BackButton(onClick = { nav.back() }) },
-                actions = {
-                    val items = overflowItems(
-                        isNewTransaction = isNewTransaction,
-                        isLoanRecord = loanData.isLoanRecord,
-                        type = transactionType,
-                        hasDateTime = dateTimeText != null,
-                        hasDueDate = dueDateText != null,
-                    )
-                    if (items.isNotEmpty()) {
-                        IconButton(onClick = { overflowExpanded = true }) {
-                            Icon(
-                                imageVector = Icons.Outlined.MoreVert,
-                                contentDescription = stringResource(R.string.more_options),
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = overflowExpanded,
-                            onDismissRequest = { overflowExpanded = false },
-                        ) {
-                            items.forEach { item ->
-                                DropdownMenuItem(
-                                    text = { Text(text = stringResource(item.labelRes)) },
-                                    onClick = {
-                                        overflowExpanded = false
-                                        when (item) {
-                                            OverflowItem.Duplicate -> onDuplicate()
-                                            OverflowItem.Delete -> deleteDialogVisible = true
-                                            OverflowItem.MakePlanned -> {
-                                                nav.back()
-                                                nav.navigateTo(
-                                                    EditPlannedScreen(
-                                                        plannedPaymentRuleId = null,
-                                                        type = transactionType,
-                                                        amount = amount,
-                                                        accountId = account?.id,
-                                                        categoryId = category?.id?.value,
-                                                        title = titleTextFieldValue.text,
-                                                        description = description,
-                                                    )
-                                                )
-                                            }
-                                        }
-                                    },
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {},
+                    navigationIcon = { BackButton(onClick = { nav.back() }) },
+                    actions = {
+                        val items = overflowItems(
+                            isNewTransaction = isNewTransaction,
+                            isLoanRecord = loanData.isLoanRecord,
+                            type = transactionType,
+                            hasDateTime = dateTimeText != null,
+                            hasDueDate = dueDateText != null,
+                        )
+                        if (items.isNotEmpty()) {
+                            IconButton(onClick = { overflowExpanded = true }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.MoreVert,
+                                    contentDescription = stringResource(R.string.more_options),
                                 )
                             }
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                ),
-            )
-        },
-        bottomBar = {
-            val action = commitAction(
-                isNewTransaction = isNewTransaction,
-                hasDueDate = dueDateText != null,
-                hasChanges = hasChanges,
-                type = transactionType,
-            )
-            // A container colour, rather than the bare background, so the edge where the scrolling
-            // form ends reads as a boundary with more content behind it instead of a clipped row.
-            Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
-                Button(
-                    onClick = {
-                        when (action) {
-                            CommitAction.Add -> onSave(true)
-                            CommitAction.Save -> if (dueDateText != null) {
-                                // Planned payment with unsaved edits: keep the screen open,
-                                // exactly as the legacy ModalSave did.
-                                onSave(false)
-                                onSetHasChanges(false)
-                            } else {
-                                onSave(true)
+                            DropdownMenu(
+                                expanded = overflowExpanded,
+                                onDismissRequest = { overflowExpanded = false },
+                            ) {
+                                items.forEach { item ->
+                                    DropdownMenuItem(
+                                        text = { Text(text = stringResource(item.labelRes)) },
+                                        onClick = {
+                                            overflowExpanded = false
+                                            when (item) {
+                                                OverflowItem.Duplicate -> onDuplicate()
+                                                OverflowItem.Delete -> deleteDialogVisible = true
+                                                OverflowItem.MakePlanned -> {
+                                                    nav.back()
+                                                    nav.navigateTo(
+                                                        EditPlannedScreen(
+                                                            plannedPaymentRuleId = null,
+                                                            type = transactionType,
+                                                            amount = amount,
+                                                            accountId = account?.id,
+                                                            categoryId = category?.id?.value,
+                                                            title = titleTextFieldValue.text,
+                                                            description = description,
+                                                        )
+                                                    )
+                                                }
+                                            }
+                                        },
+                                    )
+                                }
                             }
-
-                            CommitAction.Pay, CommitAction.Get -> onPayPlannedPayment()
                         }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime))
-                        .padding(horizontal = 24.dp, vertical = 12.dp),
-                ) {
-                    Text(text = stringResource(action.labelRes))
-                }
-            }
-        },
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-        ) {
-            if (!loanData.isLoanRecord) {
-                TransactionTypeSelector(
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = Color.Transparent,
+                    ),
+                )
+            },
+            bottomBar = {
+                val action = commitAction(
+                    isNewTransaction = isNewTransaction,
+                    hasDueDate = dueDateText != null,
+                    hasChanges = hasChanges,
                     type = transactionType,
-                    onTypeChange = onSetTransactionType,
                 )
-            }
-            AmountHeadline(
-                amountText = amount.format(baseCurrency),
-                currency = baseCurrency,
-                type = transactionType,
-                supportingText = amountSupportingText(
-                    transactionType = transactionType,
-                    account = account,
-                    customExchangeRateState = customExchangeRateState,
-                ),
-                onClick = { keypadVisible = true },
-            )
-            loanData.loanCaption?.let { caption ->
-                Text(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    text = caption,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Spacer(Modifier.height(8.dp))
-            TitleField(
-                value = titleTextFieldValue,
-                onValueChange = {
-                    titleTextFieldValue = it
-                    onTitleChange(it.text)
-                },
-                type = transactionType,
-                suggestions = titleSuggestions,
-                onSuggestionClick = { suggestion ->
-                    titleTextFieldValue = selectEndTextFieldValue(suggestion)
-                    onTitleChange(suggestion)
-                },
-                onNext = {
-                    if (shouldFocusAmount(amount = amount)) {
-                        keypadVisible = true
-                    } else {
-                        onSave(true)
+                // A container colour, rather than the bare background, so the edge where the scrolling
+                // form ends reads as a boundary with more content behind it instead of a clipped row.
+                Surface(color = MaterialTheme.colorScheme.surfaceContainer) {
+                    Button(
+                        onClick = {
+                            when (action) {
+                                CommitAction.Add -> onSave(true)
+                                CommitAction.Save -> if (dueDateText != null) {
+                                    // Planned payment with unsaved edits: keep the screen open,
+                                    // exactly as the legacy ModalSave did.
+                                    onSave(false)
+                                    onSetHasChanges(false)
+                                } else {
+                                    onSave(true)
+                                }
+
+                                CommitAction.Pay, CommitAction.Get -> onPayPlannedPayment()
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .windowInsetsPadding(WindowInsets.navigationBars.union(WindowInsets.ime))
+                            .padding(horizontal = 24.dp, vertical = 12.dp),
+                    ) {
+                        Text(text = stringResource(action.labelRes))
                     }
-                },
-                focusRequester = titleFocus,
-            )
-            Spacer(Modifier.height(8.dp))
-            CategoryRow(
-                categoryName = category?.name?.value,
-                categoryColor = category?.color?.value?.let(::Color),
-                categoryIcon = category?.icon?.id,
-                onClick = { categoryPickerVisible = true },
-            )
-            if (transactionType == TransactionType.TRANSFER) {
-                AccountRow(
-                    accountName = account?.name,
-                    currency = account?.currency,
-                    label = stringResource(R.string.from),
-                    onClick = { accountPickerTarget = AccountPickerTarget.From },
-                )
-                AccountRow(
-                    accountName = toAccount?.name,
-                    currency = toAccount?.currency,
-                    label = stringResource(R.string.to),
-                    onClick = { accountPickerTarget = AccountPickerTarget.To },
-                )
-                if (customExchangeRateState.showCard) {
-                    // Directly under the pair of accounts it explains: this rate is what converts
-                    // From's currency into To's. It also keeps the control above the fold, which
-                    // is what the deleted `animateScrollTo` hack used to achieve by force.
-                    ExchangeRateRow(
-                        rateText = stringResource(
-                            R.string.exchange_rate_value,
-                            baseCurrency,
-                            customExchangeRateState.exchangeRate.format(ExchangeRateDecimals),
-                            customExchangeRateState.toCurrencyCode ?: baseCurrency,
-                        ),
-                        onClick = { exchangeRateKeypadVisible = true },
-                        onReset = { onExchangeRateChange(null) },
-                        modifier = Modifier.padding(vertical = 8.dp),
+                }
+            },
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState()),
+            ) {
+                if (!loanData.isLoanRecord) {
+                    TransactionTypeSelector(
+                        type = transactionType,
+                        onTypeChange = onSetTransactionType,
                     )
                 }
-            } else {
-                AccountRow(
-                    accountName = account?.name,
-                    currency = account?.currency,
-                    label = stringResource(R.string.account),
-                    onClick = { accountPickerTarget = AccountPickerTarget.From },
+                AmountHeadline(
+                    amountText = amount.format(baseCurrency),
+                    currency = baseCurrency,
+                    type = transactionType,
+                    supportingText = amountSupportingText(
+                        transactionType = transactionType,
+                        account = account,
+                        customExchangeRateState = customExchangeRateState,
+                        selectAccountLabel = stringResource(R.string.select_account),
+                    ),
+                    onClick = { keypadVisible = true },
                 )
-            }
-            // An unpaid planned payment has a due date but no date-time yet; offering to set one
-            // would turn it into a normal transaction, so the legacy screen hid the row there too.
-            if (dueDateText == null || dateTimeText != null) {
-                DateTimeRow(
-                    dateTimeText = dateTimeText,
-                    onClick = onSetDate,
-                    onTimeClick = onSetTime,
-                )
-            }
-            if (dueDateText != null) {
-                DueDateRow(dueDateText = dueDateText, onClick = onDueDateClick)
-            }
-            DescriptionRow(
-                description = description,
-                onClick = { descriptionDialogVisible = true },
-            )
-            TagsRow(
-                tagCount = transactionAssociatedTags.size,
-                onClick = { tagModalVisible = true },
-            )
-            Spacer(Modifier.height(24.dp))
-        }
-    }
-
-    if (keypadVisible) {
-        AmountKeypadSheet(
-            currency = baseCurrency,
-            initialAmount = amount.takeIf { it != 0.0 },
-            accounts = accounts.map {
-                KeypadAccountUi(
-                    id = it.id.toString(),
-                    name = it.name,
-                    selected = it.id == account?.id,
-                )
-            }.toImmutableList(),
-            onAccountClick = { id ->
-                accounts.firstOrNull { it.id.toString() == id }?.let(::selectAccount)
-            },
-            onAddAccountClick = {
-                accountModalData = AccountModalData(
-                    account = null,
-                    baseCurrency = baseCurrency,
-                    balance = 0.0,
-                )
-            },
-            onDone = {
-                keypadVisible = false
-                onAmountChange(it)
-                if (shouldFocusCategory(category)) {
-                    categoryPickerVisible = true
-                } else if (shouldFocusTitle(titleTextFieldValue, transactionType)) {
-                    titleFocus.requestFocus()
-                }
-            },
-            onDismiss = { keypadVisible = false },
-            decimalCountMax = IvyCurrency.getDecimalPlaces(baseCurrency),
-        )
-    }
-
-    if (exchangeRateKeypadVisible) {
-        AmountKeypadSheet(
-            currency = "",
-            initialAmount = customExchangeRateState.exchangeRate,
-            accounts = persistentListOf(),
-            onAccountClick = {},
-            onAddAccountClick = {},
-            onDone = {
-                exchangeRateKeypadVisible = false
-                onExchangeRateChange(it)
-            },
-            onDismiss = { exchangeRateKeypadVisible = false },
-            decimalCountMax = ExchangeRateDecimals,
-        )
-    }
-
-    if (categoryPickerVisible) {
-        val noCategory = PickerItemUi(
-            id = NoCategoryItemId,
-            title = stringResource(R.string.no_category),
-            selected = category == null,
-        )
-        PickerSheet(
-            title = stringResource(R.string.categories),
-            items = (listOf(noCategory) + categories.map { it.toPickerItem(category?.id?.value) })
-                .toImmutableList(),
-            onItemClick = { id ->
-                categoryPickerVisible = false
-                onCategoryChange(categories.firstOrNull { it.id.value.toString() == id })
-                if (shouldFocusTitle(titleTextFieldValue, transactionType)) {
-                    titleFocus.requestFocus()
-                } else if (shouldFocusAmount(amount = amount)) {
-                    keypadVisible = true
-                }
-            },
-            addLabel = stringResource(R.string.new_category),
-            onAddClick = { categoryModalData = CategoryModalData(category = null) },
-            onDismiss = { categoryPickerVisible = false },
-            icon = { item ->
-                ItemIconSDefaultIcon(
-                    iconName = categories.firstOrNull { it.id.value.toString() == item.id }
-                        ?.icon?.id,
-                    defaultIcon = R.drawable.ic_custom_category_s,
-                    tint = LocalContentColor.current,
-                )
-            },
-        )
-    }
-
-    accountPickerTarget?.let { target ->
-        val selectedId = when (target) {
-            AccountPickerTarget.From -> account?.id
-            AccountPickerTarget.To -> toAccount?.id
-        }
-        PickerSheet(
-            title = stringResource(R.string.accounts),
-            items = accounts.map { it.toPickerItem(selectedId) }.toImmutableList(),
-            onItemClick = { id ->
-                accountPickerTarget = null
-                accounts.firstOrNull { it.id.toString() == id }?.let { selected ->
-                    when (target) {
-                        AccountPickerTarget.From -> selectAccount(selected)
-                        AccountPickerTarget.To -> onToAccountChange(selected)
-                    }
-                }
-            },
-            addLabel = stringResource(R.string.new_account),
-            onAddClick = {
-                accountModalData = AccountModalData(
-                    account = null,
-                    baseCurrency = baseCurrency,
-                    balance = 0.0,
-                )
-            },
-            onDismiss = { accountPickerTarget = null },
-            icon = { item ->
-                ItemIconSDefaultIcon(
-                    iconName = accounts.firstOrNull { it.id.toString() == item.id }?.icon,
-                    defaultIcon = R.drawable.ic_custom_account_s,
-                    tint = LocalContentColor.current,
-                )
-            },
-        )
-    }
-
-    if (descriptionDialogVisible) {
-        TextInputDialog(
-            title = stringResource(R.string.description),
-            initialValue = description.orEmpty(),
-            onConfirm = {
-                descriptionDialogVisible = false
-                onDescriptionChange(it.trim().takeIf(String::isNotBlank))
-            },
-            onDismiss = { descriptionDialogVisible = false },
-        )
-    }
-
-    if (deleteDialogVisible) {
-        AlertDialog(
-            onDismissRequest = { deleteDialogVisible = false },
-            title = { Text(text = stringResource(R.string.confirm_deletion)) },
-            text = {
-                Text(text = stringResource(R.string.transaction_confirm_deletion_description))
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        deleteDialogVisible = false
-                        onDelete()
-                    },
-                ) {
+                loanData.loanCaption?.let { caption ->
                     Text(
-                        text = stringResource(R.string.delete),
-                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        text = caption,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { deleteDialogVisible = false }) {
-                    Text(text = stringResource(R.string.cancel))
-                }
-            },
-        )
-    }
-
-    if (accountChangeDialogVisible) {
-        AlertDialog(
-            onDismissRequest = { accountChangeDialogVisible = false },
-            title = { Text(text = stringResource(R.string.confirm_account_change)) },
-            text = { Text(text = stringResource(R.string.confirm_account_change_description)) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        accountChangeDialogVisible = false
-                        pendingAccount?.let(onAccountChange)
+                Spacer(Modifier.height(8.dp))
+                TitleField(
+                    value = titleTextFieldValue,
+                    onValueChange = {
+                        titleTextFieldValue = it
+                        onTitleChange(it.text)
                     },
-                ) {
-                    Text(text = stringResource(R.string.confirm))
+                    type = transactionType,
+                    suggestions = titleSuggestions,
+                    onSuggestionClick = { suggestion ->
+                        titleTextFieldValue = selectEndTextFieldValue(suggestion)
+                        onTitleChange(suggestion)
+                    },
+                    onNext = {
+                        if (shouldFocusAmount(amount = amount)) {
+                            keypadVisible = true
+                        } else {
+                            onSave(true)
+                        }
+                    },
+                    focusRequester = titleFocus,
+                )
+                Spacer(Modifier.height(8.dp))
+                CategoryRow(
+                    categoryName = category?.name?.value,
+                    categoryColor = category?.color?.value?.let(::Color),
+                    categoryIcon = category?.icon?.id,
+                    onClick = { categoryPickerVisible = true },
+                )
+                if (transactionType == TransactionType.TRANSFER) {
+                    AccountRow(
+                        accountName = account?.name,
+                        currency = account?.currency,
+                        label = stringResource(R.string.from),
+                        onClick = { accountPickerTarget = AccountPickerTarget.From },
+                    )
+                    AccountRow(
+                        accountName = toAccount?.name,
+                        currency = toAccount?.currency,
+                        label = stringResource(R.string.to),
+                        onClick = { accountPickerTarget = AccountPickerTarget.To },
+                    )
+                    if (customExchangeRateState.showCard) {
+                        // Directly under the pair of accounts it explains: this rate is what converts
+                        // From's currency into To's. It also keeps the control above the fold, which
+                        // is what the deleted `animateScrollTo` hack used to achieve by force.
+                        ExchangeRateRow(
+                            rateText = stringResource(
+                                R.string.exchange_rate_value,
+                                baseCurrency,
+                                customExchangeRateState.exchangeRate.format(ExchangeRateDecimals),
+                                customExchangeRateState.toCurrencyCode ?: baseCurrency,
+                            ),
+                            onClick = { exchangeRateKeypadVisible = true },
+                            onReset = { onExchangeRateChange(null) },
+                            modifier = Modifier.padding(vertical = 8.dp),
+                        )
+                    }
+                } else {
+                    AccountRow(
+                        accountName = account?.name,
+                        currency = account?.currency,
+                        label = stringResource(R.string.account),
+                        onClick = { accountPickerTarget = AccountPickerTarget.From },
+                    )
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { accountChangeDialogVisible = false }) {
-                    Text(text = stringResource(R.string.cancel))
+                // An unpaid planned payment has a due date but no date-time yet; offering to set one
+                // would turn it into a normal transaction, so the legacy screen hid the row there too.
+                if (dueDateText == null || dateTimeText != null) {
+                    DateTimeRow(
+                        dateTimeText = dateTimeText,
+                        onClick = onSetDate,
+                        onTimeClick = onSetTime,
+                    )
                 }
+                if (dueDateText != null) {
+                    DueDateRow(dueDateText = dueDateText, onClick = onDueDateClick)
+                }
+                DescriptionRow(
+                    description = description,
+                    onClick = { descriptionDialogVisible = true },
+                )
+                TagsRow(
+                    tagCount = transactionAssociatedTags.size,
+                    onClick = { tagModalVisible = true },
+                )
+                Spacer(Modifier.height(24.dp))
+            }
+        }
+
+        if (keypadVisible) {
+            AmountKeypadSheet(
+                currency = baseCurrency,
+                initialAmount = amount.takeIf { it != 0.0 },
+                accounts = accounts.map {
+                    KeypadAccountUi(
+                        id = it.id.toString(),
+                        name = it.name,
+                        selected = it.id == account?.id,
+                    )
+                }.toImmutableList(),
+                onAccountClick = { id ->
+                    accounts.firstOrNull { it.id.toString() == id }?.let(::selectAccount)
+                },
+                onAddAccountClick = {
+                    accountModalData = AccountModalData(
+                        account = null,
+                        baseCurrency = baseCurrency,
+                        balance = 0.0,
+                    )
+                },
+                onDone = {
+                    keypadVisible = false
+                    onAmountChange(it)
+                    if (shouldFocusCategory(category)) {
+                        categoryPickerVisible = true
+                    } else if (shouldFocusTitle(titleTextFieldValue, transactionType)) {
+                        titleFocus.requestFocus()
+                    }
+                },
+                onDismiss = { keypadVisible = false },
+                decimalCountMax = IvyCurrency.getDecimalPlaces(baseCurrency),
+            )
+        }
+
+        if (exchangeRateKeypadVisible) {
+            AmountKeypadSheet(
+                currency = "",
+                initialAmount = customExchangeRateState.exchangeRate,
+                accounts = persistentListOf(),
+                onAccountClick = {},
+                onAddAccountClick = {},
+                onDone = {
+                    exchangeRateKeypadVisible = false
+                    onExchangeRateChange(it)
+                },
+                onDismiss = { exchangeRateKeypadVisible = false },
+                decimalCountMax = ExchangeRateDecimals,
+            )
+        }
+
+        if (categoryPickerVisible) {
+            val noCategory = PickerItemUi(
+                id = NoCategoryItemId,
+                title = stringResource(R.string.no_category),
+                selected = category == null,
+            )
+            PickerSheet(
+                title = stringResource(R.string.categories),
+                items = (listOf(noCategory) + categories.map { it.toPickerItem(category?.id?.value) })
+                    .toImmutableList(),
+                onItemClick = { id ->
+                    categoryPickerVisible = false
+                    onCategoryChange(categories.firstOrNull { it.id.value.toString() == id })
+                    if (shouldFocusTitle(titleTextFieldValue, transactionType)) {
+                        titleFocus.requestFocus()
+                    } else if (shouldFocusAmount(amount = amount)) {
+                        keypadVisible = true
+                    }
+                },
+                addLabel = stringResource(R.string.new_category),
+                onAddClick = { categoryModalData = CategoryModalData(category = null) },
+                onDismiss = { categoryPickerVisible = false },
+                icon = { item ->
+                    ItemIconSDefaultIcon(
+                        iconName = categories.firstOrNull { it.id.value.toString() == item.id }
+                            ?.icon?.id,
+                        defaultIcon = R.drawable.ic_custom_category_s,
+                        tint = LocalContentColor.current,
+                    )
+                },
+            )
+        }
+
+        accountPickerTarget?.let { target ->
+            val selectedId = when (target) {
+                AccountPickerTarget.From -> account?.id
+                AccountPickerTarget.To -> toAccount?.id
+            }
+            PickerSheet(
+                title = stringResource(R.string.accounts),
+                items = accounts.map { it.toPickerItem(selectedId) }.toImmutableList(),
+                onItemClick = { id ->
+                    accountPickerTarget = null
+                    accounts.firstOrNull { it.id.toString() == id }?.let { selected ->
+                        when (target) {
+                            AccountPickerTarget.From -> selectAccount(selected)
+                            AccountPickerTarget.To -> onToAccountChange(selected)
+                        }
+                    }
+                },
+                addLabel = stringResource(R.string.new_account),
+                onAddClick = {
+                    accountModalData = AccountModalData(
+                        account = null,
+                        baseCurrency = baseCurrency,
+                        balance = 0.0,
+                    )
+                },
+                onDismiss = { accountPickerTarget = null },
+                icon = { item ->
+                    ItemIconSDefaultIcon(
+                        iconName = accounts.firstOrNull { it.id.toString() == item.id }?.icon,
+                        defaultIcon = R.drawable.ic_custom_account_s,
+                        tint = LocalContentColor.current,
+                    )
+                },
+            )
+        }
+
+        if (descriptionDialogVisible) {
+            TextInputDialog(
+                title = stringResource(R.string.description),
+                initialValue = description.orEmpty(),
+                onConfirm = {
+                    descriptionDialogVisible = false
+                    onDescriptionChange(it.trim().takeIf(String::isNotBlank))
+                },
+                onDismiss = { descriptionDialogVisible = false },
+            )
+        }
+
+        if (deleteDialogVisible) {
+            AlertDialog(
+                onDismissRequest = { deleteDialogVisible = false },
+                title = { Text(text = stringResource(R.string.confirm_deletion)) },
+                text = {
+                    Text(text = stringResource(R.string.transaction_confirm_deletion_description))
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            deleteDialogVisible = false
+                            onDelete()
+                        },
+                    ) {
+                        Text(
+                            text = stringResource(R.string.delete),
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { deleteDialogVisible = false }) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                },
+            )
+        }
+
+        if (accountChangeDialogVisible) {
+            AlertDialog(
+                onDismissRequest = { accountChangeDialogVisible = false },
+                title = { Text(text = stringResource(R.string.confirm_account_change)) },
+                text = { Text(text = stringResource(R.string.confirm_account_change_description)) },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            accountChangeDialogVisible = false
+                            pendingAccount?.let(onAccountChange)
+                        },
+                    ) {
+                        Text(text = stringResource(R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { accountChangeDialogVisible = false }) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                },
+            )
+        }
+
+        if (backgroundProcessing) {
+            ProgressDialog(
+                title = stringResource(R.string.confirm_account_change),
+                description = stringResource(R.string.confirm_account_loan_change),
+            )
+        }
+
+        LegacyModals(
+            categoryModalData = categoryModalData,
+            accountModalData = accountModalData,
+            tagModalVisible = tagModalVisible,
+            onCreateCategory = {
+                onCreateCategory(it)
+                categoryPickerVisible = false
             },
+            onEditCategory = onEditCategory,
+            onCategoryModalDismiss = { categoryModalData = null },
+            onCreateAccount = onCreateAccount,
+            onAccountModalDismiss = { accountModalData = null },
+            tags = tags,
+            transactionAssociatedTags = transactionAssociatedTags,
+            onTagOperation = onTagOperation,
+            onTagModalDismiss = { tagModalVisible = false },
         )
     }
-
-    if (backgroundProcessing) {
-        ProgressDialog(
-            title = stringResource(R.string.confirm_account_change),
-            description = stringResource(R.string.confirm_account_loan_change),
-        )
-    }
-
-    LegacyModals(
-        categoryModalData = categoryModalData,
-        accountModalData = accountModalData,
-        tagModalVisible = tagModalVisible,
-        onCreateCategory = {
-            onCreateCategory(it)
-            categoryPickerVisible = false
-        },
-        onEditCategory = onEditCategory,
-        onCategoryModalDismiss = { categoryModalData = null },
-        onCreateAccount = onCreateAccount,
-        onAccountModalDismiss = { accountModalData = null },
-        tags = tags,
-        transactionAssociatedTags = transactionAssociatedTags,
-        onTagOperation = onTagOperation,
-        onTagModalDismiss = { tagModalVisible = false },
-    )
 }
 
 /**
@@ -808,11 +812,17 @@ private fun LegacyModals(
     }
 }
 
-@Composable
+/**
+ * A plain function, not a composable: it only computes a string and has no UI of its own to
+ * emit, so making it `@Composable` would just make it an (unstable) value-returning composable.
+ * The one piece of composition-scoped data it needs, the "select account" label, comes in as a
+ * parameter instead.
+ */
 private fun amountSupportingText(
     transactionType: TransactionType,
     account: Account?,
     customExchangeRateState: CustomExchangeRateState,
+    selectAccountLabel: String,
 ): String? = when {
     transactionType == TransactionType.TRANSFER -> {
         val converted = customExchangeRateState.convertedAmount
@@ -825,7 +835,7 @@ private fun amountSupportingText(
     }
 
     account != null -> account.name
-    else -> stringResource(R.string.select_account)
+    else -> selectAccountLabel
 }
 
 private val CommitAction.labelRes: Int

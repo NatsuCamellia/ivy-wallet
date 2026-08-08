@@ -137,8 +137,8 @@ fun AccountRow(
 fun DateTimeRow(
     dateTimeText: String?,
     onClick: () -> Unit,
-    onTimeClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
+    onTimeClick: (() -> Unit)? = null,
 ) {
     SettingsItem(
         title = dateTimeText ?: stringResource(R.string.set_date_and_time),

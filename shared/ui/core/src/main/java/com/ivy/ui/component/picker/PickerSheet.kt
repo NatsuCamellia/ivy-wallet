@@ -207,7 +207,7 @@ fun PickerSheet(
 
 /** For screenshot testing */
 @Composable
-fun PickerUiTest(accounts: Boolean) {
+fun PickerUiTest(accounts: Boolean, modifier: Modifier = Modifier) {
     if (accounts) {
         PickerContent(
             title = "Accounts",
@@ -215,6 +215,7 @@ fun PickerUiTest(accounts: Boolean) {
             onItemClick = {},
             addLabel = "New account",
             onAddClick = {},
+            modifier = modifier,
         )
     } else {
         PickerContent(
@@ -223,6 +224,7 @@ fun PickerUiTest(accounts: Boolean) {
             onItemClick = {},
             addLabel = "New category",
             onAddClick = {},
+            modifier = modifier,
             icon = { Icon(imageVector = Icons.Outlined.Circle, contentDescription = null) },
         )
     }

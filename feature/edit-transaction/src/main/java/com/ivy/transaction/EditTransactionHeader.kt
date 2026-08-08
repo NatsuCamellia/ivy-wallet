@@ -24,11 +24,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -136,6 +140,9 @@ fun TitleField(
     focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
+    // Focus state is this composable's own business — the caller only needs to be able to *move*
+    // focus here, which the FocusRequester it already passes covers.
+    var hasFocus by remember { mutableStateOf(false) }
     Column(modifier = modifier) {
         TextField(
             value = value,
@@ -145,7 +152,8 @@ fun TitleField(
                 // 8dp here plus the field's own 16dp of content padding lands the text on the
                 // screen's 24dp start edge, shared with the amount headline and the rows below.
                 .padding(horizontal = 8.dp)
-                .focusRequester(focusRequester),
+                .focusRequester(focusRequester)
+                .onFocusChanged { hasFocus = it.isFocused },
             textStyle = MaterialTheme.typography.headlineSmall,
             placeholder = { Text(text = stringResource(type.titleRes)) },
             singleLine = true,
@@ -169,7 +177,10 @@ fun TitleField(
             modifier = Modifier.padding(horizontal = 24.dp),
             color = MaterialTheme.colorScheme.outlineVariant,
         )
-        if (suggestions.isNotEmpty()) {
+        // Gated on focus, not merely on the suggestion set: the ViewModel refreshes suggestions on
+        // every category/account/title change, so an un-gated row would sit there permanently and
+        // push Category / Account / Date & time down the page.
+        if (hasFocus && suggestions.isNotEmpty()) {
             FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()

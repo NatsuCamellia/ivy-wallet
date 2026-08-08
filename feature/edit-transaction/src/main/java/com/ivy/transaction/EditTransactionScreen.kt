@@ -673,6 +673,9 @@ private fun EditTransactionUi(
                     onDescriptionChange(it.trim().takeIf(String::isNotBlank))
                 },
                 onDismiss = { descriptionDialogVisible = false },
+                // Descriptions are multi-line by design; the legacy DescriptionModal inserted
+                // newlines explicitly.
+                singleLine = false,
             )
         }
 

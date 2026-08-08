@@ -23,16 +23,21 @@ fun commitAction(
 
 enum class OverflowItem { Duplicate, Delete, MakePlanned }
 
+/**
+ * Delete is offered for every saved transaction, loan records included. The legacy `Toolbar`
+ * rendered `DeleteButton` under a bare `initialTransactionId != null`; `isLoanRecord` only ever
+ * suppressed the *type* button, which it did by passing `type = TRANSFER` in its place. The screen
+ * still hides the type selector for loan records — that part is unchanged.
+ */
 fun overflowItems(
     isNewTransaction: Boolean,
-    isLoanRecord: Boolean,
     type: TransactionType,
     hasDateTime: Boolean,
     hasDueDate: Boolean,
 ): List<OverflowItem> = buildList {
     if (!isNewTransaction) {
         add(OverflowItem.Duplicate)
-        if (!isLoanRecord) add(OverflowItem.Delete)
+        add(OverflowItem.Delete)
     }
     val plannedAvailable = type != TransactionType.TRANSFER && !hasDateTime && !hasDueDate
     if (isNewTransaction && plannedAvailable) add(OverflowItem.MakePlanned)

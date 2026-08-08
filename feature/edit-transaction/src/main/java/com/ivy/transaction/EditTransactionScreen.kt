@@ -336,7 +336,6 @@ private fun EditTransactionUi(
                     actions = {
                         val items = overflowItems(
                             isNewTransaction = isNewTransaction,
-                            isLoanRecord = loanData.isLoanRecord,
                             type = transactionType,
                             hasDateTime = dateTimeText != null,
                             hasDueDate = dueDateText != null,

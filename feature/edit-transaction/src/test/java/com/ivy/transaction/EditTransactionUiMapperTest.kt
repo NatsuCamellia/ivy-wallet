@@ -61,7 +61,6 @@ class EditTransactionUiMapperTest {
     fun `a new transaction offers only the planned shortcut`() {
         overflowItems(
             isNewTransaction = true,
-            isLoanRecord = false,
             type = TransactionType.EXPENSE,
             hasDateTime = false,
             hasDueDate = false,
@@ -72,7 +71,6 @@ class EditTransactionUiMapperTest {
     fun `an existing transaction offers duplicate and delete`() {
         overflowItems(
             isNewTransaction = false,
-            isLoanRecord = false,
             type = TransactionType.EXPENSE,
             hasDateTime = true,
             hasDueDate = false,
@@ -83,7 +81,6 @@ class EditTransactionUiMapperTest {
     fun `transfers never offer the planned shortcut`() {
         overflowItems(
             isNewTransaction = true,
-            isLoanRecord = false,
             type = TransactionType.TRANSFER,
             hasDateTime = false,
             hasDueDate = false,
@@ -94,21 +91,26 @@ class EditTransactionUiMapperTest {
     fun `a dated transaction never offers the planned shortcut`() {
         overflowItems(
             isNewTransaction = true,
-            isLoanRecord = false,
             type = TransactionType.EXPENSE,
             hasDateTime = true,
             hasDueDate = false,
         ) shouldContainExactly emptyList()
     }
 
+    /**
+     * The legacy `Toolbar` gated `DeleteButton` on `initialTransactionId != null` alone — loan
+     * records included. `isLoanRecord` only ever suppressed the *type* button, which the screen
+     * still handles by hiding the type selector.
+     */
     @Test
-    fun `loan records cannot be deleted from here`() {
-        overflowItems(
-            isNewTransaction = false,
-            isLoanRecord = true,
-            type = TransactionType.EXPENSE,
-            hasDateTime = true,
-            hasDueDate = false,
-        ) shouldContainExactly listOf(OverflowItem.Duplicate)
+    fun `every saved transaction can be deleted, whatever its type`() {
+        TransactionType.entries.forEach { type ->
+            overflowItems(
+                isNewTransaction = false,
+                type = type,
+                hasDateTime = true,
+                hasDueDate = false,
+            ) shouldContainExactly listOf(OverflowItem.Duplicate, OverflowItem.Delete)
+        }
     }
 }

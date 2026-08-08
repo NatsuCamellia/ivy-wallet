@@ -238,7 +238,10 @@ fun ExchangeRateRow(
             .padding(horizontal = 16.dp)
             .clip(MaterialTheme.shapes.large)
             .background(extendedColors.warningContainer)
-            .clickable(onClick = onClick)
+            .clickable(
+                onClickLabel = stringResource(R.string.edit_exchange_rate),
+                onClick = onClick,
+            )
             .padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

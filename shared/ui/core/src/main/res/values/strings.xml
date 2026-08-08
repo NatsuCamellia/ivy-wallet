@@ -354,6 +354,7 @@
     <string name="enter_record_amount_uppercase">ENTER RECORD AMOUNT</string>
     <string name="backspace">Backspace</string>
     <string name="edit_amount">Edit amount</string>
+    <string name="edit_exchange_rate">Edit exchange rate</string>
     <string name="record_deletion_warning">Are you sure you want to delete the "%1$s" record?</string>
     <string name="account_change_warning">"If you attempt to change the account associated with the loan record to one in a different currency, all loan records will be recalculated based on today\'s exchange rates."</string>
     <string name="edit_name">Edit name</string>

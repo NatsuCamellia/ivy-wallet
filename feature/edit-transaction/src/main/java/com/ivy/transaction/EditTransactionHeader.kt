@@ -165,7 +165,8 @@ fun TitleField(
             keyboardActions = KeyboardActions(onNext = { onNext() }),
         )
         HorizontalDivider(
-            modifier = Modifier.padding(horizontal = 16.dp),
+            // Same 24dp edge as the field's text, the amount headline and every row below.
+            modifier = Modifier.padding(horizontal = 24.dp),
             color = MaterialTheme.colorScheme.outlineVariant,
         )
         if (suggestions.isNotEmpty()) {

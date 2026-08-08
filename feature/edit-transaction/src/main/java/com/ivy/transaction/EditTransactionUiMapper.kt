@@ -49,6 +49,7 @@ fun Account.toPickerItem(selectedId: UUID?): PickerItemUi = PickerItemUi(
 fun Category.toPickerItem(selectedId: UUID?): PickerItemUi = PickerItemUi(
     id = id.value.toString(),
     title = name.value,
+    supportingText = null,
     color = color.value.toComposeColor(),
     selected = id.value == selectedId,
 )

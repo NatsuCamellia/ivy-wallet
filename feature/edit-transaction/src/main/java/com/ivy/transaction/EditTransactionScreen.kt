@@ -593,6 +593,8 @@ private fun EditTransactionUi(
             val noCategory = PickerItemUi(
                 id = NoCategoryItemId,
                 title = stringResource(R.string.no_category),
+                supportingText = null,
+                color = null,
                 selected = category == null,
             )
             PickerSheet(

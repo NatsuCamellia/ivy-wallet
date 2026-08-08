@@ -57,6 +57,7 @@ private val OperatorKeys = setOf(
 )
 
 @Immutable
+@Suppress("DataClassTypedIDs")
 data class KeypadAccountUi(
     val id: String,
     val name: String,

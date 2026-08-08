@@ -40,12 +40,13 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Immutable
+@Suppress("DataClassTypedIDs")
 data class PickerItemUi(
     val id: String,
     val title: String,
-    val supportingText: String? = null,
-    val color: Color? = null,
-    val selected: Boolean = false,
+    val supportingText: String?,
+    val color: Color?,
+    val selected: Boolean,
 )
 
 @Composable
@@ -234,18 +235,49 @@ private val PreviewCategoryItems = persistentListOf(
     PickerItemUi(
         id = "1",
         title = "Groceries, household and pet supplies",
+        supportingText = null,
         color = Color(0xFF4CAF50),
         selected = false,
     ),
-    PickerItemUi(id = "2", title = "Rent", color = Color(0xFF2196F3), selected = true),
-    PickerItemUi(id = "3", title = "Entertainment", color = Color(0xFFFF9800), selected = false),
-    PickerItemUi(id = "4", title = "Transport", color = Color(0xFF9C27B0), selected = false),
+    PickerItemUi(
+        id = "2",
+        title = "Rent",
+        supportingText = null,
+        color = Color(0xFF2196F3),
+        selected = true,
+    ),
+    PickerItemUi(
+        id = "3",
+        title = "Entertainment",
+        supportingText = null,
+        color = Color(0xFFFF9800),
+        selected = false,
+    ),
+    PickerItemUi(
+        id = "4",
+        title = "Transport",
+        supportingText = null,
+        color = Color(0xFF9C27B0),
+        selected = false,
+    ),
 )
 
 private val PreviewAccountItems = persistentListOf(
-    PickerItemUi(id = "1", title = "Cash", supportingText = "USD"),
-    PickerItemUi(id = "2", title = "Revolut", supportingText = "EUR"),
-    PickerItemUi(id = "3", title = "DSK Bank", supportingText = "BGN"),
+    PickerItemUi(id = "1", title = "Cash", supportingText = "USD", color = null, selected = false),
+    PickerItemUi(
+        id = "2",
+        title = "Revolut",
+        supportingText = "EUR",
+        color = null,
+        selected = false,
+    ),
+    PickerItemUi(
+        id = "3",
+        title = "DSK Bank",
+        supportingText = "BGN",
+        color = null,
+        selected = false,
+    ),
 )
 
 @Preview

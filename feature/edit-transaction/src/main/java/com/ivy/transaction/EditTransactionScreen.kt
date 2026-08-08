@@ -53,6 +53,7 @@ import com.ivy.data.model.CategoryId
 import com.ivy.data.model.Tag
 import com.ivy.data.model.TagId
 import com.ivy.data.model.primitive.ColorInt
+import com.ivy.data.model.primitive.IconAsset
 import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.design.api.LocalTimeConverter
 import com.ivy.design.api.LocalTimeFormatter
@@ -914,11 +915,12 @@ private fun EditTransactionPreview(
 ) {
     IvyPreview(dark = dark) {
         when (state) {
+            // No account: this is the one state that pixel-verifies the rows' empty-state colour.
             EditTransactionPreviewState.NewExpense -> PreviewEditTransactionUi(
                 isNewTransaction = true,
                 transactionType = TransactionType.EXPENSE,
                 amount = 0.0,
-                account = PreviewRevolut,
+                account = null,
             )
 
             EditTransactionPreviewState.EditFilled -> PreviewEditTransactionUi(
@@ -1031,7 +1033,10 @@ private val PreviewCategory = Category(
     id = CategoryId(UUID.fromString("00000000-0000-0000-0000-000000000003")),
     name = NotBlankTrimmedString.unsafe("Food & Drink"),
     color = ColorInt(0xFF25B26A.toInt()),
-    icon = null,
+    // A real asset name, resolved through the same ItemIconSDefaultIcon path production uses, so
+    // the golden actually pixel-checks the icon's fit inside its coloured bubble. With `null` here
+    // the fallback drawable rendered at a different size and the ring was never verified.
+    icon = IconAsset.unsafe("groceries"),
     orderNum = 0.0,
 )
 

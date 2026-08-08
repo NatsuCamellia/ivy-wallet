@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,10 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.design.system.IvyMaterial3Theme
+import com.ivy.ui.R
 import com.ivy.ui.component.transaction.CategoryIconBubble
 import com.ivy.ui.component.transaction.TransactionItemPosition
 import com.ivy.ui.component.transaction.toShape
@@ -206,6 +207,19 @@ fun PickerSheet(
     }
 }
 
+/**
+ * A real category icon asset, at the 32dp intrinsic size the app's icon set ships. The stand-in
+ * `Icons.Outlined.Circle` used before is 24dp, so it left room around itself no matter how the
+ * bubble was sized and the golden could not catch an icon that swallowed its colour ring.
+ */
+@Composable
+private fun PreviewCategoryIcon() {
+    Icon(
+        painter = painterResource(id = R.drawable.ic_custom_groceries_s),
+        contentDescription = null,
+    )
+}
+
 /** For screenshot testing */
 @Composable
 fun PickerUiTest(accounts: Boolean, modifier: Modifier = Modifier) {
@@ -226,7 +240,7 @@ fun PickerUiTest(accounts: Boolean, modifier: Modifier = Modifier) {
             addLabel = "New category",
             onAddClick = {},
             modifier = modifier,
-            icon = { Icon(imageVector = Icons.Outlined.Circle, contentDescription = null) },
+            icon = { PreviewCategoryIcon() },
         )
     }
 }
@@ -291,7 +305,7 @@ private fun PickerContentCategoryPreview() {
                 onItemClick = {},
                 addLabel = "New category",
                 onAddClick = {},
-                icon = { Icon(imageVector = Icons.Outlined.Circle, contentDescription = null) },
+                icon = { PreviewCategoryIcon() },
             )
         }
     }

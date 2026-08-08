@@ -223,6 +223,13 @@ fun EditTransactionScreen(screen: EditTransactionScreen) {
 /** Which of the (up to two) account rows the account picker was opened from. */
 private enum class AccountPickerTarget { From, To }
 
+/**
+ * Which surface launched the legacy `AccountModal`. The launching sheet has to be closed first —
+ * a `ModalBottomSheet` lives in its own window, above the activity content the legacy modals render
+ * into — so it is recorded here and re-opened once the modal closes.
+ */
+private enum class AccountModalOrigin { Keypad, PickerFrom, PickerTo }
+
 @Suppress("LongParameterList", "LongMethod", "CyclomaticComplexMethod")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -284,7 +291,21 @@ private fun EditTransactionUi(
     var tagModalVisible by remember { mutableStateOf(false) }
     var categoryModalData: CategoryModalData? by remember { mutableStateOf(null) }
     var accountModalData: AccountModalData? by remember { mutableStateOf(null) }
+    var accountModalOrigin: AccountModalOrigin? by remember { mutableStateOf(null) }
     var pendingAccount by remember(account) { mutableStateOf(account) }
+
+    fun openAccountModal(origin: AccountModalOrigin) {
+        // Close the launching sheet before the legacy modal opens: the sheet is hosted in its own
+        // window above the activity content, so a modal shown underneath it would be invisible.
+        keypadVisible = false
+        accountPickerTarget = null
+        accountModalOrigin = origin
+        accountModalData = AccountModalData(
+            account = null,
+            baseCurrency = baseCurrency,
+            balance = 0.0,
+        )
+    }
 
     var titleTextFieldValue by remember(initialTitle) {
         mutableStateOf(TextFieldValue(initialTitle.orEmpty()))
@@ -537,13 +558,7 @@ private fun EditTransactionUi(
                 onAccountClick = { id ->
                     accounts.firstOrNull { it.id.toString() == id }?.let(::selectAccount)
                 },
-                onAddAccountClick = {
-                    accountModalData = AccountModalData(
-                        account = null,
-                        baseCurrency = baseCurrency,
-                        balance = 0.0,
-                    )
-                },
+                onAddAccountClick = { openAccountModal(AccountModalOrigin.Keypad) },
                 onDone = {
                     keypadVisible = false
                     onAmountChange(it)
@@ -594,7 +609,11 @@ private fun EditTransactionUi(
                     }
                 },
                 addLabel = stringResource(R.string.new_category),
-                onAddClick = { categoryModalData = CategoryModalData(category = null) },
+                onAddClick = {
+                    // Same window ordering as the account modal: close the sheet first.
+                    categoryPickerVisible = false
+                    categoryModalData = CategoryModalData(category = null)
+                },
                 onDismiss = { categoryPickerVisible = false },
                 icon = { item ->
                     ItemIconSDefaultIcon(
@@ -626,10 +645,11 @@ private fun EditTransactionUi(
                 },
                 addLabel = stringResource(R.string.new_account),
                 onAddClick = {
-                    accountModalData = AccountModalData(
-                        account = null,
-                        baseCurrency = baseCurrency,
-                        balance = 0.0,
+                    openAccountModal(
+                        when (target) {
+                            AccountPickerTarget.From -> AccountModalOrigin.PickerFrom
+                            AccountPickerTarget.To -> AccountModalOrigin.PickerTo
+                        }
                     )
                 },
                 onDismiss = { accountPickerTarget = null },
@@ -717,14 +737,24 @@ private fun EditTransactionUi(
             categoryModalData = categoryModalData,
             accountModalData = accountModalData,
             tagModalVisible = tagModalVisible,
-            onCreateCategory = {
-                onCreateCategory(it)
-                categoryPickerVisible = false
-            },
+            // The ViewModel selects the freshly created category, so the picker has nothing left
+            // to say and stays closed.
+            onCreateCategory = onCreateCategory,
             onEditCategory = onEditCategory,
             onCategoryModalDismiss = { categoryModalData = null },
             onCreateAccount = onCreateAccount,
-            onAccountModalDismiss = { accountModalData = null },
+            onAccountModalDismiss = {
+                accountModalData = null
+                when (accountModalOrigin) {
+                    AccountModalOrigin.Keypad -> keypadVisible = true
+                    AccountModalOrigin.PickerFrom ->
+                        accountPickerTarget = AccountPickerTarget.From
+
+                    AccountModalOrigin.PickerTo -> accountPickerTarget = AccountPickerTarget.To
+                    null -> Unit
+                }
+                accountModalOrigin = null
+            },
             tags = tags,
             transactionAssociatedTags = transactionAssociatedTags,
             onTagOperation = onTagOperation,

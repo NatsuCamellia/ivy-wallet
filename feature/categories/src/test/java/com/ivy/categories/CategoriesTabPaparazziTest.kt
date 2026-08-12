@@ -8,35 +8,35 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(TestParameterInjector::class)
-class CategoriesScreenPaparazziTest(
+class CategoriesTabPaparazziTest(
     @TestParameter
     private val theme: PaparazziTheme,
 ) : PaparazziScreenshotTest() {
     @Test
     fun `snapshot Categories nonCompact Screen`() {
         snapshot(theme) {
-            CategoriesScreenUiTest(theme == PaparazziTheme.Dark)
+            CategoriesTabUiTest(theme == PaparazziTheme.Dark)
         }
     }
 
     @Test
     fun `snapshot Categories nonCompact Screen with search bar`() {
         snapshot(theme) {
-            CategoriesScreenWithSearchBarUiTest(theme == PaparazziTheme.Dark)
+            CategoriesTabWithSearchBarUiTest(theme == PaparazziTheme.Dark)
         }
     }
 
     @Test
     fun `snapshot Categories compact Screen`() {
         snapshot(theme) {
-            CategoriesScreenCompactUiTest(theme == PaparazziTheme.Dark)
+            CategoriesTabCompactUiTest(theme == PaparazziTheme.Dark)
         }
     }
 
     @Test
     fun `snapshot Categories compact Screen with search bar`() {
         snapshot(theme) {
-            CategoriesScreenWithSearchBarCompactUiTest(theme == PaparazziTheme.Dark)
+            CategoriesTabWithSearchBarCompactUiTest(theme == PaparazziTheme.Dark)
         }
     }
 }

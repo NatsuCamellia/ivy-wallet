@@ -61,7 +61,7 @@ fun BoxWithConstraintsScope.BottomBar(
     onAddTransfer: () -> Unit,
     onAddPlannedPayment: () -> Unit,
 
-    showAddAccountModal: () -> Unit,
+    onFabClick: () -> Unit,
 ) {
     var fabMenuExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -129,6 +129,18 @@ fun BoxWithConstraintsScope.BottomBar(
             label = { Text(text = stringResource(R.string.accounts)) },
             modifier = Modifier.testTag("accounts"),
         )
+        NavigationBarItem(
+            selected = tab == MainTab.CATEGORIES,
+            onClick = { selectTab(MainTab.CATEGORIES) },
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.ic_categories),
+                    contentDescription = stringResource(R.string.categories),
+                )
+            },
+            label = { Text(text = stringResource(R.string.categories)) },
+            modifier = Modifier.testTag("categories"),
+        )
     }
 
     FloatingActionButtonMenu(
@@ -145,7 +157,7 @@ fun BoxWithConstraintsScope.BottomBar(
                     if (tab == MainTab.HOME) {
                         fabMenuExpanded = !fabMenuExpanded
                     } else {
-                        showAddAccountModal()
+                        onFabClick()
                     }
                 },
             ) {

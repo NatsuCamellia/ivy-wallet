@@ -85,11 +85,6 @@ data object PlannedPaymentsScreen : Screen {
         get() = true
 }
 
-data object CategoriesScreen : Screen {
-    override val isLegacy: Boolean
-        get() = true
-}
-
 data object SettingsScreen : Screen {
     override val isLegacy: Boolean
         get() = false

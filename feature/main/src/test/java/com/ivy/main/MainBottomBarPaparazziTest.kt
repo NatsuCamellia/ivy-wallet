@@ -25,7 +25,7 @@ class MainBottomBarPaparazziTest(
                     onAddExpense = {},
                     onAddTransfer = {},
                     onAddPlannedPayment = {},
-                    showAddAccountModal = {},
+                    onFabClick = {},
                 )
             }
         }
@@ -42,7 +42,24 @@ class MainBottomBarPaparazziTest(
                     onAddExpense = {},
                     onAddTransfer = {},
                     onAddPlannedPayment = {},
-                    showAddAccountModal = {},
+                    onFabClick = {},
+                )
+            }
+        }
+    }
+
+    @Test
+    fun `snapshot bottom bar - categories tab`() {
+        snapshot(theme) {
+            BoxWithConstraints {
+                BottomBar(
+                    tab = MainTab.CATEGORIES,
+                    selectTab = {},
+                    onAddIncome = {},
+                    onAddExpense = {},
+                    onAddTransfer = {},
+                    onAddPlannedPayment = {},
+                    onFabClick = {},
                 )
             }
         }

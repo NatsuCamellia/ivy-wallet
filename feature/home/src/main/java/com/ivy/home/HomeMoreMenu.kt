@@ -42,7 +42,6 @@ import com.ivy.legacy.utils.clickableNoIndication
 import com.ivy.legacy.utils.openUrl
 import com.ivy.legacy.utils.rememberInteractionSource
 import com.ivy.navigation.BudgetScreen
-import com.ivy.navigation.CategoriesScreen
 import com.ivy.navigation.LoansScreen
 import com.ivy.navigation.PlannedPaymentsScreen
 import com.ivy.navigation.ReportScreen
@@ -68,6 +67,7 @@ fun BoxWithConstraintsScope.MoreMenu(
     onSwitchTheme: () -> Unit,
     onBufferClick: () -> Unit,
     onCurrencyClick: () -> Unit,
+    onCategoriesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     FilledTonalIconButton(
@@ -95,6 +95,7 @@ fun BoxWithConstraintsScope.MoreMenu(
                 theme = theme,
                 onSwitchTheme = onSwitchTheme,
                 onBufferClick = onBufferClick,
+                onCategoriesClick = onCategoriesClick,
             )
         }
     }
@@ -108,6 +109,7 @@ private fun MoreMenuContent(
     theme: Theme,
     onSwitchTheme: () -> Unit,
     onBufferClick: () -> Unit,
+    onCategoriesClick: () -> Unit,
 ) {
     val nav = navigation()
     // rootScreen() unsafely casts LocalContext.current — capture the context here (always
@@ -133,7 +135,7 @@ private fun MoreMenuContent(
             theme = theme,
             onSwitchTheme = onSwitchTheme,
             onSettingsClick = { nav.navigateTo(SettingsScreen) },
-            onCategoriesClick = { nav.navigateTo(CategoriesScreen) },
+            onCategoriesClick = onCategoriesClick,
             onPlannedPaymentsClick = { nav.navigateTo(PlannedPaymentsScreen) },
             onShareClick = {
                 if (context is RootScreen) {
@@ -390,6 +392,7 @@ private fun PreviewCollapsed() {
             onSwitchTheme = {},
             onBufferClick = {},
             onCurrencyClick = {},
+            onCategoriesClick = {},
         )
     }
 }
@@ -408,6 +411,7 @@ private fun PreviewExpanded() {
             onSwitchTheme = {},
             onBufferClick = {},
             onCurrencyClick = {},
+            onCategoriesClick = {},
         )
     }
 }
@@ -424,6 +428,7 @@ fun MoreMenuContentUiTest(isDark: Boolean) {
             theme = Theme.LIGHT,
             onSwitchTheme = {},
             onBufferClick = {},
+            onCategoriesClick = {},
         )
     }
 }

@@ -2,13 +2,12 @@ package com.ivy.categories
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,8 +22,10 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,9 +40,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import com.ivy.legacy.IvyWalletPreview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ivy.base.legacy.Theme
@@ -52,10 +52,9 @@ import com.ivy.data.model.primitive.IconAsset
 import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
+import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.ui.SearchInput
 import com.ivy.legacy.utils.balancePrefix
-import com.ivy.legacy.utils.compactBalancePrefix
-import com.ivy.legacy.utils.format
 import com.ivy.legacy.utils.selectEndTextFieldValue
 import com.ivy.navigation.TransactionsScreen
 import com.ivy.navigation.navigation
@@ -138,7 +137,7 @@ private fun BoxWithConstraintsScope.UI(
 
                 Text(
                     text = stringResource(R.string.categories),
-                    style = UI.typo.h2.style(
+                    style = UI.typo.b1.style(
                         color = UI.colors.pureInverse,
                         fontWeight = FontWeight.ExtraBold
                     )
@@ -162,6 +161,14 @@ private fun BoxWithConstraintsScope.UI(
 
                 Spacer(Modifier.width(24.dp))
             }
+
+            Spacer(Modifier.height(16.dp))
+            CategoryTotalsCards(
+                currency = state.baseCurrency,
+                totalMonthlyExpenses = state.totalMonthlyExpenses,
+                totalMonthlyIncome = state.totalMonthlyIncome
+            )
+            Spacer(Modifier.height(16.dp))
 
             if (state.showCategorySearchBar) {
                 Spacer(Modifier.height(16.dp))
@@ -241,6 +248,90 @@ private fun BoxWithConstraintsScope.UI(
 }
 
 @Composable
+private fun CategoryTotalsCards(
+    currency: String,
+    totalMonthlyExpenses: Double,
+    totalMonthlyIncome: Double,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Spacer(Modifier.width(16.dp))
+
+        CategoryTotalCard(
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            label = stringResource(R.string.month_expenses),
+            currency = currency,
+            amount = totalMonthlyExpenses
+        )
+
+        Spacer(Modifier.width(12.dp))
+
+        CategoryTotalCard(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            label = stringResource(R.string.month_income),
+            currency = currency,
+            amount = totalMonthlyIncome
+        )
+
+        Spacer(Modifier.width(16.dp))
+    }
+}
+
+@Composable
+private fun RowScope.CategoryTotalCard(
+    containerColor: Color,
+    label: String,
+    currency: String,
+    amount: Double,
+) {
+    val contentColor = contentColorFor(containerColor)
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .clip(MaterialTheme.shapes.large)
+            .background(containerColor)
+    ) {
+        Spacer(Modifier.height(12.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(Modifier.width(16.dp))
+
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                color = contentColor
+            )
+        }
+
+        Spacer(Modifier.height(4.dp))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Spacer(Modifier.width(20.dp))
+
+            AmountCurrencyB1(
+                amount = amount,
+                currency = currency,
+                textColor = contentColor,
+                shortenBigNumbers = true
+            )
+
+            Spacer(Modifier.width(4.dp))
+        }
+
+        Spacer(Modifier.height(20.dp))
+    }
+}
+
+@Composable
 private fun CategoryCard(
     currency: String,
     categoryData: CategoryData,
@@ -248,206 +339,102 @@ private fun CategoryCard(
     onLongClick: () -> Unit,
     onClick: () -> Unit
 ) {
-    val contrastColor = findContrastTextColor(categoryData.category.color.value.toComposeColor())
-
-    if (!compactModeEnabled) {
-        Spacer(Modifier.height(16.dp))
-        DefaultCategoryCard(onClick, categoryData, currency)
-    } else {
-        Spacer(Modifier.height(8.dp))
-        CompactCategoryCard(
-            categoryData = categoryData,
-            contrastColor = contrastColor,
-            currency = currency,
-            onClick = onClick
-        )
-    }
+    Spacer(Modifier.height(16.dp))
+    DefaultCategoryCard(
+        onClick = onClick,
+        categoryData = categoryData,
+        currency = currency,
+        compactModeEnabled = compactModeEnabled
+    )
 }
 
 @Composable
 private fun DefaultCategoryCard(
     onClick: () -> Unit,
     categoryData: CategoryData,
-    currency: String
+    currency: String,
+    compactModeEnabled: Boolean
 ) {
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .clip(UI.shapes.r4)
-            .border(2.dp, UI.colors.medium, UI.shapes.r4)
+            .background(MaterialTheme.colorScheme.surfaceContainer, UI.shapes.r4)
             .clickable(
                 onClick = onClick
             )
     ) {
         CategoryHeader(
             categoryData = categoryData,
-            currency = currency,
-            contrastColor = findContrastTextColor(categoryData.category.color.value.toComposeColor())
+            currency = currency
         )
 
-        Spacer(Modifier.height(12.dp))
-
-        // Emitting content
-        AddedSpent(
-            currency = currency,
-            monthlyIncome = categoryData.monthlyIncome,
-            monthlyExpenses = categoryData.monthlyExpenses
-        )
-
-        Spacer(Modifier.height(12.dp))
-    }
-}
-
-@Composable
-private fun CompactCategoryCard(
-    categoryData: CategoryData,
-    contrastColor: Color,
-    currency: String,
-    onClick: () -> Unit
-) {
-    val category = categoryData.category
-    val balancePrefixValue = compactBalancePrefix(
-        income = categoryData.monthlyIncome,
-        expenses = categoryData.monthlyExpenses
-    )
-
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .border(2.dp, UI.colors.medium, UI.shapes.r4)
-            .clickable(
-                onClick = onClick
-            ),
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(all = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
+        if (!compactModeEnabled) {
+            Spacer(
                 modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(category.color.value.toComposeColor()),
-                contentAlignment = Alignment.Center,
-            ) {
-                ItemIconSDefaultIcon(
-                    iconName = category.icon?.id,
-                    defaultIcon = R.drawable.ic_custom_account_s,
-                    tint = contrastColor
-                )
-            }
-
-            Row(
-                modifier =
-                Modifier
-                    .padding(horizontal = 8.dp)
+                    .padding(horizontal = 20.dp)
                     .fillMaxWidth()
-                    .fillMaxHeight(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = category.name.value,
-                    style = UI.typo.b2.style(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
+                    .height(1.dp)
+                    .background(UI.colors.pureInverse.copy(alpha = 0.1f))
+            )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Format the monthly balance according to the currency format and remove
-                    // any '+' or '-' signs that might be included from the prefix to ensure
-                    // a clean and consistent representation.
-                    val currencyFormatted =
-                        categoryData.monthlyBalance.format(currency).replace(Regex("[+-]"), "")
+            Spacer(Modifier.height(12.dp))
 
-                    Text(
-                        text = "$balancePrefixValue$currencyFormatted",
-                        style = UI.typo.nB1.style(
-                            color = UI.colors.pureInverse,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = currency,
-                        style = UI.typo.nB2.style(
-                            color = UI.colors.pureInverse,
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                }
-            }
+            AddedSpent(
+                currency = currency,
+                monthlyIncome = categoryData.monthlyIncome,
+                monthlyExpenses = categoryData.monthlyExpenses,
+                dividerColor = UI.colors.pureInverse.copy(alpha = 0.15f)
+            )
+
+            Spacer(Modifier.height(12.dp))
         }
     }
 }
 
 @Composable
-fun AddedSpent(
+private fun AddedSpent(
     monthlyIncome: Double,
     monthlyExpenses: Double,
     currency: String,
     modifier: Modifier = Modifier,
     textColor: Color = UI.colors.pureInverse,
     dividerColor: Color = UI.colors.medium,
-    center: Boolean = true,
-    dividerSpacer: Dp? = null,
-
-    ) {
+) {
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        if (center) {
-            Spacer(Modifier.weight(1f))
-        }
+        Spacer(Modifier.weight(1f))
 
         LabelAmount(
             textColor = textColor,
             label = stringResource(R.string.month_expenses),
             amount = monthlyExpenses,
-            currency = currency,
-            center = center
+            currency = currency
         )
 
-        if (center) {
-            Spacer(Modifier.weight(1f))
-        }
-
-        if (dividerSpacer != null) {
-            Spacer(modifier = Modifier.width(dividerSpacer))
-        }
+        Spacer(Modifier.weight(1f))
 
         // Divider
         Spacer(
             modifier = Modifier
-                .width(2.dp)
+                .width(1.dp)
                 .height(48.dp)
                 .background(dividerColor, UI.shapes.rFull)
         )
 
-        if (center) {
-            Spacer(Modifier.weight(1f))
-        }
-
-        if (dividerSpacer != null) {
-            Spacer(modifier = Modifier.width(dividerSpacer))
-        }
+        Spacer(Modifier.weight(1f))
 
         LabelAmount(
             textColor = textColor,
             label = stringResource(R.string.month_income),
             amount = monthlyIncome,
-            currency = currency,
-            center = center
+            currency = currency
         )
 
-        if (center) {
-            Spacer(Modifier.weight(1f))
-        }
+        Spacer(Modifier.weight(1f))
     }
 }
 
@@ -456,11 +443,10 @@ private fun LabelAmount(
     label: String,
     amount: Double,
     currency: String,
-    textColor: Color,
-    center: Boolean
+    textColor: Color
 ) {
     Column(
-        horizontalAlignment = if (center) Alignment.CenterHorizontally else Alignment.Start
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = label,
@@ -488,18 +474,17 @@ private fun LabelAmount(
 private fun CategoryHeader(
     categoryData: CategoryData,
     currency: String,
-    contrastColor: Color,
 ) {
     val category = categoryData.category
+    val categoryColor = category.color.value.toComposeColor()
+    val iconTint = findContrastTextColor(categoryColor)
     val balancePrefixValue = balancePrefix(
         income = categoryData.monthlyIncome,
         expenses = categoryData.monthlyExpenses
     )
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(category.color.value.toComposeColor(), UI.shapes.r4Top)
+        modifier = Modifier.fillMaxWidth()
     ) {
         Spacer(Modifier.height(16.dp))
 
@@ -508,29 +493,41 @@ private fun CategoryHeader(
         ) {
             Spacer(Modifier.width(20.dp))
 
-            ItemIconSDefaultIcon(
-                iconName = category.icon?.id,
-                defaultIcon = R.drawable.ic_custom_category_s,
-                tint = contrastColor
-            )
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(categoryColor),
+                contentAlignment = Alignment.Center
+            ) {
+                ItemIconSDefaultIcon(
+                    iconName = category.icon?.id,
+                    defaultIcon = R.drawable.ic_custom_category_s,
+                    tint = iconTint
+                )
+            }
 
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(12.dp))
 
             Text(
+                modifier = Modifier.weight(1f),
                 text = category.name.value,
                 style = UI.typo.b1.style(
-                    color = contrastColor,
+                    color = UI.colors.pureInverse,
                     fontWeight = FontWeight.ExtraBold
-                )
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
+
+            Spacer(Modifier.width(16.dp))
         }
 
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(12.dp))
 
         BalanceRow(
             modifier = Modifier.align(Alignment.CenterHorizontally),
 
-            textColor = contrastColor,
             currency = currency,
             balance = categoryData.monthlyBalance,
 
@@ -692,6 +689,8 @@ private fun Preview(
             baseCurrency = "BGN",
             compactCategoriesModeEnabled = compactModeEnabled,
             showCategorySearchBar = displaySearchBarEnabled,
+            totalMonthlyExpenses = 3360.50,
+            totalMonthlyIncome = 16445.48,
             categories = persistentListOf(
                 CategoryData(
                     category = Category(
@@ -772,6 +771,8 @@ private fun PreviewWithSearchBarEnabled(
             baseCurrency = "BGN",
             compactCategoriesModeEnabled = compactModeEnabled,
             showCategorySearchBar = displaySearchBarEnabled,
+            totalMonthlyExpenses = 3360.50,
+            totalMonthlyIncome = 16445.48,
             categories = persistentListOf(
                 CategoryData(
                     category = Category(

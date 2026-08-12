@@ -57,7 +57,6 @@ import com.ivy.legacy.utils.balancePrefix
 import com.ivy.legacy.utils.compactBalancePrefix
 import com.ivy.legacy.utils.format
 import com.ivy.legacy.utils.selectEndTextFieldValue
-import com.ivy.navigation.CategoriesScreen
 import com.ivy.navigation.TransactionsScreen
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
@@ -91,7 +90,7 @@ import kotlinx.collections.immutable.persistentListOf
 import java.util.UUID
 
 @Composable
-fun BoxWithConstraintsScope.CategoriesScreen(screen: CategoriesScreen) {
+fun BoxWithConstraintsScope.CategoriesTab() {
     val viewModel: CategoriesViewModel = screenScopedViewModel()
     val state = viewModel.uiState()
 
@@ -193,18 +192,6 @@ private fun BoxWithConstraintsScope.UI(
             Spacer(Modifier.height(150.dp)) // scroll hack
         }
     }
-    CategoriesBottomBar(
-        onAddCategory = {
-            onEvent(
-                CategoriesScreenEvent.OnCategoryModalVisible(
-                    CategoryModalData(category = null)
-                )
-            )
-        },
-        onClose = {
-            nav.back()
-        },
-    )
 
     ReorderModalSingleType(
         visible = state.reorderModalVisible,
@@ -875,7 +862,7 @@ private fun SearchField(
 
 /** For screenshot testing */
 @Composable
-fun CategoriesScreenUiTest(isDark: Boolean) {
+fun CategoriesTabUiTest(isDark: Boolean) {
     val theme = when (isDark) {
         true -> Theme.DARK
         false -> Theme.LIGHT
@@ -885,7 +872,7 @@ fun CategoriesScreenUiTest(isDark: Boolean) {
 
 /** For screenshot testing */
 @Composable
-fun CategoriesScreenWithSearchBarUiTest(isDark: Boolean) {
+fun CategoriesTabWithSearchBarUiTest(isDark: Boolean) {
     val theme = when (isDark) {
         true -> Theme.DARK
         false -> Theme.LIGHT
@@ -895,7 +882,7 @@ fun CategoriesScreenWithSearchBarUiTest(isDark: Boolean) {
 
 /** For screenshot testing */
 @Composable
-fun CategoriesScreenCompactUiTest(isDark: Boolean) {
+fun CategoriesTabCompactUiTest(isDark: Boolean) {
     val theme = when (isDark) {
         true -> Theme.DARK
         false -> Theme.LIGHT
@@ -905,7 +892,7 @@ fun CategoriesScreenCompactUiTest(isDark: Boolean) {
 
 /** For screenshot testing */
 @Composable
-fun CategoriesScreenWithSearchBarCompactUiTest(isDark: Boolean) {
+fun CategoriesTabWithSearchBarCompactUiTest(isDark: Boolean) {
     val theme = when (isDark) {
         true -> Theme.DARK
         false -> Theme.LIGHT

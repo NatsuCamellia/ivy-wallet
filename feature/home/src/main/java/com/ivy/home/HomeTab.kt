@@ -236,7 +236,11 @@ fun BoxWithConstraintsScope.HomeUi(
         },
         onCurrencyClick = {
             currencyModalVisible = true
-        }
+        },
+        onCategoriesClick = {
+            setMoreMenuExpanded(false)
+            ivyContext.selectMainTab(MainTab.CATEGORIES)
+        },
     )
 
     BufferModal(

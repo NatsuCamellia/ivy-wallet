@@ -103,7 +103,9 @@ fun BoxWithConstraintsScope.CategoriesTab() {
 private fun BoxWithConstraintsScope.UI(
     state: CategoriesScreenState = CategoriesScreenState(
         compactCategoriesModeEnabled = false,
-        showCategorySearchBar = false
+        showCategorySearchBar = false,
+        totalMonthlyExpenses = 0.0,
+        totalMonthlyIncome = 0.0
     ),
     onEvent: (CategoriesScreenEvent) -> Unit = {}
 ) {
@@ -173,26 +175,25 @@ private fun BoxWithConstraintsScope.UI(
             if (state.showCategorySearchBar) {
                 Spacer(Modifier.height(16.dp))
                 SearchField(onSearch = { onEvent(CategoriesScreenEvent.OnSearchQueryUpdate(it)) })
+                Spacer(Modifier.height(16.dp))
             }
-            Spacer(Modifier.height(16.dp))
         }
 
         items(state.categories, key = { it.category.id.value }) { categoryData ->
-            CategoryCard(
-                currency = state.baseCurrency,
-                categoryData = categoryData,
-                compactModeEnabled = state.compactCategoriesModeEnabled,
-                onLongClick = {
-                    onEvent(CategoriesScreenEvent.OnReorderModalVisible(true))
-                }
-            ) {
-                nav.navigateTo(
-                    TransactionsScreen(
-                        accountId = null,
-                        categoryId = categoryData.category.id.value
+            Spacer(Modifier.height(16.dp))
+            DefaultCategoryCard(
+                onClick = {
+                    nav.navigateTo(
+                        TransactionsScreen(
+                            accountId = null,
+                            categoryId = categoryData.category.id.value
+                        )
                     )
-                )
-            }
+                },
+                categoryData = categoryData,
+                currency = state.baseCurrency,
+                compactModeEnabled = state.compactCategoriesModeEnabled
+            )
         }
 
         item {
@@ -329,23 +330,6 @@ private fun RowScope.CategoryTotalCard(
 
         Spacer(Modifier.height(20.dp))
     }
-}
-
-@Composable
-private fun CategoryCard(
-    currency: String,
-    categoryData: CategoryData,
-    compactModeEnabled: Boolean,
-    onLongClick: () -> Unit,
-    onClick: () -> Unit
-) {
-    Spacer(Modifier.height(16.dp))
-    DefaultCategoryCard(
-        onClick = onClick,
-        categoryData = categoryData,
-        currency = currency,
-        compactModeEnabled = compactModeEnabled
-    )
 }
 
 @Composable

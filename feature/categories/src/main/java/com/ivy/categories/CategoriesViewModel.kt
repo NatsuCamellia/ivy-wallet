@@ -68,15 +68,19 @@ class CategoriesViewModel @Inject constructor(
             start()
         }
 
+        val categories = getCategories()
+
         return CategoriesScreenState(
             baseCurrency = getBaseCurrency(),
-            categories = getCategories(),
+            categories = categories,
             reorderModalVisible = getReorderModalVisible(),
             categoryModalData = getCategoryModalData(),
             sortOrder = getSortOrder(),
             sortModalVisible = getSortModalVisible(),
             compactCategoriesModeEnabled = getCompactCategoriesMode(),
-            showCategorySearchBar = getShowCategorySearchBar()
+            showCategorySearchBar = getShowCategorySearchBar(),
+            totalMonthlyExpenses = categories.sumOf { it.monthlyExpenses },
+            totalMonthlyIncome = categories.sumOf { it.monthlyIncome }
         )
     }
 

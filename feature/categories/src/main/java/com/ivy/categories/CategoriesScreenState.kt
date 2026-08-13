@@ -16,5 +16,7 @@ data class CategoriesScreenState(
     val sortOrder: SortOrder = SortOrder.DEFAULT,
     val compactCategoriesModeEnabled: Boolean,
     val showCategorySearchBar: Boolean,
+    val totalMonthlyExpenses: Double,
+    val totalMonthlyIncome: Double,
 
 )

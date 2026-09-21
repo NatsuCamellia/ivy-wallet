@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.viewModelScope
 import com.ivy.base.legacy.SharedPrefs
 import com.ivy.base.legacy.Transaction
@@ -56,7 +55,6 @@ class CategoriesViewModel @Inject constructor(
     private val baseCurrency = mutableStateOf("")
     private val categories =
         mutableStateOf<ImmutableList<CategoryData>>(persistentListOf<CategoryData>())
-    private val searchQuery = mutableStateOf("")
     private val reorderModalVisible = mutableStateOf(false)
     private val categoryModalData = mutableStateOf<CategoryModalData?>(null)
     private val sortModalVisible = mutableStateOf(false)
@@ -78,7 +76,6 @@ class CategoriesViewModel @Inject constructor(
             sortOrder = getSortOrder(),
             sortModalVisible = getSortModalVisible(),
             compactCategoriesModeEnabled = getCompactCategoriesMode(),
-            showCategorySearchBar = getShowCategorySearchBar(),
             totalMonthlyExpenses = categories.sumOf { it.monthlyExpenses },
             totalMonthlyIncome = categories.sumOf { it.monthlyIncome }
         )
@@ -90,23 +87,13 @@ class CategoriesViewModel @Inject constructor(
     }
 
     @Composable
-    private fun getShowCategorySearchBar(): Boolean {
-        return features.showCategorySearchBar.asEnabledState()
-    }
-
-    @Composable
     private fun getBaseCurrency(): String {
         return baseCurrency.value
     }
 
     @Composable
     private fun getCategories(): ImmutableList<CategoryData> {
-        val allCats = categories.value
-        return remember(allCats, searchQuery.value) {
-            allCats.filter {
-                searchQuery.value.lowercase().trim() in it.category.name.toString().lowercase()
-            }.toImmutableList()
-        }
+        return categories.value
     }
 
     @Composable
@@ -196,10 +183,6 @@ class CategoriesViewModel @Inject constructor(
         }
     }
 
-    private fun updateSearchQuery(queryString: String) {
-        searchQuery.value = queryString
-    }
-
     private suspend fun reorder(
         newOrder: List<CategoryData>,
         sortOrder: SortOrder = SortOrder.DEFAULT
@@ -268,8 +251,6 @@ class CategoriesViewModel @Inject constructor(
                 is CategoriesScreenEvent.OnCategoryModalVisible -> {
                     categoryModalData.value = event.categoryModalData
                 }
-
-                is CategoriesScreenEvent.OnSearchQueryUpdate -> updateSearchQuery(event.queryString)
             }
         }
     }

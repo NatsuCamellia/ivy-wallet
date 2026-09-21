@@ -5,7 +5,6 @@ interface Features {
     val compactAccountsMode: BoolFeature
     val compactCategoriesMode: BoolFeature
     val showTitleSuggestions: BoolFeature
-    val showCategorySearchBar: BoolFeature
     val hideTotalBalance: BoolFeature
     val showDecimalNumber: BoolFeature
     val standardKeypadLayout: BoolFeature

@@ -20,23 +20,9 @@ class CategoriesTabPaparazziTest(
     }
 
     @Test
-    fun `snapshot Categories nonCompact Screen with search bar`() {
-        snapshot(theme) {
-            CategoriesTabWithSearchBarUiTest(theme == PaparazziTheme.Dark)
-        }
-    }
-
-    @Test
     fun `snapshot Categories compact Screen`() {
         snapshot(theme) {
             CategoriesTabCompactUiTest(theme == PaparazziTheme.Dark)
-        }
-    }
-
-    @Test
-    fun `snapshot Categories compact Screen with search bar`() {
-        snapshot(theme) {
-            CategoriesTabWithSearchBarCompactUiTest(theme == PaparazziTheme.Dark)
         }
     }
 }

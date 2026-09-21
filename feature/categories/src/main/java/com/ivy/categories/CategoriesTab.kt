@@ -53,9 +53,7 @@ import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.legacy.IvyWalletPreview
-import com.ivy.legacy.ui.SearchInput
 import com.ivy.legacy.utils.balancePrefix
-import com.ivy.legacy.utils.selectEndTextFieldValue
 import com.ivy.navigation.TransactionsScreen
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
@@ -102,7 +100,6 @@ fun BoxWithConstraintsScope.CategoriesTab() {
 private fun BoxWithConstraintsScope.UI(
     state: CategoriesScreenState = CategoriesScreenState(
         compactCategoriesModeEnabled = false,
-        showCategorySearchBar = false,
         totalMonthlyExpenses = 0.0,
         totalMonthlyIncome = 0.0
     ),
@@ -170,12 +167,6 @@ private fun BoxWithConstraintsScope.UI(
                 totalMonthlyIncome = state.totalMonthlyIncome
             )
             Spacer(Modifier.height(16.dp))
-
-            if (state.showCategorySearchBar) {
-                Spacer(Modifier.height(16.dp))
-                SearchField(onSearch = { onEvent(CategoriesScreenEvent.OnSearchQueryUpdate(it)) })
-                Spacer(Modifier.height(16.dp))
-            }
         }
 
         items(state.categories, key = { it.category.id.value }) { categoryData ->
@@ -656,22 +647,14 @@ private fun PreviewCategoriesCompactModeEnabled(theme: Theme = Theme.LIGHT) {
 
 @Preview
 @Composable
-private fun PreviewCategoriesCompactModeEnabledAndSearchBarEnabled(theme: Theme = Theme.LIGHT) {
-    Preview(theme = theme, compactModeEnabled = true, displaySearchBarEnabled = true)
-}
-
-@Preview
-@Composable
 private fun Preview(
     theme: Theme = Theme.LIGHT,
-    compactModeEnabled: Boolean = false,
-    displaySearchBarEnabled: Boolean = false
+    compactModeEnabled: Boolean = false
 ) {
     IvyWalletPreview(theme) {
         val state = CategoriesScreenState(
             baseCurrency = "BGN",
             compactCategoriesModeEnabled = compactModeEnabled,
-            showCategorySearchBar = displaySearchBarEnabled,
             totalMonthlyExpenses = 3360.50,
             totalMonthlyIncome = 16445.48,
             categories = persistentListOf(
@@ -740,108 +723,6 @@ private fun Preview(
         )
         UI(state = state)
     }
-}
-
-@Preview
-@Composable
-private fun PreviewWithSearchBarEnabled(
-    theme: Theme = Theme.LIGHT,
-    compactModeEnabled: Boolean = false,
-    displaySearchBarEnabled: Boolean = true
-) {
-    IvyWalletPreview(theme) {
-        val state = CategoriesScreenState(
-            baseCurrency = "BGN",
-            compactCategoriesModeEnabled = compactModeEnabled,
-            showCategorySearchBar = displaySearchBarEnabled,
-            totalMonthlyExpenses = 3360.50,
-            totalMonthlyIncome = 16445.48,
-            categories = persistentListOf(
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Groceries"),
-                        color = ColorInt(Green.toArgb()),
-                        icon = IconAsset.unsafe("groceries"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 2125.0,
-                    monthlyExpenses = 920.0,
-                    monthlyIncome = 3045.0
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Fun"),
-                        color = ColorInt(Orange.toArgb()),
-                        icon = IconAsset.unsafe("game"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 1200.0,
-                    monthlyExpenses = 750.0,
-                    monthlyIncome = 0.0
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Ivy"),
-                        color = ColorInt(IvyDark.toArgb()),
-                        icon = IconAsset.unsafe("star"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 1200.0,
-                    monthlyExpenses = 0.0,
-                    monthlyIncome = 5000.0
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Food"),
-                        color = ColorInt(GreenLight.toArgb()),
-                        icon = IconAsset.unsafe("atom"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 12125.21,
-                    monthlyExpenses = 1350.50,
-                    monthlyIncome = 8000.48
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Shisha"),
-                        color = ColorInt(GreenDark.toArgb()),
-                        icon = IconAsset.unsafe("drink"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 820.0,
-                    monthlyExpenses = 340.0,
-                    monthlyIncome = 400.0
-                ),
-
-                )
-        )
-        UI(state = state)
-    }
-}
-
-@Composable
-private fun SearchField(
-    onSearch: (String) -> Unit,
-) {
-    var searchQueryTextFieldValue by remember {
-        mutableStateOf(selectEndTextFieldValue(""))
-    }
-
-    SearchInput(
-        searchQueryTextFieldValue = searchQueryTextFieldValue,
-        hint = "Search categories",
-        focus = false,
-        showClearIcon = searchQueryTextFieldValue.text.isNotEmpty(),
-        onSetSearchQueryTextField = {
-            searchQueryTextFieldValue = it
-            onSearch(it.text)
-        }
-    )
 }
 
 /** For screenshot testing */
@@ -856,30 +737,10 @@ fun CategoriesTabUiTest(isDark: Boolean) {
 
 /** For screenshot testing */
 @Composable
-fun CategoriesTabWithSearchBarUiTest(isDark: Boolean) {
-    val theme = when (isDark) {
-        true -> Theme.DARK
-        false -> Theme.LIGHT
-    }
-    Preview(theme = theme, displaySearchBarEnabled = true)
-}
-
-/** For screenshot testing */
-@Composable
 fun CategoriesTabCompactUiTest(isDark: Boolean) {
     val theme = when (isDark) {
         true -> Theme.DARK
         false -> Theme.LIGHT
     }
     Preview(theme, compactModeEnabled = true)
-}
-
-/** For screenshot testing */
-@Composable
-fun CategoriesTabWithSearchBarCompactUiTest(isDark: Boolean) {
-    val theme = when (isDark) {
-        true -> Theme.DARK
-        false -> Theme.LIGHT
-    }
-    Preview(theme, compactModeEnabled = true, displaySearchBarEnabled = true)
 }

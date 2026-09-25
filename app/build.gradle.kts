@@ -90,6 +90,12 @@ android {
         }
     }
 
+    sourceSets {
+        // The demo APK ships as the release build, so give it the release launcher icon
+        // (matchingFallbacks only applies to dependencies, not this module's own sources).
+        getByName("demo").res.srcDir("src/release/res")
+    }
+
     val javaVersion = libs.versions.jvm.target.get()
 
     compileOptions {

@@ -62,9 +62,9 @@ read-only**; do not edit them.
 
 The fork's own UI redesign specs and plans live in `docs/superpowers/specs/` and `docs/superpowers/plans/`.
 
-## Commits
+## Commits and PRs
 
 - Use semantic commit messages: `<type>(<optional scope>): <summary>`, e.g. `feat(home): ...`, `fix: ...`.
   Types: `feat`, `fix`, `refactor`, `style`, `docs`, `test`, `build`, `ci`, `chore`.
 - Keep the message as concise as possible. The body is optional and must not exceed two short paragraphs.
-- Do not append session links (e.g. `Claude-Session: ...`) to commit messages.
+- Do not append session links (e.g. `Claude-Session: ...`) to commit messages or PR descriptions.

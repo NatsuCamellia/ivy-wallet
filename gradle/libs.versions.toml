@@ -17,8 +17,8 @@ paparazzi = "2.0.0-alpha05"
 # Android
 min-sdk = "28"
 compile-sdk = "37"
-version-name = "2026.09.24"
-version-code = "209"
+version-name = "2026.10.04"
+version-code = "210"
 jvm-target = "17"
 
 

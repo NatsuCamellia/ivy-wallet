@@ -87,9 +87,6 @@ fun AmountModal(
 
     if (visible) {
         key(id) {
-            val keyboard = LocalSoftwareKeyboardController.current
-            LaunchedEffect(Unit) { keyboard?.hide() }
-
             ActionSheet(
                 onDismiss = dismiss,
                 actions = { dismissSheet ->
@@ -133,32 +130,38 @@ fun AmountModal(
                     }
                 }
             ) {
+                val keyboard = LocalSoftwareKeyboardController.current
+                LaunchedEffect(Unit) { keyboard?.hide() }
+
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     Header?.invoke()
 
-                    Text(
-                        text = buildAnnotatedString {
-                            append(amount.ifBlank { "0" })
-                            withStyle(SpanStyle(fontWeight = FontWeight.Normal)) {
-                                append(" $currency")
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        style = MaterialTheme.typography.displaySmallEmphasized,
-                        textAlign = TextAlign.Center,
-                    )
-
-                    AmountInput(
-                        currency = currency,
-                        decimalCountMax = decimalCountMax,
-                        amount = amount,
+                    Column(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        amount = it
+                        Text(
+                            text = buildAnnotatedString {
+                                append(amount.ifBlank { "0" })
+                                withStyle(SpanStyle(fontWeight = FontWeight.Normal)) {
+                                    append(" $currency")
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            style = MaterialTheme.typography.displaySmallEmphasized,
+                            textAlign = TextAlign.Center,
+                        )
+
+                        AmountInput(
+                            currency = currency,
+                            decimalCountMax = decimalCountMax,
+                            amount = amount,
+                        ) {
+                            amount = it
+                        }
                     }
                 }
             }
@@ -263,6 +266,7 @@ class KeypadKey(
     val onClick: () -> Unit,
     val label: String = "",
     val icon: ImageVector? = null,
+    val description: String? = null,
     val role: KeypadRole = KeypadRole.Digit,
 )
 
@@ -336,6 +340,7 @@ fun AmountKeypad(
                 KeypadKey(
                     tag = "key_del",
                     icon = Icons.AutoMirrored.Filled.Backspace,
+                    description = stringResource(R.string.backspace),
                     role = KeypadRole.Clear,
                     onClick = onBackspace,
                 ),
@@ -344,7 +349,7 @@ fun AmountKeypad(
     }
 
     Column(
-        modifier = modifier.padding(horizontal = 16.dp),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         rows.forEach { row ->
@@ -364,7 +369,7 @@ fun AmountKeypad(
                         contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight),
                     ) {
                         if (key.icon != null) {
-                            Icon(imageVector = key.icon, contentDescription = null)
+                            Icon(imageVector = key.icon, contentDescription = key.description)
                         } else {
                             Text(text = key.label, style = MaterialTheme.typography.titleLarge, maxLines = 1)
                         }

@@ -53,7 +53,7 @@ fun ActionSheet(
     sheetGesturesEnabled: Boolean = true,
     contentScrollable: Boolean = true,
     actions: @Composable RowScope.(dismiss: () -> Unit) -> Unit = {},
-    content: @Composable ColumnScope.() -> Unit,
+    content: @Composable ColumnScope.(dismiss: () -> Unit) -> Unit,
 ) {
     val sheetState = rememberActionSheetState()
     val scope = rememberCoroutineScope()
@@ -96,7 +96,7 @@ fun ActionSheet(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     )
                 }
-                content()
+                content(dismiss)
             }
             FlexibleBottomAppBar {
                 IconButton(

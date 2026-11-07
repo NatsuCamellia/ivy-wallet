@@ -290,6 +290,9 @@
     <string name="crypto">Crypto</string>
     <string name="exchange_rate">Exchange rate</string>
     <string name="choose_color">Select a color</string>
+    <string name="color_value">Color %1$s</string>
+    <string name="backspace">Backspace</string>
+    <string name="deselect">Deselect</string>
     <string name="reorder">Reorder</string>
     <string name="keyword">Keyword</string>
     <string name="edit_budget">Edit budget</string>

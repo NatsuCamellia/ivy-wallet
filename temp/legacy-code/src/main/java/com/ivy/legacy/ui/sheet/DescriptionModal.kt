@@ -1,6 +1,7 @@
 package com.ivy.legacy.ui.sheet
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -53,14 +54,12 @@ fun DescriptionModal(
 
     if (visible) {
         key(id) {
-            val keyboard = LocalSoftwareKeyboardController.current
-            val focus = remember { FocusRequester() }
-            LaunchedEffect(Unit) { focus.requestFocus() }
-
             ActionSheet(
                 onDismiss = dismiss,
                 title = stringResource(R.string.description),
                 actions = { dismissSheet ->
+                    val keyboard = LocalSoftwareKeyboardController.current
+
                     Spacer(Modifier.weight(1f))
 
                     when {
@@ -103,33 +102,37 @@ fun DescriptionModal(
                     }
                 }
             ) {
-                OutlinedTextField(
-                    value = descTextFieldValue,
-                    onValueChange = { descTextFieldValue = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .focusRequester(focus)
-                        .testTag("modal_desc_input"),
-                    placeholder = { Text(stringResource(R.string.description_text_field_hint)) },
-                    minLines = 3,
-                    keyboardOptions = KeyboardOptions(
-                        autoCorrect = true,
-                        capitalization = KeyboardCapitalization.Sentences,
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Default
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onAny = {
-                            descTextFieldValue = descTextFieldValue.copy(
-                                text = StringBuilder(descTextFieldValue.text)
-                                    .insert(descTextFieldValue.selection.end, "\n")
-                                    .toString(),
-                                selection = TextRange(descTextFieldValue.selection.end + 1)
-                            )
-                        }
-                    ),
-                )
+                val focus = remember { FocusRequester() }
+                LaunchedEffect(Unit) { focus.requestFocus() }
+
+                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    OutlinedTextField(
+                        value = descTextFieldValue,
+                        onValueChange = { descTextFieldValue = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focus)
+                            .testTag("modal_desc_input"),
+                        placeholder = { Text(stringResource(R.string.description_text_field_hint)) },
+                        minLines = 3,
+                        keyboardOptions = KeyboardOptions(
+                            autoCorrect = true,
+                            capitalization = KeyboardCapitalization.Sentences,
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Default
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onAny = {
+                                descTextFieldValue = descTextFieldValue.copy(
+                                    text = StringBuilder(descTextFieldValue.text)
+                                        .insert(descTextFieldValue.selection.end, "\n")
+                                        .toString(),
+                                    selection = TextRange(descTextFieldValue.selection.end + 1)
+                                )
+                            }
+                        ),
+                    )
+                }
             }
         }
     }

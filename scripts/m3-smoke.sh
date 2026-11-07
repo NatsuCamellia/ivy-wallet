@@ -296,6 +296,30 @@ flow_nested_back() {
   return 0
 }
 
+# Calculator sheet: type an expression, Close, reopen: it must start from the current amount again.
+flow_calculator_reopen() {
+  open_account_edit_sheet || return 1
+  tap_node any sub "Enter account balance" || return 1
+  wait_for text exact "Enter" || return 1
+  tap_node desc exact "Calculator" || return 1
+  wait_for text exact "Set" || return 1
+  tap_node text exact "2" || return 1
+  tap_node text exact "+" || return 1
+  tap_node text exact "2" || return 1
+  dump
+  has text exact "2+2" || { log "expression 2+2 not shown"; return 1; }
+  shot calc-reopen-1-typed
+  tap_node desc exact "Close" || return 1
+  wait_gone text exact "Set" || return 1
+  wait_for text exact "Enter" || return 1
+  tap_node desc exact "Calculator" || return 1
+  wait_for text exact "Set" || return 1
+  has text exact "2+2" && { log "stale expression 2+2 after reopen"; return 1; }
+  shot calc-reopen-2-fresh
+  crashed && return 1
+  return 0
+}
+
 # Sheet with a text field: focus it, keyboard up, the pinned action row must sit above the keyboard.
 flow_keyboard_sheet() {
   open_account_edit_sheet || return 1
@@ -465,7 +489,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_nested_back flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide}; do
+for flow in ${FLOWS:-flow_onboarding flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide}; do
   run_flow "$flow"
 done
 

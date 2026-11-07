@@ -32,7 +32,7 @@ fun IconBadge(
     ) {
         Icon(
             painter = painterResource(iconRes),
-            contentDescription = iconName,
+            contentDescription = null,
             modifier = Modifier.padding(4.dp),
         )
     }

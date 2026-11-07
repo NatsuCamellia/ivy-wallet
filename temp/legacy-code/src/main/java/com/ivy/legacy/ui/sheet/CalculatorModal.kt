@@ -42,12 +42,12 @@ fun CalculatorModal(
     id: UUID = remember { UUID.randomUUID() },
     onCalculation: (Double) -> Unit
 ) {
-    var expression by remember(id, initialAmount) {
-        mutableStateOf(initialAmount?.format(currency) ?: "")
-    }
-
     if (visible) {
         key(id) {
+            var expression by remember(initialAmount) {
+                mutableStateOf(initialAmount?.format(currency) ?: "")
+            }
+
             ActionSheet(
                 onDismiss = dismiss,
                 title = stringResource(R.string.calculator),
@@ -69,14 +69,14 @@ fun CalculatorModal(
                 }
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     val isEmpty = expression.isBlank()
                     Text(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         text = if (isEmpty) stringResource(R.string.calculator_empty_expression) else expression,
                         style = MaterialTheme.typography.headlineMediumEmphasized,
                         textAlign = TextAlign.Center,

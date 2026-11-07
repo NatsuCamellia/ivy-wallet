@@ -2,13 +2,13 @@ package com.ivy.legacy.ui.sheet
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.RemoveCircleOutline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
@@ -62,9 +62,6 @@ fun ChooseCategoryModal(
 
     if (visible) {
         key(id) {
-            val keyboard = LocalSoftwareKeyboardController.current
-            LaunchedEffect(Unit) { keyboard?.hide() }
-
             ActionSheet(
                 onDismiss = dismiss,
                 title = stringResource(R.string.choose_category),
@@ -81,22 +78,25 @@ fun ChooseCategoryModal(
                         Text(stringResource(R.string.skip))
                     }
                 }
-            ) {
+            ) { dismissSheet ->
+                val keyboard = LocalSoftwareKeyboardController.current
+                LaunchedEffect(Unit) { keyboard?.hide() }
+
                 LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
                 ) {
-                    items(categories) { category ->
+                    itemsIndexed(categories, key = { _, category -> category.id.value }) { index, category ->
                         val selected = category == selectedCategory
                         SegmentedListItem(
                             selected = selected,
                             onClick = {
                                 selectedCategory = category
+                                dismissSheet()
                                 onCategoryChanged(category)
-                                dismiss()
                             },
                             shapes = ListItemDefaults.segmentedShapes(
-                                index = categories.indexOf(category),
+                                index = index,
                                 count = categories.size + 1,
                             ),
                             modifier = Modifier.testTag("choose_category_button"),
@@ -115,7 +115,10 @@ fun ChooseCategoryModal(
                                             onCategoryChanged(null)
                                         }
                                     ) {
-                                        Icon(Icons.Default.Close, contentDescription = null)
+                                        Icon(
+                                            Icons.Default.RemoveCircleOutline,
+                                            contentDescription = stringResource(R.string.deselect),
+                                        )
                                     }
                                 }
                             } else {
@@ -127,7 +130,7 @@ fun ChooseCategoryModal(
                         }
                     }
 
-                    item {
+                    item(key = "add_new") {
                         SegmentedListItem(
                             onClick = { showCategoryModal(null) },
                             shapes = ListItemDefaults.segmentedShapes(

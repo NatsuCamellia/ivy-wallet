@@ -45,7 +45,7 @@ fun BoxScope.IvyModal(
                     Spacer(Modifier.weight(1f))
                     PrimaryAction()
                 },
-                content = Content
+                content = { Content() }
             )
         }
     }

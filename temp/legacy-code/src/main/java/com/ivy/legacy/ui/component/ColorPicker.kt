@@ -2,8 +2,6 @@ package com.ivy.legacy.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -17,8 +15,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.ivy.ui.R
 import com.ivy.ui.color.IVY_COLOR_PICKER_COLORS_FREE
@@ -36,7 +37,6 @@ fun ColorPicker(
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             text = stringResource(R.string.choose_color),
-            modifier = Modifier.padding(horizontal = 16.dp),
             style = MaterialTheme.typography.titleSmall,
         )
 
@@ -44,15 +44,17 @@ fun ColorPicker(
             state = rememberLazyListState(
                 initialFirstVisibleItemIndex = pickerColors.indexOf(selectedColor).coerceAtLeast(0)
             ),
-            contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(pickerColors) { color ->
                 val selected = color == selectedColor
+                val description = stringResource(R.string.color_value, "#%08X".format(color.toArgb()))
                 FilledIconToggleButton(
                     checked = selected,
                     onCheckedChange = { onColorSelect(color) },
-                    modifier = Modifier.testTag("color_item_${color.value}"),
+                    modifier = Modifier
+                        .testTag("color_item_${color.value}")
+                        .semantics { contentDescription = description },
                     shapes = IconButtonDefaults.toggleableShapes(),
                     colors = IconButtonDefaults.filledIconToggleButtonColors(
                         containerColor = color,

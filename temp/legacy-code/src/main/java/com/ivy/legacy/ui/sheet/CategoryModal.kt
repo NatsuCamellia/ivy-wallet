@@ -33,6 +33,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -132,7 +135,9 @@ fun CategoryModal(
                 }
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     IconNameRow(
@@ -159,6 +164,8 @@ fun CategoryModal(
         }
     }
 
+    // Temporary host: ChooseIconModal is still a BoxWithConstraintsScope extension.
+    // This BoxWithConstraints goes away when it is rewritten in Task 3.3.
     BoxWithConstraints {
         ChooseIconModal(
             visible = chooseIconModalVisible,
@@ -183,10 +190,12 @@ fun IconNameRow(
     nameTextFieldValue: TextFieldValue,
     setNameTextFieldValue: (TextFieldValue) -> Unit,
 
-    showChooseIconModal: () -> Unit
+    showChooseIconModal: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val nameFocus = remember { FocusRequester() }
     val keyboard = LocalSoftwareKeyboardController.current
+    val chooseIconLabel = stringResource(R.string.choose_icon)
     LaunchedEffect(Unit) {
         if (autoFocusKeyboard) {
             nameFocus.requestFocus()
@@ -194,9 +203,7 @@ fun IconNameRow(
     }
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -206,7 +213,8 @@ fun IconNameRow(
             defaultIcon = defaultIcon,
             modifier = Modifier
                 .clip(CircleShape)
-                .clickable { showChooseIconModal() }
+                .clickable(role = Role.Button) { showChooseIconModal() }
+                .semantics { contentDescription = chooseIconLabel }
                 .testTag("modal_item_icon"),
         )
 

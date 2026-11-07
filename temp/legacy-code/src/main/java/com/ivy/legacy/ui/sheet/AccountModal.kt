@@ -134,7 +134,9 @@ fun AccountModal(
                 }
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     IconNameRow(
@@ -200,6 +202,8 @@ fun AccountModal(
         }
     }
 
+    // Temporary host: CurrencyModal and ChooseIconModal are still BoxWithConstraintsScope extensions.
+    // This BoxWithConstraints goes away when they are rewritten in Task 3.3.
     BoxWithConstraints {
         CurrencyModal(
             title = stringResource(R.string.choose_currency),
@@ -231,7 +235,6 @@ private fun AccountSettings(
     onAmountClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
     ) {
         SegmentedListItem(

@@ -198,6 +198,7 @@ fun BoxWithConstraintsScope.LoanModal(
         Spacer(Modifier.height(24.dp))
 
         IconNameRow(
+            modifier = Modifier.padding(horizontal = 16.dp),
             hint = stringResource(R.string.loan_name),
             defaultIcon = R.drawable.ic_custom_loan_m,
             color = color,

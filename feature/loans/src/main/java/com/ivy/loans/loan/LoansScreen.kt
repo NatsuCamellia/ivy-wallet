@@ -61,7 +61,7 @@ import com.ivy.legacy.ui.sheet.ReorderButton
 import com.ivy.legacy.ui.sheet.ReorderModalSingleType
 import com.ivy.ui.color.dynamicContrast
 import com.ivy.ui.color.findContrastTextColor
-import com.ivy.wallet.ui.theme.modal.LoanModal
+import com.ivy.legacy.ui.sheet.LoanModal
 import com.ivy.wallet.ui.theme.toComposeColor
 import kotlinx.collections.immutable.persistentListOf
 import java.time.Instant

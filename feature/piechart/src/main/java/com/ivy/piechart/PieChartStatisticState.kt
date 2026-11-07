@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.ivy.base.legacy.Transaction
 import com.ivy.base.model.TransactionType
 import com.ivy.legacy.data.model.TimePeriod
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalData
+import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
 import kotlinx.collections.immutable.ImmutableList
 import java.util.UUID
 

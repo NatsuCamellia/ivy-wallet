@@ -18,49 +18,6 @@ import com.ivy.wallet.ui.theme.GradientRed
 import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.IvyButton
 import com.ivy.wallet.ui.theme.components.IvyCircleButton
-import com.ivy.wallet.ui.theme.components.IvyOutlinedButton
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
-fun ModalDynamicPrimaryAction(
-    initialEmpty: Boolean,
-    initialChanged: Boolean,
-
-    testTagSave: String = "tag_save",
-    testTagDelete: String = "tag_delete",
-
-    onDelete: () -> Unit,
-    dismiss: () -> Unit,
-    onSave: () -> Unit
-) {
-    when {
-        initialEmpty -> {
-            ModalAdd(
-                testTag = testTagSave
-            ) {
-                onSave()
-                dismiss()
-            }
-        }
-        else -> {
-            if (!initialChanged) {
-                ModalDelete(
-                    testTag = testTagDelete
-                ) {
-                    onDelete()
-                    dismiss()
-                }
-            } else {
-                ModalSave(
-                    modifier = Modifier.testTag(testTagSave)
-                ) {
-                    onSave()
-                    dismiss()
-                }
-            }
-        }
-    }
-}
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable
@@ -149,23 +106,6 @@ fun ModalAdd(
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable
-fun ModalNegativeButton(
-    text: String,
-    @DrawableRes iconStart: Int,
-    enabled: Boolean = true,
-    onClick: () -> Unit,
-) {
-    IvyButton(
-        text = text,
-        backgroundGradient = GradientRed,
-        iconStart = iconStart,
-        onClick = onClick,
-        enabled = enabled
-    )
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
 fun ModalPositiveButton(
     modifier: Modifier = Modifier,
     text: String,
@@ -215,19 +155,4 @@ fun ModalTitle(
             fontWeight = FontWeight.ExtraBold
         )
     )
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
-fun ModalSkip(
-    text: String = stringResource(R.string.skip),
-    onClick: () -> Unit
-) {
-    IvyOutlinedButton(
-        text = text,
-        iconStart = null,
-        solidBackground = true
-    ) {
-        onClick()
-    }
 }

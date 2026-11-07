@@ -79,10 +79,10 @@ import com.ivy.wallet.ui.theme.components.getCustomIconIdS
 import com.ivy.ui.color.dynamicContrast
 import com.ivy.ui.color.findContrastTextColor
 import com.ivy.ui.color.isDarkColor
-import com.ivy.wallet.ui.theme.modal.DeleteModal
-import com.ivy.wallet.ui.theme.modal.LoanModal
-import com.ivy.wallet.ui.theme.modal.LoanRecordModal
-import com.ivy.wallet.ui.theme.modal.ProgressModal
+import com.ivy.legacy.ui.sheet.DeleteModal
+import com.ivy.legacy.ui.sheet.LoanModal
+import com.ivy.legacy.ui.sheet.LoanRecordModal
+import com.ivy.legacy.ui.sheet.ProgressModal
 import com.ivy.wallet.ui.theme.toComposeColor
 import kotlinx.collections.immutable.persistentListOf
 import java.time.Instant

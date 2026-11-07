@@ -43,7 +43,7 @@ import com.ivy.wallet.domain.deprecated.logic.model.CreateBudgetData
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.Purple1Dark
 import com.ivy.ui.color.Red3Light
-import com.ivy.wallet.ui.theme.modal.DeleteModal
+import com.ivy.legacy.ui.sheet.DeleteModal
 import com.ivy.wallet.ui.theme.modal.IvyModal
 import com.ivy.wallet.ui.theme.modal.ModalAddSave
 import com.ivy.wallet.ui.theme.modal.ModalAmountSection

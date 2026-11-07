@@ -80,7 +80,7 @@ import com.ivy.wallet.ui.theme.components.ItemIconMDefaultIcon
 import com.ivy.wallet.ui.theme.components.IvyOutlinedButton
 import com.ivy.ui.color.findContrastTextColor
 import com.ivy.wallet.ui.theme.gradientExpenses
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModal
+import com.ivy.legacy.ui.sheet.ChoosePeriodModal
 import com.ivy.wallet.ui.theme.pureBlur
 import com.ivy.wallet.ui.theme.toComposeColor
 import com.ivy.wallet.ui.theme.wallet.AmountCurrencyB1Row

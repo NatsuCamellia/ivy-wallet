@@ -1,84 +1,51 @@
-package com.ivy.wallet.ui.theme.modal
+package com.ivy.legacy.ui.sheet
 
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.Spacer
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ContainedLoadingIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.legacy.IvyWalletPreview
-import com.ivy.ui.color.Red
-import java.util.UUID
+import com.ivy.legacy.ui.WalletPreview
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@SuppressLint("ComposeModifierMissing")
 @Composable
-fun BoxWithConstraintsScope.ProgressModal(
-    id: UUID = UUID.randomUUID(),
+fun ProgressModal(
     title: String,
     description: String,
     visible: Boolean,
-    color: Color = UI.colors.orange,
     dismiss: () -> Unit = {},
 ) {
-    IvyModal(
-        id = id,
-        visible = visible,
-        dismiss = dismiss,
-        PrimaryAction = {}
-    ) {
-        Spacer(Modifier.height(32.dp))
+    if (visible) {
+        AlertDialog(
+            onDismissRequest = dismiss,
+            confirmButton = {},
+            title = { Text(title) },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(24.dp),
+                ) {
+                    Text(description)
 
-        Text(
-            modifier = Modifier.padding(horizontal = 32.dp),
-            text = title,
-            style = UI.typo.b1.style(
-                color = Red,
-                fontWeight = FontWeight.ExtraBold
-            )
+                    ContainedLoadingIndicator()
+                }
+            },
         )
-
-        Spacer(Modifier.height(24.dp))
-
-        Text(
-            modifier = Modifier.padding(horizontal = 32.dp),
-            text = description,
-            style = UI.typo.b2.style(
-                color = UI.colors.pureInverse,
-                fontWeight = FontWeight.Medium
-            )
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        LinearProgressIndicator(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp)
-                .height(8.dp)
-                .clip(
-                    UI.shapes.rFull
-                ),
-            color = color
-        )
-
-        Spacer(Modifier.height(48.dp))
     }
 }
 
 /** For screenshot testing */
 @Composable
 fun ProgressModalUiTest(isDark: Boolean) {
-    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+    WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
         ProgressModal(
             title = "Exporting data",
             description = "This may take a few minutes. Please do not close the app.",

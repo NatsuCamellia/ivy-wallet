@@ -77,9 +77,9 @@ import com.ivy.wallet.ui.theme.components.IvyDividerLine
 import com.ivy.wallet.ui.theme.components.IvyOutlinedButton
 import com.ivy.wallet.ui.theme.components.IvyOutlinedButtonFillMaxWidth
 import com.ivy.wallet.ui.theme.components.WrapContentRow
-import com.ivy.wallet.ui.theme.modal.AddKeywordModal
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModal
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalData
+import com.ivy.legacy.ui.sheet.AddKeywordModal
+import com.ivy.legacy.ui.sheet.ChoosePeriodModal
+import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
 import com.ivy.legacy.ui.sheet.AmountModal
 import com.ivy.wallet.ui.theme.toComposeColor
 import com.ivy.wallet.ui.theme.wallet.AmountCurrencyB1Row

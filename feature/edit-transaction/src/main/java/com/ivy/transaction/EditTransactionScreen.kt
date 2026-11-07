@@ -65,13 +65,14 @@ import com.ivy.wallet.ui.edit.core.EditBottomSheet
 import com.ivy.wallet.ui.edit.core.Title
 import com.ivy.wallet.ui.edit.core.Toolbar
 import com.ivy.wallet.ui.theme.components.AddPrimaryAttributeButton
-import com.ivy.wallet.ui.theme.components.ChangeTransactionTypeModal
+import com.ivy.legacy.ui.sheet.ChangeTransactionTypeModal
 import com.ivy.wallet.ui.theme.components.CustomExchangeRateCard
-import com.ivy.wallet.ui.theme.modal.DeleteModal
+import com.ivy.legacy.ui.sheet.ConfirmModal
+import com.ivy.legacy.ui.sheet.DeleteModal
 import com.ivy.wallet.ui.theme.modal.ModalAdd
 import com.ivy.wallet.ui.theme.modal.ModalCheck
 import com.ivy.wallet.ui.theme.modal.ModalSave
-import com.ivy.wallet.ui.theme.modal.ProgressModal
+import com.ivy.legacy.ui.sheet.ProgressModal
 import com.ivy.legacy.ui.sheet.AccountModal
 import com.ivy.legacy.ui.sheet.AccountModalData
 import com.ivy.legacy.ui.sheet.AmountModal
@@ -578,12 +579,10 @@ private fun BoxWithConstraintsScope.UI(
         onSetTransactionType(it)
     }
 
-    DeleteModal(
+    ConfirmModal(
         visible = accountChangeModal,
         title = stringResource(R.string.confirm_account_change),
         description = stringResource(R.string.confirm_account_change_description),
-        buttonText = stringResource(R.string.confirm),
-        iconStart = R.drawable.ic_agreed,
         dismiss = {
             accountChangeModal = false
         }

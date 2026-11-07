@@ -521,6 +521,70 @@ flow_reorder() {
   return 0
 }
 
+# home_period_label: text of the period button on Home (a month name, or "Mon, YYYY"), from the current dump
+home_period_label() {
+  python3 -I - "$XML" "$(screen_height)" <<'PY'
+import re, sys, xml.etree.ElementTree as ET
+months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+          "November", "December"]
+path, height = sys.argv[1], int(sys.argv[2])
+for n in ET.parse(path).iter('node'):
+    text = n.get('text') or ''
+    m = re.match(r'^([A-Za-z]+)(, \d{4})?$', text)
+    if not m or not any(name == m.group(1) or name[:3] == m.group(1) for name in months):
+        continue
+    if int(re.findall(r'\d+', n.get('bounds'))[3]) < height * 0.35:
+        print(text)
+        sys.exit(0)
+sys.exit(1)
+PY
+}
+
+# next_month <chip|label> <current Home label> <year>: the chip text (or the Home label afterwards) for the month
+# after the current one. The chip row starts at the current month, so the next chip is on screen; December
+# continues into next year's chip.
+next_month() {
+  python3 -I - "$@" <<'PY'
+import sys
+months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+          "November", "December"]
+kind, label, year = sys.argv[1], sys.argv[2], int(sys.argv[3])
+i = months.index(label)
+if i == 11:
+    print("January, %d" % (year + 1) if kind == "chip" else "Jan, %d" % (year + 1))
+else:
+    print(months[i + 1])
+PY
+}
+
+# Home period button -> Choose period sheet -> pick the next month -> Set: the Home label must change to it.
+flow_choose_period() {
+  go_home || return 1
+  dump || return 1
+  local label year chip expect label_after
+  label=$(home_period_label) || { log "period label not found on Home"; return 1; }
+  year=$(adb shell date +%Y | tr -d '\r')
+  chip=$(next_month chip "$label" "$year") || return 1
+  expect=$(next_month label "$label" "$year") || return 1
+  log "Home period '$label', picking chip '$chip', expecting '$expect'"
+  tap_node text exact "$label" || return 1
+  wait_for text exact "Choose month" || return 1
+  has text exact "Set" || { log "Set button missing"; return 1; }
+  shot choose-period-1-open
+  tap_node text exact "$chip" || return 1
+  sleep 1
+  shot choose-period-2-picked
+  tap_node text exact "Set" || return 1
+  wait_gone text exact "Choose month" || return 1
+  sleep 1
+  dump || return 1
+  label_after=$(home_period_label) || { log "period label missing after Set"; return 1; }
+  [ "$label_after" = "$expect" ] || { log "Home period is '$label_after', expected '$expect'"; return 1; }
+  shot choose-period-3-home
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -548,7 +612,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder}; do
+for flow in ${FLOWS:-flow_onboarding flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period}; do
   run_flow "$flow"
 done
 

@@ -46,8 +46,8 @@ import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.BalanceRow
 import com.ivy.wallet.ui.theme.components.IvyCircleButton
 import com.ivy.wallet.ui.theme.components.IvyDividerLine
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModal
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalData
+import com.ivy.legacy.ui.sheet.ChoosePeriodModal
+import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
 import com.ivy.wallet.ui.theme.wallet.PeriodSelector
 
 val FAB_BUTTON_SIZE = 56.dp

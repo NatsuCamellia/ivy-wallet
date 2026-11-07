@@ -4,7 +4,7 @@ import com.ivy.base.model.TransactionType
 import com.ivy.data.model.Category
 import com.ivy.data.model.IntervalType
 import com.ivy.legacy.datamodel.Account
-import com.ivy.wallet.ui.theme.modal.RecurringRuleModalData
+import com.ivy.legacy.ui.sheet.RecurringRuleModalData
 import com.ivy.legacy.ui.sheet.AccountModalData
 import com.ivy.legacy.ui.sheet.CategoryModalData
 import kotlinx.collections.immutable.ImmutableList

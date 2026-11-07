@@ -40,11 +40,11 @@ import com.ivy.wallet.ui.edit.core.EditBottomSheet
 import com.ivy.wallet.ui.edit.core.Title
 import com.ivy.wallet.ui.edit.core.Toolbar
 import com.ivy.ui.color.Orange
-import com.ivy.wallet.ui.theme.components.ChangeTransactionTypeModal
-import com.ivy.wallet.ui.theme.modal.DeleteModal
+import com.ivy.legacy.ui.sheet.ChangeTransactionTypeModal
+import com.ivy.legacy.ui.sheet.DeleteModal
 import com.ivy.wallet.ui.theme.modal.ModalSet
-import com.ivy.wallet.ui.theme.modal.RecurringRuleModal
-import com.ivy.wallet.ui.theme.modal.RecurringRuleModalData
+import com.ivy.legacy.ui.sheet.RecurringRuleModal
+import com.ivy.legacy.ui.sheet.RecurringRuleModalData
 import com.ivy.legacy.ui.sheet.AccountModal
 import com.ivy.legacy.ui.sheet.AccountModalData
 import com.ivy.legacy.ui.sheet.CategoryModal

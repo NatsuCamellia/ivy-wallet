@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.ivy.base.legacy.Theme
+import com.ivy.base.legacy.appContext
 import com.ivy.base.resource.AndroidResourceProvider
 import com.ivy.base.time.impl.DeviceTimeProvider
 import com.ivy.base.time.impl.StandardTimeConverter
@@ -17,6 +18,7 @@ fun WalletPreview(
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
+    appContext = context
     val ctx = remember(theme) { IvyWalletCtx().apply { switchTheme(theme) } }
     val timeProvider = remember { DeviceTimeProvider() }
     val timeConverter = remember { StandardTimeConverter(timeProvider) }

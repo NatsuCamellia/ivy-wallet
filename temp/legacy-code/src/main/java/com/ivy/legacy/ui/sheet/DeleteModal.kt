@@ -1,177 +1,159 @@
-package com.ivy.wallet.ui.theme.modal
+package com.ivy.legacy.ui.sheet
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.legacy.IvyWalletPreview
-import com.ivy.legacy.utils.hideKeyboard
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.ui.R
-import com.ivy.ui.color.Red
-import com.ivy.wallet.ui.theme.components.IvyNameTextField
-import java.util.UUID
 
 @SuppressLint("ComposeModifierMissing")
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable
-fun BoxWithConstraintsScope.DeleteModal(
+fun DeleteModal(
     title: String,
     description: String,
     visible: Boolean,
     dismiss: () -> Unit,
-    id: UUID = UUID.randomUUID(),
     buttonText: String = stringResource(R.string.delete),
-    iconStart: Int = R.drawable.ic_delete,
     onDelete: () -> Unit,
 ) {
-    IvyModal(
-        id = id,
-        visible = visible,
-        dismiss = dismiss,
-        PrimaryAction = {
-            ModalNegativeButton(
-                text = buttonText,
-                iconStart = iconStart
-            ) {
-                onDelete()
-            }
-        }
-    ) {
-        Spacer(Modifier.height(32.dp))
-
-        Text(
-            modifier = Modifier.padding(horizontal = 32.dp),
-            text = title,
-            style = UI.typo.b1.style(
-                color = Red,
-                fontWeight = FontWeight.ExtraBold
-            )
+    if (visible) {
+        AlertDialog(
+            onDismissRequest = dismiss,
+            confirmButton = {
+                TextButton(
+                    onClick = onDelete,
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                ) {
+                    Text(buttonText)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = dismiss) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+            title = { Text(title) },
+            text = { Text(description) },
         )
-
-        Spacer(Modifier.height(24.dp))
-
-        Text(
-            modifier = Modifier.padding(horizontal = 32.dp),
-            text = description,
-            style = UI.typo.b2.style(
-                color = UI.colors.pureInverse,
-                fontWeight = FontWeight.Medium
-            )
-        )
-
-        Spacer(Modifier.height(48.dp))
     }
 }
 
 @SuppressLint("ComposeModifierMissing")
 @Composable
-fun BoxWithConstraintsScope.DeleteConfirmationModal(
+fun ConfirmModal(
+    title: String,
+    description: String,
+    visible: Boolean,
+    dismiss: () -> Unit,
+    onConfirm: () -> Unit,
+) {
+    if (visible) {
+        AlertDialog(
+            onDismissRequest = dismiss,
+            confirmButton = {
+                TextButton(onClick = onConfirm) {
+                    Text(stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = dismiss) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+            title = { Text(title) },
+            text = { Text(description) },
+        )
+    }
+}
+
+@SuppressLint("ComposeModifierMissing")
+@Composable
+fun DeleteConfirmationModal(
     title: String,
     description: String,
     visible: Boolean,
     enableDeletionButton: Boolean,
     onAccountNameChange: (String) -> Unit,
     dismiss: () -> Unit,
-    id: UUID = UUID.randomUUID(),
     hint: String = stringResource(id = R.string.account_name),
     buttonText: String = stringResource(R.string.delete),
-    iconStart: Int = R.drawable.ic_delete,
     onDelete: () -> Unit,
 ) {
-    var deletionTextFieldValue by remember(this) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    IvyModal(
-        id = id,
-        visible = visible,
-        dismiss = dismiss,
-        PrimaryAction = {
-            ModalNegativeButton(
-                text = buttonText,
-                iconStart = iconStart,
-                enabled = enableDeletionButton
-            ) {
-                onDelete()
-            }
-        }
-    ) {
-        Spacer(Modifier.height(32.dp))
+    if (visible) {
+        var deletionTextFieldValue by remember { mutableStateOf(TextFieldValue("")) }
+        val keyboard = LocalSoftwareKeyboardController.current
 
-        Text(
-            modifier = Modifier.padding(horizontal = 32.dp),
-            text = title,
-            style = UI.typo.b1.style(
-                color = Red,
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        Text(
-            modifier = Modifier.padding(horizontal = 32.dp),
-            text = description,
-            style = UI.typo.b2.style(
-                color = UI.colors.pureInverse,
-                fontWeight = FontWeight.Medium
-            )
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        val view = LocalView.current
-
-        IvyNameTextField(
-            modifier = Modifier
-                .padding(start = 28.dp, end = 36.dp),
-            underlineModifier = Modifier.padding(start = 24.dp, end = 32.dp),
-            value = deletionTextFieldValue,
-            hint = hint,
-            keyboardOptions = KeyboardOptions(
-                capitalization = KeyboardCapitalization.Words,
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Text,
-                autoCorrect = true
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    hideKeyboard(view)
+        AlertDialog(
+            onDismissRequest = dismiss,
+            confirmButton = {
+                TextButton(
+                    onClick = onDelete,
+                    enabled = enableDeletionButton,
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                ) {
+                    Text(buttonText)
                 }
-            ),
-        ) { newValue ->
-            deletionTextFieldValue = newValue
-            onAccountNameChange(newValue.text)
-        }
+            },
+            dismissButton = {
+                TextButton(onClick = dismiss) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+            title = { Text(title) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text(description)
 
-        Spacer(Modifier.height(48.dp))
+                    OutlinedTextField(
+                        value = deletionTextFieldValue,
+                        onValueChange = {
+                            deletionTextFieldValue = it
+                            onAccountNameChange(it.text)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(hint) },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Done,
+                            keyboardType = KeyboardType.Text,
+                            autoCorrect = true
+                        ),
+                        keyboardActions = KeyboardActions(onDone = { keyboard?.hide() }),
+                    )
+                }
+            },
+        )
     }
 }
 
 /** For screenshot testing */
 @Composable
 fun DeleteModalUiTest(isDark: Boolean) {
-    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+    WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
         DeleteModal(
             title = "Delete account?",
             description = "This will delete the account and all of its transactions.",
@@ -185,7 +167,7 @@ fun DeleteModalUiTest(isDark: Boolean) {
 /** For screenshot testing */
 @Composable
 fun DeleteConfirmationModalUiTest(isDark: Boolean) {
-    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+    WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
         DeleteConfirmationModal(
             title = "Delete account?",
             description = "Type the account name to confirm the deletion.",

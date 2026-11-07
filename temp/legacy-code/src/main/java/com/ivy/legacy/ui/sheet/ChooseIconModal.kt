@@ -1,6 +1,7 @@
 package com.ivy.legacy.ui.sheet
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -11,7 +12,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.FilledIconToggleButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.customIconResource
@@ -38,6 +39,7 @@ import java.util.UUID
 
 private const val IconsPerRow = 5
 
+@Suppress("ParameterNaming")
 @SuppressLint("ComposeModifierMissing")
 @Composable
 fun ChooseIconModal(
@@ -48,7 +50,7 @@ fun ChooseIconModal(
     id: UUID = remember { UUID.randomUUID() },
 
     dismiss: () -> Unit,
-    onIconChoose: (String?) -> Unit
+    onIconChosen: (String?) -> Unit
 ) {
     if (visible) {
         key(id) {
@@ -63,7 +65,7 @@ fun ChooseIconModal(
 
                     Button(
                         onClick = {
-                            onIconChoose(selectedIcon)
+                            onIconChosen(selectedIcon)
                             dismissSheet()
                         },
                         modifier = Modifier.testTag("choose_icon_save"),
@@ -91,16 +93,19 @@ private fun IconGrid(
     color: Color,
     onIconSelect: (String) -> Unit,
 ) {
+    val icons = remember { ivyIcons() }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(IconsPerRow),
+        contentPadding = PaddingValues(horizontal = 16.dp),
     ) {
-        for (entry in ivyIcons()) {
+        for (entry in icons) {
             when (entry) {
                 is IconPickerSection -> item(key = entry.title, span = { GridItemSpan(maxLineSpan) }) {
                     Text(
                         text = entry.title,
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(ListItemDefaults.ContentPadding),
+                        modifier = Modifier.padding(vertical = 8.dp),
                     )
                 }
 

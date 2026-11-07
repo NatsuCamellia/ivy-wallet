@@ -55,12 +55,12 @@ import com.ivy.ui.R
 import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.wallet.domain.data.IvyCurrency
 import com.ivy.wallet.domain.pure.data.IncomeExpensePair
-import com.ivy.wallet.ui.theme.modal.BufferModal
-import com.ivy.wallet.ui.theme.modal.BufferModalData
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModal
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalData
+import com.ivy.legacy.ui.sheet.BufferModal
+import com.ivy.legacy.ui.sheet.BufferModalData
+import com.ivy.legacy.ui.sheet.ChoosePeriodModal
+import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
 import com.ivy.legacy.ui.sheet.CurrencyModal
-import com.ivy.wallet.ui.theme.modal.DeleteModal
+import com.ivy.legacy.ui.sheet.DeleteModal
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.math.BigDecimal

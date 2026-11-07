@@ -69,11 +69,11 @@ import com.ivy.ui.color.Red3
 import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.IvySwitch
 import com.ivy.wallet.ui.theme.components.IvyToolbar
-import com.ivy.wallet.ui.theme.modal.ChooseStartDateOfMonthModal
+import com.ivy.legacy.ui.sheet.ChooseStartDateOfMonthModal
 import com.ivy.legacy.ui.sheet.CurrencyModal
-import com.ivy.wallet.ui.theme.modal.DeleteModal
-import com.ivy.wallet.ui.theme.modal.NameModal
-import com.ivy.wallet.ui.theme.modal.ProgressModal
+import com.ivy.legacy.ui.sheet.DeleteModal
+import com.ivy.legacy.ui.sheet.NameModal
+import com.ivy.legacy.ui.sheet.ProgressModal
 import java.util.Locale
 
 @ExperimentalFoundationApi

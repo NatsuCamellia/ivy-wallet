@@ -3,8 +3,8 @@ package com.ivy.loans.loandetails
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.datamodel.Loan
 import com.ivy.loans.loan.data.DisplayLoanRecord
-import com.ivy.wallet.ui.theme.modal.LoanModalData
-import com.ivy.wallet.ui.theme.modal.LoanRecordModalData
+import com.ivy.legacy.ui.sheet.LoanModalData
+import com.ivy.legacy.ui.sheet.LoanRecordModalData
 import kotlinx.collections.immutable.ImmutableList
 import java.time.Instant
 

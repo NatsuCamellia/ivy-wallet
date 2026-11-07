@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -17,8 +18,12 @@ import com.ivy.wallet.ui.theme.components.getCustomIconId
 
 @DrawableRes
 @Composable
-fun customIconResource(iconName: String?, @DrawableRes defaultIcon: Int, size: String): Int =
-    getCustomIconId(LocalContext.current, iconName, size)?.iconId ?: defaultIcon
+fun customIconResource(iconName: String?, @DrawableRes defaultIcon: Int, size: String): Int {
+    val context = LocalContext.current
+    return remember(context, iconName, defaultIcon, size) {
+        getCustomIconId(context, iconName, size)?.iconId ?: defaultIcon
+    }
+}
 
 /** The only place a user-picked colour and `ic_custom_*` icon are shown: a coloured circle with the icon on it. */
 @Composable

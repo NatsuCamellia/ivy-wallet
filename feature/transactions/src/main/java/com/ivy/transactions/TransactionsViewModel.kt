@@ -58,7 +58,7 @@ import com.ivy.wallet.domain.deprecated.logic.PlannedPaymentsLogic
 import com.ivy.wallet.domain.deprecated.logic.WalletAccountLogic
 import com.ivy.wallet.domain.deprecated.logic.WalletCategoryLogic
 import com.ivy.wallet.domain.pure.exchange.ExchangeData
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalData
+import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

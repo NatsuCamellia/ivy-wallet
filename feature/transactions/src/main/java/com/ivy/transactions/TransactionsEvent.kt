@@ -5,7 +5,7 @@ import com.ivy.data.model.Category
 import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.datamodel.Account
 import com.ivy.navigation.TransactionsScreen
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalData
+import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
 
 sealed interface TransactionsEvent {
     data class SetUpcomingExpanded(val expanded: Boolean) : TransactionsEvent

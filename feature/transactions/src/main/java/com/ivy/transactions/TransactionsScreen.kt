@@ -80,10 +80,10 @@ import com.ivy.wallet.ui.theme.components.ItemIconMDefaultIcon
 import com.ivy.ui.color.dynamicContrast
 import com.ivy.ui.color.findContrastTextColor
 import com.ivy.ui.color.isDarkColor
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModal
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalData
-import com.ivy.wallet.ui.theme.modal.DeleteConfirmationModal
-import com.ivy.wallet.ui.theme.modal.DeleteModal
+import com.ivy.legacy.ui.sheet.ChoosePeriodModal
+import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
+import com.ivy.legacy.ui.sheet.DeleteConfirmationModal
+import com.ivy.legacy.ui.sheet.DeleteModal
 import com.ivy.legacy.ui.sheet.AccountModal
 import com.ivy.legacy.ui.sheet.AccountModalData
 import com.ivy.legacy.ui.sheet.CategoryModal

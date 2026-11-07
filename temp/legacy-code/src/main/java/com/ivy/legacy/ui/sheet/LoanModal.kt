@@ -1,82 +1,62 @@
-package com.ivy.wallet.ui.theme.modal
+package com.ivy.legacy.ui.sheet
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
 import com.ivy.data.model.LoanType
 import com.ivy.data.model.primitive.NotBlankTrimmedString
-import com.ivy.ui.time.LocalTimeConverter
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.frp.test.TestingContext
-import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.datamodel.Loan
 import com.ivy.legacy.legacy.ui.theme.components.DateTimeRow
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.AccountsRow
+import com.ivy.legacy.ui.component.AmountItem
 import com.ivy.legacy.ui.component.ColorPicker
+import com.ivy.legacy.utils.capitalizeLocal
 import com.ivy.legacy.utils.getDefaultFIATCurrency
 import com.ivy.legacy.utils.isNotNullOrBlank
-import com.ivy.legacy.utils.onScreenStart
 import com.ivy.legacy.utils.selectEndTextFieldValue
-import com.ivy.ui.util.thenIf
-import com.ivy.legacy.legacy.ui.theme.modal.ModalNameInput
+import com.ivy.legacy.utils.toLowerCaseLocal
 import com.ivy.ui.R
+import com.ivy.ui.color.Ivy
+import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.wallet.domain.data.IvyCurrency
 import com.ivy.wallet.domain.deprecated.logic.model.CreateAccountData
 import com.ivy.wallet.domain.deprecated.logic.model.CreateLoanData
-import com.ivy.wallet.ui.theme.GradientIvy
-import com.ivy.wallet.ui.theme.Gray
-import com.ivy.ui.color.Ivy
-import com.ivy.ui.color.White
-import com.ivy.wallet.ui.theme.components.ItemIconSDefaultIcon
-import com.ivy.wallet.ui.theme.components.IvyCheckboxWithText
-import com.ivy.wallet.ui.theme.components.IvyIcon
-import com.ivy.ui.color.findContrastTextColor
-import com.ivy.legacy.ui.sheet.AccountModal
-import com.ivy.legacy.ui.sheet.AccountModalData
-import com.ivy.legacy.ui.sheet.AmountModal
-import com.ivy.legacy.ui.sheet.ChooseIconModal
-import com.ivy.legacy.ui.sheet.CurrencyModal
-import com.ivy.legacy.ui.sheet.IconNameRow
-import com.ivy.wallet.ui.theme.toComposeColor
-import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
 import java.util.UUID
+import kotlinx.collections.immutable.toImmutableList
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
 data class LoanModalData(
     val loan: Loan?,
     val baseCurrency: String,
@@ -88,9 +68,9 @@ data class LoanModalData(
 )
 
 @Suppress("CyclomaticComplexMethod", "LongMethod")
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@SuppressLint("ComposeModifierMissing")
 @Composable
-fun BoxWithConstraintsScope.LoanModal(
+fun LoanModal(
     modal: LoanModalData?,
     dateTime: Instant,
     onSetDate: () -> Unit,
@@ -102,507 +82,255 @@ fun BoxWithConstraintsScope.LoanModal(
     onPerformCalculations: () -> Unit = {},
     dismiss: () -> Unit,
 ) {
-    val loan = modal?.loan
-    val timeConverter = LocalTimeConverter.current
+    if (modal == null) return
 
-    var nameTextFieldValue by remember(modal) {
-        mutableStateOf(selectEndTextFieldValue(loan?.name))
-    }
-    var dateTime = modal?.loan?.dateTime ?: with(timeConverter) {
-        dateTime.toLocalDateTime()
-    }
-    var type by remember(modal) {
-        mutableStateOf(modal?.loan?.type ?: LoanType.BORROW)
-    }
-    var amount by remember(modal) {
-        mutableStateOf(modal?.loan?.amount ?: 0.0)
-    }
-    var color by remember(modal) {
-        mutableStateOf(loan?.color?.let { Color(it) } ?: Ivy)
-    }
-    var icon by remember(modal) {
-        mutableStateOf(loan?.icon)
-    }
-    var noteTextFieldValue by remember(modal) {
-        mutableStateOf(selectEndTextFieldValue(loan?.note))
-    }
-    var currencyCode by remember(modal) {
-        mutableStateOf(modal?.baseCurrency ?: "")
-    }
+    key(modal.id) {
+        val loan = modal.loan
+        val timeConverter = LocalTimeConverter.current
 
-    var selectedAcc by remember(modal) {
-        mutableStateOf(modal?.selectedAccount)
-    }
+        var nameTextFieldValue by remember { mutableStateOf(selectEndTextFieldValue(loan?.name)) }
+        val loanDateTime = loan?.dateTime ?: with(timeConverter) { dateTime.toLocalDateTime() }
+        var type by remember { mutableStateOf(loan?.type ?: LoanType.BORROW) }
+        var amount by remember { mutableStateOf(loan?.amount ?: 0.0) }
+        var color by remember { mutableStateOf(loan?.color?.let { Color(it) } ?: Ivy) }
+        var icon by remember { mutableStateOf(loan?.icon) }
+        var noteTextFieldValue by remember { mutableStateOf(selectEndTextFieldValue(loan?.note)) }
+        var currencyCode by remember { mutableStateOf(modal.baseCurrency) }
+        var selectedAcc by remember { mutableStateOf(modal.selectedAccount) }
+        var createLoanTrans by remember { mutableStateOf(modal.createLoanTransaction) }
 
-    var createLoanTrans by remember(modal) {
-        mutableStateOf(modal?.createLoanTransaction ?: false)
-    }
+        var accountChangeModal by remember { mutableStateOf(false) }
+        var amountModalVisible by remember { mutableStateOf(false) }
+        var currencyModalVisible by remember { mutableStateOf(false) }
+        var chooseIconModalVisible by remember { mutableStateOf(false) }
+        var accountModalData: AccountModalData? by remember { mutableStateOf(null) }
 
-    var accountChangeModal by remember { mutableStateOf(false) }
-    var amountModalVisible by remember { mutableStateOf(false) }
-    var currencyModalVisible by remember { mutableStateOf(false) }
-    var chooseIconModalVisible by remember(modal) {
-        mutableStateOf(false)
-    }
-
-    var accountModalData: AccountModalData? by remember { mutableStateOf(null) }
-
-    IvyModal(
-        id = modal?.id,
-        visible = modal != null,
-        dismiss = dismiss,
-        shiftIfKeyboardShown = false,
-        PrimaryAction = {
-            ModalAddSave(
-                item = modal?.loan,
-                // enabled = nameTextFieldValue.text.isNotNullOrBlank() && amount > 0 && ((createLoanTrans && selectedAcc != null) || !createLoanTrans)
-                enabled = nameTextFieldValue.text.isNotNullOrBlank() && amount > 0 && selectedAcc != null
-            ) {
-                accountChangeModal =
-                    loan != null && modal.selectedAccount != null && currencyCode != (
-                        modal.selectedAccount.currency
-                            ?: modal.baseCurrency
-                        )
-
-                if (!accountChangeModal) {
-                    save(
-                        loan = loan,
-                        nameTextFieldValue = nameTextFieldValue,
-                        dateTime = dateTime,
-                        noteTextFieldValue = noteTextFieldValue,
-                        type = type,
-                        color = color,
-                        icon = icon,
-                        amount = amount,
-                        selectedAccount = selectedAcc,
-                        createLoanTransaction = createLoanTrans,
-
-                        onCreateLoan = onCreateLoan,
-                        onEditLoan = onEditLoan,
-                        dismiss = dismiss
-                    )
-                }
-            }
-        }
-    ) {
-        onScreenStart {
-            if (modal?.autoOpenAmountModal == true) {
+        LaunchedEffect(Unit) {
+            if (modal.autoOpenAmountModal) {
                 amountModalVisible = true
             }
         }
 
-        Spacer(Modifier.height(32.dp))
+        val amountLabel = stringResource(R.string.enter_loan_amount_uppercase).toLowerCaseLocal().capitalizeLocal()
+        val gutter = Modifier.padding(horizontal = 16.dp)
 
-        ModalTitle(
-            text = if (modal?.loan != null) stringResource(R.string.edit_loan) else stringResource(R.string.new_loan),
-        )
+        ActionSheet(
+            onDismiss = dismiss,
+            title = stringResource(if (loan != null) R.string.edit_loan else R.string.new_loan),
+            actions = { dismissSheet ->
+                Spacer(Modifier.weight(1f))
 
-        Spacer(Modifier.height(24.dp))
+                Button(
+                    onClick = {
+                        accountChangeModal =
+                            loan != null && modal.selectedAccount != null &&
+                                currencyCode != (modal.selectedAccount.currency ?: modal.baseCurrency)
 
-        IconNameRow(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            hint = stringResource(R.string.loan_name),
-            defaultIcon = R.drawable.ic_custom_loan_m,
-            color = color,
-            icon = icon,
+                        if (!accountChangeModal) {
+                            save(
+                                loan = loan,
+                                nameTextFieldValue = nameTextFieldValue,
+                                dateTime = loanDateTime,
+                                noteTextFieldValue = noteTextFieldValue,
+                                type = type,
+                                color = color,
+                                icon = icon,
+                                amount = amount,
+                                selectedAccount = selectedAcc,
+                                createLoanTransaction = createLoanTrans,
 
-            autoFocusKeyboard = modal?.autoFocusKeyboard ?: true,
-
-            nameTextFieldValue = nameTextFieldValue,
-            setNameTextFieldValue = { nameTextFieldValue = it },
-            showChooseIconModal = {
-                chooseIconModalVisible = true
+                                onCreateLoan = onCreateLoan,
+                                onEditLoan = onEditLoan,
+                                dismiss = dismissSheet
+                            )
+                        }
+                    },
+                    enabled = nameTextFieldValue.text.isNotNullOrBlank() && amount > 0 && selectedAcc != null,
+                    modifier = if (loan == null) Modifier.testTag("modal_add") else Modifier,
+                ) {
+                    Text(stringResource(if (loan != null) R.string.save else R.string.add))
+                }
             }
-        )
+        ) { dismissSheet ->
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                IconNameRow(
+                    hint = stringResource(R.string.loan_name),
+                    defaultIcon = R.drawable.ic_custom_loan_m,
+                    color = color,
+                    icon = icon,
 
-        Spacer(Modifier.height(24.dp))
+                    autoFocusKeyboard = modal.autoFocusKeyboard,
 
-        DateTimeRow(
-            dateTime = dateTime,
-            onEditDate = onSetDate,
-            onEditTime = onSetTime
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        LoanTypePicker(
-            type = type,
-            onTypeSelected = { type = it }
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        ColorPicker(
-            selectedColor = color,
-            onColorSelect = { color = it }
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            modifier = Modifier.padding(horizontal = 32.dp),
-            text = stringResource(R.string.note),
-            style = UI.typo.b2.style(
-                color = UI.colors.pureInverse,
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        ModalNameInput(
-            hint = stringResource(R.string.description_text_field_hint),
-            autoFocusKeyboard = false,
-            textFieldValue = noteTextFieldValue,
-            setTextFieldValue = {
-                noteTextFieldValue = it
-            }
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Text(
-            modifier = Modifier.padding(horizontal = 32.dp),
-            text = stringResource(R.string.associated_account),
-            style = UI.typo.b2.style(
-                color = UI.colors.pureInverse,
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
-
-        Spacer(Modifier.height(16.dp))
-
-        AccountsRow(
-            accounts = accounts,
-            selectedAccount = selectedAcc,
-            onSelectedAccountChanged = {
-                selectedAcc = it
-                currencyCode = it.currency ?: getDefaultFIATCurrency().currencyCode
-            },
-            onAddNewAccount = {
-                accountModalData = AccountModalData(
-                    account = null,
-                    baseCurrency = selectedAcc?.currency ?: "USD",
-                    balance = 0.0
+                    nameTextFieldValue = nameTextFieldValue,
+                    setNameTextFieldValue = { nameTextFieldValue = it },
+                    showChooseIconModal = { chooseIconModalVisible = true },
+                    modifier = gutter,
                 )
-            },
-            childrenTestTag = "amount_modal_account"
-        )
 
-        Spacer(Modifier.height(16.dp))
+                DateTimeRow(
+                    dateTime = loanDateTime,
+                    onEditDate = onSetDate,
+                    onEditTime = onSetTime,
+                    modifier = gutter,
+                )
 
-        IvyCheckboxWithText(
-            modifier = Modifier
-                .padding(start = 16.dp)
-                .align(Alignment.Start),
-            text = stringResource(R.string.create_main_transaction),
-            checked = createLoanTrans
-        ) {
-            createLoanTrans = it
-        }
+                Column(modifier = gutter, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.loan_type),
+                        style = MaterialTheme.typography.titleSmall,
+                    )
 
-        Spacer(modifier = Modifier.height(24.dp))
+                    SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                        LoanType.entries.forEachIndexed { index, loanType ->
+                            SegmentedButton(
+                                selected = type == loanType,
+                                onClick = { type = loanType },
+                                shape = SegmentedButtonDefaults.itemShape(
+                                    index = index,
+                                    count = LoanType.entries.size,
+                                ),
+                            ) {
+                                Text(
+                                    stringResource(
+                                        if (loanType == LoanType.BORROW) R.string.borrow_money else R.string.lend_money
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
 
-        ModalAmountSection(
-            label = stringResource(R.string.enter_loan_amount_uppercase),
-            currency = currencyCode,
-            amount = amount,
-            amountPaddingTop = 40.dp,
-            amountPaddingBottom = 40.dp,
-        ) {
-            amountModalVisible = true
-        }
-    }
+                ColorPicker(
+                    selectedColor = color,
+                    onColorSelect = { color = it }
+                )
 
-    val amountModalId = remember(modal, amount) {
-        UUID.randomUUID()
-    }
-    AmountModal(
-        id = amountModalId,
-        visible = amountModalVisible,
-        currency = currencyCode,
-        initialAmount = amount,
-        dismiss = { amountModalVisible = false }
-    ) { newAmount ->
-        amount = newAmount
-    }
+                OutlinedTextField(
+                    value = noteTextFieldValue,
+                    onValueChange = { noteTextFieldValue = it },
+                    modifier = gutter.fillMaxWidth(),
+                    label = { Text(stringResource(R.string.note)) },
+                    singleLine = true,
+                )
 
-    CurrencyModal(
-        title = stringResource(R.string.choose_currency),
-        initialCurrency = IvyCurrency.fromCode(currencyCode),
-        visible = currencyModalVisible,
-        dismiss = { currencyModalVisible = false }
-    ) {
-        currencyCode = it
-    }
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.associated_account),
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = gutter,
+                    )
 
-    AccountModal(
-        modal = accountModalData,
-        onCreateAccount = onCreateAccount,
-        onEditAccount = { _, _ -> },
-        dismiss = {
-            accountModalData = null
-        }
-    )
+                    AccountsRow(
+                        accounts = remember(accounts) { accounts.toImmutableList() },
+                        selectedAccount = selectedAcc,
+                        onSelectedAccountChange = {
+                            selectedAcc = it
+                            currencyCode = it.currency ?: getDefaultFIATCurrency().currencyCode
+                        },
+                        onAddNewAccount = {
+                            accountModalData = AccountModalData(
+                                account = null,
+                                baseCurrency = selectedAcc?.currency ?: "USD",
+                                balance = 0.0
+                            )
+                        },
+                        childrenTestTag = "amount_modal_account"
+                    )
+                }
 
-    ChooseIconModal(
-        visible = chooseIconModalVisible,
-        initialIcon = icon ?: "loan",
-        color = color,
-        dismiss = { chooseIconModalVisible = false }
-    ) {
-        icon = it
-    }
+                Column(
+                    modifier = gutter,
+                    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+                ) {
+                    SegmentedListItem(
+                        checked = createLoanTrans,
+                        onCheckedChange = { createLoanTrans = it },
+                        shapes = ListItemDefaults.segmentedShapes(index = 0, count = 2),
+                        leadingContent = { Checkbox(checked = createLoanTrans, onCheckedChange = null) },
+                    ) {
+                        Text(stringResource(R.string.create_main_transaction))
+                    }
 
-    DeleteModal(
-        visible = accountChangeModal,
-        title = stringResource(R.string.confirm_account_change),
-        description = stringResource(R.string.confirm_account_change_warning),
-        buttonText = stringResource(R.string.confirm),
-        iconStart = R.drawable.ic_agreed,
-        dismiss = {
-            selectedAcc = modal?.selectedAccount ?: selectedAcc
-            accountChangeModal = false
-        }
-    ) {
-        onPerformCalculations()
-        save(
-            loan = loan,
-            nameTextFieldValue = nameTextFieldValue,
-            dateTime = dateTime,
-            noteTextFieldValue = noteTextFieldValue,
-            type = type,
-            color = color,
-            icon = icon,
-            amount = amount,
-            selectedAccount = selectedAcc,
-            createLoanTransaction = createLoanTrans,
-
-            onCreateLoan = onCreateLoan,
-            onEditLoan = onEditLoan,
-            dismiss = dismiss
-        )
-        accountChangeModal = false
-    }
-}
-
-@Composable
-@Suppress("ParameterNaming")
-private fun AccountsRow(
-    modifier: Modifier = Modifier,
-    accounts: List<Account>,
-    selectedAccount: Account?,
-    childrenTestTag: String? = null,
-    onSelectedAccountChanged: (Account) -> Unit,
-    onAddNewAccount: () -> Unit
-) {
-    val lazyState = rememberLazyListState()
-
-    LaunchedEffect(accounts, selectedAccount) {
-        if (selectedAccount != null) {
-            val selectedIndex = accounts.indexOf(selectedAccount)
-            if (selectedIndex != -1) {
-                launch {
-                    if (TestingContext.inTest) return@launch // breaks UI tests
-
-                    lazyState.scrollToItem(
-                        index = selectedIndex, // +1 because Spacer width 24.dp
+                    AmountItem(
+                        label = amountLabel,
+                        currency = currencyCode,
+                        amount = amount,
+                        index = 1,
+                        count = 2,
+                        onClick = { amountModalVisible = true },
                     )
                 }
             }
-        }
-    }
 
-    LazyRow(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        state = lazyState
-    ) {
-        item {
-            Spacer(Modifier.width(24.dp))
-        }
-
-        itemsIndexed(accounts) { _, account ->
-            Account(
-                account = account,
-                selected = selectedAccount == account,
-                testTag = childrenTestTag ?: "account"
+            ConfirmModal(
+                visible = accountChangeModal,
+                title = stringResource(R.string.confirm_account_change),
+                description = stringResource(R.string.confirm_account_change_warning),
+                dismiss = {
+                    selectedAcc = modal.selectedAccount ?: selectedAcc
+                    accountChangeModal = false
+                }
             ) {
-                onSelectedAccountChanged(account)
+                onPerformCalculations()
+                save(
+                    loan = loan,
+                    nameTextFieldValue = nameTextFieldValue,
+                    dateTime = loanDateTime,
+                    noteTextFieldValue = noteTextFieldValue,
+                    type = type,
+                    color = color,
+                    icon = icon,
+                    amount = amount,
+                    selectedAccount = selectedAcc,
+                    createLoanTransaction = createLoanTrans,
+
+                    onCreateLoan = onCreateLoan,
+                    onEditLoan = onEditLoan,
+                    dismiss = dismissSheet
+                )
+                accountChangeModal = false
             }
         }
 
-        item {
-            AddAccount {
-                onAddNewAccount()
-            }
+        val amountModalId = remember(amount) { UUID.randomUUID() }
+        AmountModal(
+            id = amountModalId,
+            visible = amountModalVisible,
+            currency = currencyCode,
+            initialAmount = amount,
+            dismiss = { amountModalVisible = false }
+        ) { newAmount ->
+            amount = newAmount
         }
 
-        item {
-            Spacer(Modifier.width(24.dp))
-        }
-    }
-}
-
-@Composable
-private fun Account(
-    account: Account,
-    selected: Boolean,
-    testTag: String,
-    onClick: () -> Unit
-) {
-    val accountColor = account.color.toComposeColor()
-    val textColor =
-        if (selected) findContrastTextColor(accountColor) else UI.colors.pureInverse
-
-    val medium = UI.colors.medium
-    val rFull = UI.shapes.rFull
-
-    Row(
-        modifier = Modifier
-            .clip(UI.shapes.rFull)
-            .thenIf(!selected) {
-                border(2.dp, medium, rFull)
-            }
-            .thenIf(selected) {
-                background(accountColor, rFull)
-            }
-            .clickable(onClick = onClick)
-            .testTag(testTag),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(12.dp))
-
-        ItemIconSDefaultIcon(
-            iconName = account.icon,
-            defaultIcon = R.drawable.ic_custom_account_s,
-            tint = textColor
-        )
-
-        Spacer(Modifier.width(4.dp))
-
-        Text(
-            modifier = Modifier.padding(vertical = 10.dp),
-            text = account.name,
-            style = UI.typo.b2.style(
-                color = textColor,
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
-
-        Spacer(Modifier.width(24.dp))
-    }
-
-    Spacer(Modifier.width(8.dp))
-}
-
-@Composable
-private fun AddAccount(
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .clip(UI.shapes.rFull)
-            .border(2.dp, UI.colors.medium, UI.shapes.rFull)
-            .clickable(onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(12.dp))
-
-        IvyIcon(
-            icon = R.drawable.ic_plus,
-            tint = UI.colors.pureInverse
-        )
-
-        Spacer(Modifier.width(4.dp))
-
-        Text(
-            modifier = Modifier.padding(vertical = 10.dp),
-            text = stringResource(R.string.add_account),
-            style = UI.typo.b2.style(
-                color = UI.colors.pureInverse,
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
-
-        Spacer(Modifier.width(24.dp))
-    }
-
-    Spacer(Modifier.width(8.dp))
-}
-
-@Suppress("ParameterNaming")
-@Composable
-private fun ColumnScope.LoanTypePicker(
-    type: LoanType,
-    onTypeSelected: (LoanType) -> Unit
-) {
-    Text(
-        modifier = Modifier.padding(horizontal = 32.dp),
-        text = stringResource(R.string.loan_type),
-        style = UI.typo.b2.style(
-            color = UI.colors.pureInverse,
-            fontWeight = FontWeight.ExtraBold
-        )
-    )
-
-    Spacer(Modifier.height(16.dp))
-
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 24.dp)
-            .fillMaxWidth()
-            .background(UI.colors.medium, UI.shapes.r2),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(8.dp))
-
-        SelectorButton(
-            selected = type == LoanType.BORROW,
-            label = stringResource(R.string.borrow_money)
+        CurrencyModal(
+            title = stringResource(R.string.choose_currency),
+            initialCurrency = IvyCurrency.fromCode(currencyCode),
+            visible = currencyModalVisible,
+            dismiss = { currencyModalVisible = false }
         ) {
-            onTypeSelected(LoanType.BORROW)
+            currencyCode = it
         }
 
-        Spacer(Modifier.width(8.dp))
-
-        SelectorButton(
-            selected = type == LoanType.LEND,
-            label = stringResource(R.string.lend_money)
-        ) {
-            onTypeSelected(LoanType.LEND)
-        }
-
-        Spacer(Modifier.width(8.dp))
-    }
-}
-
-@Composable
-private fun RowScope.SelectorButton(
-    selected: Boolean,
-    label: String,
-    onClick: () -> Unit
-) {
-    val rFull = UI.shapes.rFull
-    Text(
-        modifier = Modifier
-            .weight(1f)
-            .clip(UI.shapes.rFull)
-            .clickable {
-                onClick()
-            }
-            .padding(vertical = 8.dp)
-            .thenIf(selected) {
-                background(GradientIvy.asHorizontalBrush(), rFull)
-            }
-            .padding(vertical = 8.dp),
-        text = label,
-        style = UI.typo.b2.style(
-            color = if (selected) White else Gray,
-            fontWeight = FontWeight.ExtraBold,
-            textAlign = TextAlign.Center
+        AccountModal(
+            modal = accountModalData,
+            onCreateAccount = onCreateAccount,
+            onEditAccount = { _, _ -> },
+            dismiss = { accountModalData = null }
         )
-    )
+
+        ChooseIconModal(
+            visible = chooseIconModalVisible,
+            initialIcon = icon ?: "loan",
+            color = color,
+            dismiss = { chooseIconModalVisible = false }
+        ) {
+            icon = it
+        }
+    }
 }
 
 private fun save(
@@ -657,7 +385,7 @@ private fun save(
 @Preview
 @Composable
 private fun Preview(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
+    WalletPreview(theme) {
         LoanModal(
             modal = LoanModalData(
                 loan = null,
@@ -683,7 +411,7 @@ fun LoanModalUiTest(isDark: Boolean) {
 @Suppress("MagicNumber")
 @Composable
 fun EditLoanModalUiTest(isDark: Boolean) {
-    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+    WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
         LoanModal(
             modal = LoanModalData(
                 loan = Loan(

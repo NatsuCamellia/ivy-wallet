@@ -6,7 +6,7 @@ import com.ivy.data.model.IntervalType
 import com.ivy.legacy.datamodel.Account
 import com.ivy.wallet.domain.deprecated.logic.model.CreateAccountData
 import com.ivy.wallet.domain.deprecated.logic.model.CreateCategoryData
-import com.ivy.wallet.ui.theme.modal.RecurringRuleModalData
+import com.ivy.legacy.ui.sheet.RecurringRuleModalData
 import com.ivy.legacy.ui.sheet.AccountModalData
 import com.ivy.legacy.ui.sheet.CategoryModalData
 import java.time.LocalDateTime

@@ -1,11 +1,18 @@
 package com.ivy.legacy.legacy.ui.theme.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.ivy.ui.time.LocalTimeFormatter
@@ -13,8 +20,6 @@ import com.ivy.legacy.utils.convertLocalToUTC
 import com.ivy.legacy.utils.convertUTCToLocal
 import com.ivy.legacy.utils.formatNicely
 import com.ivy.legacy.utils.timeNowUTC
-import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.components.IvyOutlinedButton
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -30,27 +35,27 @@ fun DateTimeRow(
 
     Row(
         modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Spacer(Modifier.width(24.dp))
+        OutlinedButton(onClick = onEditDate, modifier = Modifier.weight(1f)) {
+            Icon(
+                imageVector = Icons.Default.CalendarMonth,
+                contentDescription = null,
+                modifier = Modifier.size(ButtonDefaults.IconSize),
+            )
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Text(dateTime.formatNicely())
+        }
 
-        IvyOutlinedButton(
-            text = dateTime.formatNicely(),
-            iconStart = R.drawable.ic_date,
-            onClick = onEditDate
-        )
-
-        Spacer(Modifier.weight(1f))
-
-        IvyOutlinedButton(
-            text = with(timeFormatter) {
-                dateTime.toLocalTime().format()
-            },
-            iconStart = R.drawable.ic_date,
-            onClick = onEditTime
-        )
-
-        Spacer(Modifier.width(24.dp))
+        OutlinedButton(onClick = onEditTime, modifier = Modifier.weight(1f)) {
+            Icon(
+                imageVector = Icons.Default.Schedule,
+                contentDescription = null,
+                modifier = Modifier.size(ButtonDefaults.IconSize),
+            )
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Text(with(timeFormatter) { dateTime.toLocalTime().format() })
+        }
     }
 }
 

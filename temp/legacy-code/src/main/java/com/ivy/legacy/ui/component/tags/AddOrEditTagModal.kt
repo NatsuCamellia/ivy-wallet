@@ -34,7 +34,7 @@ import com.ivy.data.model.primitive.ColorInt
 import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.data.model.TagId
 import com.ivy.legacy.IvyWalletPreview
-import com.ivy.wallet.ui.theme.Ivy
+import com.ivy.ui.color.Ivy
 import com.ivy.wallet.ui.theme.components.DeleteButton
 import com.ivy.wallet.ui.theme.components.IvyTitleTextField
 import com.ivy.wallet.ui.theme.modal.IvyModal

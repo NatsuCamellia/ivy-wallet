@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
-import com.ivy.design.utils.thenIf
+import com.ivy.ui.util.thenIf
 import com.ivy.legacy.data.model.MainTab
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.utils.clickableNoIndication
@@ -56,9 +56,9 @@ import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.Gradient
 import com.ivy.wallet.ui.theme.GradientGreen
 import com.ivy.wallet.ui.theme.GradientIvy
-import com.ivy.wallet.ui.theme.Green
-import com.ivy.wallet.ui.theme.Ivy
-import com.ivy.wallet.ui.theme.White
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.Ivy
+import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.IvyCircleButton
 import com.ivy.wallet.ui.theme.components.IvyIcon
 import com.ivy.wallet.ui.theme.components.IvyOutlinedButton

@@ -26,10 +26,10 @@ import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.legacy.IvyWalletPreview
-import com.ivy.design.utils.thenIf
+import com.ivy.ui.util.thenIf
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Ivy
-import com.ivy.wallet.ui.theme.White
+import com.ivy.ui.color.Ivy
+import com.ivy.ui.color.White
 import java.util.UUID
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")

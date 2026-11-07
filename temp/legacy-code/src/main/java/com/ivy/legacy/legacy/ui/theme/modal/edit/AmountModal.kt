@@ -53,7 +53,7 @@ import com.ivy.legacy.utils.hideKeyboard
 import com.ivy.legacy.utils.localDecimalSeparator
 import com.ivy.legacy.utils.onScreenStart
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Red
+import com.ivy.ui.color.Red
 import com.ivy.wallet.ui.theme.components.IvyIcon
 import com.ivy.wallet.ui.theme.modal.IvyModal
 import com.ivy.wallet.ui.theme.modal.ModalPositiveButton

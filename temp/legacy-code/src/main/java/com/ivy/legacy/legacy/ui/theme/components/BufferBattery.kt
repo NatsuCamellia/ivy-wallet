@@ -24,14 +24,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
-import com.ivy.design.utils.thenIf
+import com.ivy.ui.util.thenIf
 import com.ivy.legacy.IvyWalletComponentPreview
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Green
-import com.ivy.wallet.ui.theme.Ivy
-import com.ivy.wallet.ui.theme.Orange
-import com.ivy.wallet.ui.theme.Red
-import com.ivy.wallet.ui.theme.White
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.Ivy
+import com.ivy.ui.color.Orange
+import com.ivy.ui.color.Red
+import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.wallet.AmountCurrencyB2Row
 import kotlin.math.abs
 

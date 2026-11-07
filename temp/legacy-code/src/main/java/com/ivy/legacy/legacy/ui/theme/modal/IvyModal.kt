@@ -52,7 +52,7 @@ import com.ivy.legacy.utils.hideKeyboard
 import com.ivy.legacy.utils.keyboardOnlyWindowInsets
 import com.ivy.legacy.utils.navigationBarInsets
 import com.ivy.legacy.utils.onScreenStart
-import com.ivy.design.utils.thenIf
+import com.ivy.ui.util.thenIf
 import com.ivy.navigation.Navigation
 import com.ivy.navigation.navigation
 import com.ivy.wallet.ui.theme.components.ActionsRow

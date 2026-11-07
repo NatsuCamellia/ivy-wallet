@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.ivy.design.utils.thenIf
+import com.ivy.ui.util.thenIf
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable

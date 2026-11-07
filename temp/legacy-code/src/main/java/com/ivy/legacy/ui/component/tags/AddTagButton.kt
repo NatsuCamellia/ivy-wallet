@@ -7,13 +7,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.ivy.data.model.TagId
-import com.ivy.design.l0_system.Orange3
+import com.ivy.ui.color.Orange3
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.wallet.ui.theme.Gradient
 import com.ivy.wallet.ui.theme.components.IvyBorderButton
 import com.ivy.wallet.ui.theme.components.IvyButton
-import com.ivy.wallet.ui.theme.findContrastTextColor
+import com.ivy.ui.color.findContrastTextColor
 import kotlinx.collections.immutable.ImmutableList
 import com.ivy.ui.R
 

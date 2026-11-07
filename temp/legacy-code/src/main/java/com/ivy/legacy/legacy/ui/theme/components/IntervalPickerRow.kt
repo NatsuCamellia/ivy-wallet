@@ -34,7 +34,7 @@ import com.ivy.legacy.utils.selectEndTextFieldValue
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.Gradient
 import com.ivy.wallet.ui.theme.GradientIvy
-import com.ivy.wallet.ui.theme.White
+import com.ivy.ui.color.White
 
 private const val RepeatIntervalCharLimit = 5
 

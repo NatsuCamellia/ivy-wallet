@@ -25,7 +25,7 @@ import com.ivy.legacy.IvyWalletComponentPreview
 import com.ivy.legacy.utils.format
 import com.ivy.ui.R
 import com.ivy.wallet.domain.data.IvyCurrency
-import com.ivy.wallet.ui.theme.Orange
+import com.ivy.ui.color.Orange
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable

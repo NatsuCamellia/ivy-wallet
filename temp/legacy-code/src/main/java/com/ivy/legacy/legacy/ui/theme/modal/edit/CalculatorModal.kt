@@ -30,7 +30,7 @@ import com.ivy.legacy.utils.localDecimalSeparator
 import com.ivy.legacy.utils.normalizeExpression
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.Red
+import com.ivy.ui.color.Red
 import com.ivy.wallet.ui.theme.modal.IvyModal
 import com.ivy.wallet.ui.theme.modal.ModalSet
 import com.ivy.wallet.ui.theme.modal.ModalTitle

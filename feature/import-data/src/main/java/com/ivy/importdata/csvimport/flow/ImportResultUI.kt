@@ -27,9 +27,9 @@ import com.ivy.navigation.navigation
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.GradientIvy
 import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.Green
-import com.ivy.wallet.ui.theme.Red
-import com.ivy.wallet.ui.theme.White
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.Red
+import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.BackButton
 import com.ivy.wallet.ui.theme.components.IvyDividerLine
 import com.ivy.wallet.ui.theme.components.OnboardingButton

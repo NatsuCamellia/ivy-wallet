@@ -42,7 +42,7 @@ import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.colorAs
 import com.ivy.design.l0_system.style
-import com.ivy.design.utils.thenIf
+import com.ivy.ui.util.thenIf
 import com.ivy.importdata.csvimport.flow.ImportProcessing
 import com.ivy.importdata.csvimport.flow.ImportResultUI
 import com.ivy.legacy.IvyWalletPreview

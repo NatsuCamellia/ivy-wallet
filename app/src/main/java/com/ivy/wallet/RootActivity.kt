@@ -35,14 +35,12 @@ import com.ivy.IvyNavGraph
 import com.ivy.base.legacy.Theme
 import com.ivy.base.time.TimeConverter
 import com.ivy.base.time.TimeProvider
-import com.ivy.design.api.IvyDesign
-import com.ivy.design.api.IvyUI
 import com.ivy.design.system.IvyMaterial3Theme
 import com.ivy.domain.RootScreen
 import com.ivy.home.customerjourney.CustomerJourneyCardsProvider
 import com.ivy.legacy.Constants
 import com.ivy.legacy.IvyWalletCtx
-import com.ivy.legacy.appDesign
+import com.ivy.legacy.IvyWalletUI
 import com.ivy.legacy.utils.activityForResultLauncher
 import com.ivy.legacy.utils.sendToCrashlytics
 import com.ivy.legacy.utils.simpleActivityForResultLauncher
@@ -110,8 +108,8 @@ class RootActivity : AppCompatActivity(), RootScreen {
                 null -> { // display nothing
                 }
                 true -> {
-                    IvyUI(
-                        design = appDesign(ivyContext),
+                    IvyWalletUI(
+                        ctx = ivyContext,
                         timeConverter = timeConverter,
                         timeProvider = timeProvider,
                         timeFormatter = timeFormatter,
@@ -131,8 +129,8 @@ class RootActivity : AppCompatActivity(), RootScreen {
 
                 false -> {
                     NavigationRoot(navigation = navigation) { screen ->
-                        IvyUI(
-                            design = appDesign(ivyContext),
+                        IvyWalletUI(
+                            ctx = ivyContext,
                             includeSurface = screen?.isLegacy ?: true,
                             timeConverter = timeConverter,
                             timeProvider = timeProvider,
@@ -146,10 +144,10 @@ class RootActivity : AppCompatActivity(), RootScreen {
 
             IvyMaterial3Theme(
                 dark = isDarkThemeEnabled(
-                    ivyDesign = appDesign(ivyContext),
+                    theme = ivyContext.theme,
                     systemDarkTheme = isSystemInDarkTheme
                 ),
-                isTrueBlack = appDesign(ivyContext).context().theme == Theme.AMOLED_DARK
+                isTrueBlack = ivyContext.theme == Theme.AMOLED_DARK
             ) {
                 dateTimePicker.Content()
             }
@@ -255,8 +253,8 @@ class RootActivity : AppCompatActivity(), RootScreen {
         }
     }
 
-    private fun isDarkThemeEnabled(ivyDesign: IvyDesign, systemDarkTheme: Boolean): Boolean {
-        return when (ivyDesign.context().theme) {
+    private fun isDarkThemeEnabled(theme: Theme, systemDarkTheme: Boolean): Boolean {
+        return when (theme) {
             Theme.LIGHT -> false
             Theme.DARK -> true
             Theme.AMOLED_DARK -> true

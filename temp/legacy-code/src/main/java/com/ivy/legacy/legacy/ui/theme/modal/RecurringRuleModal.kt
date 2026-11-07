@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
 import com.ivy.data.model.IntervalType
-import com.ivy.design.api.LocalTimeProvider
+import com.ivy.ui.time.LocalTimeProvider
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.legacy.IvyWalletCtx
@@ -47,13 +47,13 @@ import com.ivy.legacy.utils.formatDateWeekDayLong
 import com.ivy.legacy.utils.formatNicely
 import com.ivy.legacy.utils.hideKeyboard
 import com.ivy.legacy.utils.onScreenStart
-import com.ivy.design.utils.thenIf
+import com.ivy.ui.util.thenIf
 import com.ivy.legacy.utils.rememberInteractionSource
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.Gradient
 import com.ivy.wallet.ui.theme.GradientIvy
 import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.White
+import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.IntervalPickerRow
 import com.ivy.wallet.ui.theme.components.IvyCircleButton
 import com.ivy.wallet.ui.theme.components.IvyDividerLine

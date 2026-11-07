@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import com.ivy.design.l1_buildingBlocks.data.IvyPadding
 import com.ivy.design.utils.ivyPadding
-import com.ivy.design.utils.thenIf
+import com.ivy.ui.util.thenIf
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable

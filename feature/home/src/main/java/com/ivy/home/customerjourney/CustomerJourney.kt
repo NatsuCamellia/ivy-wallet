@@ -32,8 +32,8 @@ import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.Gradient
 import com.ivy.wallet.ui.theme.components.IvyButton
 import com.ivy.wallet.ui.theme.components.IvyIcon
-import com.ivy.wallet.ui.theme.dynamicContrast
-import com.ivy.wallet.ui.theme.findContrastTextColor
+import com.ivy.ui.color.dynamicContrast
+import com.ivy.ui.color.findContrastTextColor
 import kotlinx.collections.immutable.ImmutableList
 
 @Composable

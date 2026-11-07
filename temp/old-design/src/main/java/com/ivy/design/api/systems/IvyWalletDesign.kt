@@ -12,6 +12,20 @@ import com.ivy.base.legacy.Theme
 import com.ivy.design.api.IvyDesign
 import com.ivy.design.l0_system.*
 import com.ivy.ui.R
+import com.ivy.ui.color.Black
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.GreenDark
+import com.ivy.ui.color.GreenLight
+import com.ivy.ui.color.IvyDark
+import com.ivy.ui.color.IvyLight
+import com.ivy.ui.color.Orange
+import com.ivy.ui.color.OrangeDark
+import com.ivy.ui.color.OrangeLight
+import com.ivy.ui.color.Purple
+import com.ivy.ui.color.Red
+import com.ivy.ui.color.RedDark
+import com.ivy.ui.color.RedLight
+import com.ivy.ui.color.White
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 abstract class IvyWalletDesign : IvyDesign {

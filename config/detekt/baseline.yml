@@ -327,7 +327,7 @@
     <ID>CompositionLocalAllowlist:IvyTheme.kt$LocalIvyColors</ID>
     <ID>CompositionLocalAllowlist:IvyTheme.kt$LocalIvyShapes</ID>
     <ID>CompositionLocalAllowlist:IvyTheme.kt$LocalIvyTypography</ID>
-    <ID>CompositionLocalAllowlist:IvyUI.kt$LocalIvyContext</ID>
+    <ID>CompositionLocalAllowlist:IvyWalletCtx.kt$LocalWalletCtx</ID>
     <ID>CompositionLocalAllowlist:NavigationRoot.kt$LocalNavigation</ID>
     <ID>ConstructorParameterNaming:LoanTransactionsLogic.kt$LoanTransactionsLogic$val Loan: LTLoanMapper</ID>
     <ID>ConstructorParameterNaming:LoanTransactionsLogic.kt$LoanTransactionsLogic$val LoanRecord: LTLoanRecordMapper</ID>
@@ -2624,13 +2624,13 @@
     <ID>MagicNumber:ChoosePeriodModal.kt$200</ID>
     <ID>MagicNumber:ChoosePeriodModal.kt$3</ID>
     <ID>MagicNumber:ChoosePeriodModal.kt$35</ID>
-    <ID>MagicNumber:Colors.kt$0.1f</ID>
-    <ID>MagicNumber:Colors.kt$0.4f</ID>
-    <ID>MagicNumber:Colors.kt$0.5</ID>
-    <ID>MagicNumber:Colors.kt$0.5f</ID>
-    <ID>MagicNumber:Colors.kt$0.6f</ID>
-    <ID>MagicNumber:Colors.kt$0.8f</ID>
-    <ID>MagicNumber:Colors.kt$3</ID>
+    <ID>MagicNumber:ContrastColor.kt$0.1f</ID>
+    <ID>MagicNumber:ContrastColor.kt$0.4f</ID>
+    <ID>MagicNumber:ContrastColor.kt$0.5</ID>
+    <ID>MagicNumber:ContrastColor.kt$0.5f</ID>
+    <ID>MagicNumber:ContrastColor.kt$0.6f</ID>
+    <ID>MagicNumber:ContrastColor.kt$0.8f</ID>
+    <ID>MagicNumber:ContrastColor.kt$3</ID>
     <ID>MagicNumber:CurrencyPicker.kt$20</ID>
     <ID>MagicNumber:CustomExchangeRateCard.kt$4</ID>
     <ID>MagicNumber:DateExt.kt$10</ID>
@@ -2668,13 +2668,6 @@
     <ID>MagicNumber:ImportViewModel.kt$ImportViewModel$100</ID>
     <ID>MagicNumber:InputField.kt$100</ID>
     <ID>MagicNumber:IntervalPickerRow.kt$180f</ID>
-    <ID>MagicNumber:IvyColors.kt$0.1f</ID>
-    <ID>MagicNumber:IvyColors.kt$0.4f</ID>
-    <ID>MagicNumber:IvyColors.kt$0.5</ID>
-    <ID>MagicNumber:IvyColors.kt$0.5f</ID>
-    <ID>MagicNumber:IvyColors.kt$0.6f</ID>
-    <ID>MagicNumber:IvyColors.kt$0.8f</ID>
-    <ID>MagicNumber:IvyColors.kt$3</ID>
     <ID>MagicNumber:IvyLineChart.kt$3</ID>
     <ID>MagicNumber:IvyModal.kt$0.01f</ID>
     <ID>MagicNumber:IvyModal.kt$1000f</ID>
@@ -10650,8 +10643,8 @@
     <ID>UnusedPrivateProperty:LoanDetailsViewModel.kt$LoanDetailsViewModel$private val loanDao: LoanDao</ID>
     <ID>UnusedPrivateProperty:OnboardingPrivacyTC.kt$val context = LocalContext.current</ID>
     <ID>UnusedPrivateProperty:TransactionReminderLogic.kt$TransactionReminderLogic.Companion$private const val UNIQUE_WORK_NAME_V1 = "transaction_reminder_work"</ID>
-    <ID>UseCheckOrError:IvyContext.kt$IvyContext$throw IllegalStateException("screenHeight not initialized")</ID>
-    <ID>UseCheckOrError:IvyContext.kt$IvyContext$throw IllegalStateException("screenWidth not initialized")</ID>
+    <ID>UseCheckOrError:IvyWalletCtx.kt$IvyWalletCtx$throw IllegalStateException("screenHeight not initialized")</ID>
+    <ID>UseCheckOrError:IvyWalletCtx.kt$IvyWalletCtx$throw IllegalStateException("screenWidth not initialized")</ID>
     <ID>UseCheckOrError:SharedPrefs.kt$SharedPrefs$throw IllegalStateException("SharePrefs key '$key' cannot be null")</ID>
     <ID>UseCheckOrError:ZipUtils.kt$throw IllegalStateException("Location file must be directory or not exist")</ID>
     <ID>UtilityClassWithPublicConstructor:WidgetBase.kt$WidgetBase</ID>

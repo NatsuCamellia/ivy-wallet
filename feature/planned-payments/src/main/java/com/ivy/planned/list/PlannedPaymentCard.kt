@@ -31,7 +31,7 @@ import com.ivy.data.model.CategoryId
 import com.ivy.data.model.IntervalType
 import com.ivy.data.model.primitive.ColorInt
 import com.ivy.data.model.primitive.NotBlankTrimmedString
-import com.ivy.design.api.LocalTimeConverter
+import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.legacy.IvyWalletPreview
@@ -47,14 +47,14 @@ import com.ivy.legacy.utils.uppercaseLocal
 import com.ivy.navigation.TransactionsScreen
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Blue
+import com.ivy.ui.color.Blue
 import com.ivy.wallet.ui.theme.Gradient
-import com.ivy.wallet.ui.theme.Green
-import com.ivy.wallet.ui.theme.Orange
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.Orange
 import com.ivy.wallet.ui.theme.components.IvyButton
 import com.ivy.wallet.ui.theme.components.IvyIcon
 import com.ivy.wallet.ui.theme.components.getCustomIconIdS
-import com.ivy.wallet.ui.theme.findContrastTextColor
+import com.ivy.ui.color.findContrastTextColor
 import com.ivy.wallet.ui.theme.toComposeColor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ivy.design.api.LocalTimeFormatter
+import com.ivy.ui.time.LocalTimeFormatter
 import com.ivy.legacy.utils.convertLocalToUTC
 import com.ivy.legacy.utils.convertUTCToLocal
 import com.ivy.legacy.utils.formatNicely

@@ -27,7 +27,7 @@ import com.ivy.data.repository.CategoryRepository
 import com.ivy.data.repository.TagRepository
 import com.ivy.data.repository.TransactionRepository
 import com.ivy.data.repository.mapper.TransactionMapper
-import com.ivy.design.l0_system.RedLight
+import com.ivy.ui.color.RedLight
 import com.ivy.domain.features.Features
 import com.ivy.frp.then
 import com.ivy.legacy.IvyWalletCtx

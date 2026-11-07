@@ -35,8 +35,8 @@ import com.ivy.base.model.TransactionType
 import com.ivy.data.model.Category
 import com.ivy.data.model.Tag
 import com.ivy.data.model.TagId
-import com.ivy.design.api.LocalTimeConverter
-import com.ivy.design.l0_system.Orange
+import com.ivy.ui.time.LocalTimeConverter
+import com.ivy.ui.color.Orange
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.design.utils.hideKeyboard

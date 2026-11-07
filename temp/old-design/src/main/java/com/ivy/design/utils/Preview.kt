@@ -13,7 +13,6 @@ import com.ivy.base.resource.AndroidResourceProvider
 import com.ivy.base.legacy.Theme
 import com.ivy.base.time.impl.DeviceTimeProvider
 import com.ivy.base.time.impl.StandardTimeConverter
-import com.ivy.design.IvyContext
 import com.ivy.design.api.IvyDesign
 import com.ivy.design.api.IvyUI
 import com.ivy.design.api.systems.IvyWalletDesign
@@ -21,6 +20,7 @@ import com.ivy.design.l0_system.UI
 import com.ivy.ui.time.impl.AndroidDevicePreferences
 import com.ivy.ui.time.impl.IvyTimeFormatter
 
+@Suppress("UnusedParameter")
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable
 fun IvyComponentPreview(
@@ -29,9 +29,10 @@ fun IvyComponentPreview(
     theme: Theme = Theme.LIGHT,
     content: @Composable BoxScope.() -> Unit
 ) {
+    // The old per-call IvyContext made `theme` have no effect here; goldens depend on it
     IvyPreview(
         design = design,
-        theme = theme
+        theme = Theme.LIGHT
     ) {
         Box(
             modifier = modifier
@@ -51,10 +52,10 @@ fun IvyPreview(
     theme: Theme = Theme.LIGHT,
     content: @Composable BoxWithConstraintsScope.() -> Unit
 ) {
-    design.context().switchTheme(theme = theme)
     val timeProvider = DeviceTimeProvider()
     val timeConverter = StandardTimeConverter(timeProvider)
     IvyUI(
+        theme = theme,
         design = design,
         content = content,
         timeConverter = timeConverter,
@@ -69,7 +70,4 @@ fun IvyPreview(
 }
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
-fun defaultDesign(): IvyDesign = object : IvyWalletDesign() {
-    override fun context(): IvyContext = object : IvyContext() {
-    }
-}
+fun defaultDesign(): IvyDesign = object : IvyWalletDesign() {}

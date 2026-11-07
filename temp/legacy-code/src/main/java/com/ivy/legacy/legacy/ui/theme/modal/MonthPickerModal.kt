@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
-import com.ivy.design.utils.thenIf
+import com.ivy.ui.util.thenIf
 import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.data.model.Month
 import com.ivy.legacy.data.model.Month.Companion.monthsList
@@ -33,9 +33,9 @@ import com.ivy.legacy.utils.hideKeyboard
 import com.ivy.legacy.utils.onScreenStart
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.Gradient
-import com.ivy.wallet.ui.theme.Ivy
+import com.ivy.ui.color.Ivy
 import com.ivy.wallet.ui.theme.components.WrapContentRow
-import com.ivy.wallet.ui.theme.findContrastTextColor
+import com.ivy.ui.color.findContrastTextColor
 import java.time.LocalDate
 import java.util.UUID
 

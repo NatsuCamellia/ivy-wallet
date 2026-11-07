@@ -23,10 +23,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
-import com.ivy.design.utils.thenIf
+import com.ivy.ui.util.thenIf
 import com.ivy.legacy.IvyWalletComponentPreview
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Green
+import com.ivy.ui.color.Green
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable

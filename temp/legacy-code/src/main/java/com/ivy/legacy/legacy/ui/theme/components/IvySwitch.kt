@@ -17,7 +17,7 @@ import com.ivy.design.l0_system.UI
 import com.ivy.legacy.IvyWalletComponentPreview
 import com.ivy.legacy.utils.springBounce
 import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.Green
+import com.ivy.ui.color.Green
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable

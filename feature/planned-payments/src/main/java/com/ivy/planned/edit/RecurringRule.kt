@@ -27,7 +27,7 @@ import com.ivy.legacy.utils.formatDateOnly
 import com.ivy.legacy.utils.timeNowUTC
 import com.ivy.legacy.utils.uppercaseLocal
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Orange
+import com.ivy.ui.color.Orange
 import com.ivy.wallet.ui.theme.components.AddPrimaryAttributeButton
 import com.ivy.wallet.ui.theme.components.IvyIcon
 import java.time.LocalDateTime

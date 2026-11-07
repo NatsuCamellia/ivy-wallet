@@ -35,12 +35,12 @@ import com.ivy.design.l0_system.UI
 import com.ivy.legacy.utils.drawColoredShadow
 import com.ivy.legacy.utils.timeNowUTC
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Black
+import com.ivy.ui.color.Black
 import com.ivy.wallet.ui.theme.Gradient
 import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.Green
-import com.ivy.wallet.ui.theme.IvyDark
-import com.ivy.wallet.ui.theme.RedLight
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.IvyDark
+import com.ivy.ui.color.RedLight
 import com.ivy.wallet.ui.theme.components.IvyIcon
 import com.ivy.wallet.ui.theme.toComposeColor
 import kotlinx.collections.immutable.ImmutableList

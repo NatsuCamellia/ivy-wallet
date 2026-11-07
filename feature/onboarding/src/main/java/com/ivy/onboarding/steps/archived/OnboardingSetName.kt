@@ -44,7 +44,7 @@ import com.ivy.legacy.utils.onScreenStart
 import com.ivy.legacy.utils.springBounceSlow
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.GradientIvy
-import com.ivy.wallet.ui.theme.White
+import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.IvyOutlinedTextField
 import com.ivy.wallet.ui.theme.components.OnboardingButton
 

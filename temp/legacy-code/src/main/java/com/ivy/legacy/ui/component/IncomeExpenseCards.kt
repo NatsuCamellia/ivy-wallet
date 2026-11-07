@@ -30,12 +30,12 @@ import com.ivy.legacy.utils.format
 import com.ivy.ui.R
 import com.ivy.wallet.domain.data.IvyCurrency
 import com.ivy.wallet.ui.theme.Gradient
-import com.ivy.wallet.ui.theme.Green
+import com.ivy.ui.color.Green
 import com.ivy.wallet.ui.theme.MediumBlack
 import com.ivy.wallet.ui.theme.MediumWhite
 import com.ivy.wallet.ui.theme.components.IvyButton
-import com.ivy.wallet.ui.theme.findContrastTextColor
-import com.ivy.wallet.ui.theme.isDarkColor
+import com.ivy.ui.color.findContrastTextColor
+import com.ivy.ui.color.isDarkColor
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Suppress("ParameterNaming")

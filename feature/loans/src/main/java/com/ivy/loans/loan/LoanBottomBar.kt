@@ -34,11 +34,11 @@ import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.utils.navigationBarInset
 import com.ivy.legacy.utils.toDensityPx
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Blue
+import com.ivy.ui.color.Blue
 import com.ivy.wallet.ui.theme.GradientPurple
-import com.ivy.wallet.ui.theme.Green
+import com.ivy.ui.color.Green
 import com.ivy.wallet.ui.theme.Purple
-import com.ivy.wallet.ui.theme.White
+import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.IvyCircleButton
 import com.ivy.wallet.ui.theme.components.IvyIcon
 import com.ivy.wallet.ui.theme.pureBlur

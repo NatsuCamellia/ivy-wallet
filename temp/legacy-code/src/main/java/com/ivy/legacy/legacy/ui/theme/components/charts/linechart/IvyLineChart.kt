@@ -33,8 +33,8 @@ import com.ivy.legacy.IvyWalletComponentPreview
 import com.ivy.legacy.data.model.Month
 import com.ivy.legacy.utils.lerp
 import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.Green
-import com.ivy.wallet.ui.theme.Ivy
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.Ivy
 import timber.log.Timber
 import java.text.DecimalFormat
 import kotlin.math.pow

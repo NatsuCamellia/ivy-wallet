@@ -14,7 +14,7 @@ import com.ivy.wallet.ui.theme.Gradient
 import com.ivy.wallet.ui.theme.components.IvyBorderButton
 import com.ivy.wallet.ui.theme.components.IvyButton
 import com.ivy.wallet.ui.theme.components.getCustomIconIdS
-import com.ivy.wallet.ui.theme.findContrastTextColor
+import com.ivy.ui.color.findContrastTextColor
 import com.ivy.wallet.ui.theme.toComposeColor
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")

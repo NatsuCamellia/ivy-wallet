@@ -24,7 +24,7 @@ import com.ivy.legacy.utils.format
 import com.ivy.legacy.utils.formatLocal
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.Green
+import com.ivy.ui.color.Green
 import java.time.LocalDate
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")

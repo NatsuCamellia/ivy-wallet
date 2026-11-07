@@ -1,74 +1,22 @@
 package com.ivy.wallet.ui.theme
 
-import androidx.annotation.ColorInt
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.ColorUtils
 import com.ivy.design.l0_system.UI
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val White = Color(0xFFFAFAFA)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val Black = Color(0xFF111114)
-
-// Primary
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val Ivy = Color(0xFF6B4DFF)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val Blue = Color(0xFF4CC3FF)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val Green = Color(0xFF14CC9E)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val Orange = Color(0xFFF29F30)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val Red = Color(0xFFFF4060)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val Red3 = Color(0xFFFF4CA6)
-
-// Light
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val IvyLight = Color(0xFFD5CCFF)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val GreenLight = Color(0xFFAAF2E0)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val OrangeLight = Color(0xFFFFDEB3)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val RedLight = Color(0xFFFFCCD5)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val Red3Light = Color(0xFFFFCCE6)
-
-// Dark
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val IvyDark = Color(0xFF352680)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val Purple1Dark = Color(0xFF622680)
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.Ivy
+import com.ivy.ui.color.Orange
+import com.ivy.ui.color.Red
 
 val Purple = Color(0xFFA020F0)
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val GreenDark = Color(0xFF0A664F)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-val OrangeDark = Color(0xFF734B17)
 // --------------------------------------------------------------------------------------------------
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
@@ -172,106 +120,6 @@ data class Gradient(
 
     @Deprecated("Old design system. Use `:ivy-design` and Material3")
     fun asVerticalBrush() = Brush.verticalGradient(colors = listOf(startColor, endColor))
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-fun findContrastTextColor(backgroundColor: Color): Color {
-    return if (isDarkColor(backgroundColor.toArgb())) White else Black
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-fun isDarkColor(color: Color): Boolean {
-    return isDarkColor(color.toArgb())
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-fun isDarkColor(@ColorInt color: Int): Boolean {
-    return ColorUtils.calculateLuminance(color) <= 0.5
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-fun Color.dynamicContrast(): Color {
-    val pickedColor = this.toHSVSpec()
-
-    return when {
-        pickedColor.s >= 0.5f && pickedColor.v >= 0.4f -> {
-            // Primary
-            if (isDarkColor(this)) {
-                lighten()
-            } else {
-                darken()
-            }
-        }
-
-        pickedColor.s <= 0.5f && pickedColor.v >= 0.8f -> {
-            // Light
-            darken()
-        }
-
-        pickedColor.s >= 0.1f && pickedColor.v <= 0.6f -> {
-            // Dark
-            lighten()
-        }
-
-        else -> {
-            if (isDarkColor(this)) {
-                lighten()
-            } else {
-                darken()
-            }
-        }
-    }
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-fun Color.lighten(): Color {
-    return this.hsv(
-        s = 0.3f,
-        v = 1f
-    )
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-fun Color.darken(): Color {
-    return this.hsv(
-        s = 0.6f,
-        v = 0.5f
-    )
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-fun Color.toHSVSpec(): HSVSpec {
-    val hsv = FloatArray(3)
-    val color: Int = this.toArgb()
-    android.graphics.Color.colorToHSV(color, hsv)
-    return HSVSpec(hsv[0], hsv[1], hsv[2])
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-data class HSVSpec(
-    val h: Float,
-    val s: Float,
-    val v: Float
-)
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-fun Color.hsv(
-    h: Float? = null,
-    s: Float,
-    v: Float
-): Color {
-    val hsv = FloatArray(3)
-    val color: Int = this.toArgb()
-    android.graphics.Color.colorToHSV(color, hsv)
-
-    if (h != null) {
-        hsv[0] = h
-    }
-
-    hsv[1] = s
-    hsv[2] = v
-
-    return Color(android.graphics.Color.HSVToColor(hsv))
 }
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")

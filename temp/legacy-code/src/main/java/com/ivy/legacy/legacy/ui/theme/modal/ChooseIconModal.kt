@@ -38,11 +38,11 @@ import com.ivy.design.l1_buildingBlocks.SpacerVer
 import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.utils.hideKeyboard
 import com.ivy.legacy.utils.onScreenStart
-import com.ivy.design.utils.thenIf
+import com.ivy.ui.util.thenIf
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Ivy
+import com.ivy.ui.color.Ivy
 import com.ivy.wallet.ui.theme.components.ItemIconS
-import com.ivy.wallet.ui.theme.dynamicContrast
+import com.ivy.ui.color.dynamicContrast
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import java.util.UUID

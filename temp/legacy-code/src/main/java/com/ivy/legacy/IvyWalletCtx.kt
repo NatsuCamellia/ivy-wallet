@@ -2,11 +2,12 @@ package com.ivy.legacy
 
 import android.net.Uri
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.ivy.design.IvyContext
 import com.ivy.base.legacy.SharedPrefs
+import com.ivy.base.legacy.Theme
 import com.ivy.data.model.Category
 import com.ivy.legacy.datamodel.Account
 import java.time.LocalDate
@@ -17,7 +18,28 @@ import javax.inject.Singleton
 
 @Deprecated("Legacy code. Don't use it, please.")
 @Singleton
-class IvyWalletCtx @Inject constructor() : IvyContext() {
+class IvyWalletCtx @Inject constructor() {
+    @Deprecated("Old design system. Use `:ivy-design` and Material3")
+    var theme: Theme by mutableStateOf(Theme.LIGHT)
+        private set
+
+    @Deprecated("Old design system. Use `:ivy-design` and Material3")
+    var screenWidth: Int = -1
+        get() {
+            return if (field > 0) field else throw IllegalStateException("screenWidth not initialized")
+        }
+
+    @Deprecated("Old design system. Use `:ivy-design` and Material3")
+    var screenHeight: Int = -1
+        get() {
+            return if (field > 0) field else throw IllegalStateException("screenHeight not initialized")
+        }
+
+    @Deprecated("Old design system. Use `:ivy-design` and Material3")
+    fun switchTheme(theme: Theme) {
+        this.theme = theme
+    }
+
     // ------------------------------------------ State ---------------------------------------------
     @Deprecated("Legacy code. Don't use it, please.")
     var startDayOfMonth = 1
@@ -162,3 +184,5 @@ class IvyWalletCtx @Inject constructor() : IvyContext() {
         accountsListState = null
     }
 }
+
+val LocalWalletCtx = compositionLocalOf<IvyWalletCtx> { error("No LocalWalletCtx") }

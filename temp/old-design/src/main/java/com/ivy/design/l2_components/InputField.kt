@@ -24,6 +24,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.widget.addTextChangedListener
 import com.ivy.design.l0_system.*
 import com.ivy.design.utils.*
+import com.ivy.ui.color.Purple1Dark
+import com.ivy.ui.color.Purple1Light
 import kotlin.math.roundToInt
 
 /**

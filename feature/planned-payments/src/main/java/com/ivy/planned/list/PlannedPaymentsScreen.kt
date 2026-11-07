@@ -19,7 +19,7 @@ import com.ivy.data.model.CategoryId
 import com.ivy.data.model.IntervalType
 import com.ivy.data.model.primitive.ColorInt
 import com.ivy.data.model.primitive.NotBlankTrimmedString
-import com.ivy.design.l0_system.Purple
+import com.ivy.ui.color.Purple
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.legacy.IvyWalletPreview
@@ -31,8 +31,8 @@ import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
 import com.ivy.ui.rememberScrollPositionListState
-import com.ivy.wallet.ui.theme.Green
-import com.ivy.wallet.ui.theme.Orange
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.Orange
 import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDateTime
 import java.time.ZoneOffset

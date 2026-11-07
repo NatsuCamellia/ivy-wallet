@@ -17,7 +17,7 @@ import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.legacy.IvyWalletPreview
-import com.ivy.wallet.ui.theme.Red
+import com.ivy.ui.color.Red
 import java.util.UUID
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")

@@ -41,8 +41,8 @@ import com.ivy.navigation.navigation
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.Gradient
 import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.Orange
-import com.ivy.wallet.ui.theme.White
+import com.ivy.ui.color.Orange
+import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.BalanceRow
 import com.ivy.wallet.ui.theme.components.IvyCircleButton
 import com.ivy.wallet.ui.theme.components.IvyDividerLine

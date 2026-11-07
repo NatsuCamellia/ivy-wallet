@@ -14,6 +14,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.design.l0_system.UI
 import com.ivy.legacy.IvyWalletComponentPreview
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.Ivy
+import com.ivy.ui.color.Orange
+import com.ivy.ui.color.Red
 import com.ivy.wallet.ui.theme.*
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")

@@ -57,7 +57,6 @@ fun ActionSheet(
     val scope = rememberCoroutineScope()
     val currentOnDismiss by rememberUpdatedState(onDismiss)
     var finished by remember { mutableStateOf(false) }
-    var hiding by remember { mutableStateOf(false) }
     val finish: () -> Unit = {
         if (!finished) {
             finished = true
@@ -65,11 +64,8 @@ fun ActionSheet(
         }
     }
     val dismiss: () -> Unit = {
-        if (!hiding) {
-            hiding = true
-            scope.launch { sheetState.hide() }.invokeOnCompletion {
-                if (!sheetState.isVisible) finish()
-            }
+        scope.launch { sheetState.hide() }.invokeOnCompletion {
+            if (!sheetState.isVisible) finish()
         }
     }
 

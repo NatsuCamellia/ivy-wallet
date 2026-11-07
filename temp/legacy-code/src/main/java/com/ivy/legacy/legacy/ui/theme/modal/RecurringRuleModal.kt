@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.data.model.IntervalType
 import com.ivy.design.api.LocalTimeProvider
 import com.ivy.design.l0_system.UI
@@ -400,14 +401,15 @@ private fun IvyWalletCtx.pickDate(
     }
 }
 
+@Suppress("MagicNumber")
 @Preview
 @Composable
-private fun Preview_oneTime() {
-    IvyWalletPreview {
+private fun Preview_oneTime(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         BoxWithConstraints(Modifier.padding(bottom = 48.dp)) {
             RecurringRuleModal(
                 modal = RecurringRuleModalData(
-                    initialStartDate = null,
+                    initialStartDate = LocalDateTime.of(2026, 1, 15, 12, 0),
                     initialIntervalN = null,
                     initialIntervalType = null,
                     initialOneTime = true
@@ -419,14 +421,15 @@ private fun Preview_oneTime() {
     }
 }
 
+@Suppress("MagicNumber")
 @Preview
 @Composable
-private fun Preview_multipleTimes() {
-    IvyWalletPreview {
+private fun Preview_multipleTimes(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         BoxWithConstraints(Modifier.padding(bottom = 48.dp)) {
             RecurringRuleModal(
                 modal = RecurringRuleModalData(
-                    initialStartDate = null,
+                    initialStartDate = LocalDateTime.of(2026, 1, 15, 12, 0),
                     initialIntervalN = null,
                     initialIntervalType = null,
                     initialOneTime = false
@@ -436,4 +439,16 @@ private fun Preview_multipleTimes() {
             )
         }
     }
+}
+
+/** For screenshot testing */
+@Composable
+fun RecurringRuleModalOneTimeUiTest(isDark: Boolean) {
+    Preview_oneTime(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing */
+@Composable
+fun RecurringRuleModalMultipleTimesUiTest(isDark: Boolean) {
+    Preview_multipleTimes(if (isDark) Theme.DARK else Theme.LIGHT)
 }

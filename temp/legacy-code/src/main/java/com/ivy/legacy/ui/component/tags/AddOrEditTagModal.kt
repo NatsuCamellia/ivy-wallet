@@ -26,16 +26,23 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.toArgb
 import arrow.core.raise.either
+import com.ivy.base.legacy.Theme
 import com.ivy.data.model.Tag
+import com.ivy.data.model.primitive.ColorInt
 import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.data.model.TagId
+import com.ivy.legacy.IvyWalletPreview
+import com.ivy.wallet.ui.theme.Ivy
 import com.ivy.wallet.ui.theme.components.DeleteButton
 import com.ivy.wallet.ui.theme.components.IvyTitleTextField
 import com.ivy.wallet.ui.theme.modal.IvyModal
 import com.ivy.wallet.ui.theme.modal.ModalPositiveButton
 import com.ivy.wallet.ui.theme.modal.ModalTitle
 import com.ivy.ui.R
+import java.time.Instant
+import java.util.UUID
 
 @Suppress("DEPRECATION")
 @SuppressLint("ComposeModifierMissing")
@@ -142,5 +149,41 @@ fun BoxWithConstraintsScope.AddOrEditTagModal(
         LaunchedEffect(titleFocus) {
             titleFocus.requestFocus()
         }
+    }
+}
+
+/** For screenshot testing */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun AddOrEditTagModalUiTest(isDark: Boolean) {
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        AddOrEditTagModal(
+            id = TagId(UUID.fromString("00000000-0000-0000-0000-000000000001")),
+            visible = true,
+            onDismiss = {}
+        )
+    }
+}
+
+/** For screenshot testing */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun EditTagModalUiTest(isDark: Boolean) {
+    val tag = Tag(
+        id = TagId(UUID.fromString("00000000-0000-0000-0000-000000000001")),
+        name = NotBlankTrimmedString.unsafe("Groceries"),
+        description = null,
+        color = ColorInt(Ivy.toArgb()),
+        icon = null,
+        orderNum = 0.0,
+        creationTimestamp = Instant.parse("2026-01-15T12:00:00Z"),
+    )
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        AddOrEditTagModal(
+            id = tag.id,
+            visible = true,
+            initialTag = tag,
+            onDismiss = {}
+        )
     }
 }

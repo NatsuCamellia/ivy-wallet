@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.legacy.IvyWalletPreview
@@ -74,8 +75,8 @@ fun BoxWithConstraintsScope.NameModal(
 
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletPreview {
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         NameModal(
             visible = true,
             name = "Iliyan",
@@ -83,4 +84,10 @@ private fun Preview() {
         ) {
         }
     }
+}
+
+/** For screenshot testing */
+@Composable
+fun NameModalUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT)
 }

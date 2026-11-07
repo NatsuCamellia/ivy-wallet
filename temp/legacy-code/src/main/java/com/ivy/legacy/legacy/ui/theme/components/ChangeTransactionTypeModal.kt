@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.base.model.TransactionType
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
@@ -209,8 +210,8 @@ private fun TransactionTypeButton(
 
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletPreview {
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         ChangeTransactionTypeModal(
             includeTransferType = true,
             visible = true,
@@ -219,4 +220,10 @@ private fun Preview() {
         ) {
         }
     }
+}
+
+/** For screenshot testing */
+@Composable
+fun ChangeTransactionTypeModalUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT)
 }

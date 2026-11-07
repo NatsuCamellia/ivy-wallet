@@ -8,7 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
+import com.ivy.legacy.IvyWalletPreview
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.components.BufferBattery
 import com.ivy.wallet.ui.theme.modal.edit.AmountModal
@@ -79,5 +81,17 @@ fun BoxWithConstraintsScope.BufferModal(
         dismiss = { amountModalVisible = false }
     ) {
         newBufferAmount = it
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun BufferModalUiTest(isDark: Boolean) {
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        BufferModal(
+            modal = BufferModalData(balance = 1250.0, buffer = 500.0, currency = "BGN"),
+            dismiss = {},
+            onBufferChanged = {}
+        )
     }
 }

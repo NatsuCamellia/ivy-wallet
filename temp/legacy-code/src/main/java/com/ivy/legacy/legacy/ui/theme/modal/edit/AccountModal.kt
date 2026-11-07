@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.domain.legacy.ui.IvyColorPicker
@@ -339,13 +340,41 @@ private fun AccountCurrency(
 
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletPreview {
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         AccountModal(
             modal = AccountModalData(
                 account = null,
                 baseCurrency = "BGN",
                 balance = 0.0
+            ),
+            onCreateAccount = { },
+            onEditAccount = { _, _ -> }
+        ) {
+        }
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun AccountModalUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing */
+@Composable
+fun EditAccountModalUiTest(isDark: Boolean) {
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        AccountModal(
+            modal = AccountModalData(
+                account = Account(
+                    name = "Cash",
+                    color = Ivy.toArgb(),
+                    currency = "BGN",
+                    id = UUID.fromString("00000000-0000-0000-0000-000000000001")
+                ),
+                baseCurrency = "BGN",
+                balance = 1250.0
             ),
             onCreateAccount = { },
             onEditAccount = { _, _ -> }

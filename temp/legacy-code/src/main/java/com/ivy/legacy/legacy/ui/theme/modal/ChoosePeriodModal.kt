@@ -27,11 +27,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.data.model.IntervalType
 import com.ivy.design.api.LocalTimeConverter
 import com.ivy.design.api.LocalTimeProvider
@@ -59,6 +61,8 @@ import com.ivy.wallet.ui.theme.components.IntervalPickerRow
 import com.ivy.wallet.ui.theme.components.IvyDividerLine
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 import java.util.concurrent.TimeUnit
@@ -160,7 +164,7 @@ fun BoxWithConstraintsScope.ChoosePeriodModal(
 }
 
 @Composable
-@Suppress("ParameterNaming")
+@Suppress("ParameterNaming", "MagicNumber")
 private fun ColumnScope.ChooseMonth(
     selectedMonthYear: MonthYear?,
     onSelected: (MonthYear) -> Unit,
@@ -177,7 +181,8 @@ private fun ColumnScope.ChooseMonth(
 
     Spacer(Modifier.height(24.dp))
 
-    val currentYear = dateNowUTC().year
+    val today = if (LocalInspectionMode.current) LocalDate.of(2026, 1, 15) else dateNowUTC()
+    val currentYear = today.year
     val months = remember(currentYear) {
         monthsList()
             .map {
@@ -204,7 +209,7 @@ private fun ColumnScope.ChooseMonth(
             }
         } else {
             val currentMonthYear = MonthYear(
-                month = fromMonthValue(dateNowUTC().monthValue),
+                month = fromMonthValue(today.monthValue),
                 year = currentYear
             )
             val currentMonthIndex = months.indexOf(currentMonthYear)
@@ -541,12 +546,13 @@ private fun ColumnScope.AllTime(
 
 @Preview
 @Composable
-private fun Preview_MonthSelected() {
-    IvyWalletPreview {
+private fun Preview_MonthSelected(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         ChoosePeriodModal(
             modal = ChoosePeriodModalData(
                 period = TimePeriod(
-                    month = fromMonthValue(3)
+                    month = fromMonthValue(3),
+                    year = 2026
                 )
             ),
             dismiss = {}
@@ -558,15 +564,14 @@ private fun Preview_MonthSelected() {
 @Suppress("MagicNumber")
 @Preview
 @Composable
-private fun Preview_FromTo() {
-    IvyWalletPreview {
+private fun Preview_FromTo(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         ChoosePeriodModal(
             modal = ChoosePeriodModalData(
                 period = TimePeriod(
                     fromToRange = FromToTimeRange(
-                        from = LocalTimeProvider.current.utcNow(),
-                        to = LocalTimeProvider.current.utcNow()
-                            .plusSeconds(TimeUnit.DAYS.toSeconds(36L))
+                        from = Instant.parse("2026-01-15T12:00:00Z"),
+                        to = Instant.parse("2026-02-20T12:00:00Z")
                     )
                 )
             ),
@@ -578,8 +583,8 @@ private fun Preview_FromTo() {
 
 @Preview
 @Composable
-private fun Preview_LastN() {
-    IvyWalletPreview {
+private fun Preview_LastN(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         ChoosePeriodModal(
             modal = ChoosePeriodModalData(
                 period = TimePeriod(
@@ -593,4 +598,22 @@ private fun Preview_LastN() {
         ) {
         }
     }
+}
+
+/** For screenshot testing */
+@Composable
+fun ChoosePeriodModalMonthUiTest(isDark: Boolean) {
+    Preview_MonthSelected(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing */
+@Composable
+fun ChoosePeriodModalFromToUiTest(isDark: Boolean) {
+    Preview_FromTo(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing */
+@Composable
+fun ChoosePeriodModalLastNUiTest(isDark: Boolean) {
+    Preview_LastN(if (isDark) Theme.DARK else Theme.LIGHT)
 }

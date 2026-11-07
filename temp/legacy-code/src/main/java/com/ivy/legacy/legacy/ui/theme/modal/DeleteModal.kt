@@ -22,8 +22,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
+import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.utils.hideKeyboard
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.Red
@@ -163,5 +165,35 @@ fun BoxWithConstraintsScope.DeleteConfirmationModal(
         }
 
         Spacer(Modifier.height(48.dp))
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun DeleteModalUiTest(isDark: Boolean) {
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        DeleteModal(
+            title = "Delete account?",
+            description = "This will delete the account and all of its transactions.",
+            visible = true,
+            dismiss = {},
+            onDelete = {}
+        )
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun DeleteConfirmationModalUiTest(isDark: Boolean) {
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        DeleteConfirmationModal(
+            title = "Delete account?",
+            description = "Type the account name to confirm the deletion.",
+            visible = true,
+            enableDeletionButton = false,
+            onAccountNameChange = {},
+            dismiss = {},
+            onDelete = {}
+        )
     }
 }

@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.data.model.Category
 import com.ivy.data.model.CategoryId
 import com.ivy.data.model.primitive.ColorInt
@@ -287,8 +288,8 @@ private class AddNewCategory
 @ExperimentalFoundationApi
 @Preview
 @Composable
-private fun PreviewChooseCategoryModal() {
-    IvyWalletPreview {
+private fun PreviewChooseCategoryModal(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         val categories = mutableListOf(
             Category(
                 name = NotBlankTrimmedString.unsafe("Test"),
@@ -322,4 +323,11 @@ private fun PreviewChooseCategoryModal() {
         ) {
         }
     }
+}
+
+/** For screenshot testing */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ChooseCategoryModalUiTest(isDark: Boolean) {
+    PreviewChooseCategoryModal(if (isDark) Theme.DARK else Theme.LIGHT)
 }

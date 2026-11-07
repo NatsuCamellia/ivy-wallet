@@ -88,6 +88,7 @@ import com.ivy.wallet.ui.theme.toComposeColor
 import com.ivy.wallet.ui.theme.wallet.AmountCurrencyB1
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import java.util.UUID
 
 @Composable
@@ -911,4 +912,18 @@ fun CategoriesScreenWithSearchBarCompactUiTest(isDark: Boolean) {
         false -> Theme.LIGHT
     }
     Preview(theme, compactModeEnabled = true, displaySearchBarEnabled = true)
+}
+
+/** For screenshot testing */
+@Composable
+fun SortModalUiTest(isDark: Boolean) {
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        SortModal(
+            items = SortOrder.entries.toImmutableList(),
+            visible = true,
+            initialType = SortOrder.DEFAULT,
+            dismiss = {},
+            onSortOrderChange = {}
+        )
+    }
 }

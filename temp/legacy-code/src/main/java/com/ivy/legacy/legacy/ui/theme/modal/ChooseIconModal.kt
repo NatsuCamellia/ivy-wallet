@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.design.l1_buildingBlocks.DividerW
@@ -330,8 +331,8 @@ private fun Section(
 
 @Preview
 @Composable
-private fun ChooseIconModal() {
-    IvyWalletPreview {
+private fun ChooseIconModal(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         ChooseIconModal(
             visible = true,
             initialIcon = "gift",
@@ -748,3 +749,9 @@ fun ivyIcons(): List<Any> = listOf(
     "ic_vue_weather_cold",
     "ic_vue_weather_sun",
 )
+
+/** For screenshot testing */
+@Composable
+fun ChooseIconModalUiTest(isDark: Boolean) {
+    ChooseIconModal(if (isDark) Theme.DARK else Theme.LIGHT)
+}

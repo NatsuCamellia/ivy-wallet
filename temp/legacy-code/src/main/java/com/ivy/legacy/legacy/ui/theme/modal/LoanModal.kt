@@ -34,6 +34,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.data.model.LoanType
 import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.design.api.LocalTimeConverter
@@ -652,8 +653,8 @@ private fun save(
 
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletPreview {
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         LoanModal(
             modal = LoanModalData(
                 loan = null,
@@ -663,7 +664,41 @@ private fun Preview() {
             onEditLoan = { _, _ -> },
             onSetTime = { },
             onSetDate = { },
-            dateTime = Instant.now()
+            dateTime = Instant.parse("2026-01-15T12:00:00Z")
+        ) {
+        }
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun LoanModalUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing */
+@Suppress("MagicNumber")
+@Composable
+fun EditLoanModalUiTest(isDark: Boolean) {
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        LoanModal(
+            modal = LoanModalData(
+                loan = Loan(
+                    name = "Car loan",
+                    amount = 5000.0,
+                    type = LoanType.LEND,
+                    color = Ivy.toArgb(),
+                    note = "Paid back in installments",
+                    dateTime = LocalDateTime.of(2026, 1, 15, 12, 0),
+                    id = UUID.fromString("00000000-0000-0000-0000-000000000001")
+                ),
+                baseCurrency = "BGN",
+            ),
+            onCreateLoan = { },
+            onEditLoan = { _, _ -> },
+            onSetTime = { },
+            onSetDate = { },
+            dateTime = Instant.parse("2026-01-15T12:00:00Z")
         ) {
         }
     }

@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.design.utils.hideKeyboard
@@ -139,8 +140,8 @@ fun BoxWithConstraintsScope.DescriptionModal(
 
 @Preview
 @Composable
-private fun PreviewDescriptionModal_emptyText() {
-    IvyWalletPreview {
+private fun PreviewDescriptionModal_emptyText(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         DescriptionModal(
             visible = true,
             description = "",
@@ -148,4 +149,10 @@ private fun PreviewDescriptionModal_emptyText() {
         ) {
         }
     }
+}
+
+/** For screenshot testing */
+@Composable
+fun DescriptionModalUiTest(isDark: Boolean) {
+    PreviewDescriptionModal_emptyText(if (isDark) Theme.DARK else Theme.LIGHT)
 }

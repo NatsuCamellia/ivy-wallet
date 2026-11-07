@@ -27,19 +27,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.toArgb
+import com.ivy.base.legacy.Theme
 import com.ivy.data.model.Tag
 import com.ivy.data.model.TagId
+import com.ivy.data.model.primitive.ColorInt
+import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.data.repository.mapper.TagMapper.Companion.createNewTagId
 import com.ivy.design.l0_system.Blue2Dark
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.design.utils.thenIf
+import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.ui.SearchInput
 import com.ivy.legacy.utils.drawColoredShadow
 import com.ivy.legacy.utils.hideKeyboard
 import com.ivy.legacy.utils.onScreenStart
 import com.ivy.legacy.utils.selectEndTextFieldValue
 import com.ivy.wallet.ui.theme.Gradient
+import com.ivy.wallet.ui.theme.Ivy
 import com.ivy.wallet.ui.theme.components.IvyBorderButton
 import com.ivy.wallet.ui.theme.components.IvyCircleButton
 import com.ivy.wallet.ui.theme.findContrastTextColor
@@ -49,8 +55,11 @@ import com.ivy.wallet.ui.theme.modal.ModalPositiveButton
 import com.ivy.wallet.ui.theme.modal.ModalTitle
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.components.WrapContentRow
+import java.time.Instant
 import kotlinx.collections.immutable.ImmutableList
 import java.util.UUID
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 
 @ExperimentalFoundationApi
 @Suppress("ParameterNaming")
@@ -333,3 +342,34 @@ private fun AddNewTagButton(
 }
 
 private class AddNewTag
+
+/** For screenshot testing */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ShowTagModalUiTest(isDark: Boolean) {
+    val tags = listOf("Groceries", "Travel", "Work", "Gifts").mapIndexed { index, name ->
+        Tag(
+            id = TagId(UUID.fromString("00000000-0000-0000-0000-00000000000${index + 1}")),
+            name = NotBlankTrimmedString.unsafe(name),
+            description = null,
+            color = ColorInt(Ivy.toArgb()),
+            icon = null,
+            orderNum = index.toDouble(),
+            creationTimestamp = Instant.parse("2026-01-15T12:00:00Z"),
+        )
+    }
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        ShowTagModal(
+            visible = true,
+            onDismiss = {},
+            allTagList = tags.toImmutableList(),
+            selectedTagList = persistentListOf(tags[1].id),
+            onTagAdd = {},
+            onTagEdit = { _, _ -> },
+            onTagDelete = {},
+            onTagSelected = {},
+            onTagDeSelected = {},
+            onTagSearch = {}
+        )
+    }
+}

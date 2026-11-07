@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.domain.di.FeaturesEntryPoint
@@ -327,14 +329,18 @@ fun AmountKeyboard(
      * Layout changes are rare, so recomposition has minimal impact on performance.
      **/
 
-    val context = LocalContext.current
-    val features = remember {
-        EntryPointAccessors.fromApplication(
-            context.applicationContext,
-            FeaturesEntryPoint::class.java
-        ).getFeatures()
+    val isStandardLayout = if (LocalInspectionMode.current) {
+        false
+    } else {
+        val context = LocalContext.current
+        val features = remember {
+            EntryPointAccessors.fromApplication(
+                context.applicationContext,
+                FeaturesEntryPoint::class.java
+            ).getFeatures()
+        }
+        features.standardKeypadLayout.asEnabledState()
     }
-    val isStandardLayout = features.standardKeypadLayout.asEnabledState()
 
     // Decide the order of the numbers based on the keypad layout
     val countButtonValues = if (isStandardLayout) {
@@ -491,8 +497,8 @@ private fun circleButtonModifier(
 
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletPreview {
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         BoxWithConstraints(
             modifier = Modifier.padding(bottom = modalPreviewActionRowHeight())
         ) {
@@ -506,4 +512,10 @@ private fun Preview() {
             }
         }
     }
+}
+
+/** For screenshot testing */
+@Composable
+fun AmountModalUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT)
 }

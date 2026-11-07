@@ -34,7 +34,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import arrow.core.raise.either
+import com.ivy.base.legacy.Theme
 import com.ivy.data.model.Category
+import com.ivy.data.model.CategoryId
 import com.ivy.data.model.primitive.ColorInt
 import com.ivy.data.model.primitive.IconAsset
 import com.ivy.data.model.primitive.NotBlankTrimmedString
@@ -237,10 +239,37 @@ fun IconNameRow(
 
 @Preview
 @Composable
-private fun PreviewCategoryModal() {
-    IvyWalletPreview {
+private fun PreviewCategoryModal(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         CategoryModal(
             modal = CategoryModalData(null),
+            onCreateCategory = { },
+            onEditCategory = { }
+        ) {
+        }
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun CategoryModalUiTest(isDark: Boolean) {
+    PreviewCategoryModal(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing */
+@Composable
+fun EditCategoryModalUiTest(isDark: Boolean) {
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        CategoryModal(
+            modal = CategoryModalData(
+                Category(
+                    name = NotBlankTrimmedString.unsafe("Groceries"),
+                    color = ColorInt(Ivy.toArgb()),
+                    icon = null,
+                    id = CategoryId(UUID.fromString("00000000-0000-0000-0000-000000000001")),
+                    orderNum = 0.0,
+                )
+            ),
             onCreateCategory = { },
             onEditCategory = { }
         ) {

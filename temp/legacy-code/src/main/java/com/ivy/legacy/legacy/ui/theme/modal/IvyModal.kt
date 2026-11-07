@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.utils.rememberInteractionSource
 import com.ivy.legacy.IvyWalletPreview
@@ -321,8 +322,8 @@ fun ModalActionsRow(
 
 @Preview
 @Composable
-private fun PreviewIvyModal_minimal() {
-    IvyWalletPreview {
+private fun PreviewIvyModal_minimal(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         IvyModal(
             id = UUID.randomUUID(),
             visible = true,
@@ -351,3 +352,9 @@ fun ModalPreviewActionRowSpacer() {
 
 @Composable
 fun modalPreviewActionRowHeight() = 80.dp
+
+/** For screenshot testing */
+@Composable
+fun IvyModalUiTest(isDark: Boolean) {
+    PreviewIvyModal_minimal(if (isDark) Theme.DARK else Theme.LIGHT)
+}

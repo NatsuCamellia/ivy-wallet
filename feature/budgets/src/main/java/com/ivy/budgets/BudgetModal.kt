@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.data.model.Category
 import com.ivy.data.model.CategoryId
 import com.ivy.data.model.primitive.ColorInt
@@ -266,8 +267,8 @@ private fun CategoriesRow(
 
 @Preview
 @Composable
-private fun Preview_create() {
-    IvyWalletPreview {
+private fun Preview_create(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         val cat1 = Category(
             name = NotBlankTrimmedString.unsafe("Science"),
             color = ColorInt(Purple1Dark.toArgb()),
@@ -309,8 +310,8 @@ private fun Preview_create() {
 
 @Preview
 @Composable
-private fun Preview_edit() {
-    IvyWalletPreview {
+private fun Preview_edit(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         val cat1 = Category(
             name = NotBlankTrimmedString.unsafe("Science"),
             color = ColorInt(Purple1Dark.toArgb()),
@@ -354,4 +355,16 @@ private fun Preview_edit() {
         ) {
         }
     }
+}
+
+/** For screenshot testing */
+@Composable
+fun BudgetModalCreateUiTest(isDark: Boolean) {
+    Preview_create(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing */
+@Composable
+fun BudgetModalEditUiTest(isDark: Boolean) {
+    Preview_edit(if (isDark) Theme.DARK else Theme.LIGHT)
 }

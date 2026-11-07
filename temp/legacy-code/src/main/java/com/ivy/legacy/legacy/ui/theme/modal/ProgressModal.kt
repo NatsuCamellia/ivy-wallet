@@ -13,8 +13,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
+import com.ivy.legacy.IvyWalletPreview
 import com.ivy.wallet.ui.theme.Red
 import java.util.UUID
 
@@ -70,5 +72,17 @@ fun BoxWithConstraintsScope.ProgressModal(
         )
 
         Spacer(Modifier.height(48.dp))
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun ProgressModalUiTest(isDark: Boolean) {
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        ProgressModal(
+            title = "Exporting data",
+            description = "This may take a few minutes. Please do not close the app.",
+            visible = true
+        )
     }
 }

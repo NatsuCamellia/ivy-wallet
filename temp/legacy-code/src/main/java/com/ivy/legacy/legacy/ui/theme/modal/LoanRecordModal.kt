@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.base.model.LoanRecordType
 import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.design.api.LocalTimeConverter
@@ -662,8 +663,8 @@ private fun AddAccount(
 
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletPreview {
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         LoanRecordModal(
             modal = LoanRecordModalData(
                 loanRecord = null,
@@ -675,7 +676,40 @@ private fun Preview() {
             dismiss = {},
             onSetDate = {},
             onSetTime = {},
-            dateTime = Instant.now()
+            dateTime = Instant.parse("2026-01-15T12:00:00Z")
+        )
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun LoanRecordModalUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing */
+@Composable
+fun EditLoanRecordModalUiTest(isDark: Boolean) {
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        LoanRecordModal(
+            modal = LoanRecordModalData(
+                loanRecord = LoanRecord(
+                    loanId = UUID.fromString("00000000-0000-0000-0000-000000000002"),
+                    amount = 300.0,
+                    note = "First installment",
+                    dateTime = Instant.parse("2026-01-15T12:00:00Z"),
+                    loanRecordType = LoanRecordType.DECREASE,
+                    id = UUID.fromString("00000000-0000-0000-0000-000000000001")
+                ),
+                baseCurrency = "BGN"
+            ),
+            onCreate = {},
+            onEdit = {},
+            onDelete = {},
+            dismiss = {},
+            onSetDate = {},
+            onSetTime = {},
+            dateTime = Instant.parse("2026-01-15T12:00:00Z")
         )
     }
 }

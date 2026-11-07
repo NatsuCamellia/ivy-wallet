@@ -22,8 +22,10 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
+import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.utils.numberBetween
 import com.ivy.legacy.utils.swap
 import com.ivy.ui.R
@@ -388,5 +390,38 @@ private fun <T : Reorderable> calculateOrderNum(
         }
 
         else -> 0.0
+    }
+}
+
+private data class ReorderItem(val name: String, val orderNum: Double) : Reorderable {
+    override fun getItemOrderNum(): Double = orderNum
+
+    override fun withNewOrderNum(newOrderNum: Double): Reorderable = copy(orderNum = newOrderNum)
+}
+
+/** For screenshot testing */
+@Suppress("ModifierMissing")
+@Composable
+fun ReorderModalUiTest(isDark: Boolean) {
+    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        ReorderModalSingleType(
+            visible = true,
+            initialItems = listOf("Cash", "Bank", "Savings").mapIndexed { index, name ->
+                ReorderItem(name, index.toDouble())
+            },
+            dismiss = {}
+        ) { _, item ->
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 24.dp)
+                    .padding(vertical = 8.dp),
+                text = item.name,
+                style = UI.typo.b1.style(
+                    color = UI.colors.pureInverse,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
     }
 }

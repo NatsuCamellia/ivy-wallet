@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.legacy.Constants
@@ -431,11 +432,34 @@ private fun LoginButton(
 
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletPreview {
+private fun Preview(
+    theme: Theme = Theme.LIGHT,
+    onboardingState: OnboardingState = OnboardingState.SPLASH
+) {
+    IvyWalletPreview(theme) {
         OnboardingSplashLogin(
-            onboardingState = OnboardingState.SPLASH,
+            onboardingState = onboardingState,
             onSkip = {}
         )
     }
+}
+
+/** For screenshot testing */
+@Composable
+fun OnboardingSplashUiTest(isDark: Boolean) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    Preview(theme, OnboardingState.SPLASH)
+}
+
+/** For screenshot testing */
+@Composable
+fun OnboardingLoginUiTest(isDark: Boolean) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    Preview(theme, OnboardingState.LOGIN)
 }

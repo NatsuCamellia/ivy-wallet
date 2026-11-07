@@ -30,10 +30,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ivy.navigation.IvyPreview
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun ReleasesScreenImpl() {
@@ -248,4 +251,47 @@ private fun GitHubButton(
             contentDescription = "GitHub"
         )
     }
+}
+
+@Preview
+@Composable
+private fun PreviewReleasesUi(isDark: Boolean = false) {
+    IvyPreview(isDark) {
+        ReleasesUi(
+            uiState = ReleasesState.Success(
+                releasesInfo = persistentListOf(
+                    ReleaseInfo(
+                        releaseName = "v2026.10.22",
+                        releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.22",
+                        releaseDate = "2026-10-22",
+                        releaseCommits = persistentListOf(
+                            "Target Android 16 (API 36) for Google Play",
+                            "Bump reactivecircus/android-emulator-runner",
+                        ),
+                    ),
+                    ReleaseInfo(
+                        releaseName = "v2026.10.15",
+                        releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.15",
+                        releaseDate = "2026-10-15",
+                        releaseCommits = persistentListOf(
+                            "Fix crash when opening the budgets screen",
+                        ),
+                    ),
+                    ReleaseInfo(
+                        releaseName = "v2026.10.08",
+                        releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.08",
+                        releaseDate = "2026-10-08",
+                        releaseCommits = persistentListOf(),
+                    ),
+                )
+            ),
+            onEvent = {}
+        )
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun ReleasesUiTest(isDark: Boolean) {
+    PreviewReleasesUi(isDark)
 }

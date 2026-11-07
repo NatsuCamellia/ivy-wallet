@@ -35,17 +35,21 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.colorAs
 import com.ivy.design.l0_system.style
 import com.ivy.design.utils.thenIf
 import com.ivy.importdata.csvimport.flow.ImportProcessing
 import com.ivy.importdata.csvimport.flow.ImportResultUI
+import com.ivy.legacy.IvyWalletPreview
 import com.ivy.navigation.CSVScreen
 import com.ivy.onboarding.viewmodel.OnboardingViewModel
 import com.ivy.ui.R
+import kotlinx.collections.immutable.persistentListOf
 import kotlin.math.abs
 
 @Composable
@@ -662,4 +666,38 @@ private fun LazyListScope.continueButton(
         Spacer8()
         Spacer8()
     }
+}
+
+@Preview
+@Composable
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
+        ImportUI(
+            state = CSVState(
+                uiState = UIState.Idle,
+                columns = null,
+                csv = persistentListOf(
+                    CSVRow(listOf("Date", "Account", "Amount", "Category")),
+                    CSVRow(listOf("2023-04-27", "Cash", "-12.50", "Food")),
+                    CSVRow(listOf("2023-04-28", "Bank", "1500.00", "Salary")),
+                ),
+                important = null,
+                transfer = null,
+                optional = null,
+                continueEnabled = false,
+            ),
+            launchedFromOnboarding = false,
+            onEvent = {}
+        )
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun CSVScreenUiTest(isDark: Boolean) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    Preview(theme)
 }

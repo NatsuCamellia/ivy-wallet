@@ -663,7 +663,7 @@ private val testDateTime = LocalDateTime.of(2023, 4, 27, 0, 35)
 private fun BoxWithConstraintsScope.Preview(isDark: Boolean = false) {
     IvyPreview(isDark) {
         UI(
-            screen = EditTransactionScreen(null, TransactionType.EXPENSE),
+            screen = EditTransactionScreen(UUID(0, 0), TransactionType.EXPENSE),
             initialTitle = "",
             titleSuggestions = persistentSetOf(),
             tags = persistentListOf(),

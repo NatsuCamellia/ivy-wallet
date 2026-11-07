@@ -72,6 +72,7 @@ import kotlin.math.roundToInt
 val TRN_BUTTON_CLICK_AREA_HEIGHT = 150.dp
 val FAB_BUTTON_SIZE = 56.dp
 
+@Suppress("LongMethod")
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable
 fun BoxWithConstraintsScope.BottomBar(
@@ -84,10 +85,11 @@ fun BoxWithConstraintsScope.BottomBar(
     onAddPlannedPayment: () -> Unit,
 
     showAddAccountModal: () -> Unit,
+    initiallyExpanded: Boolean = false,
 ) {
     val ivyContext = ivyWalletCtx()
 
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(initiallyExpanded) }
 
     val modalId = remember { UUID.randomUUID() }
 

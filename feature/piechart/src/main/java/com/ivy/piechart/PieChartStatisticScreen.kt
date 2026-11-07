@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ivy.base.legacy.Theme
 import com.ivy.base.model.TransactionType
 import com.ivy.data.model.Category
 import com.ivy.data.model.CategoryId
@@ -477,12 +478,13 @@ private fun PercentText(
 @ExperimentalFoundationApi
 @Preview
 @Composable
-private fun Preview_Expense() {
-    com.ivy.legacy.IvyWalletPreview {
+private fun Preview_Expense(theme: Theme = Theme.LIGHT) {
+    com.ivy.legacy.IvyWalletPreview(theme) {
         val state = PieChartStatisticState(
             transactionType = TransactionType.EXPENSE,
-            period = com.ivy.legacy.data.model.TimePeriod.currentMonth(
-                startDayOfMonth = 1
+            period = com.ivy.legacy.data.model.TimePeriod(
+                month = com.ivy.legacy.data.model.Month.monthsList().first(),
+                year = 2023
             ), // preview
             baseCurrency = "BGN",
             totalAmount = 1828.0,
@@ -654,4 +656,15 @@ private fun Preview_Income() {
 
         UI(state = state)
     }
+}
+
+/** For screenshot testing */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PieChartStatisticUiTest(isDark: Boolean) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    Preview_Expense(theme)
 }

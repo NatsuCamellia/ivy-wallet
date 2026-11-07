@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ivy.accounts.AccountsTab
+import com.ivy.base.legacy.Theme
 import com.ivy.base.model.TransactionType
 import com.ivy.home.HomeTab
 import com.ivy.legacy.IvyWalletPreview
@@ -128,14 +129,31 @@ private fun BoxWithConstraintsScope.UI(
 @ExperimentalFoundationApi
 @Preview
 @Composable
-private fun PreviewMainScreen() {
-    IvyWalletPreview {
-        UI(
-            screen = MainScreen,
+private fun PreviewMainScreen(
+    theme: Theme = Theme.LIGHT,
+    expanded: Boolean = false
+) {
+    IvyWalletPreview(theme) {
+        BottomBar(
             tab = MainTab.HOME,
-            baseCurrency = "BGN",
             selectTab = {},
-            onCreateAccount = { }
+            onAddIncome = {},
+            onAddExpense = {},
+            onAddTransfer = {},
+            onAddPlannedPayment = {},
+            showAddAccountModal = {},
+            initiallyExpanded = expanded
         )
     }
+}
+
+/** For screenshot testing */
+@OptIn(ExperimentalAnimationApi::class, ExperimentalFoundationApi::class)
+@Composable
+fun MainUiTest(isDark: Boolean, expanded: Boolean = false) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    PreviewMainScreen(theme, expanded)
 }

@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.data.model.Category
 import com.ivy.data.model.CategoryId
 import com.ivy.data.model.primitive.ColorInt
@@ -339,8 +340,8 @@ private fun Preview_Empty() {
 @ExperimentalFoundationApi
 @Preview
 @Composable
-private fun Preview_Categories() {
-    IvyWalletPreview {
+private fun Preview_Categories(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         OnboardingCategories(
             suggestions = listOf(
                 CreateCategoryData(
@@ -401,7 +402,7 @@ private fun Preview_Categories() {
                 Category(
                     name = NotBlankTrimmedString.unsafe("Food & Drinks"),
                     color = ColorInt(Orange.toArgb()),
-                    icon = IconAsset.unsafe("fooddrinks"),
+                    icon = IconAsset.unsafe("fooddrink"),
                     id = CategoryId(UUID.randomUUID()),
                     orderNum = 0.0,
                 )
@@ -482,4 +483,15 @@ private fun Preview_Premium() {
             }
         )
     }
+}
+
+/** For screenshot testing */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun OnboardingCategoriesUiTest(isDark: Boolean) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    Preview_Categories(theme)
 }

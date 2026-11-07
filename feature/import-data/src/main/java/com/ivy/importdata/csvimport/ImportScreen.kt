@@ -8,6 +8,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ivy.base.legacy.Theme
 import com.ivy.importdata.csvimport.flow.ImportFrom
 import com.ivy.importdata.csvimport.flow.ImportProcessing
 import com.ivy.importdata.csvimport.flow.ImportResultUI
@@ -113,8 +114,8 @@ private fun BoxWithConstraintsScope.UI(
 @ExperimentalFoundationApi
 @Preview
 @Composable
-private fun Preview() {
-    com.ivy.legacy.IvyWalletPreview {
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    com.ivy.legacy.IvyWalletPreview(theme) {
         UI(
             screen = ImportScreen(launchedFromOnboarding = true),
             importStep = ImportStep.IMPORT_FROM,
@@ -123,4 +124,15 @@ private fun Preview() {
             importResult = null
         )
     }
+}
+
+/** For screenshot testing */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun ImportScreenUiTest(isDark: Boolean) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    Preview(theme)
 }

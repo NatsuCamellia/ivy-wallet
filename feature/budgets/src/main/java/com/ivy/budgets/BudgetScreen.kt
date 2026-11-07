@@ -21,11 +21,16 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.budgets.model.DisplayBudget
 import com.ivy.design.api.LocalTimeFormatter
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
+import com.ivy.legacy.IvyWalletPreview
+import com.ivy.legacy.data.model.FromToTimeRange
+import com.ivy.legacy.datamodel.Budget
 import com.ivy.legacy.legacy.ui.theme.components.BudgetBattery
 import com.ivy.legacy.utils.clickableNoIndication
 import com.ivy.legacy.utils.format
@@ -39,6 +44,9 @@ import com.ivy.wallet.ui.theme.components.IvyIcon
 import com.ivy.wallet.ui.theme.components.ReorderButton
 import com.ivy.wallet.ui.theme.components.ReorderModalSingleType
 import com.ivy.wallet.ui.theme.wallet.AmountCurrencyB1
+import kotlinx.collections.immutable.persistentListOf
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 @Composable
 fun BoxWithConstraintsScope.BudgetScreen(screen: BudgetScreen) {
@@ -364,4 +372,60 @@ private fun NoBudgetsEmptyState(
 
         Spacer(Modifier.height(96.dp))
     }
+}
+
+@Suppress("MagicNumber")
+@Preview
+@Composable
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
+        UI(
+            state = BudgetScreenState(
+                baseCurrency = "BGN",
+                budgets = persistentListOf(
+                    DisplayBudget(
+                        budget = Budget(
+                            name = "Groceries",
+                            amount = 600.0,
+                            categoryIdsSerialized = null,
+                            accountIdsSerialized = null,
+                            orderId = 0.0,
+                        ),
+                        spentAmount = 420.5
+                    ),
+                    DisplayBudget(
+                        budget = Budget(
+                            name = "Entertainment",
+                            amount = 150.0,
+                            categoryIdsSerialized = null,
+                            accountIdsSerialized = null,
+                            orderId = 1.0,
+                        ),
+                        spentAmount = 160.0
+                    ),
+                ),
+                categories = persistentListOf(),
+                accounts = persistentListOf(),
+                categoryBudgetsTotal = 750.0,
+                appBudgetMax = 1000.0,
+                totalRemainingBudgetText = "Remaining: 419.50 BGN",
+                timeRange = FromToTimeRange(
+                    from = LocalDate.of(2023, 4, 1).atTime(12, 0).toInstant(ZoneOffset.UTC),
+                    to = LocalDate.of(2023, 4, 30).atTime(12, 0).toInstant(ZoneOffset.UTC),
+                ),
+                reorderModalVisible = false,
+                budgetModalData = null
+            )
+        )
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun BudgetScreenUiTest(isDark: Boolean) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    Preview(theme)
 }

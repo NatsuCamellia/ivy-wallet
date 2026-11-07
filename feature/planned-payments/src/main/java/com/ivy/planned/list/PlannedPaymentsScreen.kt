@@ -12,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.base.model.TransactionType
 import com.ivy.data.model.Category
 import com.ivy.data.model.CategoryId
@@ -24,7 +25,6 @@ import com.ivy.design.l0_system.style
 import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.datamodel.PlannedPaymentRule
-import com.ivy.legacy.utils.timeNowUTC
 import com.ivy.navigation.EditPlannedScreen
 import com.ivy.navigation.PlannedPaymentsScreen
 import com.ivy.navigation.navigation
@@ -34,6 +34,7 @@ import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.wallet.ui.theme.Green
 import com.ivy.wallet.ui.theme.Orange
 import kotlinx.collections.immutable.persistentListOf
+import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.UUID
 
@@ -104,10 +105,11 @@ private fun BoxWithConstraintsScope.UI(
     )
 }
 
+@Suppress("MagicNumber")
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletPreview {
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         val account = Account(name = "Cash", Green.toArgb())
         val food = Category(
             name = NotBlankTrimmedString.unsafe("Food"),
@@ -135,7 +137,7 @@ private fun Preview() {
                         title = "Lidl pazar",
                         categoryId = food.id.value,
                         amount = 250.75,
-                        startDate = timeNowUTC().plusDays(5).toInstant(ZoneOffset.UTC),
+                        startDate = LocalDateTime.of(2023, 4, 27, 12, 0).toInstant(ZoneOffset.UTC),
                         oneTime = true,
                         intervalType = null,
                         intervalN = null,
@@ -150,7 +152,7 @@ private fun Preview() {
                         title = "Tabu",
                         categoryId = shisha.id.value,
                         amount = 1025.5,
-                        startDate = timeNowUTC().plusDays(5).toInstant(ZoneOffset.UTC),
+                        startDate = LocalDateTime.of(2023, 4, 27, 12, 0).toInstant(ZoneOffset.UTC),
                         oneTime = false,
                         intervalType = IntervalType.MONTH,
                         intervalN = 1,
@@ -164,4 +166,14 @@ private fun Preview() {
             )
         )
     }
+}
+
+/** For screenshot testing */
+@Composable
+fun PlannedPaymentsScreenUiTest(isDark: Boolean) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    Preview(theme)
 }

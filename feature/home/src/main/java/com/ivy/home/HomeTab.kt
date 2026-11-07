@@ -399,8 +399,12 @@ fun HomeLazyColumn(
 @ExperimentalFoundationApi
 @Preview
 @Composable
-private fun BoxWithConstraintsScope.PreviewHomeTab(isDark: Boolean = false) {
+private fun BoxWithConstraintsScope.PreviewHomeTab(
+    isDark: Boolean = false,
+    moreMenuExpanded: Boolean = false
+) {
     IvyPreview(isDark) {
+        ivyWalletCtx().setMoreMenuExpanded(moreMenuExpanded)
         HomeUi(
             uiState = HomeState(
                 theme = Theme.AUTO,
@@ -442,12 +446,12 @@ private fun BoxWithConstraintsScope.PreviewHomeTab(isDark: Boolean = false) {
 /** For screenshot testing */
 @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun HomeUiTest(isDark: Boolean) {
+fun HomeUiTest(isDark: Boolean, moreMenuExpanded: Boolean = false) {
     val theme = when (isDark) {
         true -> Theme.DARK
         false -> Theme.LIGHT
     }
     IvyWalletPreview(theme) {
-        PreviewHomeTab(isDark)
+        PreviewHomeTab(isDark, moreMenuExpanded)
     }
 }

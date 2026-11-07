@@ -17,4 +17,6 @@ dependencies {
     implementation(projects.temp.oldDesign)
 
     implementation(libs.bundles.opencsv)
+
+    testImplementation(projects.shared.ui.testing)
 }

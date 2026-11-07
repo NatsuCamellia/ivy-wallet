@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.base.model.TransactionType
 import com.ivy.data.model.Category
 import com.ivy.data.model.IntervalType
@@ -52,6 +53,7 @@ import com.ivy.wallet.ui.theme.modal.edit.ChooseCategoryModal
 import com.ivy.wallet.ui.theme.modal.edit.DescriptionModal
 import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDateTime
+import java.util.UUID
 
 @ExperimentalFoundationApi
 @Composable
@@ -424,10 +426,10 @@ private fun shouldFocusAmount(amount: Double) = amount == 0.0
 @ExperimentalFoundationApi
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletPreview {
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         UI(
-            screen = EditPlannedScreen(null, TransactionType.EXPENSE),
+            screen = EditPlannedScreen(UUID(0, 0), TransactionType.EXPENSE),
             EditPlannedScreenState(
                 oneTime = false,
                 startDate = null,
@@ -453,4 +455,15 @@ private fun Preview() {
             )
         ) {}
     }
+}
+
+/** For screenshot testing */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun EditPlannedScreenUiTest(isDark: Boolean) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    Preview(theme)
 }

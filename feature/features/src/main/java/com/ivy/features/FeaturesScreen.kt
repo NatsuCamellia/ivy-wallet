@@ -28,11 +28,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.design.system.colors.IvyColors.Gray
+import com.ivy.navigation.IvyPreview
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun FeaturesScreenImpl(
@@ -185,4 +188,44 @@ private fun FeatureSectionDivider(
             )
         )
     }
+}
+
+@Preview
+@Composable
+private fun PreviewFeaturesUi(isDark: Boolean = false) {
+    IvyPreview(isDark) {
+        FeaturesUi(
+            uiState = FeaturesUiState(
+                featureItemViewStates = persistentListOf(
+                    FeatureItemViewState.FeatureHeaderViewState(name = "Experimental"),
+                    FeatureItemViewState.FeatureToggleViewState(
+                        key = "standard_keypad",
+                        name = "Standard keypad layout",
+                        enabled = true,
+                        description = "Use the standard 1-2-3 numeric keypad layout.",
+                    ),
+                    FeatureItemViewState.FeatureToggleViewState(
+                        key = "compact_mode",
+                        name = "Compact mode",
+                        enabled = false,
+                        description = "Show more items on the screen.",
+                    ),
+                    FeatureItemViewState.FeatureHeaderViewState(name = "Debug"),
+                    FeatureItemViewState.FeatureToggleViewState(
+                        key = "extra_logging",
+                        name = "Extra logging",
+                        enabled = false,
+                        description = null,
+                    ),
+                )
+            ),
+            onEvent = {}
+        )
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun FeaturesUiTest(isDark: Boolean) {
+    PreviewFeaturesUi(isDark)
 }

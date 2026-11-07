@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.legacy.IvyWalletPreview
@@ -325,8 +326,8 @@ private fun Preview_Empty() {
 @ExperimentalFoundationApi
 @Preview
 @Composable
-private fun Preview_Accounts() {
-    IvyWalletPreview {
+private fun Preview_Accounts(theme: Theme = Theme.LIGHT) {
+    IvyWalletPreview(theme) {
         val baseCurrency = "BGN"
         OnboardingAccounts(
             baseCurrency = baseCurrency,
@@ -426,4 +427,15 @@ private fun Preview_Premium() {
             )
         )
     }
+}
+
+/** For screenshot testing */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun OnboardingAccountsUiTest(isDark: Boolean) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    Preview_Accounts(theme)
 }

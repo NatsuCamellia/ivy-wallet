@@ -4,14 +4,11 @@ import android.animation.ArgbEvaluator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.os.Build
 import android.util.DisplayMetrics
 import android.view.View
-import android.view.Window
 import android.view.WindowInsetsController
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.FloatRange
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -95,31 +92,15 @@ fun setStatusBarDarkTextCompat(darkText: Boolean) {
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 fun setStatusBarDarkTextCompat(view: View, darkText: Boolean) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        view.windowInsetsController?.setStatusBarDarkText(darkText)
-    } else {
-        val window = (view.context as Activity).window
-        setStatusBarDarkTextOld(window, darkText)
-    }
+    view.windowInsetsController?.setStatusBarDarkText(darkText)
 }
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
-@RequiresApi(Build.VERSION_CODES.R)
 fun WindowInsetsController.setStatusBarDarkText(darkText: Boolean) {
     setSystemBarsAppearance(
         if (darkText) WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS else 0,
         WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
     )
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Suppress("DEPRECATION")
-fun setStatusBarDarkTextOld(window: Window, darkText: Boolean) {
-    window.decorView.systemUiVisibility = if (darkText) {
-        window.decorView.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR // set status bar dark text
-    } else {
-        window.decorView.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv() // reset status bar dark text
-    }
 }
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")

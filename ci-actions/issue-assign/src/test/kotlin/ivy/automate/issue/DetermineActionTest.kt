@@ -34,7 +34,7 @@ class DetermineActionTest {
     val gitHubService = mockk<GitHubService>()
 
     fun testScope(
-        block: suspend context(GitHubService) () -> Unit
+        block: suspend GitHubService.() -> Unit
     ) {
         runTest {
             block(gitHubService)

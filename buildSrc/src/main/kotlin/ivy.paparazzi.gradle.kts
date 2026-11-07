@@ -3,6 +3,12 @@ plugins {
     id("app.cash.paparazzi")
 }
 
+android {
+    testOptions {
+        targetSdk = catalog.version("target-sdk").toInt()
+    }
+}
+
 // TODO Remove when https://github.com/google/guava/issues/6567 is fixed.
 // See also: https://github.com/google/guava/issues/6801.
 dependencies.constraints {

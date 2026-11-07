@@ -1,7 +1,6 @@
 plugins {
     org.jetbrains.kotlin.plugin.compose
     id("ivy.module")
-    id("app.cash.molecule")
 }
 
 android {
@@ -23,6 +22,15 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        optIn.addAll(
+            "androidx.compose.material3.ExperimentalMaterial3Api",
+            "androidx.compose.material3.ExperimentalMaterial3ExpressiveApi"
+        )
+    }
+}
+
 composeCompiler {
     reportsDestination = layout.buildDirectory.dir("compose_compiler")
     metricsDestination = layout.buildDirectory.dir("compose_compiler")
@@ -30,6 +38,7 @@ composeCompiler {
 
 dependencies {
     implementation(libs.bundles.compose)
+    implementation(libs.cashapp.molecule.runtime)
 
     lintChecks(libs.slack.lint.compose)
 }

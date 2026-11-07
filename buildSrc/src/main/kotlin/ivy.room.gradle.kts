@@ -10,13 +10,6 @@ dependencies {
     androidTestImplementation(libs.room.testing)
 }
 
-android {
-    sourceSets {
-        // Adds exported schema location as test app assets.
-        getByName("androidTest").assets.srcDirs(files("$projectDir/schemas"))
-    }
-}
-
 room {
     schemaDirectory("$projectDir/schemas")
 }

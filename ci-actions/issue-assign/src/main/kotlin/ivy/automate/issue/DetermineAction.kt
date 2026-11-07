@@ -32,37 +32,35 @@ sealed interface Action {
     ) : Action
 }
 
-context(GitHubService)
-suspend fun determineAction(args: GitHubIssueArgs): Either<String, Action> = either {
+suspend fun GitHubService.determineAction(args: GitHubIssueArgs): Either<String, Action> = either {
     val issueNumber = args.issueNumber
     val intention = checkCommentsForIntention(issueNumber).bind()
         ?: return@either Action.DoNothing(issueNumber)
 
     when (intention) {
-        is CommentIntention.TakeIssue -> intention.toAction(issueNumber).bind()
+        is CommentIntention.TakeIssue -> toAction(intention, issueNumber).bind()
         CommentIntention.Unknown -> Action.DoNothing(issueNumber)
     }
 }
 
-context(GitHubService)
-private suspend fun CommentIntention.TakeIssue.toAction(
+private suspend fun GitHubService.toAction(
+    intention: CommentIntention.TakeIssue,
     issueNumber: GitHubIssueNumber,
 ): Either<String, Action> = either {
     val assignee = checkIfIssueIsAssigned(issueNumber).bind()
     if (assignee != null) {
-        return@either Action.AlreadyTaken(user, issueNumber, assignee)
+        return@either Action.AlreadyTaken(intention.user, issueNumber, assignee)
     }
 
     val approved = checkLabelsForApproved(issueNumber).bind()
     if (!approved) {
-        return@either Action.NotApproved(user, issueNumber)
+        return@either Action.NotApproved(intention.user, issueNumber)
     }
 
-    Action.AssignIssue(issueNumber, user)
+    Action.AssignIssue(issueNumber, intention.user)
 }
 
-context(GitHubService)
-private suspend fun checkCommentsForIntention(
+private suspend fun GitHubService.checkCommentsForIntention(
     issueNumber: GitHubIssueNumber
 ): Either<String, CommentIntention?> = either {
     val comments = fetchIssueComments(issueNumber)
@@ -78,8 +76,7 @@ private suspend fun checkCommentsForIntention(
     analyzeCommentIntention(lastComment)
 }
 
-context(GitHubService)
-private suspend fun checkIfIssueIsAssigned(
+private suspend fun GitHubService.checkIfIssueIsAssigned(
     issueNumber: GitHubIssueNumber
 ): Either<String, GitHubUser?> = either {
     val issueInfo = fetchIssue(issueNumber)
@@ -89,8 +86,7 @@ private suspend fun checkIfIssueIsAssigned(
     issueInfo.assignee
 }
 
-context(GitHubService)
-private suspend fun checkLabelsForApproved(
+private suspend fun GitHubService.checkLabelsForApproved(
     issueNumber: GitHubIssueNumber
 ): Either<String, Boolean> = either {
     val labels = fetchIssueLabels(issueNumber)

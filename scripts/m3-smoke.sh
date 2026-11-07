@@ -337,41 +337,80 @@ flow_navbar_clearance() {
   return 0
 }
 
+# close_top_settled: Close button top once two consecutive dumps agree (animations finished)
+close_top_settled() {
+  local prev="" cur i
+  for i in 1 2 3 4 5 6 7 8; do
+    dump || return 1
+    cur=$(close_button | awk '{print $4}')
+    [ -n "$cur" ] && [ "$cur" = "$prev" ] && { echo "$cur"; return 0; }
+    prev=$cur
+  done
+  return 1
+}
+
+# sheet_top <raw-screencap> <width> <height>: y of the sheet's top edge, scanning down the screen
+# centre from 15% height for the first light pixel (the page behind the sheet is dark or saturated)
+sheet_top() {
+  python3 -I - "$1" "$2" "$3" <<'PY'
+import sys
+data = open(sys.argv[1], 'rb').read()
+w, h = int(sys.argv[2]), int(sys.argv[3])
+hdr = len(data) - w * h * 4
+for y in range(int(h * 0.15), h):
+    p = hdr + (y * w + w // 2) * 4
+    if data[p] > 225 and data[p + 1] > 225 and data[p + 2] > 225:
+        print(y)
+        sys.exit(0)
+print(-1)
+PY
+}
+
 # Start closing a sheet, drag it back up while it is still hiding (cancels the hide), tap Close
 # again: the sheet must close and exactly one level goes away.
+# An attempt only counts when (1) the hide demonstrably started before the drag (the sheet top in a
+# screenshot taken between the tap and the drag is lower than in the pre-tap one; a dump is too slow
+# to observe this, the sheet is already gone by then) and (2) afterwards the sheet is back at
+# the exact settled pre-tap position (Close button top unchanged).
 flow_cancelled_hide() {
   open_account_edit_sheet || return 1
-  adb shell settings put global animator_duration_scale 10
-  local w h attempt cancelled="" before after
+  adb shell settings put global animator_duration_scale "${ANIM_SCALE:-20}"
+  local w h attempt cancelled="" by1 pos after top0 top1
   w=$(screen_width); h=$(screen_height)
   for attempt in 1 2 3 4 5 6; do
+    by1=$(close_top_settled) || { log "sheet never settled"; break; }
     dump || break
-    before=$(close_button) || { log "close button missing"; break; }
-    set -- $before
-    local bx=$1 by=$2 by1=$4
-    adb shell "input tap $bx $by; input swipe $((w / 2)) $((h * 9 / 10)) $((w / 2)) $((h * 6 / 10)) ${SWIPE_MS:-250}" </dev/null
+    pos=$(close_button) || { log "close button missing"; break; }
+    set -- $pos
+    adb exec-out screencap >"$OUT/.pre.raw"
+    adb shell "input tap $1 $2; sleep 0.2; screencap /sdcard/m3-mid.raw; input swipe $((w / 2)) $((h * 9 / 10)) $((w / 2)) $((h * 6 / 10)) ${SWIPE_MS:-250}" </dev/null
+    adb pull /sdcard/m3-mid.raw "$OUT/.mid.raw" >/dev/null 2>&1
+    top0=$(sheet_top "$OUT/.pre.raw" "$w" "$h")
+    top1=$(sheet_top "$OUT/.mid.raw" "$w" "$h")
     sleep 4
     dump || break
-    # cancelled = the sheet is back at the exact pre-tap position, not merely still present
-    if after=$(close_button); then
-      set -- $after
-      if [ "$4" -eq "$by1" ] && has text exact "Edit account"; then
-        cancelled=$attempt
-        break
-      fi
-      log "attempt $attempt: sheet still on screen at y=$4 (before tap y=$by1), not a cancelled hide"
-      sleep 5
-      dump || break
-      has text exact "Edit account" && { adb shell input keyevent KEYCODE_BACK; sleep 3; }
+    if [ "$top0" -lt 0 ] || [ "$top1" -lt 0 ] || [ $((top1 - top0)) -lt 20 ]; then
+      log "attempt $attempt: sheet top $top0 -> $top1 before the drag, the hide never started"
+    elif after=$(close_button) && [ "$(echo "$after" | awk '{print $4}')" -eq "$by1" ] && has text exact "Edit account"; then
+      cancelled=$attempt
+      break
+    else
+      log "attempt $attempt: hide started (sheet top $top0 -> $top1) but the sheet is not back at y=$by1"
     fi
-    log "attempt $attempt: hide was not cancelled, reopening"
+    sleep 4
+    dump || break
+    if has text exact "Edit account"; then
+      adb shell input keyevent KEYCODE_BACK
+      sleep 3
+    fi
     wait_for text exact "Edit" || break
     tap_node text exact "Edit" || break
     wait_for text exact "Edit account" || break
   done
   adb shell settings put global animator_duration_scale 1
+  rm -f "$OUT/.pre.raw" "$OUT/.mid.raw"
   [ -n "$cancelled" ] || { log "could not interrupt the hide"; return 1; }
-  log "hide cancelled on attempt $cancelled (sheet back at y=$by1)"
+  log "hide cancelled on attempt $cancelled (started, then sheet back at y=$by1)"
   shot cancelled-hide-1-sheet-back
   tap_node desc exact "Close" || return 1
   wait_gone text exact "Edit account" || return 1

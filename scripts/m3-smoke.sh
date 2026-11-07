@@ -55,9 +55,24 @@ ensure_device() {
 
 # ---------- UI helpers ----------
 
+DUMP_FAILED=0
+
+# Fresh UI tree or failure: never leaves a stale tree behind; a failure also fails the running flow.
 dump() {
-  adb shell uiautomator dump /sdcard/m3-ui.xml >/dev/null 2>&1
-  adb pull /sdcard/m3-ui.xml "$XML" >/dev/null 2>&1
+  local attempt
+  rm -f "$XML"
+  for attempt in 1 2 3; do
+    adb shell rm -f /sdcard/m3-ui.xml >/dev/null 2>&1
+    if adb shell uiautomator dump /sdcard/m3-ui.xml >/dev/null 2>&1 \
+      && adb pull /sdcard/m3-ui.xml "$XML" >/dev/null 2>&1 && [ -s "$XML" ]; then
+      return 0
+    fi
+    sleep 1
+  done
+  rm -f "$XML"
+  log "uiautomator dump failed"
+  DUMP_FAILED=1
+  return 1
 }
 
 # find_node <text|desc|any|class> <exact|sub> <needle> [index]  ->  "cx cy x1 y1 x2 y2"
@@ -109,19 +124,29 @@ print((x1 + x2) // 2, (y1 + y2) // 2, x1, y1, x2, y2)
 PY
 }
 
-# bottom edge of the lowest clickable node that is fully on screen (the pinned action row)
-lowest_clickable_bottom() {
-  python3 -I - "$XML" "$(screen_height)" <<'PY'
+# close_button <dump>: "cx cy x1 y1 x2 y2" of the clickable node around the Close icon (pinned action row)
+close_button() {
+  python3 -I - "$XML" <<'PY'
 import re, sys, xml.etree.ElementTree as ET
-height = int(sys.argv[2])
-best = 0
-for n in ET.parse(sys.argv[1]).iter('node'):
+def box(n):
+    return tuple(map(int, re.findall(r'\d+', n.get('bounds'))))
+nodes = list(ET.parse(sys.argv[1]).iter('node'))
+icons = [box(n) for n in nodes if n.get('content-desc') == 'Close']
+if not icons:
+    sys.exit(1)
+ix1, iy1, ix2, iy2 = icons[0]
+cx, cy = (ix1 + ix2) // 2, (iy1 + iy2) // 2
+best = None
+for n in nodes:
     if n.get('clickable') != 'true':
         continue
-    y2 = int(re.findall(r'\d+', n.get('bounds'))[3])
-    if y2 <= height:
-        best = max(best, y2)
-print(best)
+    x1, y1, x2, y2 = box(n)
+    if x1 <= cx <= x2 and y1 <= cy <= y2 and (best is None or (x2 - x1) * (y2 - y1) < (best[2] - best[0]) * (best[3] - best[1])):
+        best = (x1, y1, x2, y2)
+if not best:
+    best = (ix1, iy1, ix2, iy2)
+x1, y1, x2, y2 = best
+print((x1 + x2) // 2, (y1 + y2) // 2, x1, y1, x2, y2)
 PY
 }
 
@@ -200,7 +225,6 @@ crashed() { adb logcat -d | grep -q "FATAL EXCEPTION"; }
 # Cold start through onboarding (offline account, skip accounts and categories) to Home.
 flow_onboarding() {
   adb shell pm clear $PKG >/dev/null
-  adb logcat -c
   adb shell am start -n $ACTIVITY >/dev/null
   wait_for text exact "I accept and agree" 30 || return 1
   # the four unchecked boxes are the only clickable CheckBox nodes
@@ -285,11 +309,11 @@ flow_keyboard_sheet() {
   sleep 1
   shot keyboard-sheet
   dump
-  local row
-  row=$(lowest_clickable_bottom)
-  log "action row bottom=$row ime top=$ime"
-  [ "$row" -le "$ime" ] || { log "action row is under the keyboard"; return 1; }
-  has desc exact "Close" || { log "close button missing"; return 1; }
+  local close
+  close=$(close_button) || { log "close button missing"; return 1; }
+  set -- $close
+  log "close button bottom=$6 ime top=$ime"
+  [ "$6" -le "$ime" ] || { log "close button is under the keyboard"; return 1; }
   adb shell input keyevent KEYCODE_BACK
   sleep 1
   back
@@ -303,11 +327,12 @@ flow_navbar_clearance() {
   sleep 1
   shot navbar-sheet
   dump
-  local row nav
-  row=$(lowest_clickable_bottom)
+  local close nav
+  close=$(close_button) || { log "close button missing"; return 1; }
   nav=$(nav_bar_top)
-  log "action row bottom=$row navbar top=$nav"
-  [ "$row" -le "$nav" ] || { log "action row overlaps the navigation bar"; return 1; }
+  set -- $close
+  log "close button bottom=$6 navbar top=$nav"
+  [ -n "$nav" ] && [ "$6" -le "$nav" ] || { log "close button overlaps the navigation bar"; return 1; }
   crashed && return 1
   return 0
 }
@@ -317,32 +342,41 @@ flow_navbar_clearance() {
 flow_cancelled_hide() {
   open_account_edit_sheet || return 1
   adb shell settings put global animator_duration_scale 10
-  local w h attempt cancelled=""
+  local w h attempt cancelled="" before after
   w=$(screen_width); h=$(screen_height)
   for attempt in 1 2 3 4 5 6; do
-    dump
-    pos=$(find_node desc exact "Close") || { log "close button missing"; adb shell settings put global animator_duration_scale 1; return 1; }
-    set -- $pos
-    adb shell "input tap $1 $2; input swipe $((w / 2)) $((h * 9 / 10)) $((w / 2)) $((h * 6 / 10)) ${SWIPE_MS:-250}" </dev/null
-    sleep 3
-    dump
-    if has text exact "Edit account"; then
-      cancelled=$attempt
-      break
+    dump || break
+    before=$(close_button) || { log "close button missing"; break; }
+    set -- $before
+    local bx=$1 by=$2 by1=$4
+    adb shell "input tap $bx $by; input swipe $((w / 2)) $((h * 9 / 10)) $((w / 2)) $((h * 6 / 10)) ${SWIPE_MS:-250}" </dev/null
+    sleep 4
+    dump || break
+    # cancelled = the sheet is back at the exact pre-tap position, not merely still present
+    if after=$(close_button); then
+      set -- $after
+      if [ "$4" -eq "$by1" ] && has text exact "Edit account"; then
+        cancelled=$attempt
+        break
+      fi
+      log "attempt $attempt: sheet still on screen at y=$4 (before tap y=$by1), not a cancelled hide"
+      sleep 5
+      dump || break
+      has text exact "Edit account" && { adb shell input keyevent KEYCODE_BACK; sleep 3; }
     fi
-    log "attempt $attempt: sheet closed before the drag, reopening"
+    log "attempt $attempt: hide was not cancelled, reopening"
     wait_for text exact "Edit" || break
     tap_node text exact "Edit" || break
     wait_for text exact "Edit account" || break
   done
   adb shell settings put global animator_duration_scale 1
   [ -n "$cancelled" ] || { log "could not interrupt the hide"; return 1; }
-  log "hide cancelled on attempt $cancelled"
+  log "hide cancelled on attempt $cancelled (sheet back at y=$by1)"
   shot cancelled-hide-1-sheet-back
   tap_node desc exact "Close" || return 1
   wait_gone text exact "Edit account" || return 1
   sleep 1
-  dump
+  dump || return 1
   has text exact "Edit" && has text exact "Cash" || { log "expected the account screen after the second close"; return 1; }
   shot cancelled-hide-2-closed
   crashed && return 1
@@ -353,7 +387,8 @@ flow_cancelled_hide() {
 
 run_flow() {
   local name=$1
-  if "$name"; then
+  DUMP_FAILED=0
+  if "$name" && [ "$DUMP_FAILED" = 0 ]; then
     echo "PASS $name"
     RESULTS+=("PASS $name")
   else
@@ -370,6 +405,7 @@ if [ -z "${SKIP_INSTALL:-}" ]; then
   ./gradlew --console=plain --max-workers=3 :app:installDebug >"$OUT/install.log" 2>&1 || { log "installDebug failed, see $OUT/install.log"; exit 2; }
 fi
 adb shell settings put global animator_duration_scale 1 >/dev/null 2>&1
+adb logcat -c
 
 for flow in ${FLOWS:-flow_onboarding flow_nested_back flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide}; do
   run_flow "$flow"

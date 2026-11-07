@@ -155,7 +155,9 @@ Ivy Wallet 的 UI 建立在一套自製 design system 上，散落在 4 個模�
 - **一律失敗：** `.offset(` 裡的數字 `.dp`；`.sp` literal；`fontSize =`；`RoundedCornerShape(N.dp)`。
 - **合法的間隔寫法：** `Arrangement.spacedBy(...)`、`contentPadding`、`padding(...)`、偶爾的 `Spacer(...)`，數值限 M3 格線 4、8、12、16、24，同樣計入下方預算。
 - **需列入白名單：** 其他數字 `.dp`，以及 `.size(`、`.height(`、`.width(`。白名單是 `docs/m3-migration/dp-allowlist.tsv`，理由限圖表幾何和圖示尺寸。
-- **預算：** 每模組每 100 行新增最多 3 個數字 `.dp`（現有 M3 範本約 2.2 到 3.0）；全 repo `.dp` 總數（目前 1,781）每階段都要下降。
+- **預算：** 模組指 Gradle 模組（含 `src/` 的目錄，例如 `shared/ui/core`、`feature/home`）。該範圍內某模組新增非測試行數達 100 行以上時，每 100 行最多 3 個數字 `.dp`（現有 M3 範本約 2.2 到 3.0）；未達 100 行時，該模組最多 3 個數字 `.dp`。全 repo `.dp` 總數（目前 1,781，含 `(-3).dp` 寫法）每階段都要下降。
+- **`0.dp` 與 `N.0.dp`：** `0.dp` 永遠合法，不需列入白名單（仍計入預算和總數）；`N.0.dp` 先正規化為 `N.dp` 再檢查格線。
+- **以所在呼叫分類：** 每個 `.dp` 依其所在行上直接包住它的呼叫判斷：`padding`、`contentPadding`（`PaddingValues`）、`spacedBy` 屬間隔，需在格線上；`size`、`height`、`width`、`heightIn`、`widthIn`、`sizeIn`、`defaultMinSize`、`requiredSize`、`requiredHeight`、`requiredWidth` 屬尺寸，一律要白名單（`Spacer(...)` 內的 `size`/`height`/`width` 視為間隔）。例如 `Modifier.padding(8.dp).heightIn(min = 16.dp)` 的 `16.dp` 需要白名單。
 - 驗收 agent 退回元件已提供間距卻又多加 padding 的寫法，也退回只為了還原舊版面而存在的數值。
 
 ## 「已刪除」的定義

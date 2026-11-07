@@ -17,6 +17,12 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.add("-Xannotation-default-target=first-only")
+    }
+}
+
 gradle.projectsEvaluated {
     // Increase tests Heap Size because of Kotest property-based tests
     tasks.withType<Test> {

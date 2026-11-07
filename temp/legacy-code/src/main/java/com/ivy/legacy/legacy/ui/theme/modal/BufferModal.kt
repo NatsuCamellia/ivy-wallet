@@ -13,7 +13,7 @@ import com.ivy.design.l0_system.UI
 import com.ivy.legacy.IvyWalletPreview
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.components.BufferBattery
-import com.ivy.wallet.ui.theme.modal.edit.AmountModal
+import com.ivy.legacy.ui.sheet.AmountModal
 import java.util.*
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")

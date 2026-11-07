@@ -33,7 +33,7 @@ import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.ui.SearchInput
 import com.ivy.legacy.utils.selectEndTextFieldValue
 import com.ivy.navigation.navigation
-import com.ivy.wallet.ui.theme.modal.edit.AmountModal
+import com.ivy.legacy.ui.sheet.AmountModal
 import kotlinx.collections.immutable.persistentListOf
 import java.util.UUID
 

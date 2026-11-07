@@ -1,50 +1,46 @@
-package com.ivy.wallet.ui.theme.modal.edit
+package com.ivy.legacy.ui.sheet
 
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.design.utils.hideKeyboard
-import com.ivy.legacy.IvyWalletPreview
-import com.ivy.legacy.rootView
-import com.ivy.legacy.utils.clickableNoIndication
-import com.ivy.legacy.utils.onScreenStart
-import com.ivy.legacy.utils.rememberInteractionSource
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.utils.selectEndTextFieldValue
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.components.IvyDescriptionTextField
-import com.ivy.wallet.ui.theme.modal.IvyModal
-import com.ivy.wallet.ui.theme.modal.ModalDynamicPrimaryAction
 import java.util.UUID
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@SuppressLint("ComposeModifierMissing")
 @Suppress("ParameterNaming")
 @Composable
-fun BoxWithConstraintsScope.DescriptionModal(
-    id: UUID = UUID.randomUUID(),
+fun DescriptionModal(
+    id: UUID = remember { UUID.randomUUID() },
     visible: Boolean,
     description: String?,
 
@@ -54,94 +50,95 @@ fun BoxWithConstraintsScope.DescriptionModal(
     var descTextFieldValue by remember(description) {
         mutableStateOf(selectEndTextFieldValue(description))
     }
-    val view = rootView()
 
-    IvyModal(
-        id = id,
-        visible = visible,
-        dismiss = dismiss,
-        PrimaryAction = {
-            ModalDynamicPrimaryAction(
-                initialEmpty = description.isNullOrBlank(),
-                initialChanged = description != descTextFieldValue.text,
+    if (visible) {
+        key(id) {
+            val keyboard = LocalSoftwareKeyboardController.current
+            val focus = remember { FocusRequester() }
+            LaunchedEffect(Unit) { focus.requestFocus() }
 
-                testTagSave = "modal_desc_save",
-                testTagDelete = "modal_desc_delete",
+            ActionSheet(
+                onDismiss = dismiss,
+                title = stringResource(R.string.description),
+                actions = { dismissSheet ->
+                    Spacer(Modifier.weight(1f))
 
-                onSave = {
-                    onDescriptionChanged(descTextFieldValue.text)
-                    view.hideKeyboard()
-                },
-                onDelete = {
-                    onDescriptionChanged(null)
-                    view.hideKeyboard()
-                },
-                dismiss = dismiss
-            )
-        }
-    ) {
-        Spacer(Modifier.height(32.dp))
+                    when {
+                        description.isNullOrBlank() -> Button(
+                            onClick = {
+                                onDescriptionChanged(descTextFieldValue.text)
+                                keyboard?.hide()
+                                dismissSheet()
+                            },
+                            modifier = Modifier.testTag("modal_desc_save"),
+                        ) {
+                            Text(stringResource(R.string.add))
+                        }
 
-        Text(
-            modifier = Modifier
-                .padding(start = 32.dp),
-            text = stringResource(R.string.description),
-            style = UI.typo.b1.style(
-                color = UI.colors.pureInverse,
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
+                        description == descTextFieldValue.text -> Button(
+                            onClick = {
+                                onDescriptionChanged(null)
+                                keyboard?.hide()
+                                dismissSheet()
+                            },
+                            modifier = Modifier.testTag("modal_desc_delete"),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.error,
+                                contentColor = MaterialTheme.colorScheme.onError,
+                            ),
+                        ) {
+                            Text(stringResource(R.string.delete))
+                        }
 
-        Spacer(Modifier.height(24.dp))
-
-        val focus = FocusRequester()
-        onScreenStart {
-            focus.requestFocus()
-        }
-
-        IvyDescriptionTextField(
-            modifier = Modifier
-                .padding(horizontal = 32.dp)
-                .fillMaxWidth()
-                .focusRequester(focus),
-            testTag = "modal_desc_input",
-            keyboardOptions = KeyboardOptions(
-                autoCorrect = true,
-                capitalization = KeyboardCapitalization.Sentences,
-                keyboardType = KeyboardType.Text,
-                imeAction = ImeAction.Default
-            ),
-            keyboardActions = KeyboardActions(
-                onAny = {
-                    descTextFieldValue = descTextFieldValue.copy(
-                        text = StringBuilder(descTextFieldValue.text)
-                            .insert(descTextFieldValue.selection.end, "\n")
-                            .toString(),
-                        selection = TextRange(descTextFieldValue.selection.end + 1)
-                    )
+                        else -> Button(
+                            onClick = {
+                                onDescriptionChanged(descTextFieldValue.text)
+                                keyboard?.hide()
+                                dismissSheet()
+                            },
+                            modifier = Modifier.testTag("modal_desc_save"),
+                        ) {
+                            Text(stringResource(R.string.save))
+                        }
+                    }
                 }
-            ),
-            value = descTextFieldValue,
-            hint = stringResource(R.string.description_text_field_hint),
-        ) {
-            descTextFieldValue = it
+            ) {
+                OutlinedTextField(
+                    value = descTextFieldValue,
+                    onValueChange = { descTextFieldValue = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .focusRequester(focus)
+                        .testTag("modal_desc_input"),
+                    placeholder = { Text(stringResource(R.string.description_text_field_hint)) },
+                    minLines = 3,
+                    keyboardOptions = KeyboardOptions(
+                        autoCorrect = true,
+                        capitalization = KeyboardCapitalization.Sentences,
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Default
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onAny = {
+                            descTextFieldValue = descTextFieldValue.copy(
+                                text = StringBuilder(descTextFieldValue.text)
+                                    .insert(descTextFieldValue.selection.end, "\n")
+                                    .toString(),
+                                selection = TextRange(descTextFieldValue.selection.end + 1)
+                            )
+                        }
+                    ),
+                )
+            }
         }
-
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(24.dp)
-                .clickableNoIndication(rememberInteractionSource()) {
-                    focus.requestFocus()
-                }
-        )
     }
 }
 
 @Preview
 @Composable
 private fun PreviewDescriptionModal_emptyText(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
+    WalletPreview(theme) {
         DescriptionModal(
             visible = true,
             description = "",

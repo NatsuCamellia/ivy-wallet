@@ -84,7 +84,7 @@ import com.ivy.ui.color.findContrastTextColor
 import com.ivy.wallet.ui.theme.modal.DURATION_MODAL_ANIM
 import com.ivy.wallet.ui.theme.modal.ModalSave
 import com.ivy.wallet.ui.theme.modal.ModalSet
-import com.ivy.wallet.ui.theme.modal.edit.AmountModal
+import com.ivy.legacy.ui.sheet.AmountModal
 import com.ivy.wallet.ui.theme.toComposeColor
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -303,7 +303,6 @@ fun BoxWithConstraintsScope.EditBottomSheet(
                 childrenTestTag = "amount_modal_account"
             )
         },
-        amountSpacerTop = 48.dp,
         dismiss = {
             setAmountModalShown(false)
         }

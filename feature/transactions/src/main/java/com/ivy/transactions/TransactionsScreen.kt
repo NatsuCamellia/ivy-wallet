@@ -84,10 +84,10 @@ import com.ivy.wallet.ui.theme.modal.ChoosePeriodModal
 import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalData
 import com.ivy.wallet.ui.theme.modal.DeleteConfirmationModal
 import com.ivy.wallet.ui.theme.modal.DeleteModal
-import com.ivy.wallet.ui.theme.modal.edit.AccountModal
-import com.ivy.wallet.ui.theme.modal.edit.AccountModalData
-import com.ivy.wallet.ui.theme.modal.edit.CategoryModal
-import com.ivy.wallet.ui.theme.modal.edit.CategoryModalData
+import com.ivy.legacy.ui.sheet.AccountModal
+import com.ivy.legacy.ui.sheet.AccountModalData
+import com.ivy.legacy.ui.sheet.CategoryModal
+import com.ivy.legacy.ui.sheet.CategoryModalData
 import com.ivy.wallet.ui.theme.toComposeColor
 import com.ivy.wallet.ui.theme.wallet.PeriodSelector
 import kotlinx.collections.immutable.ImmutableList

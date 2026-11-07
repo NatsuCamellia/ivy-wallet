@@ -30,14 +30,14 @@ import com.ivy.wallet.ui.theme.modal.NameModalUiTest
 import com.ivy.wallet.ui.theme.modal.ProgressModalUiTest
 import com.ivy.wallet.ui.theme.modal.RecurringRuleModalMultipleTimesUiTest
 import com.ivy.wallet.ui.theme.modal.RecurringRuleModalOneTimeUiTest
-import com.ivy.wallet.ui.theme.modal.edit.AccountModalUiTest
-import com.ivy.wallet.ui.theme.modal.edit.AmountModalUiTest
-import com.ivy.wallet.ui.theme.modal.edit.CalculatorModalUiTest
-import com.ivy.wallet.ui.theme.modal.edit.CategoryModalUiTest
-import com.ivy.wallet.ui.theme.modal.edit.ChooseCategoryModalUiTest
-import com.ivy.wallet.ui.theme.modal.edit.DescriptionModalUiTest
-import com.ivy.wallet.ui.theme.modal.edit.EditAccountModalUiTest
-import com.ivy.wallet.ui.theme.modal.edit.EditCategoryModalUiTest
+import com.ivy.legacy.ui.sheet.AccountModalUiTest
+import com.ivy.legacy.ui.sheet.AmountModalUiTest
+import com.ivy.legacy.ui.sheet.CalculatorModalUiTest
+import com.ivy.legacy.ui.sheet.CategoryModalUiTest
+import com.ivy.legacy.ui.sheet.ChooseCategoryModalUiTest
+import com.ivy.legacy.ui.sheet.DescriptionModalUiTest
+import com.ivy.legacy.ui.sheet.EditAccountModalUiTest
+import com.ivy.legacy.ui.sheet.EditCategoryModalUiTest
 import org.junit.Test
 import org.junit.runner.RunWith
 

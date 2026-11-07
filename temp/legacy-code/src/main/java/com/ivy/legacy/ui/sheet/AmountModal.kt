@@ -1,72 +1,64 @@
-package com.ivy.wallet.ui.theme.modal.edit
+package com.ivy.legacy.ui.sheet
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Backspace
+import androidx.compose.material.icons.filled.Calculate
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.ivy.base.legacy.Theme
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
 import com.ivy.domain.di.FeaturesEntryPoint
-import com.ivy.legacy.IvyWalletPreview
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.utils.amountToDouble
 import com.ivy.legacy.utils.amountToDoubleOrNull
 import com.ivy.legacy.utils.format
 import com.ivy.legacy.utils.formatInputAmount
 import com.ivy.legacy.utils.formatInt
-import com.ivy.legacy.utils.hideKeyboard
 import com.ivy.legacy.utils.localDecimalSeparator
-import com.ivy.legacy.utils.onScreenStart
 import com.ivy.ui.R
-import com.ivy.ui.color.Red
-import com.ivy.wallet.ui.theme.components.IvyIcon
-import com.ivy.wallet.ui.theme.modal.IvyModal
-import com.ivy.wallet.ui.theme.modal.ModalPositiveButton
-import com.ivy.wallet.ui.theme.modal.modalPreviewActionRowHeight
 import dagger.hilt.android.EntryPointAccessors
 import java.util.UUID
 import kotlin.math.truncate
 
 @SuppressLint("ComposeModifierMissing")
 @Suppress("ParameterNaming")
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable
-fun BoxWithConstraintsScope.AmountModal(
+fun AmountModal(
     id: UUID,
     visible: Boolean,
     currency: String,
@@ -75,7 +67,6 @@ fun BoxWithConstraintsScope.AmountModal(
     showPlusMinus: Boolean = false,
     decimalCountMax: Int = 2,
     Header: (@Composable () -> Unit)? = null,
-    amountSpacerTop: Dp = 64.dp,
     onAmountChanged: (Double) -> Unit,
 ) {
     var amount by remember(id) {
@@ -94,88 +85,84 @@ fun BoxWithConstraintsScope.AmountModal(
         mutableStateOf(false)
     }
 
-    IvyModal(
-        id = id,
-        visible = visible,
-        dismiss = dismiss,
-        PrimaryAction = {
-            IvyIcon(
-                modifier = circleButtonModifier(
-                    size = 52.dp,
-                    onClick = {
-                        calculatorModalVisible = true
+    if (visible) {
+        key(id) {
+            val keyboard = LocalSoftwareKeyboardController.current
+            LaunchedEffect(Unit) { keyboard?.hide() }
+
+            ActionSheet(
+                onDismiss = dismiss,
+                actions = { dismissSheet ->
+                    if (showPlusMinus) {
+                        OutlinedButton(
+                            onClick = {
+                                when {
+                                    amount.firstOrNull() == '-' -> amount = amount.drop(1)
+                                    amount.isNotEmpty() -> amount = "-$amount"
+                                }
+                            },
+                            modifier = Modifier.testTag("plus_minus"),
+                        ) {
+                            Text("+/-")
+                        }
                     }
-                )
-                    .testTag("btn_calculator")
-                    .padding(all = 4.dp),
-                icon = R.drawable.ic_custom_calculator_m,
-                tint = UI.colors.pureInverse
-            )
 
-            Spacer(Modifier.width(16.dp))
+                    IconButton(
+                        onClick = { calculatorModalVisible = true },
+                        modifier = Modifier.testTag("btn_calculator"),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Calculate,
+                            contentDescription = stringResource(R.string.calculator),
+                        )
+                    }
 
-            ModalPositiveButton(
-                text = stringResource(R.string.enter),
-                iconStart = R.drawable.ic_check
-            ) {
-                try {
-                    onAmountChanged(amount.amountToDouble())
-                    dismiss()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        },
-        SecondaryActions = {
-            if (showPlusMinus) {
-                Row {
-                    Spacer(modifier = Modifier.width(24.dp))
-                    KeypadCircleButton(
-                        text = "+/-",
-                        testTag = "plus_minus",
-                        fontSize = 22.sp,
-                        btnSize = 52.dp,
+                    Spacer(Modifier.weight(1f))
+
+                    Button(
                         onClick = {
-                            when {
-                                amount.firstOrNull() == '-' -> {
-                                    amount = amount.drop(1)
-                                }
-
-                                amount.isNotEmpty() -> {
-                                    amount = "-$amount"
-                                }
+                            try {
+                                onAmountChanged(amount.amountToDouble())
+                                dismissSheet()
+                            } catch (e: Exception) {
+                                e.printStackTrace()
                             }
                         }
+                    ) {
+                        Text(stringResource(R.string.enter))
+                    }
+                }
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    Header?.invoke()
+
+                    Text(
+                        text = buildAnnotatedString {
+                            append(amount.ifBlank { "0" })
+                            withStyle(SpanStyle(fontWeight = FontWeight.Normal)) {
+                                append(" $currency")
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        style = MaterialTheme.typography.displaySmallEmphasized,
+                        textAlign = TextAlign.Center,
                     )
+
+                    AmountInput(
+                        currency = currency,
+                        decimalCountMax = decimalCountMax,
+                        amount = amount,
+                    ) {
+                        amount = it
+                    }
                 }
             }
         }
-    ) {
-        Header?.invoke()
-
-        Spacer(Modifier.height(amountSpacerTop))
-
-        val rootView = LocalView.current
-        onScreenStart {
-            hideKeyboard(rootView)
-        }
-
-        AmountCurrency(
-            amount = amount,
-            currency = currency
-        )
-
-        Spacer(Modifier.height(10.dp))
-
-        AmountInput(
-            currency = currency,
-            decimalCountMax = decimalCountMax,
-            amount = amount
-        ) {
-            amount = it
-        }
-
-        Spacer(Modifier.height(24.dp))
     }
 
     CalculatorModal(
@@ -191,40 +178,8 @@ fun BoxWithConstraintsScope.AmountModal(
     )
 }
 
-@SuppressLint("ComposeModifierMissing")
 @Composable
-fun AmountCurrency(
-    amount: String,
-    currency: String,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.weight(1f))
-
-        Text(
-            text = amount.ifBlank { "0" },
-            style = UI.typo.nH2.style(
-                fontWeight = FontWeight.Bold,
-                color = UI.colors.pureInverse
-            )
-        )
-        Spacer(Modifier.width(4.dp))
-        Text(
-            text = currency,
-            style = UI.typo.nH2.style(
-                fontWeight = FontWeight.Normal,
-                color = UI.colors.pureInverse
-            )
-        )
-
-        Spacer(Modifier.weight(1f))
-    }
-}
-
-@Composable
-fun AmountInput(
+private fun AmountInput(
     currency: String,
     amount: String,
     decimalCountMax: Int = 2,
@@ -232,10 +187,9 @@ fun AmountInput(
 ) {
     var firstInput by remember { mutableStateOf(true) }
 
-    AmountKeyboard(
-        horizontalPadding = 40.dp,
+    AmountKeypad(
         forCalculator = false,
-        onNumberPressed = {
+        onNumberPress = {
             if (firstInput) {
                 setAmount(it)
                 firstInput = false
@@ -302,33 +256,38 @@ private fun formatNumber(number: String): String? {
     return null
 }
 
-@SuppressLint(
-    "ComposeContentEmitterReturningValues",
-    "ComposeMultipleContentEmitters",
-    "ComposeModifierMissing",
+enum class KeypadRole { Digit, Operator, Clear }
+
+class KeypadKey(
+    val tag: String,
+    val onClick: () -> Unit,
+    val label: String = "",
+    val icon: ImageVector? = null,
+    val role: KeypadRole = KeypadRole.Digit,
 )
-@Suppress("ParameterNaming")
+
+/**
+ * Digit grid shared by the amount and calculator sheets. [topRow] is an optional extra first row;
+ * [sideKeys] adds one key at the end of each of the three digit rows and the last row.
+ */
+@Suppress("UnstableCollections")
 @Composable
-fun AmountKeyboard(
+fun AmountKeypad(
     forCalculator: Boolean,
-    onNumberPressed: (String) -> Unit,
+    onNumberPress: (String) -> Unit,
     onDecimalPoint: () -> Unit,
-    horizontalPadding: Dp = 0.dp,
-    ZeroRow: (@Composable RowScope.() -> Unit)? = null,
-    FirstRowExtra: (@Composable RowScope.() -> Unit)? = null,
-    SecondRowExtra: (@Composable RowScope.() -> Unit)? = null,
-    ThirdRowExtra: (@Composable RowScope.() -> Unit)? = null,
-    FourthRowExtra: (@Composable RowScope.() -> Unit)? = null,
     onBackspace: () -> Unit,
+    modifier: Modifier = Modifier,
+    topRow: List<KeypadKey> = emptyList(),
+    sideKeys: List<KeypadKey> = emptyList(),
 ) {
     /**
      * Retrieve `features` via EntryPointAccessors. `isStandardLayout` is stable and
      * only changes via settings, so there isn't unnecessary recompositions.
      * `isStandardLayout` doesn't change while the keyboard is shown.
-     * `AmountKeyboard` is self-contained, making it easy to reuse without passing parameters.
+     * `AmountKeypad` is self-contained, making it easy to reuse without passing parameters.
      * Layout changes are rare, so recomposition has minimal impact on performance.
      **/
-
     val isStandardLayout = if (LocalInspectionMode.current) {
         false
     } else {
@@ -357,159 +316,89 @@ fun AmountKeyboard(
         )
     }
 
-    if (ZeroRow != null) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            ZeroRow.invoke(this)
+    val tagPrefix = if (forCalculator) "calc_key_" else "key_"
+    val digit = { value: String ->
+        KeypadKey(tag = tagPrefix + value, label = value, onClick = { onNumberPress(value) })
+    }
+    val rows = buildList {
+        if (topRow.isNotEmpty()) add(topRow)
+        countButtonValues.forEachIndexed { index, numbers ->
+            add(numbers.map(digit) + listOfNotNull(sideKeys.getOrNull(index)))
         }
-
-        Spacer(Modifier.height(8.dp))
+        add(
+            listOf(
+                KeypadKey(
+                    tag = if (forCalculator) "calc_key_decimal_separator" else "key_decimal_separator",
+                    label = localDecimalSeparator(),
+                    onClick = onDecimalPoint,
+                ),
+                digit("0"),
+                KeypadKey(
+                    tag = "key_del",
+                    icon = Icons.AutoMirrored.Filled.Backspace,
+                    role = KeypadRole.Clear,
+                    onClick = onBackspace,
+                ),
+            ) + listOfNotNull(sideKeys.getOrNull(countButtonValues.size))
+        )
     }
 
-    // Loop through the rows to create CircleNumberButtons
-    countButtonValues.forEachIndexed { rowIndex, rowNumbers ->
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            rowNumbers.forEach { num ->
-                CircleNumberButton(
-                    forCalculator = forCalculator,
-                    value = num,
-                    onNumberPressed = onNumberPressed
-                )
-            }
-
-            when (rowIndex) {
-                0 -> FirstRowExtra?.invoke(this)
-                1 -> SecondRowExtra?.invoke(this)
-                2 -> ThirdRowExtra?.invoke(this)
-            }
-        }
-
-        Spacer(Modifier.height(8.dp))
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = horizontalPadding),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceEvenly
+    Column(
+        modifier = modifier.padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        KeypadCircleButton(
-            text = localDecimalSeparator(),
-            testTag = if (forCalculator) {
-                "calc_key_decimal_separator"
-            } else {
-                "key_decimal_separator"
+        rows.forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                row.forEach { key ->
+                    FilledTonalButton(
+                        onClick = key.onClick,
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(min = ButtonDefaults.MediumContainerHeight)
+                            .testTag(key.tag),
+                        shapes = ButtonDefaults.shapes(),
+                        colors = key.role.colors(),
+                        contentPadding = ButtonDefaults.contentPaddingFor(ButtonDefaults.MediumContainerHeight),
+                    ) {
+                        if (key.icon != null) {
+                            Icon(imageVector = key.icon, contentDescription = null)
+                        } else {
+                            Text(text = key.label, style = MaterialTheme.typography.titleLarge, maxLines = 1)
+                        }
+                    }
+                }
             }
-        ) {
-            onDecimalPoint()
         }
-
-        CircleNumberButton(
-            forCalculator = forCalculator,
-            value = "0",
-            onNumberPressed = onNumberPressed
-        )
-
-        IvyIcon(
-            modifier = circleButtonModifier(onClick = onBackspace)
-                .padding(all = 24.dp)
-                .testTag("key_del"),
-            icon = R.drawable.ic_backspace,
-            tint = Red
-        )
-
-        FourthRowExtra?.invoke(this)
     }
 }
 
 @Composable
-@Suppress("ParameterNaming")
-fun CircleNumberButton(
-    forCalculator: Boolean,
-    value: String,
-    onNumberPressed: (String) -> Unit,
-) {
-    KeypadCircleButton(
-        text = value,
-        testTag = if (forCalculator) {
-            "calc_key_$value"
-        } else {
-            "key_$value"
-        },
-        onClick = {
-            onNumberPressed(value)
-        }
+private fun KeypadRole.colors(): ButtonColors = when (this) {
+    KeypadRole.Digit -> ButtonDefaults.filledTonalButtonColors()
+    KeypadRole.Operator -> ButtonDefaults.filledTonalButtonColors(
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
     )
-}
-
-@SuppressLint("ComposeModifierMissing")
-@Composable
-fun KeypadCircleButton(
-    text: String,
-    testTag: String,
-    textColor: Color = UI.colors.pureInverse,
-    fontSize: TextUnit = 32.sp,
-    btnSize: Dp = 80.dp,
-    onClick: () -> Unit,
-) {
-    Text(
-        modifier = circleButtonModifier(size = btnSize, onClick = onClick)
-            .testTag(testTag),
-        text = text,
-        fontSize = fontSize,
-        style = UI.typo.nH2.style(
-            color = textColor,
-            fontWeight = FontWeight.Bold
-        ).copy(
-            textAlign = TextAlign.Center
-        )
+    KeypadRole.Clear -> ButtonDefaults.filledTonalButtonColors(
+        containerColor = MaterialTheme.colorScheme.errorContainer,
+        contentColor = MaterialTheme.colorScheme.onErrorContainer,
     )
-}
-
-@SuppressLint("ComposableModifierFactory", "ModifierFactoryExtensionFunction")
-@Composable
-private fun circleButtonModifier(
-    size: Dp = 80.dp,
-    onClick: () -> Unit,
-): Modifier {
-    return Modifier
-        .size(size)
-        .clip(CircleShape)
-        .clickable(
-            onClick = onClick
-        )
-        .background(UI.colors.pure, UI.shapes.rFull)
-        .border(2.dp, UI.colors.medium, UI.shapes.rFull)
-        .wrapContentHeight()
 }
 
 @Preview
 @Composable
 private fun Preview(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
-        BoxWithConstraints(
-            modifier = Modifier.padding(bottom = modalPreviewActionRowHeight())
+    WalletPreview(theme) {
+        AmountModal(
+            id = UUID.randomUUID(),
+            visible = true,
+            currency = "BGN",
+            initialAmount = null,
+            dismiss = { }
         ) {
-            AmountModal(
-                id = UUID.randomUUID(),
-                visible = true,
-                currency = "BGN",
-                initialAmount = null,
-                dismiss = { }
-            ) {
-            }
         }
     }
 }

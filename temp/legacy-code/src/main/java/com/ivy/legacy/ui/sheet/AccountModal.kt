@@ -1,57 +1,50 @@
-package com.ivy.wallet.ui.theme.modal.edit
+package com.ivy.legacy.ui.sheet
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.Row
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.domain.legacy.ui.IvyColorPicker
-import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.datamodel.Account
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.ColorPicker
+import com.ivy.legacy.utils.format
 import com.ivy.legacy.utils.isNotNullOrBlank
-import com.ivy.legacy.utils.onScreenStart
 import com.ivy.legacy.utils.selectEndTextFieldValue
 import com.ivy.legacy.utils.toLowerCaseLocal
 import com.ivy.legacy.utils.toUpperCaseLocal
 import com.ivy.ui.R
+import com.ivy.ui.color.Ivy
 import com.ivy.wallet.domain.data.IvyCurrency
 import com.ivy.wallet.domain.deprecated.logic.model.CreateAccountData
-import com.ivy.wallet.ui.theme.Gray
-import com.ivy.ui.color.Ivy
-import com.ivy.wallet.ui.theme.components.IvyCheckboxWithText
 import com.ivy.wallet.ui.theme.modal.ChooseIconModal
 import com.ivy.wallet.ui.theme.modal.CurrencyModal
-import com.ivy.wallet.ui.theme.modal.IvyModal
-import com.ivy.wallet.ui.theme.modal.ModalAddSave
-import com.ivy.wallet.ui.theme.modal.ModalAmountSection
-import com.ivy.wallet.ui.theme.modal.ModalTitle
 import java.util.UUID
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
 data class AccountModalData(
     val account: Account?,
     val baseCurrency: String,
@@ -62,9 +55,9 @@ data class AccountModalData(
     val id: UUID = UUID.randomUUID()
 )
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@SuppressLint("ComposeModifierMissing")
 @Composable
-fun BoxWithConstraintsScope.AccountModal(
+fun AccountModal(
     modal: AccountModalData?,
     onCreateAccount: (CreateAccountData) -> Unit,
     onEditAccount: (Account, balance: Double) -> Unit,
@@ -98,105 +91,82 @@ fun BoxWithConstraintsScope.AccountModal(
 
     val forceNonZeroBalance = modal?.forceNonZeroBalance ?: false
 
-    IvyModal(
-        id = modal?.id,
-        visible = modal != null,
-        dismiss = dismiss,
-        shiftIfKeyboardShown = false,
-        PrimaryAction = {
-            ModalAddSave(
-                item = modal?.account,
-                enabled = nameTextFieldValue.text.isNotNullOrBlank() && (!forceNonZeroBalance || amount > 0)
+    if (modal != null) {
+        key(modal.id) {
+            LaunchedEffect(Unit) {
+                if (modal.adjustBalanceMode) {
+                    amountModalVisible = true
+                }
+            }
+
+            ActionSheet(
+                onDismiss = dismiss,
+                title = if (account != null) {
+                    stringResource(R.string.edit_account)
+                } else {
+                    stringResource(R.string.new_account)
+                },
+                actions = { dismissSheet ->
+                    Spacer(Modifier.weight(1f))
+
+                    Button(
+                        onClick = {
+                            save(
+                                account = account,
+                                nameTextFieldValue = nameTextFieldValue,
+                                currency = currencyCode,
+                                color = color,
+                                icon = icon,
+                                amount = amount,
+                                includeInBalance = includeInBalance,
+
+                                onCreateAccount = onCreateAccount,
+                                onEditAccount = onEditAccount,
+                                dismiss = dismissSheet
+                            )
+                        },
+                        enabled = nameTextFieldValue.text.isNotNullOrBlank() &&
+                            (!forceNonZeroBalance || amount > 0),
+                        modifier = if (account == null) Modifier.testTag("modal_add") else Modifier,
+                    ) {
+                        Text(stringResource(if (account != null) R.string.save else R.string.add))
+                    }
+                }
             ) {
-                save(
-                    account = account,
-                    nameTextFieldValue = nameTextFieldValue,
-                    currency = currencyCode,
-                    color = color,
-                    icon = icon,
-                    amount = amount,
-                    includeInBalance = includeInBalance,
-
-                    onCreateAccount = onCreateAccount,
-                    onEditAccount = onEditAccount,
-                    dismiss = dismiss
-                )
-            }
-        }
-    ) {
-        onScreenStart {
-            if (modal?.adjustBalanceMode == true) {
-                amountModalVisible = true
-            }
-        }
-
-        Spacer(Modifier.height(32.dp))
-
-        ModalTitle(
-            text = if (modal?.account != null) {
-                stringResource(
-                    R.string.edit_account
-                )
-            } else {
-                stringResource(R.string.new_account)
-            },
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        IconNameRow(
-            hint = stringResource(R.string.account_name),
-            defaultIcon = R.drawable.ic_custom_account_m,
-            color = color,
-            icon = icon,
-
-            autoFocusKeyboard = modal?.autoFocusKeyboard ?: true,
-
-            nameTextFieldValue = nameTextFieldValue,
-            setNameTextFieldValue = { nameTextFieldValue = it },
-            showChooseIconModal = {
-                chooseIconModalVisible = true
-            }
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        IvyColorPicker(
-            selectedColor = color,
-            onColorSelected = { color = it }
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        ModalAmountSection(
-            Header = {
-                Spacer(Modifier.height(16.dp))
-
-                AccountCurrency(
-                    currencyCode = currencyCode
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    currencyModalVisible = true
-                }
+                    IconNameRow(
+                        hint = stringResource(R.string.account_name),
+                        defaultIcon = R.drawable.ic_custom_account_m,
+                        color = color,
+                        icon = icon,
 
-                Spacer(modifier = Modifier.height(16.dp))
+                        autoFocusKeyboard = modal.autoFocusKeyboard,
 
-                IvyCheckboxWithText(
-                    modifier = Modifier
-                        .padding(start = 16.dp)
-                        .align(Alignment.Start),
-                    text = stringResource(R.string.include_account),
-                    checked = includeInBalance
-                ) {
-                    includeInBalance = it
+                        nameTextFieldValue = nameTextFieldValue,
+                        setNameTextFieldValue = { nameTextFieldValue = it },
+                        showChooseIconModal = {
+                            chooseIconModalVisible = true
+                        }
+                    )
+
+                    ColorPicker(
+                        selectedColor = color,
+                        onColorSelect = { color = it }
+                    )
+
+                    AccountSettings(
+                        currencyCode = currencyCode,
+                        amount = amount,
+                        includeInBalance = includeInBalance,
+                        onCurrencyClick = { currencyModalVisible = true },
+                        onIncludeInBalanceChange = { includeInBalance = it },
+                        onAmountClick = { amountModalVisible = true },
+                    )
                 }
-            },
-            label = stringResource(R.string.enter_account_balance).uppercase(),
-            currency = currencyCode,
-            amount = amount,
-            amountPaddingTop = 40.dp,
-            amountPaddingBottom = 40.dp,
-        ) {
-            amountModalVisible = true
+            }
         }
     }
 
@@ -230,29 +200,71 @@ fun BoxWithConstraintsScope.AccountModal(
         }
     }
 
-    val context = LocalContext.current
-    CurrencyModal(
-        title = stringResource(R.string.choose_currency),
-        initialCurrency = IvyCurrency.fromCode(currencyCode),
-        visible = currencyModalVisible,
-        dismiss = { currencyModalVisible = false }
-    ) {
-        currencyCode = it
+    BoxWithConstraints {
+        CurrencyModal(
+            title = stringResource(R.string.choose_currency),
+            initialCurrency = IvyCurrency.fromCode(currencyCode),
+            visible = currencyModalVisible,
+            dismiss = { currencyModalVisible = false }
+        ) {
+            currencyCode = it
+        }
 
-//        if (IvyCurrency.fromCode(it)?.isCrypto == true) {
-//            if (getCustomIconId(context = context, iconName = it, size = "m") != null) {
-//                icon = it
-//            }
-//        }
+        ChooseIconModal(
+            visible = chooseIconModalVisible,
+            initialIcon = icon ?: "account",
+            color = color,
+            dismiss = { chooseIconModalVisible = false }
+        ) {
+            icon = it
+        }
     }
+}
 
-    ChooseIconModal(
-        visible = chooseIconModalVisible,
-        initialIcon = icon ?: "account",
-        color = color,
-        dismiss = { chooseIconModalVisible = false }
+@Composable
+private fun AccountSettings(
+    currencyCode: String,
+    amount: Double,
+    includeInBalance: Boolean,
+    onCurrencyClick: () -> Unit,
+    onIncludeInBalanceChange: (Boolean) -> Unit,
+    onAmountClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
     ) {
-        icon = it
+        SegmentedListItem(
+            onClick = onCurrencyClick,
+            shapes = ListItemDefaults.segmentedShapes(index = 0, count = 3),
+            modifier = Modifier.testTag("account_modal_currency"),
+            supportingContent = {
+                Text(IvyCurrency.fromCode(currencyCode)?.name?.toLowerCaseLocal() ?: "")
+            },
+        ) {
+            Text(currencyCode.toUpperCaseLocal())
+        }
+
+        SegmentedListItem(
+            checked = includeInBalance,
+            onCheckedChange = onIncludeInBalanceChange,
+            shapes = ListItemDefaults.segmentedShapes(index = 1, count = 3),
+            trailingContent = { Switch(checked = includeInBalance, onCheckedChange = null) },
+        ) {
+            Text(stringResource(R.string.include_account))
+        }
+
+        SegmentedListItem(
+            onClick = onAmountClick,
+            shapes = ListItemDefaults.segmentedShapes(index = 2, count = 3),
+            modifier = Modifier.testTag("amount_balance"),
+            overlineContent = { Text(stringResource(R.string.enter_account_balance)) },
+        ) {
+            Text(
+                text = "${amount.format(currencyCode)} $currencyCode",
+                style = MaterialTheme.typography.headlineSmallEmphasized,
+            )
+        }
     }
 }
 
@@ -296,52 +308,10 @@ private fun save(
     dismiss()
 }
 
-@Composable
-private fun AccountCurrency(
-    currencyCode: String,
-
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .background(UI.colors.medium, UI.shapes.r4)
-            .clip(UI.shapes.r4)
-            .clickable {
-                onClick()
-            }
-            .padding(vertical = 24.dp)
-            .testTag("account_modal_currency"),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(32.dp))
-
-        Text(
-            text = currencyCode.toUpperCaseLocal(),
-            style = UI.typo.b1.style(
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
-
-        Spacer(Modifier.weight(1f))
-
-        val currencyName = IvyCurrency.fromCode(currencyCode)?.name ?: ""
-        Text(
-            text = "-$currencyName".toLowerCaseLocal(),
-            style = UI.typo.b2.style(
-                fontWeight = FontWeight.SemiBold,
-                color = Gray
-            )
-        )
-
-        Spacer(Modifier.width(24.dp))
-    }
-}
-
 @Preview
 @Composable
 private fun Preview(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
+    WalletPreview(theme) {
         AccountModal(
             modal = AccountModalData(
                 account = null,
@@ -364,7 +334,7 @@ fun AccountModalUiTest(isDark: Boolean) {
 /** For screenshot testing */
 @Composable
 fun EditAccountModalUiTest(isDark: Boolean) {
-    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+    WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
         AccountModal(
             modal = AccountModalData(
                 account = Account(

@@ -271,11 +271,10 @@ open_account_edit_sheet() {
 flow_nested_back() {
   open_account_edit_sheet || return 1
   shot nested-1-account
-  tap_node text exact "ENTER ACCOUNT BALANCE" || return 1
-  tap_node text exact "0.00 USD" || return 1
+  tap_node any sub "Enter account balance" || return 1
   wait_for text exact "Enter" || return 1
   shot nested-2-amount
-  tap_icon bottom || return 1
+  tap_node desc exact "Calculator" || return 1
   wait_for text exact "Set" || return 1
   has text exact "÷" || { log "calculator keypad missing"; return 1; }
   shot nested-3-calculator

@@ -248,7 +248,6 @@
     <ID>ComposableNaming:OnScreenStart.kt$onScreenStart</ID>
     <ID>ComposableNaming:UIExt.kt$setStatusBarDarkTextCompat</ID>
     <ID>ComposableParamOrder:AddKeywordModal.kt$AddKeywordModal</ID>
-    <ID>ComposableParamOrder:AmountModal.kt$AmountKeyboard</ID>
     <ID>ComposableParamOrder:BackBottomBar.kt$BackBottomBar</ID>
     <ID>ComposableParamOrder:BudgetBattery.kt$BudgetBattery</ID>
     <ID>ComposableParamOrder:BufferBattery.kt$BufferBattery</ID>
@@ -2355,12 +2354,7 @@
     <ID>FunctionNaming:WearAppConfigurationAccessors.kt$internal fun DependencyHandler.`wearApp`( dependencyNotation: String, dependencyConfiguration: Action&lt;ExternalModuleDependency&gt; ): ExternalModuleDependency</ID>
     <ID>FunctionNaming:WearAppConfigurationAccessors.kt$internal fun DependencyHandler.`wearApp`( group: String, name: String, version: String? = null, configuration: String? = null, classifier: String? = null, ext: String? = null, dependencyConfiguration: Action&lt;ExternalModuleDependency&gt;? = null ): ExternalModuleDependency</ID>
     <ID>FunctionNaming:WearAppConfigurationAccessors.kt$internal fun DependencyHandler.`wearApp`(dependencyNotation: Any): Dependency?</ID>
-    <ID>FunctionParameterNaming:AmountModal.kt$FirstRowExtra: (@Composable RowScope.() -&gt; Unit)? = null</ID>
-    <ID>FunctionParameterNaming:AmountModal.kt$FourthRowExtra: (@Composable RowScope.() -&gt; Unit)? = null</ID>
     <ID>FunctionParameterNaming:AmountModal.kt$Header: (@Composable () -&gt; Unit)? = null</ID>
-    <ID>FunctionParameterNaming:AmountModal.kt$SecondRowExtra: (@Composable RowScope.() -&gt; Unit)? = null</ID>
-    <ID>FunctionParameterNaming:AmountModal.kt$ThirdRowExtra: (@Composable RowScope.() -&gt; Unit)? = null</ID>
-    <ID>FunctionParameterNaming:AmountModal.kt$ZeroRow: (@Composable RowScope.() -&gt; Unit)? = null</ID>
     <ID>FunctionParameterNaming:BackBottomBar.kt$PrimaryAction: @Composable () -&gt; Unit</ID>
     <ID>FunctionParameterNaming:ColumnRoot.kt$Content: @Composable ColumnScope.() -&gt; Unit</ID>
     <ID>FunctionParameterNaming:EditBottomSheet.kt$ActionButton: @Composable () -&gt; Unit</ID>
@@ -2387,14 +2381,12 @@
     <ID>InvalidPackageDeclaration:AccountByIdAct.kt$package com.ivy.wallet.domain.action.account</ID>
     <ID>InvalidPackageDeclaration:AccountDataAct.kt$package com.ivy.wallet.domain.action.viewmodel.account</ID>
     <ID>InvalidPackageDeclaration:AccountFunctions.kt$package com.ivy.wallet.domain.pure.account</ID>
-    <ID>InvalidPackageDeclaration:AccountModal.kt$package com.ivy.wallet.ui.theme.modal.edit</ID>
     <ID>InvalidPackageDeclaration:AccountsAct.kt$package com.ivy.wallet.domain.action.account</ID>
     <ID>InvalidPackageDeclaration:Action.kt$package com.ivy.frp.action</ID>
     <ID>InvalidPackageDeclaration:AddKeywordModal.kt$package com.ivy.wallet.ui.theme.modal</ID>
     <ID>InvalidPackageDeclaration:AddPrimaryAttributeButton.kt$package com.ivy.wallet.ui.theme.components</ID>
     <ID>InvalidPackageDeclaration:AllTrnsAct.kt$package com.ivy.wallet.domain.action.transaction</ID>
     <ID>InvalidPackageDeclaration:AmountCurrency.kt$package com.ivy.wallet.ui.theme.wallet</ID>
-    <ID>InvalidPackageDeclaration:AmountModal.kt$package com.ivy.wallet.ui.theme.modal.edit</ID>
     <ID>InvalidPackageDeclaration:Annotations.kt$package com.ivy.frp</ID>
     <ID>InvalidPackageDeclaration:BackBottomBar.kt$package com.ivy.wallet.ui.theme.components</ID>
     <ID>InvalidPackageDeclaration:BalanceRow.kt$package com.ivy.wallet.ui.theme.components</ID>
@@ -2410,17 +2402,14 @@
     <ID>InvalidPackageDeclaration:CalcIncomeExpenseAct.kt$package com.ivy.wallet.domain.action.wallet</ID>
     <ID>InvalidPackageDeclaration:CalcTrnsIncomeExpenseAct.kt$package com.ivy.wallet.domain.action.transaction</ID>
     <ID>InvalidPackageDeclaration:CalcWalletBalanceAct.kt$package com.ivy.wallet.domain.action.wallet</ID>
-    <ID>InvalidPackageDeclaration:CalculatorModal.kt$package com.ivy.wallet.ui.theme.modal.edit</ID>
     <ID>InvalidPackageDeclaration:CatValueFunctions.kt$package com.ivy.wallet.domain.pure.transaction</ID>
     <ID>InvalidPackageDeclaration:CategoriesAct.kt$package com.ivy.wallet.domain.action.category</ID>
     <ID>InvalidPackageDeclaration:Category.kt$package com.ivy.wallet.ui.edit.core</ID>
     <ID>InvalidPackageDeclaration:CategoryByIdAct.kt$package com.ivy.wallet.domain.action.category</ID>
     <ID>InvalidPackageDeclaration:CategoryCreator.kt$package com.ivy.wallet.domain.deprecated.logic</ID>
     <ID>InvalidPackageDeclaration:CategoryIncomeWithAccountFiltersAct.kt$package com.ivy.wallet.domain.action.category</ID>
-    <ID>InvalidPackageDeclaration:CategoryModal.kt$package com.ivy.wallet.ui.theme.modal.edit</ID>
     <ID>InvalidPackageDeclaration:CategoryTrnsBetweenAct.kt$package com.ivy.wallet.domain.action.category</ID>
     <ID>InvalidPackageDeclaration:ChangeTransactionTypeModal.kt$package com.ivy.wallet.ui.theme.components</ID>
-    <ID>InvalidPackageDeclaration:ChooseCategoryModal.kt$package com.ivy.wallet.ui.theme.modal.edit</ID>
     <ID>InvalidPackageDeclaration:ChooseIconModal.kt$package com.ivy.wallet.ui.theme.modal</ID>
     <ID>InvalidPackageDeclaration:ChoosePeriodModal.kt$package com.ivy.wallet.ui.theme.modal</ID>
     <ID>InvalidPackageDeclaration:ChooseStartDateOfMonthModal.kt$package com.ivy.wallet.ui.theme.modal</ID>
@@ -2444,7 +2433,6 @@
     <ID>InvalidPackageDeclaration:DeleteButton.kt$package com.ivy.wallet.ui.theme.components</ID>
     <ID>InvalidPackageDeclaration:DeleteModal.kt$package com.ivy.wallet.ui.theme.modal</ID>
     <ID>InvalidPackageDeclaration:Description.kt$package com.ivy.wallet.ui.edit.core</ID>
-    <ID>InvalidPackageDeclaration:DescriptionModal.kt$package com.ivy.wallet.ui.theme.modal.edit</ID>
     <ID>InvalidPackageDeclaration:DueDate.kt$package com.ivy.wallet.ui.edit.core</ID>
     <ID>InvalidPackageDeclaration:DueTrnsAct.kt$package com.ivy.wallet.domain.action.transaction</ID>
     <ID>InvalidPackageDeclaration:DueTrnsInfoAct.kt$package com.ivy.wallet.domain.action.viewmodel.home</ID>
@@ -2575,7 +2563,6 @@
     <ID>InvalidPackageDeclaration:WidgetBase.kt$package com.ivy.widgets</ID>
     <ID>InvalidPackageDeclaration:WrapContentRow.kt$package com.ivy.wallet.ui.theme.components</ID>
     <ID>LargeClass:TransactionsViewModel.kt$TransactionsViewModel : ComposeViewModel</ID>
-    <ID>LongMethod:AccountModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun BoxWithConstraintsScope.AccountModal( modal: AccountModalData?, onCreateAccount: (CreateAccountData) -&gt; Unit, onEditAccount: (Account, balance: Double) -&gt; Unit, dismiss: () -&gt; Unit, )</ID>
     <ID>LongMethod:ChooseIconModal.kt$fun ivyIcons(): List&lt;Any&gt;</ID>
     <ID>LongMethod:EditPlannedScreen.kt$@ExperimentalFoundationApi @Composable private fun BoxWithConstraintsScope.UI( screen: EditPlannedScreen, state: EditPlannedScreenState, onEvent: (EditPlannedScreenEvent) -&gt; Unit )</ID>
     <ID>LongMethod:EditTransactionScreen.kt$@ExperimentalFoundationApi @Composable private fun BoxWithConstraintsScope.UI( screen: EditTransactionScreen, transactionType: TransactionType, baseCurrency: String, initialTitle: String?, titleSuggestions: ImmutableSet&lt;String&gt;, description: String?, category: Category?, dateTime: LocalDateTime?, account: Account?, toAccount: Account?, dueDate: LocalDateTime?, amount: Double, customExchangeRateState: CustomExchangeRateState, categories: ImmutableList&lt;Category&gt;, accounts: ImmutableList&lt;Account&gt;, onTitleChanged: (String?) -&gt; Unit, onDescriptionChanged: (String?) -&gt; Unit, onAmountChanged: (Double) -&gt; Unit, onCategoryChanged: (Category?) -&gt; Unit, onAccountChanged: (Account) -&gt; Unit, onToAccountChanged: (Account) -&gt; Unit, onDueDateChanged: (LocalDateTime?) -&gt; Unit, onSetDate: (LocalDate) -&gt; Unit, onSetTime: (LocalTime) -&gt; Unit, onSetTransactionType: (TransactionType) -&gt; Unit, onCreateCategory: (CreateCategoryData) -&gt; Unit, onEditCategory: (Category) -&gt; Unit, onPayPlannedPayment: () -&gt; Unit, onSave: (closeScreen: Boolean) -&gt; Unit, onSetHasChanges: (hasChanges: Boolean) -&gt; Unit, onDelete: () -&gt; Unit, onCreateAccount: (CreateAccountData) -&gt; Unit, onExchangeRateChanged: (Double?) -&gt; Unit = { }, loanData: EditTransactionDisplayLoan = EditTransactionDisplayLoan(), backgroundProcessing: Boolean = false, hasChanges: Boolean = false, )</ID>
@@ -4366,10 +4353,7 @@
     <ID>ModifierMissing:AmountCurrency.kt$AmountCurrencyCaption</ID>
     <ID>ModifierMissing:AmountCurrency.kt$AmountCurrencyH1</ID>
     <ID>ModifierMissing:AmountCurrency.kt$AmountCurrencyH2Row</ID>
-    <ID>ModifierMissing:AmountModal.kt$AmountCurrency</ID>
-    <ID>ModifierMissing:AmountModal.kt$AmountKeyboard</ID>
     <ID>ModifierMissing:AmountModal.kt$AmountModal</ID>
-    <ID>ModifierMissing:AmountModal.kt$KeypadCircleButton</ID>
     <ID>ModifierMissing:AppLockedScreen.kt$AppLockedScreen</ID>
     <ID>ModifierMissing:BackBottomBar.kt$BackBottomBar</ID>
     <ID>ModifierMissing:BudgetModal.kt$BudgetModal</ID>
@@ -4479,7 +4463,6 @@
     <ID>MultipleEmitters:AmountCurrency.kt$AmountCurrencyB1</ID>
     <ID>MultipleEmitters:AmountCurrency.kt$AmountCurrencyCaption</ID>
     <ID>MultipleEmitters:AmountCurrency.kt$AmountCurrencyH1</ID>
-    <ID>MultipleEmitters:AmountModal.kt$AmountKeyboard</ID>
     <ID>MultipleEmitters:BudgetModal.kt$CategoriesRow</ID>
     <ID>MultipleEmitters:BudgetScreen.kt$BudgetItem</ID>
     <ID>MultipleEmitters:CSVScreen.kt$AmountMetadata</ID>
@@ -10634,7 +10617,6 @@
     <ID>UnusedPrivateMember:EditTransactionViewModel.kt$EditTransactionViewModel$private suspend fun transferToAmount( amount: Double ): Double?</ID>
     <ID>UnusedPrivateMember:Migration109to110_PlannedPayments.kt$Migration109to110_PlannedPayments$private fun SupportSQLiteDatabase.addSyncColumns(tableName: String)</ID>
     <ID>UnusedPrivateMember:SettingsScreen.kt$@Composable private fun AccountCardButton( @DrawableRes icon: Int, text: String, onClick: () -&gt; Unit )</ID>
-    <ID>UnusedPrivateProperty:AccountModal.kt$val context = LocalContext.current</ID>
     <ID>UnusedPrivateProperty:DateExt.kt$val seconds = TimeUnit.MILLISECONDS.toSeconds(timeLeftAfterCalculations)</ID>
     <ID>UnusedPrivateProperty:HomeMoreMenu.kt$val context = LocalContext.current</ID>
     <ID>UnusedPrivateProperty:IvyLineChart.kt$val marginFromX = 4.dp.toPx()</ID>

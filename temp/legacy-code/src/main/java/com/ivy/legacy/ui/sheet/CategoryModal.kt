@@ -1,19 +1,25 @@
-package com.ivy.wallet.ui.theme.modal.edit
+package com.ivy.legacy.ui.sheet
 
+import android.annotation.SuppressLint
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,7 +30,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -40,34 +46,26 @@ import com.ivy.data.model.CategoryId
 import com.ivy.data.model.primitive.ColorInt
 import com.ivy.data.model.primitive.IconAsset
 import com.ivy.data.model.primitive.NotBlankTrimmedString
-import com.ivy.domain.legacy.ui.IvyColorPicker
-import com.ivy.legacy.IvyWalletPreview
-import com.ivy.legacy.utils.hideKeyboard
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.ColorPicker
+import com.ivy.legacy.ui.component.IconBadge
 import com.ivy.legacy.utils.isNotNullOrBlank
-import com.ivy.legacy.utils.onScreenStart
 import com.ivy.legacy.utils.selectEndTextFieldValue
 import com.ivy.ui.R
-import com.ivy.wallet.domain.deprecated.logic.model.CreateCategoryData
 import com.ivy.ui.color.Ivy
-import com.ivy.wallet.ui.theme.components.ItemIconMDefaultIcon
-import com.ivy.wallet.ui.theme.components.IvyNameTextField
-import com.ivy.ui.color.dynamicContrast
+import com.ivy.wallet.domain.deprecated.logic.model.CreateCategoryData
 import com.ivy.wallet.ui.theme.modal.ChooseIconModal
-import com.ivy.wallet.ui.theme.modal.IvyModal
-import com.ivy.wallet.ui.theme.modal.ModalAddSave
-import com.ivy.wallet.ui.theme.modal.ModalTitle
 import java.util.UUID
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
 data class CategoryModalData(
     val category: Category?,
     val id: UUID = UUID.randomUUID(),
     val autoFocusKeyboard: Boolean = true,
 )
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@SuppressLint("ComposeModifierMissing")
 @Composable
-fun BoxWithConstraintsScope.CategoryModal(
+fun CategoryModal(
     modal: CategoryModalData?,
     onCreateCategory: (CreateCategoryData) -> Unit,
     onEditCategory: (Category) -> Unit,
@@ -88,87 +86,88 @@ fun BoxWithConstraintsScope.CategoryModal(
         mutableStateOf(false)
     }
 
-    IvyModal(
-        id = modal?.id,
-        visible = modal != null,
-        dismiss = dismiss,
-        PrimaryAction = {
-            ModalAddSave(
-                item = modal?.category,
-                enabled = nameTextFieldValue.text.isNotNullOrBlank()
-            ) {
-                if (initialCategory != null) {
-                    val updatedCategory = either {
-                        initialCategory.copy(
-                            name = NotBlankTrimmedString.from(nameTextFieldValue.text.trim()).bind(),
-                            color = ColorInt(color.toArgb()),
-                            icon = icon
-                        )
-                    }.getOrNull()
-
-                    if (updatedCategory != null) {
-                        onEditCategory(updatedCategory)
-                    }
+    if (modal != null) {
+        key(modal.id) {
+            ActionSheet(
+                onDismiss = dismiss,
+                title = if (initialCategory != null) {
+                    stringResource(R.string.edit_category)
                 } else {
-                    onCreateCategory(
-                        CreateCategoryData(
-                            name = nameTextFieldValue.text.trim(),
-                            color = color,
-                            icon = icon?.id
-                        )
+                    stringResource(R.string.create_category)
+                },
+                actions = { dismissSheet ->
+                    Spacer(Modifier.weight(1f))
+
+                    Button(
+                        onClick = {
+                            if (initialCategory != null) {
+                                val updatedCategory = either {
+                                    initialCategory.copy(
+                                        name = NotBlankTrimmedString.from(nameTextFieldValue.text.trim()).bind(),
+                                        color = ColorInt(color.toArgb()),
+                                        icon = icon
+                                    )
+                                }.getOrNull()
+
+                                if (updatedCategory != null) {
+                                    onEditCategory(updatedCategory)
+                                }
+                            } else {
+                                onCreateCategory(
+                                    CreateCategoryData(
+                                        name = nameTextFieldValue.text.trim(),
+                                        color = color,
+                                        icon = icon?.id
+                                    )
+                                )
+                            }
+
+                            dismissSheet()
+                        },
+                        enabled = nameTextFieldValue.text.isNotNullOrBlank(),
+                        modifier = if (initialCategory == null) Modifier.testTag("modal_add") else Modifier,
+                    ) {
+                        Text(stringResource(if (initialCategory != null) R.string.save else R.string.add))
+                    }
+                }
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    IconNameRow(
+                        hint = stringResource(R.string.category_name),
+                        defaultIcon = R.drawable.ic_custom_category_m,
+                        color = color,
+                        icon = icon?.id,
+
+                        autoFocusKeyboard = modal.autoFocusKeyboard,
+
+                        nameTextFieldValue = nameTextFieldValue,
+                        setNameTextFieldValue = { nameTextFieldValue = it },
+                        showChooseIconModal = {
+                            chooseIconModalVisible = true
+                        }
+                    )
+
+                    ColorPicker(
+                        selectedColor = color,
+                        onColorSelect = { color = it }
                     )
                 }
-
-                dismiss()
             }
         }
-    ) {
-        Spacer(Modifier.height(32.dp))
-
-        ModalTitle(
-            text = if (modal?.category != null) {
-                stringResource(R.string.edit_category)
-            } else {
-                stringResource(
-                    R.string.create_category
-                )
-            }
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        IconNameRow(
-            hint = stringResource(R.string.category_name),
-            defaultIcon = R.drawable.ic_custom_category_m,
-            color = color,
-            icon = icon?.id,
-
-            autoFocusKeyboard = modal?.autoFocusKeyboard ?: true,
-
-            nameTextFieldValue = nameTextFieldValue,
-            setNameTextFieldValue = { nameTextFieldValue = it },
-            showChooseIconModal = {
-                chooseIconModalVisible = true
-            }
-        )
-
-        Spacer(Modifier.height(40.dp))
-
-        IvyColorPicker(
-            selectedColor = color,
-            onColorSelected = { color = it }
-        )
-
-        Spacer(Modifier.height(48.dp))
     }
 
-    ChooseIconModal(
-        visible = chooseIconModalVisible,
-        initialIcon = icon?.id ?: "category",
-        color = color,
-        dismiss = { chooseIconModalVisible = false }
-    ) {
-        icon = it?.let { iconId -> IconAsset.unsafe(iconId) }
+    BoxWithConstraints {
+        ChooseIconModal(
+            visible = chooseIconModalVisible,
+            initialIcon = icon?.id ?: "category",
+            color = color,
+            dismiss = { chooseIconModalVisible = false }
+        ) {
+            icon = it?.let { iconId -> IconAsset.unsafe(iconId) }
+        }
     }
 }
 
@@ -186,61 +185,55 @@ fun IconNameRow(
 
     showChooseIconModal: () -> Unit
 ) {
+    val nameFocus = remember { FocusRequester() }
+    val keyboard = LocalSoftwareKeyboardController.current
+    LaunchedEffect(Unit) {
+        if (autoFocusKeyboard) {
+            nameFocus.requestFocus()
+        }
+    }
+
     Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val nameFocus = FocusRequester()
-
-        onScreenStart {
-            if (autoFocusKeyboard) {
-                nameFocus.requestFocus()
-            }
-        }
-
-        Spacer(Modifier.width(24.dp))
-
-        ItemIconMDefaultIcon(
+        IconBadge(
+            color = color,
+            iconName = icon,
+            defaultIcon = defaultIcon,
             modifier = Modifier
                 .clip(CircleShape)
-                .background(color, CircleShape)
-                .clickable {
-                    showChooseIconModal()
-                }
+                .clickable { showChooseIconModal() }
                 .testTag("modal_item_icon"),
-            iconName = icon,
-            tint = color.dynamicContrast(),
-            defaultIcon = defaultIcon
         )
 
-        val view = LocalView.current
-        IvyNameTextField(
-            modifier = Modifier
-                .padding(start = 28.dp, end = 36.dp)
-                .focusRequester(nameFocus),
-            underlineModifier = Modifier.padding(start = 24.dp, end = 32.dp),
+        OutlinedTextField(
             value = nameTextFieldValue,
-            hint = hint,
+            onValueChange = setNameTextFieldValue,
+            modifier = Modifier
+                .weight(1f)
+                .focusRequester(nameFocus)
+                .testTag("base_input"),
+            label = { Text(hint) },
+            singleLine = true,
             keyboardOptions = KeyboardOptions(
                 capitalization = KeyboardCapitalization.Words,
                 imeAction = ImeAction.Done,
                 keyboardType = KeyboardType.Text,
                 autoCorrect = true
             ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    hideKeyboard(view)
-                }
-            ),
-        ) { newValue ->
-            setNameTextFieldValue(newValue)
-        }
+            keyboardActions = KeyboardActions(onDone = { keyboard?.hide() }),
+        )
     }
 }
 
 @Preview
 @Composable
 private fun PreviewCategoryModal(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
+    WalletPreview(theme) {
         CategoryModal(
             modal = CategoryModalData(null),
             onCreateCategory = { },
@@ -259,7 +252,7 @@ fun CategoryModalUiTest(isDark: Boolean) {
 /** For screenshot testing */
 @Composable
 fun EditCategoryModalUiTest(isDark: Boolean) {
-    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+    WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
         CategoryModal(
             modal = CategoryModalData(
                 Category(

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -57,7 +56,6 @@ import com.ivy.legacy.utils.selectEndTextFieldValue
 import com.ivy.ui.R
 import com.ivy.ui.color.Ivy
 import com.ivy.wallet.domain.deprecated.logic.model.CreateCategoryData
-import com.ivy.wallet.ui.theme.modal.ChooseIconModal
 import java.util.UUID
 
 data class CategoryModalData(
@@ -135,9 +133,7 @@ fun CategoryModal(
                 }
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     IconNameRow(
@@ -152,7 +148,8 @@ fun CategoryModal(
                         setNameTextFieldValue = { nameTextFieldValue = it },
                         showChooseIconModal = {
                             chooseIconModalVisible = true
-                        }
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp),
                     )
 
                     ColorPicker(
@@ -164,17 +161,13 @@ fun CategoryModal(
         }
     }
 
-    // Temporary host: ChooseIconModal is still a BoxWithConstraintsScope extension.
-    // This BoxWithConstraints goes away when it is rewritten in Task 3.3.
-    BoxWithConstraints {
-        ChooseIconModal(
-            visible = chooseIconModalVisible,
-            initialIcon = icon?.id ?: "category",
-            color = color,
-            dismiss = { chooseIconModalVisible = false }
-        ) {
-            icon = it?.let { iconId -> IconAsset.unsafe(iconId) }
-        }
+    ChooseIconModal(
+        visible = chooseIconModalVisible,
+        initialIcon = icon?.id ?: "category",
+        color = color,
+        dismiss = { chooseIconModalVisible = false }
+    ) {
+        icon = it?.let { iconId -> IconAsset.unsafe(iconId) }
     }
 }
 

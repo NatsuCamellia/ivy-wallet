@@ -1,103 +1,68 @@
-package com.ivy.wallet.ui.theme.modal
+package com.ivy.legacy.ui.sheet
 
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.Row
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.legacy.IvyWalletPreview
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.CurrencyPicker
 import com.ivy.ui.R
 import com.ivy.wallet.domain.data.IvyCurrency
-import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.components.CurrencyPicker
 import java.util.UUID
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@SuppressLint("ComposeModifierMissing")
 @Composable
-fun BoxWithConstraintsScope.CurrencyModal(
+fun CurrencyModal(
     title: String,
     initialCurrency: IvyCurrency?,
     visible: Boolean,
     dismiss: () -> Unit,
-    id: UUID = UUID.randomUUID(),
+    id: UUID = remember { UUID.randomUUID() },
 
     onSetCurrency: (String) -> Unit
 ) {
-    var currency by remember(id) {
-        mutableStateOf(initialCurrency ?: IvyCurrency.getDefault())
-    }
+    if (visible) {
+        key(id) {
+            var currency by remember { mutableStateOf(initialCurrency ?: IvyCurrency.getDefault()) }
 
-    IvyModal(
-        id = id,
-        visible = visible,
-        dismiss = dismiss,
-        PrimaryAction = {
-            ModalSave(
-                modifier = Modifier.testTag("set_currency_save")
+            ActionSheet(
+                onDismiss = dismiss,
+                title = title,
+                contentScrollable = false,
+                actions = { dismissSheet ->
+                    Spacer(Modifier.weight(1f))
+
+                    Button(
+                        onClick = {
+                            onSetCurrency(currency.code)
+                            dismissSheet()
+                        },
+                        modifier = Modifier.testTag("set_currency_save"),
+                    ) {
+                        Text(stringResource(R.string.set))
+                    }
+                }
             ) {
-                onSetCurrency(currency.code)
-                dismiss()
+                CurrencyPicker(
+                    modifier = Modifier.weight(1f),
+                    initialSelectedCurrency = currency,
+
+                    includeKeyboardShownInsetSpacer = false,
+                ) {
+                    currency = it
+                }
             }
-        },
-        includeActionsRowPadding = false,
-        scrollState = null
-    ) {
-        var keyboardVisible by remember {
-            mutableStateOf(false)
-        }
-
-        if (!keyboardVisible) {
-            Spacer(Modifier.height(32.dp))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ModalTitle(text = title)
-
-                Spacer(Modifier.weight(1f))
-
-                Text(
-                    text = stringResource(R.string.supports_crypto),
-                    style = UI.typo.c.style(
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Gray
-                    )
-                )
-
-                Spacer(Modifier.width(32.dp))
-            }
-        }
-
-        Spacer(Modifier.height(24.dp))
-
-        CurrencyPicker(
-            modifier = Modifier
-                .weight(1f),
-            initialSelectedCurrency = currency,
-
-            includeKeyboardShownInsetSpacer = false,
-            lastItemSpacer = 120.dp,
-            onKeyboardShown = { visible ->
-                keyboardVisible = visible
-            }
-        ) {
-            currency = it
         }
     }
 }
@@ -105,7 +70,7 @@ fun BoxWithConstraintsScope.CurrencyModal(
 @Preview
 @Composable
 private fun Preview(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
+    WalletPreview(theme) {
         CurrencyModal(
             title = "Set currency",
             initialCurrency = null,

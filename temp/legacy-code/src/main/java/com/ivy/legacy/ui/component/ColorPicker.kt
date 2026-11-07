@@ -2,6 +2,8 @@ package com.ivy.legacy.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -38,12 +40,14 @@ fun ColorPicker(
         Text(
             text = stringResource(R.string.choose_color),
             style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(horizontal = 16.dp),
         )
 
         LazyRow(
             state = rememberLazyListState(
                 initialFirstVisibleItemIndex = pickerColors.indexOf(selectedColor).coerceAtLeast(0)
             ),
+            contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             items(pickerColors) { color ->

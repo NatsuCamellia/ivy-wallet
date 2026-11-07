@@ -15,6 +15,11 @@ import androidx.compose.ui.unit.dp
 import com.ivy.ui.color.findContrastTextColor
 import com.ivy.wallet.ui.theme.components.getCustomIconId
 
+@DrawableRes
+@Composable
+fun customIconResource(iconName: String?, @DrawableRes defaultIcon: Int, size: String): Int =
+    getCustomIconId(LocalContext.current, iconName, size)?.iconId ?: defaultIcon
+
 /** The only place a user-picked colour and `ic_custom_*` icon are shown: a coloured circle with the icon on it. */
 @Composable
 fun IconBadge(
@@ -23,7 +28,7 @@ fun IconBadge(
     @DrawableRes defaultIcon: Int,
     modifier: Modifier = Modifier,
 ) {
-    val iconRes = getCustomIconId(LocalContext.current, iconName, "m")?.iconId ?: defaultIcon
+    val iconRes = customIconResource(iconName, defaultIcon, "m")
     Surface(
         modifier = modifier.size(48.dp),
         shape = CircleShape,

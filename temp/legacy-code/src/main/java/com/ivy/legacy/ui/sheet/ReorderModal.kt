@@ -1,13 +1,27 @@
-package com.ivy.wallet.ui.theme.components
+package com.ivy.legacy.ui.sheet
 
 import android.annotation.SuppressLint
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DragHandle
+import androidx.compose.material.icons.filled.SwapVert
+import androidx.compose.material3.Button
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -15,53 +29,37 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ItemTouchHelper.*
+import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
+import androidx.recyclerview.widget.ItemTouchHelper.DOWN
+import androidx.recyclerview.widget.ItemTouchHelper.UP
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ivy.base.legacy.Theme
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.legacy.IvyWalletPreview
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.utils.numberBetween
 import com.ivy.legacy.utils.swap
 import com.ivy.ui.R
 import com.ivy.wallet.domain.data.Reorderable
-import com.ivy.wallet.ui.theme.GradientGreen
-import com.ivy.ui.color.White
-import com.ivy.wallet.ui.theme.modal.IvyModal
-import java.util.*
+import java.util.UUID
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@SuppressLint("ComposeModifierMissing")
 @Suppress("UNCHECKED_CAST", "ParameterNaming")
 @Composable
-fun <T : Reorderable> BoxScope.ReorderModalSingleType(
+fun <T : Reorderable> ReorderModalSingleType(
     visible: Boolean,
-    id: UUID = UUID.randomUUID(),
-    TitleContent: @Composable ColumnScope.() -> Unit = {
-        Text(
-            modifier = Modifier.padding(start = 32.dp),
-            text = stringResource(R.string.reorder),
-            style = UI.typo.b1.style(
-                UI.colors.pureInverse,
-                FontWeight.ExtraBold
-            )
-        )
-    },
+    id: UUID = remember { UUID.randomUUID() },
     initialItems: List<T>,
     dismiss: () -> Unit,
     onUpdateItemOrderNum: (item: T, newOrderNum: Double) -> Unit = { _, _ -> },
     onReordered: ((List<T>) -> Unit)? = null,
-    ItemContent: @Composable (Int, T) -> Unit
+    itemContent: @Composable (Int, T) -> Unit
 ) {
     ReorderModal<T>(
         visible = visible,
         id = id,
         initialItems = initialItems,
-        TitleContent = TitleContent,
         dismiss = dismiss,
         onUpdateItemOrderNum = { _, item, newOrderNum ->
             onUpdateItemOrderNum(item, newOrderNum)
@@ -71,28 +69,18 @@ fun <T : Reorderable> BoxScope.ReorderModalSingleType(
                 listAny as? List<T> ?: error("List<T> cast exception.")
             )
         },
-        ItemContent = { index, itemAny ->
-            ItemContent(index, itemAny as T)
+        itemContent = { index, itemAny ->
+            itemContent(index, itemAny as T)
         }
     )
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@SuppressLint("ComposeModifierMissing")
 @Suppress("ParameterNaming")
 @Composable
-fun <T : Reorderable> BoxScope.ReorderModal(
+fun <T : Reorderable> ReorderModal(
     visible: Boolean,
-    id: UUID = UUID.randomUUID(),
-    TitleContent: @Composable ColumnScope.() -> Unit = {
-        Text(
-            modifier = Modifier.padding(start = 32.dp),
-            text = stringResource(R.string.reorder),
-            style = UI.typo.b1.style(
-                UI.colors.pureInverse,
-                FontWeight.ExtraBold
-            )
-        )
-    },
+    id: UUID = remember { UUID.randomUUID() },
     initialItems: List<Any>,
     dismiss: () -> Unit,
     onUpdateItemOrderNum: (
@@ -101,89 +89,76 @@ fun <T : Reorderable> BoxScope.ReorderModal(
         newOrderNum: Double
     ) -> Unit = { _, _, _ -> },
     onReordered: ((List<Any>) -> Unit)? = null,
-    ItemContent: @Composable RowScope.(Int, Any) -> Unit
+    itemContent: @Composable (Int, Any) -> Unit
 ) {
-    var items by remember(id, initialItems) { mutableStateOf(initialItems) }
-    var reOrderedList: List<Any>? by remember {
-        mutableStateOf(null)
-    }
-    var orderNumUpdates by remember {
-        mutableStateOf(
-            mapOf<T, Double>()
-        )
-    }
+    if (visible) {
+        key(id) {
+            var items by remember(initialItems) { mutableStateOf(initialItems) }
+            var reOrderedList: List<Any>? by remember { mutableStateOf(null) }
+            var orderNumUpdates by remember { mutableStateOf(mapOf<T, Double>()) }
 
-    IvyModal(
-        id = id,
-        visible = visible,
-        scrollState = null,
-        dismiss = dismiss,
-        PrimaryAction = {
-            IvyCircleButton(
-                modifier = Modifier
-                    .size(48.dp)
-                    .testTag("reorder_done"),
-                backgroundGradient = GradientGreen,
-                icon = R.drawable.ic_check,
-                tint = White
-            ) {
-                orderNumUpdates.forEach { (item, newOrderNum) ->
-                    onUpdateItemOrderNum(items, item, newOrderNum)
+            ActionSheet(
+                onDismiss = dismiss,
+                title = stringResource(R.string.reorder),
+                sheetGesturesEnabled = false,
+                contentScrollable = false,
+                actions = { dismissSheet ->
+                    Spacer(Modifier.weight(1f))
+
+                    Button(
+                        onClick = {
+                            orderNumUpdates.forEach { (item, newOrderNum) ->
+                                onUpdateItemOrderNum(items, item, newOrderNum)
+                            }
+
+                            onReordered?.invoke(reOrderedList ?: items)
+                            dismissSheet()
+                        },
+                        modifier = Modifier.testTag("reorder_done"),
+                    ) {
+                        Text(stringResource(R.string.done))
+                    }
                 }
+            ) {
+                val dragColor = MaterialTheme.colorScheme.surfaceContainerHighest
+                AndroidView(
+                    modifier = Modifier.fillMaxWidth(),
+                    factory = {
+                        RecyclerView(it).apply {
+                            val itemTouchHelper = itemTouchHelper<T>(
+                                dragColor = dragColor
+                            )
+                            adapter = Adapter<T>(
+                                itemTouchHelper = itemTouchHelper,
+                                itemContent = itemContent,
+                                addItemOrderNumUpdate = { item, newOrderNum ->
+                                    orderNumUpdates = orderNumUpdates
+                                        .toMutableMap()
+                                        .apply {
+                                            this[item] = newOrderNum
+                                        }
+                                },
+                                onReorderInternalList = { reorderedItems ->
+                                    items = reorderedItems
+                                    reOrderedList = reorderedItems
+                                }
+                            )
+                            layoutManager = LinearLayoutManager(it)
+                            itemTouchHelper.attachToRecyclerView(this)
 
-                onReordered?.invoke(reOrderedList ?: items)
-                dismiss()
+                            adapter<T>().display(items)
+                        }
+                    },
+                )
             }
         }
-    ) {
-        Spacer(Modifier.height(32.dp))
-
-        TitleContent()
-
-        Spacer(Modifier.height(24.dp))
-
-        val colorMedium = UI.colors.medium
-        AndroidView(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            factory = {
-                RecyclerView(it).apply {
-                    val itemTouchHelper = itemTouchHelper<T>(
-                        colorMedium = colorMedium
-                    )
-                    adapter = Adapter<T>(
-                        itemTouchHelper = itemTouchHelper,
-                        ItemContent = ItemContent,
-                        addItemOrderNumUpdate = { item, newOrderNum ->
-                            orderNumUpdates = orderNumUpdates
-                                .toMutableMap()
-                                .apply {
-                                    this[item] = newOrderNum
-                                }
-                        },
-                        onReorderInternalList = { reorderedItems ->
-                            items = reorderedItems
-                            reOrderedList = reorderedItems
-                        }
-                    )
-                    layoutManager = LinearLayoutManager(it)
-                    itemTouchHelper.attachToRecyclerView(this)
-
-                    adapter<T>().display(items)
-                }
-            },
-            update = {
-            }
-        )
     }
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Suppress("UNCHECKED_CAST")
 private class Adapter<T : Reorderable>(
     private val itemTouchHelper: ItemTouchHelper,
-    private val ItemContent: @Composable RowScope.(Int, Any) -> Unit,
+    private val itemContent: @Composable (Int, Any) -> Unit,
     private val addItemOrderNumUpdate: (item: T, orderNum: Double) -> Unit,
     private val onReorderInternalList: (List<Any>) -> Unit
 ) : RecyclerView.Adapter<Adapter<T>.ItemViewHolder>() {
@@ -223,8 +198,7 @@ private class Adapter<T : Reorderable>(
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         holder.display(
             item = data[position],
-            ItemContent = ItemContent,
-            position = position
+            itemContent = itemContent,
         )
     }
 
@@ -236,36 +210,32 @@ private class Adapter<T : Reorderable>(
 
         fun display(
             item: Any,
-            ItemContent: @Composable RowScope.(Int, Any) -> Unit,
-            position: Int
+            itemContent: @Composable (Int, Any) -> Unit,
         ) {
             (itemView as ComposeView).setContent {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                ListItem(
+                    leadingContent = if (item as? T != null) {
+                        {
+                            Icon(
+                                imageVector = Icons.Default.DragHandle,
+                                contentDescription = stringResource(R.string.reorder),
+                                modifier = Modifier
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(
+                                            onPress = {
+                                                itemTouchHelper.startDrag(this@ItemViewHolder)
+                                            }
+                                        )
+                                    }
+                                    .testTag("reorder_drag_handle"),
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                 ) {
-                    if (item as? T != null) {
-                        Spacer(Modifier.width(24.dp))
-
-                        IvyIcon(
-                            modifier = Modifier
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onPress = {
-                                            itemTouchHelper.startDrag(this@ItemViewHolder)
-                                        }
-                                    )
-                                }
-                                .testTag("reorder_drag_handle"),
-                            icon = R.drawable.ic_drag_handle,
-                            tint = UI.colors.gray,
-                            contentDescription = "reorder_$position"
-                        )
-
-                        Spacer(Modifier.width(4.dp))
-                    }
-
-                    ItemContent(adapterPosition, item)
+                    itemContent(adapterPosition, item)
                 }
             }
         }
@@ -274,7 +244,7 @@ private class Adapter<T : Reorderable>(
 
 @Suppress("UNCHECKED_CAST")
 private fun <T : Reorderable> itemTouchHelper(
-    colorMedium: Color,
+    dragColor: Color,
 ): ItemTouchHelper {
     // 1. Note that I am specifying all 4 directions.
     //    Specifying START and END also allows
@@ -323,7 +293,7 @@ private fun <T : Reorderable> itemTouchHelper(
             super.onSelectedChanged(viewHolder, actionState)
 
             if (actionState == ACTION_STATE_DRAG) {
-                viewHolder?.itemView?.setBackgroundColor(colorMedium.toArgb())
+                viewHolder?.itemView?.setBackgroundColor(dragColor.toArgb())
             }
         }
 
@@ -355,12 +325,12 @@ fun ReorderButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    CircleButtonFilled(
-        modifier = modifier
-            .testTag("reorder_button"),
-        icon = R.drawable.ic_reorder,
-        onClick = onClick
-    )
+    FilledTonalIconButton(
+        onClick = onClick,
+        modifier = modifier.testTag("reorder_button"),
+    ) {
+        Icon(Icons.Default.SwapVert, contentDescription = stringResource(R.string.reorder))
+    }
 }
 
 @Suppress("UNCHECKED_CAST")
@@ -403,7 +373,7 @@ private data class ReorderItem(val name: String, val orderNum: Double) : Reorder
 @Suppress("ModifierMissing")
 @Composable
 fun ReorderModalUiTest(isDark: Boolean) {
-    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+    WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
         ReorderModalSingleType(
             visible = true,
             initialItems = listOf("Cash", "Bank", "Savings").mapIndexed { index, name ->
@@ -411,17 +381,7 @@ fun ReorderModalUiTest(isDark: Boolean) {
             },
             dismiss = {}
         ) { _, item ->
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 24.dp)
-                    .padding(vertical = 8.dp),
-                text = item.name,
-                style = UI.typo.b1.style(
-                    color = UI.colors.pureInverse,
-                    fontWeight = FontWeight.Bold
-                )
-            )
+            Text(item.name)
         }
     }
 }

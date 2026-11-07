@@ -2,7 +2,6 @@ package com.ivy.legacy.ui.sheet
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,8 +40,6 @@ import com.ivy.ui.R
 import com.ivy.ui.color.Ivy
 import com.ivy.wallet.domain.data.IvyCurrency
 import com.ivy.wallet.domain.deprecated.logic.model.CreateAccountData
-import com.ivy.wallet.ui.theme.modal.ChooseIconModal
-import com.ivy.wallet.ui.theme.modal.CurrencyModal
 import java.util.UUID
 
 data class AccountModalData(
@@ -134,9 +131,7 @@ fun AccountModal(
                 }
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     IconNameRow(
@@ -151,7 +146,8 @@ fun AccountModal(
                         setNameTextFieldValue = { nameTextFieldValue = it },
                         showChooseIconModal = {
                             chooseIconModalVisible = true
-                        }
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp),
                     )
 
                     ColorPicker(
@@ -166,6 +162,7 @@ fun AccountModal(
                         onCurrencyClick = { currencyModalVisible = true },
                         onIncludeInBalanceChange = { includeInBalance = it },
                         onAmountClick = { amountModalVisible = true },
+                        modifier = Modifier.padding(horizontal = 16.dp),
                     )
                 }
             }
@@ -202,26 +199,22 @@ fun AccountModal(
         }
     }
 
-    // Temporary host: CurrencyModal and ChooseIconModal are still BoxWithConstraintsScope extensions.
-    // This BoxWithConstraints goes away when they are rewritten in Task 3.3.
-    BoxWithConstraints {
-        CurrencyModal(
-            title = stringResource(R.string.choose_currency),
-            initialCurrency = IvyCurrency.fromCode(currencyCode),
-            visible = currencyModalVisible,
-            dismiss = { currencyModalVisible = false }
-        ) {
-            currencyCode = it
-        }
+    CurrencyModal(
+        title = stringResource(R.string.choose_currency),
+        initialCurrency = IvyCurrency.fromCode(currencyCode),
+        visible = currencyModalVisible,
+        dismiss = { currencyModalVisible = false }
+    ) {
+        currencyCode = it
+    }
 
-        ChooseIconModal(
-            visible = chooseIconModalVisible,
-            initialIcon = icon ?: "account",
-            color = color,
-            dismiss = { chooseIconModalVisible = false }
-        ) {
-            icon = it
-        }
+    ChooseIconModal(
+        visible = chooseIconModalVisible,
+        initialIcon = icon ?: "account",
+        color = color,
+        dismiss = { chooseIconModalVisible = false }
+    ) {
+        icon = it
     }
 }
 
@@ -233,8 +226,10 @@ private fun AccountSettings(
     onCurrencyClick: () -> Unit,
     onIncludeInBalanceChange: (Boolean) -> Unit,
     onAmountClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
     ) {
         SegmentedListItem(

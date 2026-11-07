@@ -2,8 +2,8 @@ package com.ivy.legacy.ui.sheet
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -83,7 +83,7 @@ fun ChooseCategoryModal(
                 LaunchedEffect(Unit) { keyboard?.hide() }
 
                 LazyColumn(
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
                 ) {
                     itemsIndexed(categories, key = { _, category -> category.id.value }) { index, category ->

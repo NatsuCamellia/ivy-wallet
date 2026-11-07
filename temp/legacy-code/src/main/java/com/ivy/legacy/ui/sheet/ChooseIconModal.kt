@@ -1,338 +1,140 @@
-package com.ivy.wallet.ui.theme.modal
+package com.ivy.legacy.ui.sheet
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.Row
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.Button
+import androidx.compose.material3.FilledIconToggleButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.design.l1_buildingBlocks.DividerW
-import com.ivy.design.l1_buildingBlocks.IvyText
-import com.ivy.design.l1_buildingBlocks.SpacerHor
-import com.ivy.design.l1_buildingBlocks.SpacerVer
-import com.ivy.legacy.IvyWalletPreview
-import com.ivy.legacy.utils.hideKeyboard
-import com.ivy.legacy.utils.onScreenStart
-import com.ivy.ui.util.thenIf
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.customIconResource
 import com.ivy.ui.R
 import com.ivy.ui.color.Ivy
-import com.ivy.wallet.ui.theme.components.ItemIconS
-import com.ivy.ui.color.dynamicContrast
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
+import com.ivy.ui.color.findContrastTextColor
 import java.util.UUID
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-private const val ICON_PICKER_ICONS_PER_ROW = 5
+private const val IconsPerRow = 5
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Suppress("ParameterNaming")
+@SuppressLint("ComposeModifierMissing")
 @Composable
-fun BoxWithConstraintsScope.ChooseIconModal(
+fun ChooseIconModal(
     visible: Boolean,
     initialIcon: String?,
     color: Color,
 
-    id: UUID = UUID.randomUUID(),
+    id: UUID = remember { UUID.randomUUID() },
 
     dismiss: () -> Unit,
-    onIconChosen: (String?) -> Unit
+    onIconChoose: (String?) -> Unit
 ) {
-    var selectedIcon by remember(id) {
-        mutableStateOf(initialIcon)
-    }
+    if (visible) {
+        key(id) {
+            var selectedIcon by remember { mutableStateOf(initialIcon) }
 
-    IvyModal(
-        id = id,
-        visible = visible,
-        dismiss = dismiss,
-        scrollState = null,
-        includeActionsRowPadding = false,
-        PrimaryAction = {
-            ModalSave(
-                modifier = Modifier.testTag("choose_icon_save")
+            ActionSheet(
+                onDismiss = dismiss,
+                title = stringResource(R.string.choose_icon),
+                contentScrollable = false,
+                actions = { dismissSheet ->
+                    Spacer(Modifier.weight(1f))
+
+                    Button(
+                        onClick = {
+                            onIconChoose(selectedIcon)
+                            dismissSheet()
+                        },
+                        modifier = Modifier.testTag("choose_icon_save"),
+                    ) {
+                        Text(stringResource(R.string.save))
+                    }
+                }
             ) {
-                onIconChosen(selectedIcon)
-                dismiss()
-            }
-        }
-    ) {
-        val view = LocalView.current
-        onScreenStart {
-            hideKeyboard(view)
-        }
+                val keyboard = LocalSoftwareKeyboardController.current
+                LaunchedEffect(Unit) { keyboard?.hide() }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            item {
-                Spacer(Modifier.height(32.dp))
-
-                ModalTitle(text = stringResource(R.string.choose_icon))
-
-                Spacer(Modifier.height(4.dp))
-            }
-
-            icons(selectedIcon = selectedIcon, color = color) {
-                selectedIcon = it
-            }
-
-            item {
-                Spacer(Modifier.height(160.dp))
-            }
-        }
-    }
-}
-
-private fun LazyListScope.icons(
-    selectedIcon: String?,
-    color: Color,
-
-    onIconSelected: (String) -> Unit
-) {
-    val icons = ivyIcons()
-
-    iconsR(
-        icons = icons,
-        iconsPerRow = ICON_PICKER_ICONS_PER_ROW,
-        selectedIcon = selectedIcon,
-        color = color,
-        onIconSelected = onIconSelected
-    )
-}
-
-private tailrec fun LazyListScope.iconsR(
-    icons: List<Any>,
-    rowAcc: List<String> = emptyList(),
-
-    iconsPerRow: Int,
-    selectedIcon: String?,
-    color: Color,
-
-    onIconSelected: (String) -> Unit
-) {
-    if (icons.isNotEmpty()) {
-        // recurse
-
-        when (val currentItem = icons.first()) {
-            is IconPickerSection -> {
-                addIconsRowIfNotEmpty(
-                    rowAcc = rowAcc,
+                IconGrid(
                     selectedIcon = selectedIcon,
                     color = color,
-                    onIconSelected = onIconSelected
+                    onIconSelect = { selectedIcon = it },
                 )
+            }
+        }
+    }
+}
 
-                item {
-                    Section(title = currentItem.title)
+@Composable
+private fun IconGrid(
+    selectedIcon: String?,
+    color: Color,
+    onIconSelect: (String) -> Unit,
+) {
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(IconsPerRow),
+    ) {
+        for (entry in ivyIcons()) {
+            when (entry) {
+                is IconPickerSection -> item(key = entry.title, span = { GridItemSpan(maxLineSpan) }) {
+                    Text(
+                        text = entry.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(ListItemDefaults.ContentPadding),
+                    )
                 }
 
-                // RECURSE
-                iconsR(
-                    icons = icons.drop(1),
-                    rowAcc = emptyList(),
-
-                    iconsPerRow = iconsPerRow,
-                    selectedIcon = selectedIcon,
-                    color = color,
-                    onIconSelected = onIconSelected
-
-                )
-            }
-            is String -> {
-                // icon
-
-                if (rowAcc.size == iconsPerRow) {
-                    // recurse and reset acc
-
-                    addIconsRowIfNotEmpty(
-                        rowAcc = rowAcc,
-                        selectedIcon = selectedIcon,
-                        color = color,
-                        onIconSelected = onIconSelected
-                    )
-
-                    // RECURSE
-                    iconsR(
-                        icons = icons.drop(1),
-                        rowAcc = emptyList(),
-
-                        iconsPerRow = iconsPerRow,
-                        selectedIcon = selectedIcon,
-                        color = color,
-                        onIconSelected = onIconSelected
-
-                    )
-                } else {
-                    // recurse by filling acc
-
-                    // RECURSE
-                    iconsR(
-                        icons = icons.drop(1),
-                        rowAcc = rowAcc + currentItem,
-
-                        iconsPerRow = iconsPerRow,
-                        selectedIcon = selectedIcon,
-                        color = color,
-                        onIconSelected = onIconSelected
-
-                    )
+                is String -> item(key = entry) {
+                    val selected = entry == selectedIcon
+                    FilledIconToggleButton(
+                        checked = selected,
+                        onCheckedChange = { onIconSelect(entry) },
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .testTag(entry),
+                        shapes = IconButtonDefaults.toggleableShapes(),
+                        colors = IconButtonDefaults.filledIconToggleButtonColors(
+                            checkedContainerColor = color,
+                            checkedContentColor = findContrastTextColor(color),
+                        ),
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                customIconResource(entry, R.drawable.ic_custom_category_s, "s")
+                            ),
+                            contentDescription = entry.removePrefix("ic_vue_").replace('_', ' '),
+                        )
+                    }
                 }
             }
         }
-    } else {
-        // end recursion
-        addIconsRowIfNotEmpty(
-            rowAcc = rowAcc,
-            selectedIcon = selectedIcon,
-            color = color,
-            onIconSelected = onIconSelected
-        )
     }
-}
-
-private fun LazyListScope.addIconsRowIfNotEmpty(
-    rowAcc: List<String>,
-
-    selectedIcon: String?,
-    color: Color,
-
-    onIconSelected: (String) -> Unit
-) {
-    val rowAcc = rowAcc.toImmutableList()
-
-    if (rowAcc.isNotEmpty()) {
-        item {
-            IconsRow(
-                icons = rowAcc,
-                selectedIcon = selectedIcon,
-                color = color
-            ) {
-                onIconSelected(it)
-            }
-
-            Spacer(Modifier.height(16.dp))
-        }
-    }
-}
-
-@Composable
-@Suppress("ParameterNaming")
-private fun IconsRow(
-    icons: ImmutableList<String>,
-    selectedIcon: String?,
-    color: Color,
-
-    onIconSelected: (String) -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(24.dp))
-
-        for ((index, icon) in icons.withIndex()) {
-            Icon(
-                icon = icon,
-                selected = selectedIcon == icon,
-                color = color
-            ) {
-                onIconSelected(icon)
-            }
-
-            if (index < icons.lastIndex && icons.size >= 5) {
-                Spacer(Modifier.weight(1f))
-            } else {
-                Spacer(Modifier.width(20.dp))
-            }
-        }
-
-        Spacer(Modifier.width(24.dp))
-    }
-}
-
-@Composable
-private fun Icon(
-    icon: String,
-    selected: Boolean,
-    color: Color,
-
-    onClick: () -> Unit,
-) {
-    ItemIconS(
-        modifier = Modifier
-            .clip(CircleShape)
-            .border(2.dp, if (selected) color else UI.colors.medium, CircleShape)
-            .thenIf(selected) {
-                background(color, CircleShape)
-            }
-            .clickable {
-                onClick()
-            }
-            .padding(all = 8.dp)
-            .testTag(icon),
-        iconName = icon,
-        tint = if (selected) color.dynamicContrast() else UI.colors.mediumInverse
-    )
-}
-
-@Composable
-private fun Section(
-    title: String
-) {
-    SpacerVer(height = 20.dp)
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        DividerW()
-
-        SpacerHor(width = 16.dp)
-
-        IvyText(
-            text = title,
-            typo = UI.typo.b1.style(
-                color = UI.colors.pureInverse,
-            )
-        )
-
-        SpacerHor(width = 16.dp)
-
-        DividerW()
-    }
-
-    SpacerVer(height = 20.dp)
 }
 
 @Preview
 @Composable
-private fun ChooseIconModal(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
+private fun PreviewChooseIconModal(theme: Theme = Theme.LIGHT) {
+    WalletPreview(theme) {
         ChooseIconModal(
             visible = true,
             initialIcon = "gift",
@@ -753,5 +555,5 @@ fun ivyIcons(): List<Any> = listOf(
 /** For screenshot testing */
 @Composable
 fun ChooseIconModalUiTest(isDark: Boolean) {
-    ChooseIconModal(if (isDark) Theme.DARK else Theme.LIGHT)
+    PreviewChooseIconModal(if (isDark) Theme.DARK else Theme.LIGHT)
 }

@@ -462,6 +462,65 @@ flow_cancelled_hide() {
   return 0
 }
 
+# y of the first node with this exact text, from the current dump
+text_y() { find_node text exact "$1" | awk '{print $2}'; }
+
+open_reorder_sheet() {
+  go_home || return 1
+  tap_icon tabright || return 1
+  wait_for text exact "Total Balance" || return 1
+  tap_node desc exact "Reorder" || return 1
+  wait_for text exact "Done" || return 1
+}
+
+# drag_first_below_second: long drag from the first row's handle ("Reorder" desc nodes: the handles) past
+# the second row
+drag_first_below_second() {
+  local h1 h2
+  dump || return 1
+  h1=$(find_node desc exact "Reorder" 0) && h2=$(find_node desc exact "Reorder" 1) || { log "drag handles missing"; return 1; }
+  set -- $h1
+  adb shell input swipe "$1" "$2" "$1" $(($(echo $h2 | awk '{print $2}') + 80)) 900 </dev/null
+  sleep 1.5
+}
+
+# Reorder sheet: swiping down must not dismiss it, a drag reorders the rows, Close discards the new
+# order, Done keeps it.
+flow_reorder() {
+  open_reorder_sheet || return 1
+  shot reorder-1-open
+  local w h
+  w=$(screen_width); h=$(screen_height)
+  adb shell input swipe $((w / 2)) $((h * 72 / 100)) $((w / 2)) $((h * 95 / 100)) 300 </dev/null
+  sleep 1.5
+  dump || return 1
+  has text exact "Done" && has text exact "Cash" || { log "sheet went away on swipe down"; return 1; }
+  shot reorder-2-after-swipe
+  drag_first_below_second || return 1
+  dump || return 1
+  [ "$(text_y Bank)" -lt "$(text_y Cash)" ] || { log "drag did not move Cash below Bank"; return 1; }
+  shot reorder-3-dragged
+  tap_node desc exact "Close" || return 1
+  wait_gone text exact "Done" || return 1
+  dump || return 1
+  [ "$(text_y Cash)" -lt "$(text_y Bank)" ] || { log "Close should have kept the old order"; return 1; }
+  tap_node desc exact "Reorder" || return 1
+  wait_for text exact "Done" || return 1
+  drag_first_below_second || return 1
+  tap_node text exact "Done" || return 1
+  wait_gone text exact "Done" || return 1
+  dump || return 1
+  [ "$(text_y Bank)" -lt "$(text_y Cash)" ] || { log "Done should have kept the new order"; return 1; }
+  shot reorder-4-saved
+  tap_node desc exact "Reorder" || return 1
+  wait_for text exact "Done" || return 1
+  drag_first_below_second || return 1
+  tap_node text exact "Done" || return 1
+  wait_gone text exact "Done" || return 1
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -489,7 +548,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide}; do
+for flow in ${FLOWS:-flow_onboarding flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder}; do
   run_flow "$flow"
 done
 

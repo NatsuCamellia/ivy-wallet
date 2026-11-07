@@ -57,8 +57,8 @@ import com.ivy.wallet.ui.theme.components.CircleButtonFilled
 import com.ivy.wallet.ui.theme.components.ItemIconSDefaultIcon
 import com.ivy.wallet.ui.theme.components.IvyIcon
 import com.ivy.wallet.ui.theme.components.ProgressBar
-import com.ivy.wallet.ui.theme.components.ReorderButton
-import com.ivy.wallet.ui.theme.components.ReorderModalSingleType
+import com.ivy.legacy.ui.sheet.ReorderButton
+import com.ivy.legacy.ui.sheet.ReorderModalSingleType
 import com.ivy.ui.color.dynamicContrast
 import com.ivy.ui.color.findContrastTextColor
 import com.ivy.wallet.ui.theme.modal.LoanModal

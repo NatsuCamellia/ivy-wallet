@@ -32,7 +32,7 @@ import com.ivy.wallet.domain.data.IvyCurrency
 import com.ivy.wallet.ui.theme.GradientIvy
 import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.BackButton
-import com.ivy.wallet.ui.theme.components.CurrencyPicker
+import com.ivy.legacy.ui.component.CurrencyPicker
 import com.ivy.wallet.ui.theme.components.GradientCutBottom
 import com.ivy.wallet.ui.theme.components.OnboardingButton
 

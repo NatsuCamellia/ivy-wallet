@@ -9,15 +9,12 @@ import com.ivy.legacy.ui.component.tags.ShowTagModalUiTest
 import com.ivy.ui.testing.PaparazziScreenshotTest
 import com.ivy.ui.testing.PaparazziTheme
 import com.ivy.wallet.ui.theme.components.ChangeTransactionTypeModalUiTest
-import com.ivy.wallet.ui.theme.components.ReorderModalUiTest
 import com.ivy.wallet.ui.theme.modal.AddKeywordModalUiTest
 import com.ivy.wallet.ui.theme.modal.BufferModalUiTest
-import com.ivy.wallet.ui.theme.modal.ChooseIconModalUiTest
 import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalFromToUiTest
 import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalLastNUiTest
 import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalMonthUiTest
 import com.ivy.wallet.ui.theme.modal.ChooseStartDateOfMonthModalUiTest
-import com.ivy.wallet.ui.theme.modal.CurrencyModalUiTest
 import com.ivy.wallet.ui.theme.modal.DeleteConfirmationModalUiTest
 import com.ivy.wallet.ui.theme.modal.DeleteModalUiTest
 import com.ivy.wallet.ui.theme.modal.EditLoanModalUiTest
@@ -35,9 +32,12 @@ import com.ivy.legacy.ui.sheet.AmountModalUiTest
 import com.ivy.legacy.ui.sheet.CalculatorModalUiTest
 import com.ivy.legacy.ui.sheet.CategoryModalUiTest
 import com.ivy.legacy.ui.sheet.ChooseCategoryModalUiTest
+import com.ivy.legacy.ui.sheet.ChooseIconModalUiTest
+import com.ivy.legacy.ui.sheet.CurrencyModalUiTest
 import com.ivy.legacy.ui.sheet.DescriptionModalUiTest
 import com.ivy.legacy.ui.sheet.EditAccountModalUiTest
 import com.ivy.legacy.ui.sheet.EditCategoryModalUiTest
+import com.ivy.legacy.ui.sheet.ReorderModalUiTest
 import org.junit.Test
 import org.junit.runner.RunWith
 

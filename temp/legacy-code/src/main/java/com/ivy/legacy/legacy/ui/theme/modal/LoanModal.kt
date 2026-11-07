@@ -40,12 +40,12 @@ import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
-import com.ivy.domain.legacy.ui.IvyColorPicker
 import com.ivy.frp.test.TestingContext
 import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.datamodel.Loan
 import com.ivy.legacy.legacy.ui.theme.components.DateTimeRow
+import com.ivy.legacy.ui.component.ColorPicker
 import com.ivy.legacy.utils.getDefaultFIATCurrency
 import com.ivy.legacy.utils.isNotNullOrBlank
 import com.ivy.legacy.utils.onScreenStart
@@ -67,6 +67,8 @@ import com.ivy.ui.color.findContrastTextColor
 import com.ivy.legacy.ui.sheet.AccountModal
 import com.ivy.legacy.ui.sheet.AccountModalData
 import com.ivy.legacy.ui.sheet.AmountModal
+import com.ivy.legacy.ui.sheet.ChooseIconModal
+import com.ivy.legacy.ui.sheet.CurrencyModal
 import com.ivy.legacy.ui.sheet.IconNameRow
 import com.ivy.wallet.ui.theme.toComposeColor
 import kotlinx.coroutines.launch
@@ -230,9 +232,9 @@ fun BoxWithConstraintsScope.LoanModal(
 
         Spacer(Modifier.height(24.dp))
 
-        IvyColorPicker(
+        ColorPicker(
             selectedColor = color,
-            onColorSelected = { color = it }
+            onColorSelect = { color = it }
         )
 
         Spacer(modifier = Modifier.height(24.dp))

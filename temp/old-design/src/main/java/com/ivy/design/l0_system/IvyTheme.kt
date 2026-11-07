@@ -1,19 +1,13 @@
 package com.ivy.design.l0_system
 
-import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
 import com.ivy.base.legacy.Theme
 import com.ivy.design.api.IvyDesign
-import com.ivy.design.system.IvyMaterial3Theme
+import com.ivy.ui.theme.WalletTheme
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 val LocalIvyColors = compositionLocalOf<IvyColors> { error("No IvyColors") }
@@ -59,20 +53,6 @@ fun IvyTheme(
         LocalIvyTypography provides typography,
         LocalIvyShapes provides shapes
     ) {
-        val view = LocalView.current
-        if (!view.isInEditMode && view.context is Activity) {
-            SideEffect {
-                val window = (view.context as Activity).window
-                window.statusBarColor = Color.Transparent.toArgb()
-                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars =
-                    colors.isLight
-            }
-        }
-
-        IvyMaterial3Theme(
-            dark = !colors.isLight,
-            isTrueBlack = theme == Theme.AMOLED_DARK,
-            content = content,
-        )
+        WalletTheme(theme = theme, content = content)
     }
 }

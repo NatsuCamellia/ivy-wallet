@@ -303,3 +303,10 @@ Task 2.3: the `shared/ui/testing` Paparazzi base now wraps content in `WalletThe
 | S2-101 | S2 | 2.3 | DemoPaparazziTest_snapshot_demo_composable[Light] | com.ivy.ui.testing_DemoPaparazziTest_snapshot_demo_composable[Light].png | com.ivy.ui.testing_DemoPaparazziTest_snapshot_demo_composable[Light].png | label box colour from seed M3 scheme via WalletTheme in the Paparazzi base | 2.66% of pixels changed, 461x1000 |
 | S2-102 | S2 | 2.3 | OpenSourceCardPaparazziTest_default_state[Dark] | com.ivy.ui.component_OpenSourceCardPaparazziTest_default_state[Dark].png | com.ivy.ui.component_OpenSourceCardPaparazziTest_default_state[Dark].png | shared/ui/core Paparazzi base now uses WalletTheme: card fill from seed scheme (surface container) instead of Ivy near-black / white; read, no clipping or contrast problem | 6.21% of pixels changed, 461x1000 |
 | S2-103 | S2 | 2.3 | OpenSourceCardPaparazziTest_default_state[Light] | com.ivy.ui.component_OpenSourceCardPaparazziTest_default_state[Light].png | com.ivy.ui.component_OpenSourceCardPaparazziTest_default_state[Light].png | shared/ui/core Paparazzi base now uses WalletTheme: card fill from seed scheme (surface container) instead of Ivy near-black / white; read, no clipping or contrast problem | 6.20% of pixels changed, 461x1000 |
+
+## S3 Sheet 行為改變
+
+| id | stage | part | area | old | new | reason |
+|---|---|---|---|---|---|---|
+| S3-001 | S3 | 2.4 | ActionSheet close button | only some IvyModal call sites passed a close action; the rest had no close button in the actions row | every `ActionSheet` has a close button at the start of the pinned action row, before the `actions` slot | the wrapper adds it so all 29 rebuilt sheets can be dismissed the same way; old modals without one gain it |
+| S3-002 | S3 | 2.4 | ActionSheet content width | IvyModal content was laid out by each caller inside its own 24 dp horizontal padding | sheet content is full width and the wrapper adds no horizontal padding; the title has 16 dp horizontal padding and callers pad their own form content | wrapper stays a layout shell; list-style content (`ListItem`, `SegmentedListItem`) brings its own padding |

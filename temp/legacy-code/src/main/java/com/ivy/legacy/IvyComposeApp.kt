@@ -1,13 +1,14 @@
 package com.ivy.legacy
 
-import android.annotation.SuppressLint
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -18,17 +19,14 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.Density
 import com.ivy.base.legacy.Theme
 import com.ivy.base.legacy.appContext
-import com.ivy.base.time.TimeConverter
-import com.ivy.base.time.TimeProvider
 import com.ivy.design.api.IvyDesign
-import com.ivy.design.api.IvyUI
 import com.ivy.design.api.systems.IvyWalletDesign
+import com.ivy.design.l0_system.IvyTheme
 import com.ivy.design.l0_system.UI
 import com.ivy.design.utils.IvyPreview
 import com.ivy.domain.RootScreen
 import com.ivy.navigation.Navigation
 import com.ivy.navigation.NavigationRoot
-import com.ivy.ui.time.TimeFormatter
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable
@@ -86,29 +84,36 @@ fun IvyWalletPreview(
     }
 }
 
-@SuppressLint("ComposeModifierMissing")
+@Suppress("ModifierMissing")
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable
 fun IvyWalletUI(
-    ctx: IvyWalletCtx,
-    timeConverter: TimeConverter,
-    timeProvider: TimeProvider,
-    timeFormatter: TimeFormatter,
     includeSurface: Boolean = true,
     content: @Composable BoxWithConstraintsScope.() -> Unit
 ) {
-    CompositionLocalProvider(LocalWalletCtx provides ctx) {
-        IvyUI(
-            theme = ctx.theme,
-            design = appDesign(),
-            includeSurface = includeSurface,
-            timeConverter = timeConverter,
-            timeProvider = timeProvider,
-            timeFormatter = timeFormatter,
-        ) {
-            ctx.syncScreenSize(this, LocalDensity.current)
-            content()
+    val ctx = LocalWalletCtx.current
+    IvyTheme(
+        theme = ctx.theme,
+        design = appDesign(),
+    ) {
+        WrapWithSurface(includeSurface = includeSurface) {
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                ctx.syncScreenSize(this, LocalDensity.current)
+                content()
+            }
         }
+    }
+}
+
+@Composable
+private fun WrapWithSurface(
+    includeSurface: Boolean,
+    content: @Composable () -> Unit,
+) {
+    if (includeSurface) {
+        Surface { content() }
+    } else {
+        content()
     }
 }
 

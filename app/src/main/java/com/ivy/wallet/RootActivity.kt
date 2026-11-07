@@ -32,15 +32,14 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.TimeFormat
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.ivy.IvyNavGraph
-import com.ivy.base.legacy.Theme
 import com.ivy.base.time.TimeConverter
 import com.ivy.base.time.TimeProvider
-import com.ivy.design.system.IvyMaterial3Theme
 import com.ivy.domain.RootScreen
 import com.ivy.home.customerjourney.CustomerJourneyCardsProvider
 import com.ivy.legacy.Constants
 import com.ivy.legacy.IvyWalletCtx
 import com.ivy.legacy.IvyWalletUI
+import com.ivy.legacy.ui.WalletRoot
 import com.ivy.legacy.utils.activityForResultLauncher
 import com.ivy.legacy.utils.sendToCrashlytics
 import com.ivy.legacy.utils.simpleActivityForResultLauncher
@@ -103,52 +102,40 @@ class RootActivity : AppCompatActivity(), RootScreen {
                 viewModel.start(isSystemInDarkTheme, intent)
             }
 
-            val appLocked by viewModel.appLocked.collectAsState()
-            when (appLocked) {
-                null -> { // display nothing
-                }
-                true -> {
-                    IvyWalletUI(
-                        ctx = ivyContext,
-                        timeConverter = timeConverter,
-                        timeProvider = timeProvider,
-                        timeFormatter = timeFormatter,
-                    ) {
-                        AppLockedScreen(
-                            onShowOSBiometricsModal = {
-                                authenticateWithOSBiometricsModal(
-                                    biometricPromptCallback = viewModel.handleBiometricAuthResult()
-                                )
-                            },
-                            onContinueWithoutAuthentication = {
-                                viewModel.unlockApp()
-                            }
-                        )
+            WalletRoot(
+                ctx = ivyContext,
+                timeConverter = timeConverter,
+                timeProvider = timeProvider,
+                timeFormatter = timeFormatter,
+            ) {
+                val appLocked by viewModel.appLocked.collectAsState()
+                when (appLocked) {
+                    null -> { // display nothing
                     }
-                }
+                    true -> {
+                        IvyWalletUI {
+                            AppLockedScreen(
+                                onShowOSBiometricsModal = {
+                                    authenticateWithOSBiometricsModal(
+                                        biometricPromptCallback = viewModel.handleBiometricAuthResult()
+                                    )
+                                },
+                                onContinueWithoutAuthentication = {
+                                    viewModel.unlockApp()
+                                }
+                            )
+                        }
+                    }
 
-                false -> {
-                    NavigationRoot(navigation = navigation) { screen ->
-                        IvyWalletUI(
-                            ctx = ivyContext,
-                            includeSurface = screen?.isLegacy ?: true,
-                            timeConverter = timeConverter,
-                            timeProvider = timeProvider,
-                            timeFormatter = timeFormatter,
-                        ) {
-                            IvyNavGraph(screen)
+                    false -> {
+                        NavigationRoot(navigation = navigation) { screen ->
+                            IvyWalletUI(includeSurface = screen?.isLegacy ?: true) {
+                                IvyNavGraph(screen)
+                            }
                         }
                     }
                 }
-            }
 
-            IvyMaterial3Theme(
-                dark = isDarkThemeEnabled(
-                    theme = ivyContext.theme,
-                    systemDarkTheme = isSystemInDarkTheme
-                ),
-                isTrueBlack = ivyContext.theme == Theme.AMOLED_DARK
-            ) {
                 dateTimePicker.Content()
             }
         }
@@ -250,15 +237,6 @@ class RootActivity : AppCompatActivity(), RootScreen {
                     LocalTime.of(picker.hour, picker.minute).withSecond(0)
                 )
             }
-        }
-    }
-
-    private fun isDarkThemeEnabled(theme: Theme, systemDarkTheme: Boolean): Boolean {
-        return when (theme) {
-            Theme.LIGHT -> false
-            Theme.DARK -> true
-            Theme.AMOLED_DARK -> true
-            else -> systemDarkTheme
         }
     }
 

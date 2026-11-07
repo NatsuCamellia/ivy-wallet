@@ -41,6 +41,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.ui.R
+import com.ivy.ui.util.thenIf
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -50,11 +51,13 @@ fun ActionSheet(
     modifier: Modifier = Modifier,
     title: String? = null,
     sheetGesturesEnabled: Boolean = true,
+    contentScrollable: Boolean = true,
     actions: @Composable RowScope.(dismiss: () -> Unit) -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val sheetState = rememberActionSheetState()
     val scope = rememberCoroutineScope()
+    val contentScroll = rememberScrollState()
     val currentOnDismiss by rememberUpdatedState(onDismiss)
     var finished by remember { mutableStateOf(false) }
     val finish: () -> Unit = {
@@ -83,7 +86,7 @@ fun ActionSheet(
             Column(
                 Modifier
                     .weight(1f, fill = false)
-                    .verticalScroll(rememberScrollState())
+                    .thenIf(contentScrollable) { verticalScroll(contentScroll) }
                     .padding(bottom = 16.dp)
             ) {
                 if (title != null) {

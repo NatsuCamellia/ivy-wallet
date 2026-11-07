@@ -1,5 +1,6 @@
 package com.ivy.home
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
@@ -79,9 +80,7 @@ import com.ivy.wallet.ui.theme.Gray
 import com.ivy.wallet.ui.theme.components.BufferBattery
 import com.ivy.wallet.ui.theme.components.CircleButtonFilled
 import com.ivy.wallet.ui.theme.components.IvyIcon
-import com.ivy.wallet.ui.theme.modal.AddModalBackHandling
 import com.ivy.wallet.ui.theme.wallet.AmountCurrencyB1
-import java.util.UUID
 import kotlin.math.roundToInt
 
 private const val SWIPE_UP_THRESHOLD_CLOSE_MORE_MENU = 300
@@ -175,14 +174,7 @@ fun BoxWithConstraintsScope.MoreMenu(
                     }
                 )
         ) {
-            val modalId = remember {
-                UUID.randomUUID()
-            }
-
-            AddModalBackHandling(
-                modalId = modalId,
-                visible = expanded
-            ) {
+            BackHandler(enabled = expanded) {
                 setExpanded(false)
             }
 

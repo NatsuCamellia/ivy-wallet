@@ -1,5 +1,6 @@
 package com.ivy.main
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
@@ -63,9 +64,7 @@ import com.ivy.wallet.ui.theme.components.IvyCircleButton
 import com.ivy.wallet.ui.theme.components.IvyIcon
 import com.ivy.wallet.ui.theme.components.IvyOutlinedButton
 import com.ivy.wallet.ui.theme.gradientExpenses
-import com.ivy.wallet.ui.theme.modal.AddModalBackHandling
 import com.ivy.wallet.ui.theme.pureBlur
-import java.util.UUID
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -91,12 +90,7 @@ fun BoxWithConstraintsScope.BottomBar(
 
     var expanded by remember { mutableStateOf(initiallyExpanded) }
 
-    val modalId = remember { UUID.randomUUID() }
-
-    AddModalBackHandling(
-        modalId = modalId,
-        visible = expanded
-    ) {
+    BackHandler(enabled = expanded) {
         expanded = false
     }
 

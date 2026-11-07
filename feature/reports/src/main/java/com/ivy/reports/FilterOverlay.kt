@@ -1,6 +1,7 @@
 package com.ivy.reports
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -77,7 +78,6 @@ import com.ivy.wallet.ui.theme.components.IvyOutlinedButton
 import com.ivy.wallet.ui.theme.components.IvyOutlinedButtonFillMaxWidth
 import com.ivy.wallet.ui.theme.components.WrapContentRow
 import com.ivy.wallet.ui.theme.modal.AddKeywordModal
-import com.ivy.wallet.ui.theme.modal.AddModalBackHandling
 import com.ivy.wallet.ui.theme.modal.ChoosePeriodModal
 import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalData
 import com.ivy.wallet.ui.theme.modal.edit.AmountModal
@@ -166,14 +166,7 @@ fun BoxWithConstraintsScope.FilterOverlay(
                 .systemBarsPadding()
                 .verticalScroll(rememberScrollState()),
         ) {
-            val modalId = remember {
-                UUID.randomUUID()
-            }
-
-            AddModalBackHandling(
-                modalId = modalId,
-                visible = visible
-            ) {
+            BackHandler(enabled = visible) {
                 onClose()
             }
 

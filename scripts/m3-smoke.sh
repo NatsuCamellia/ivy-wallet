@@ -15,6 +15,7 @@ SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}}"
 export PATH="$PATH:$SDK/platform-tools:$SDK/emulator"
 XML="${TMPDIR:-/tmp}/m3-smoke-ui.$$.xml"
 EMU_PID=""
+NIGHT_PREV=""
 RESULTS=()
 FAILED=0
 
@@ -25,6 +26,7 @@ log() { echo "[m3-smoke] $*" >&2; }
 
 cleanup() {
   adb shell settings put global animator_duration_scale 1 >/dev/null 2>&1
+  [ -n "$NIGHT_PREV" ] && adb shell cmd uimode night "$NIGHT_PREV" >/dev/null 2>&1
   rm -f "$XML"
   if [ -n "$EMU_PID" ] && [ -z "${KEEP_EMULATOR:-}" ]; then
     log "stopping emulator started by this script"
@@ -349,8 +351,14 @@ close_top_settled() {
   return 1
 }
 
+# raw_ok <file>: non-empty raw screencap of exactly header (16 bytes) + width * height * 4
+raw_ok() {
+  [ -s "$1" ] && [ "$(stat -c %s "$1")" -eq $((w * h * 4 + 16)) ]
+}
+
 # sheet_top <raw-screencap> <width> <height>: y of the sheet's top edge, scanning down the screen
-# centre from 15% height for the first light pixel (the page behind the sheet is dark or saturated)
+# centre from 15% height for the first light pixel. Assumes a light-mode, bright sheet over a darker
+# or saturated page (the run is pinned to light mode); callers treat a >= 20 px move as "hide started".
 sheet_top() {
   python3 -I - "$1" "$2" "$3" <<'PY'
 import sys
@@ -375,21 +383,29 @@ PY
 flow_cancelled_hide() {
   open_account_edit_sheet || return 1
   adb shell settings put global animator_duration_scale "${ANIM_SCALE:-20}"
-  local w h attempt cancelled="" by1 pos after top0 top1
+  local w h attempt cancelled="" by1 pos after top0 top1 pulled
   w=$(screen_width); h=$(screen_height)
   for attempt in 1 2 3 4 5 6; do
     by1=$(close_top_settled) || { log "sheet never settled"; break; }
     dump || break
     pos=$(close_button) || { log "close button missing"; break; }
     set -- $pos
+    rm -f "$OUT/.pre.raw" "$OUT/.mid.raw"
+    adb shell rm -f /sdcard/m3-mid.raw >/dev/null 2>&1
     adb exec-out screencap >"$OUT/.pre.raw"
     adb shell "input tap $1 $2; sleep 0.2; screencap /sdcard/m3-mid.raw; input swipe $((w / 2)) $((h * 9 / 10)) $((w / 2)) $((h * 6 / 10)) ${SWIPE_MS:-250}" </dev/null
-    adb pull /sdcard/m3-mid.raw "$OUT/.mid.raw" >/dev/null 2>&1
-    top0=$(sheet_top "$OUT/.pre.raw" "$w" "$h")
-    top1=$(sheet_top "$OUT/.mid.raw" "$w" "$h")
+    pulled=1
+    adb pull /sdcard/m3-mid.raw "$OUT/.mid.raw" >/dev/null 2>&1 || pulled=0
+    top0="" top1=""
+    if [ "$pulled" = 1 ] && raw_ok "$OUT/.pre.raw" && raw_ok "$OUT/.mid.raw"; then
+      top0=$(sheet_top "$OUT/.pre.raw" "$w" "$h")
+      top1=$(sheet_top "$OUT/.mid.raw" "$w" "$h")
+    fi
     sleep 4
     dump || break
-    if [ "$top0" -lt 0 ] || [ "$top1" -lt 0 ] || [ $((top1 - top0)) -lt 20 ]; then
+    if ! [[ $top0 =~ ^[0-9]+$ && $top1 =~ ^[0-9]+$ ]]; then
+      log "attempt $attempt: no valid screenshots (top '$top0' -> '$top1'), not counted"
+    elif [ $((top1 - top0)) -lt 20 ]; then
       log "attempt $attempt: sheet top $top0 -> $top1 before the drag, the hide never started"
     elif after=$(close_button) && [ "$(echo "$after" | awk '{print $4}')" -eq "$by1" ] && has text exact "Edit account"; then
       cancelled=$attempt
@@ -409,6 +425,7 @@ flow_cancelled_hide() {
   done
   adb shell settings put global animator_duration_scale 1
   rm -f "$OUT/.pre.raw" "$OUT/.mid.raw"
+  adb shell rm -f /sdcard/m3-mid.raw >/dev/null 2>&1
   [ -n "$cancelled" ] || { log "could not interrupt the hide"; return 1; }
   log "hide cancelled on attempt $cancelled (started, then sheet back at y=$by1)"
   shot cancelled-hide-1-sheet-back
@@ -444,6 +461,9 @@ if [ -z "${SKIP_INSTALL:-}" ]; then
   ./gradlew --console=plain --max-workers=3 :app:installDebug >"$OUT/install.log" 2>&1 || { log "installDebug failed, see $OUT/install.log"; exit 2; }
 fi
 adb shell settings put global animator_duration_scale 1 >/dev/null 2>&1
+NIGHT_PREV=$(adb shell cmd uimode night 2>/dev/null | sed 's/.*: *//' | tr -d '\r')
+case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
+adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
 for flow in ${FLOWS:-flow_onboarding flow_nested_back flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide}; do

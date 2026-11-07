@@ -1,5 +1,6 @@
 package com.ivy.legacy
 
+import android.annotation.SuppressLint
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
@@ -84,6 +85,7 @@ fun IvyWalletPreview(
     }
 }
 
+@SuppressLint("ComposeModifierMissing")
 @Suppress("ModifierMissing")
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable

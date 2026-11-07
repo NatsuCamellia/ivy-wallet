@@ -1,5 +1,6 @@
 package com.ivy.legacy.ui
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -15,6 +16,7 @@ import com.ivy.ui.time.LocalTimeFormatter
 import com.ivy.ui.time.LocalTimeProvider
 import com.ivy.ui.time.TimeFormatter
 
+@SuppressLint("ComposeModifierMissing")
 @Suppress("ModifierMissing")
 @Composable
 fun WalletRoot(

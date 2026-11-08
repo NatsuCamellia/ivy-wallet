@@ -256,9 +256,10 @@ private fun UI(
         mutableStateOf(account)
     }
 
-    val amountModalId = remember(screen.initialTransactionId, exchangeRateAmountModalShown) {
-        UUID.randomUUID()
-    }
+    val amountModalId =
+        remember(screen.initialTransactionId, customExchangeRateState.exchangeRate) {
+            UUID.randomUUID()
+        }
 
     var titleTextFieldValue by remember(initialTitle) {
         mutableStateOf(

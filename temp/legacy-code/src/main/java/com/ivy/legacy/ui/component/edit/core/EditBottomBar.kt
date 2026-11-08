@@ -126,7 +126,7 @@ fun EditBottomBar(
         }
     }
 
-    val amountModalId = remember(initialTransactionId, amountModalShown) { UUID.randomUUID() }
+    val amountModalId = remember(initialTransactionId, amount) { UUID.randomUUID() }
     AmountModal(
         id = amountModalId,
         visible = amountModalShown,

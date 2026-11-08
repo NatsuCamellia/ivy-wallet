@@ -69,7 +69,10 @@ fun AmountModal(
     Header: (@Composable () -> Unit)? = null,
     onAmountChanged: (Double) -> Unit,
 ) {
-    var amount by remember(id) {
+    // An id that changes while the sheet is open (callers key it on the amount) must not recreate the sheet
+    val openedId = remember(visible) { id }
+
+    var amount by remember(openedId) {
         mutableStateOf(
             if (currency.isNotEmpty()) {
                 initialAmount?.takeIf { it != 0.0 }?.format(currency)
@@ -81,12 +84,12 @@ fun AmountModal(
         )
     }
 
-    var calculatorModalVisible by remember(id) {
+    var calculatorModalVisible by remember(openedId) {
         mutableStateOf(false)
     }
 
     if (visible) {
-        key(id) {
+        key(openedId) {
             ActionSheet(
                 onDismiss = dismiss,
                 actions = { dismissSheet ->

@@ -728,6 +728,7 @@ flow_fab_menu() {
   return 0
 }
 
+# Leaves a transaction behind (the account balance changes), so it runs last in the default list.
 # Home FAB -> Add expense: enter an amount in the amount sheet, pick a category, the bottom bar must stay above the
 # keyboard, Add saves and the row shows on Home.
 flow_add_expense() {
@@ -763,6 +764,25 @@ flow_add_expense() {
   wait_for text exact "Groceries" || { log "saved row missing on Home"; return 1; }
   has text exact "-125.00 USD" || { log "saved amount missing on Home"; return 1; }
   shot add-expense-3-home
+  crashed && return 1
+  return 0
+}
+
+# Edit account -> Amount sheet -> type a number, Enter: one press closes the amount sheet (it must not be recreated
+# when the value changes), the account sheet stays open with the new amount, Back closes only the account sheet.
+flow_amount_sheet_close() {
+  open_account_edit_sheet || return 1
+  tap_node any sub "Enter account balance" || return 1
+  wait_for text exact "Enter" || return 1
+  tap_node text exact "7" || return 1
+  tap_node text exact "Enter" || return 1
+  wait_gone text exact "Enter" 5 || { log "one Enter press did not close the amount sheet"; return 1; }
+  has text exact "Edit account" || { log "account sheet closed with the amount sheet"; return 1; }
+  has any sub "7.00" || { log "new amount missing from the account sheet"; return 1; }
+  shot amount-close-1-account
+  back
+  wait_gone text exact "Edit account" 5 || { log "Back did not close the account sheet"; return 1; }
+  has text exact "Enter" && { log "amount sheet reappeared"; return 1; }
   crashed && return 1
   return 0
 }
@@ -826,7 +846,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_add_expense flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_add_expense}; do
   run_flow "$flow"
 done
 

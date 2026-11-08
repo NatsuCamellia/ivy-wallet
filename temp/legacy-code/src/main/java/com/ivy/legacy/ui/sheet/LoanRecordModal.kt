@@ -422,8 +422,10 @@ private fun Preview(theme: Theme = Theme.LIGHT) {
         LoanRecordModal(
             modal = LoanRecordModalData(
                 loanRecord = null,
-                baseCurrency = "BGN"
+                baseCurrency = "BGN",
+                selectedAccount = previewAccounts().first(),
             ),
+            accounts = previewAccounts(),
             onCreate = {},
             onEdit = {},
             onDelete = {},
@@ -455,8 +457,10 @@ fun EditLoanRecordModalUiTest(isDark: Boolean) {
                     loanRecordType = LoanRecordType.DECREASE,
                     id = UUID.fromString("00000000-0000-0000-0000-000000000001")
                 ),
-                baseCurrency = "BGN"
+                baseCurrency = "BGN",
+                selectedAccount = previewAccounts().first(),
             ),
+            accounts = previewAccounts(),
             onCreate = {},
             onEdit = {},
             onDelete = {},

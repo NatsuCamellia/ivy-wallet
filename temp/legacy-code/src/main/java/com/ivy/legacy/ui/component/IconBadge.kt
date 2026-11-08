@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ivy.ui.color.findContrastTextColor
 import com.ivy.wallet.ui.theme.components.getCustomIconId
@@ -32,10 +33,11 @@ fun IconBadge(
     iconName: String?,
     @DrawableRes defaultIcon: Int,
     modifier: Modifier = Modifier,
+    size: Dp = 48.dp,
 ) {
     val iconRes = customIconResource(iconName, defaultIcon, "m")
     Surface(
-        modifier = modifier.size(48.dp),
+        modifier = modifier.size(size),
         shape = CircleShape,
         color = color,
         contentColor = findContrastTextColor(color),
@@ -43,7 +45,7 @@ fun IconBadge(
         Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
-            modifier = Modifier.padding(4.dp),
+            modifier = Modifier.padding(size / 12),
         )
     }
 }

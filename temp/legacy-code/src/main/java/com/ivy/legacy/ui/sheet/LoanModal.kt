@@ -48,6 +48,7 @@ import com.ivy.legacy.utils.selectEndTextFieldValue
 import com.ivy.legacy.utils.toLowerCaseLocal
 import com.ivy.ui.R
 import com.ivy.ui.color.Ivy
+import com.ivy.ui.color.Orange
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.wallet.domain.data.IvyCurrency
 import com.ivy.wallet.domain.deprecated.logic.model.CreateAccountData
@@ -382,6 +383,11 @@ private fun save(
     dismiss()
 }
 
+internal fun previewAccounts() = listOf(
+    Account(name = "Cash", color = Ivy.toArgb(), currency = "BGN", id = UUID(0, 1)),
+    Account(name = "Bank", color = Orange.toArgb(), currency = "BGN", id = UUID(0, 2)),
+)
+
 @Preview
 @Composable
 private fun Preview(theme: Theme = Theme.LIGHT) {
@@ -390,7 +396,9 @@ private fun Preview(theme: Theme = Theme.LIGHT) {
             modal = LoanModalData(
                 loan = null,
                 baseCurrency = "BGN",
+                selectedAccount = previewAccounts().first(),
             ),
+            accounts = previewAccounts(),
             onCreateLoan = { },
             onEditLoan = { _, _ -> },
             onSetTime = { },
@@ -424,7 +432,9 @@ fun EditLoanModalUiTest(isDark: Boolean) {
                     id = UUID.fromString("00000000-0000-0000-0000-000000000001")
                 ),
                 baseCurrency = "BGN",
+                selectedAccount = previewAccounts().first(),
             ),
+            accounts = previewAccounts(),
             onCreateLoan = { },
             onEditLoan = { _, _ -> },
             onSetTime = { },

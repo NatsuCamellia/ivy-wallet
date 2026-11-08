@@ -20,6 +20,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -92,7 +93,7 @@ fun LazyListScope.transactions(
         history.isEmpty()
     ) {
         item {
-            NoTransactionsEmptyState(
+            EmptyState(
                 emptyStateTitle = emptyStateTitle,
                 emptyStateText = emptyStateText
             )
@@ -300,11 +301,13 @@ private fun onTransactionClick(
     )
 }
 
+/** A centred icon, title and hint for a list with nothing in it. */
 @Composable
-private fun NoTransactionsEmptyState(
+fun EmptyState(
     emptyStateTitle: String,
     emptyStateText: String,
     modifier: Modifier = Modifier,
+    icon: ImageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
 ) {
     Column(
         modifier = modifier
@@ -314,7 +317,7 @@ private fun NoTransactionsEmptyState(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Icon(
-            imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
+            imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(48.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant

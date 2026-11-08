@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
@@ -105,7 +106,10 @@ fun EditBottomBar(
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .clickable { setAmountModalShown(true) }
+                        .clickable(
+                            onClickLabel = stringResource(R.string.edit_amount),
+                            role = Role.Button,
+                        ) { setAmountModalShown(true) }
                         .testTag("edit_amount_balance_row"),
                 ) {
                     AmountText(

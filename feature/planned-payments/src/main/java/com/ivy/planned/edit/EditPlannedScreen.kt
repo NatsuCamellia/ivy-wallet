@@ -1,8 +1,6 @@
 package com.ivy.planned.edit
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -28,11 +26,16 @@ import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
 import com.ivy.base.model.TransactionType
 import com.ivy.data.model.Category
+import com.ivy.data.model.CategoryId
 import com.ivy.data.model.IntervalType
-import com.ivy.legacy.IvyWalletPreview
+import com.ivy.data.model.primitive.ColorInt
+import com.ivy.data.model.primitive.NotBlankTrimmedString
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.utils.onScreenStart
 import com.ivy.navigation.EditPlannedScreen
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
 import com.ivy.wallet.ui.edit.core.Category
@@ -41,6 +44,7 @@ import com.ivy.legacy.ui.component.edit.core.EditBottomBar
 import com.ivy.wallet.ui.edit.core.Title
 import com.ivy.wallet.ui.edit.core.Toolbar
 import com.ivy.ui.color.Orange
+import com.ivy.ui.color.Purple
 import com.ivy.legacy.ui.sheet.ChangeTransactionTypeModal
 import com.ivy.legacy.ui.sheet.DeleteModal
 import com.ivy.legacy.ui.sheet.RecurringRuleModal
@@ -55,9 +59,8 @@ import kotlinx.collections.immutable.persistentListOf
 import java.time.LocalDateTime
 import java.util.UUID
 
-@ExperimentalFoundationApi
 @Composable
-fun BoxWithConstraintsScope.EditPlannedScreen(screen: EditPlannedScreen) {
+fun EditPlannedScreen(screen: EditPlannedScreen) {
     val viewModel: EditPlannedViewModel = screenScopedViewModel()
     val uiState = viewModel.uiState()
     LaunchedEffect(Unit) {
@@ -76,12 +79,12 @@ fun BoxWithConstraintsScope.EditPlannedScreen(screen: EditPlannedScreen) {
  * Flow Amount + Category: Recurring Rule -> Title
  */
 @Suppress("LongMethod")
-@ExperimentalFoundationApi
 @Composable
-private fun BoxWithConstraintsScope.UI(
+private fun UI(
     screen: EditPlannedScreen,
     state: EditPlannedScreenState,
     onEvent: (EditPlannedScreenEvent) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     var titleTextFieldValue by remember(state.initialTitle) {
         mutableStateOf(
@@ -91,11 +94,13 @@ private fun BoxWithConstraintsScope.UI(
         )
     }
     val titleFocus = FocusRequester()
+    val isEdit = screen.plannedPaymentRuleId != null
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             Toolbar(
-                title = stringResource(R.string.add_planned_payment),
+                title = stringResource(if (isEdit) R.string.edit_planned_payment else R.string.add_planned_payment),
                 type = state.transactionType,
                 initialTransactionId = screen.plannedPaymentRuleId,
                 onDeleteTrnModal = {
@@ -180,14 +185,13 @@ private fun BoxWithConstraintsScope.UI(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Title(
                 type = state.transactionType,
                 titleFocus = titleFocus,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
-
                 titleTextFieldValue = titleTextFieldValue,
                 setTitleTextFieldValue = {
                     titleTextFieldValue = it
@@ -223,7 +227,6 @@ private fun BoxWithConstraintsScope.UI(
 
             if (state.transactionType != TransactionType.TRANSFER) {
                 Category(
-                    modifier = Modifier.padding(horizontal = 16.dp),
                     category = state.category,
                     onChooseCategory = {
                         onEvent(EditPlannedScreenEvent.OnCategoryModalVisible(true))
@@ -251,7 +254,6 @@ private fun BoxWithConstraintsScope.UI(
             )
 
             Description(
-                modifier = Modifier.padding(horizontal = 16.dp),
                 description = state.description,
                 onAddDescription = { onEvent(EditPlannedScreenEvent.OnDescriptionModalVisible(true)) },
                 onEditDescription = { onEvent(EditPlannedScreenEvent.OnDescriptionModalVisible(true)) }
@@ -418,47 +420,97 @@ private fun shouldFocusRecurring(
 
 private fun shouldFocusAmount(amount: Double) = amount == 0.0
 
-@ExperimentalFoundationApi
-@Preview
 @Composable
-private fun Preview(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
-        UI(
-            screen = EditPlannedScreen(UUID(0, 0), TransactionType.EXPENSE),
-            EditPlannedScreenState(
-                oneTime = false,
-                startDate = null,
-                intervalN = null,
-                intervalType = null,
-                initialTitle = "",
-                currency = "BGN",
-                description = null,
-                category = null,
-                account = Account(name = "phyre", Orange.toArgb()),
-                amount = 0.0,
-                transactionType = TransactionType.INCOME,
-                categories = persistentListOf(),
-                accounts = persistentListOf(),
-                categoryModalVisible = false,
-                categoryModalData = null,
-                accountModalData = null,
-                descriptionModalVisible = false,
-                deleteTransactionModalVisible = false,
-                recurringRuleModalData = null,
-                transactionTypeModalVisible = false,
-                amountModalVisible = false
-            )
-        ) {}
+private fun PreviewUI(
+    isDark: Boolean,
+    screen: EditPlannedScreen,
+    state: EditPlannedScreenState,
+) {
+    WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        NavigationRoot(navigation = Navigation()) {
+            UI(screen = screen, state = state, onEvent = {})
+        }
     }
 }
 
+private val previewAccount = Account(name = "phyre", Orange.toArgb(), currency = "BGN")
+
+@Suppress("MagicNumber")
+private val previewRent = Category(
+    name = NotBlankTrimmedString.unsafe("Rent"),
+    color = ColorInt(Purple.toArgb()),
+    icon = null,
+    id = CategoryId(UUID(0, 1)),
+    orderNum = 0.0,
+)
+
+@Suppress("MagicNumber")
+private val previewStartDate = LocalDateTime.of(2023, 4, 27, 12, 0)
+
+private val previewEmptyState = EditPlannedScreenState(
+    oneTime = false,
+    startDate = null,
+    intervalN = null,
+    intervalType = null,
+    initialTitle = "",
+    currency = "BGN",
+    description = null,
+    category = null,
+    account = previewAccount,
+    amount = 0.0,
+    transactionType = TransactionType.INCOME,
+    categories = persistentListOf(),
+    accounts = persistentListOf(),
+    categoryModalVisible = false,
+    categoryModalData = null,
+    accountModalData = null,
+    descriptionModalVisible = false,
+    deleteTransactionModalVisible = false,
+    recurringRuleModalData = null,
+    transactionTypeModalVisible = false,
+    amountModalVisible = false
+)
+
+@Preview
+@Composable
+private fun Preview(isDark: Boolean = false) {
+    PreviewUI(
+        isDark = isDark,
+        screen = EditPlannedScreen(plannedPaymentRuleId = null, type = TransactionType.INCOME),
+        state = previewEmptyState
+    )
+}
+
+@Suppress("MagicNumber")
+@Preview
+@Composable
+private fun PreviewEditRepeat(isDark: Boolean = false) {
+    PreviewUI(
+        isDark = isDark,
+        screen = EditPlannedScreen(plannedPaymentRuleId = UUID(0, 2), type = TransactionType.EXPENSE),
+        state = previewEmptyState.copy(
+            startDate = previewStartDate,
+            intervalN = 2,
+            intervalType = IntervalType.MONTH,
+            initialTitle = "Flat rent",
+            description = "Paid on the first working day",
+            category = previewRent,
+            categories = persistentListOf(previewRent),
+            accounts = persistentListOf(previewAccount),
+            amount = 1250.0,
+            transactionType = TransactionType.EXPENSE
+        )
+    )
+}
+
 /** For screenshot testing */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EditPlannedScreenUiTest(isDark: Boolean) {
-    val theme = when (isDark) {
-        true -> Theme.DARK
-        false -> Theme.LIGHT
-    }
-    Preview(theme)
+    Preview(isDark)
+}
+
+/** For screenshot testing */
+@Composable
+fun EditPlannedRepeatUiTest(isDark: Boolean) {
+    PreviewEditRepeat(isDark)
 }

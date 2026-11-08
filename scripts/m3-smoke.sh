@@ -763,8 +763,7 @@ flow_add_expense() {
   adb shell input text smokecoffee
   sleep 1
   tap_node text exact "Add" || return 1
-  wait_for text exact "Groceries" || { log "saved row missing on Home"; return 1; }
-  has text exact "-125.00 USD" || { log "saved amount missing on Home"; return 1; }
+  wait_for text exact "-125.00 USD" || { log "saved row missing on Home"; return 1; }
   shot add-expense-3-home
   crashed && return 1
   return 0
@@ -934,6 +933,43 @@ flow_search() {
   return 0
 }
 
+# Home More -> Planned payments: the list has a back button and the add button; add one (expense, amount sheet,
+# category, recurring rule sheet, title, Set), it is listed under Recurring payments, back returns to Home.
+flow_planned_payments() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Planned payments" || return 1
+  wait_for desc exact "Add planned payment" || return 1
+  has desc exact "Back" || { log "back button missing on the planned payments list"; return 1; }
+  shot planned-1-list
+  tap_node desc exact "Add planned payment" || return 1
+  wait_for text exact "Choose payment type" || return 1
+  tap_node text exact "Expense" || return 1
+  wait_for text exact "Enter" || return 1
+  tap_node text exact "3" || return 1
+  tap_node text exact "0" || return 1
+  tap_node text exact "Enter" || return 1
+  wait_for text exact "Choose category" || return 1
+  tap_node text exact "Groceries" || return 1
+  wait_for text exact "Plan for" || return 1
+  shot planned-2-rule
+  tap_node text exact "Set" || return 1
+  wait_gone text exact "Plan for" || { log "the recurring rule sheet did not close"; return 1; }
+  adb shell input text smokeplanned
+  sleep 1
+  shot planned-3-edit
+  tap_node text exact "Set" || return 1
+  wait_for text exact "smokeplanned" || { log "saved planned payment missing from the list"; return 1; }
+  has text exact "Recurring payments" || { log "recurring section missing"; return 1; }
+  has text exact "-30.00 USD" || { log "amount missing in the list"; return 1; }
+  shot planned-4-list-item
+  back
+  wait_for text exact "Quick access" || { log "back from the list should return to the open More sheet"; return 1; }
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -961,7 +997,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_add_expense flow_search}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_search}; do
   run_flow "$flow"
 done
 

@@ -142,24 +142,28 @@ private fun Headline(headline: String, transaction: Transaction, currency: Strin
     }
 }
 
+/** The category as a badge in its colour; without a category a transfer or a neutral default badge. */
 @Composable
-private fun TransactionBadge(category: Category?, type: TransactionType) {
+fun TransactionBadge(category: Category?, type: TransactionType, modifier: Modifier = Modifier) {
     when {
         category != null -> IconBadge(
             color = Color(category.color.value),
             iconName = category.icon?.id,
             defaultIcon = R.drawable.ic_custom_category_m,
+            modifier = modifier,
         )
 
         type == TransactionType.TRANSFER -> IconBadge(
             color = MaterialTheme.colorScheme.primaryContainer,
             icon = Icons.Default.SwapHoriz,
+            modifier = modifier,
         )
 
         else -> IconBadge(
             color = MaterialTheme.colorScheme.secondaryContainer,
             iconName = null,
             defaultIcon = R.drawable.ic_custom_category_m,
+            modifier = modifier,
         )
     }
 }
@@ -185,17 +189,20 @@ private fun DueOverline(dueDate: Instant, due: DueState?) {
     }
 }
 
+/** Chips that open the category's and the account's transactions; a transfer shows both accounts. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun NavigationChips(
+fun NavigationChips(
     category: Category?,
     account: Account?,
     toAccount: Account?,
     isTransfer: Boolean,
     showAccountColor: Boolean,
+    modifier: Modifier = Modifier,
 ) {
     val nav = navigation()
     FlowRow(
+        modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         itemVerticalAlignment = Alignment.CenterVertically,
     ) {

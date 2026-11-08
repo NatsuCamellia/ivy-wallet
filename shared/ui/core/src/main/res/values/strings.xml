@@ -80,6 +80,8 @@
     <string name="account">Account</string>
     <string name="to">To</string>
     <string name="add_account">Add account</string>
+    <string name="no_accounts">No accounts</string>
+    <string name="no_accounts_description">You don\'t have any accounts yet.\nYou can add one by tapping the \"+\" button.</string>
     <string name="income_title">Income title</string>
     <string name="expense_title">Expense title</string>
     <string name="transfer_title">Transfer title</string>

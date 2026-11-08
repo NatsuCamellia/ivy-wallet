@@ -25,4 +25,11 @@ class AccountsTabPaparazziTest(
             AccountsTabCompactUITest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotAccountsEmpty() {
+        snapshot(theme) {
+            AccountsTabEmptyUITest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

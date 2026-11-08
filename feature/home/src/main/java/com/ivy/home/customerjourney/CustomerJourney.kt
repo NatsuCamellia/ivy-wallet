@@ -65,7 +65,6 @@ fun CustomerJourneyCard(
     onCTA: () -> Unit,
 ) {
     Card(
-        onClick = onCTA,
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,

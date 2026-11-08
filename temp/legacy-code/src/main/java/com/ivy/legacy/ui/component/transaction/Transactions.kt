@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,6 +25,7 @@ import com.ivy.design.l0_system.UI
 import com.ivy.design.l0_system.style
 import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.data.LegacyDueSection
+import com.ivy.legacy.ui.component.TransactionRow
 import com.ivy.navigation.EditTransactionScreen
 import com.ivy.navigation.Navigation
 import com.ivy.navigation.navigation
@@ -36,6 +39,7 @@ import com.ivy.ui.color.Red
 import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.IvyButton
 import com.ivy.wallet.ui.theme.components.IvyIcon
+import java.util.UUID
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 fun LazyListScope.transactions(
@@ -217,26 +221,27 @@ private fun LazyListScope.trnItems(
     onPayOrGet: (Transaction) -> Unit,
     onSkipTransaction: (Transaction) -> Unit,
 ) {
-    items(
+    itemsIndexed(
         items = transactions,
-        key = { it.id }
-    ) {
+        key = { _, trn -> trn.id }
+    ) { index, trn ->
         val nav = navigation()
-        TransactionCard(
+        TransactionRow(
             baseData = baseData,
-
-            transaction = it,
+            transaction = trn,
             shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions,
             onPayOrGet = onPayOrGet,
-            onSkipTransaction = onSkipTransaction
-        ) { trn ->
-            onTransactionClick(
-                nav = nav,
-                transaction = trn
-            )
-        }
+            onClick = { onTransactionClick(nav = nav, transaction = it) },
+            modifier = Modifier.rowPadding(),
+            index = index,
+            count = transactions.size,
+            onSkipTransaction = onSkipTransaction,
+        )
     }
 }
+
+private fun Modifier.rowPadding(): Modifier =
+    padding(horizontal = 16.dp).padding(top = ListItemDefaults.SegmentedGap)
 
 private fun LazyListScope.historySection(
     baseData: AppBaseData,
@@ -248,6 +253,7 @@ private fun LazyListScope.historySection(
     onPayOrGet: (Transaction) -> Unit
 ) {
     if (history.isNotEmpty()) {
+        val groups = history.transactionGroups()
         items(
             items = history,
             key = {
@@ -261,19 +267,18 @@ private fun LazyListScope.historySection(
             when (it) {
                 is Transaction -> {
                     val nav = navigation()
+                    val (index, count) = groups.getValue(it.id)
 
-                    TransactionCard(
+                    TransactionRow(
                         baseData = baseData,
-
                         transaction = it,
                         shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions,
-                        onPayOrGet = onPayOrGet
-                    ) { trn ->
-                        onTransactionClick(
-                            nav = nav,
-                            transaction = trn
-                        )
-                    }
+                        onPayOrGet = onPayOrGet,
+                        onClick = { trn -> onTransactionClick(nav = nav, transaction = trn) },
+                        modifier = Modifier.rowPadding(),
+                        index = index,
+                        count = count,
+                    )
                 }
 
                 is TransactionHistoryDateDivider -> {
@@ -289,6 +294,19 @@ private fun LazyListScope.historySection(
             }
         }
     }
+}
+
+/** Each transaction's position and the size of the run of transactions (between date dividers) it belongs to. */
+internal fun List<TransactionHistoryItem>.transactionGroups(): Map<UUID, Pair<Int, Int>> {
+    val groups = HashMap<UUID, Pair<Int, Int>>()
+    var start = 0
+    while (start < size) {
+        var end = start
+        while (end < size && this[end] is Transaction) end++
+        for (i in start until end) groups[(this[i] as Transaction).id] = (i - start) to (end - start)
+        start = end + 1
+    }
+    return groups
 }
 
 private fun onTransactionClick(

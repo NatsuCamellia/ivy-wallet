@@ -59,6 +59,7 @@ class TransactionRowPaparazziTest(
                 expense(),
                 transfer(),
                 transfer(toAmount = 920.0, toCurrency = "EUR"),
+                transfer(toAccountId = UUID(0, 99)),
             )
         }
     }
@@ -107,6 +108,7 @@ class TransactionRowPaparazziTest(
                 expense(title = null, description = "Only a description, long enough to need a second line"),
                 expense(title = null, description = null),
                 expense(title = "No category", categoryId = null, tags = true),
+                expense(title = "Free sample", amount = 0.0),
             )
         }
     }
@@ -119,6 +121,7 @@ class TransactionRowPaparazziTest(
                 theme,
                 expense(dueDate = FAR_FUTURE, dateTime = null),
                 transfer(toAmount = 920.0, toCurrency = "EUR"),
+                expense(title = "Yacht", amount = HugeAmount),
             )
         }
     }
@@ -277,10 +280,11 @@ private fun transfer(
     amount: Double = 1000.0,
     toAmount: Double = amount,
     toCurrency: String = "USD",
+    toAccountId: UUID? = null,
 ): Transaction = transaction(
     type = TransactionType.TRANSFER,
     title = "Top-up",
     amount = amount,
-    toAccountId = if (toCurrency == "EUR") Euro.id else Bank.id,
+    toAccountId = toAccountId ?: if (toCurrency == "EUR") Euro.id else Bank.id,
     toAmount = toAmount,
 )

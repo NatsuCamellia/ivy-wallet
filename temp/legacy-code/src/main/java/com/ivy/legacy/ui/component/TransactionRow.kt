@@ -100,7 +100,8 @@ fun TransactionRow(
                 NavigationChips(
                     category = category,
                     account = account,
-                    toAccount = toAccount.takeIf { transaction.type == TransactionType.TRANSFER },
+                    toAccount = toAccount,
+                    isTransfer = transaction.type == TransactionType.TRANSFER,
                     showAccountColor = shouldShowAccountSpecificColorInTransactions,
                 )
                 Tags(transaction.tags)
@@ -113,15 +114,31 @@ fun TransactionRow(
                 }
             }
         },
-        trailingContent = {
-            Amounts(
-                transaction = transaction,
-                currency = account?.currency ?: baseData.baseCurrency,
-                toCurrency = toAccount?.currency ?: baseData.baseCurrency,
-            )
-        },
     ) {
-        Text(text = headline, maxLines = 2, overflow = TextOverflow.Ellipsis)
+        Headline(
+            headline = headline,
+            transaction = transaction,
+            currency = account?.currency ?: baseData.baseCurrency,
+            toCurrency = toAccount?.currency ?: baseData.baseCurrency,
+        )
+    }
+}
+
+/** The name and the amount share a line; when the amount is too wide for that it moves to its own line. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun Headline(headline: String, transaction: Transaction, currency: String, toCurrency: String) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Text(
+            text = headline,
+            modifier = Modifier.weight(1f),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Amounts(transaction, currency, toCurrency)
     }
 }
 
@@ -174,6 +191,7 @@ private fun NavigationChips(
     category: Category?,
     account: Account?,
     toAccount: Account?,
+    isTransfer: Boolean,
     showAccountColor: Boolean,
 ) {
     val nav = navigation()
@@ -190,13 +208,18 @@ private fun NavigationChips(
             )
         }
         AccountChip(account, showAccountColor, nav)
-        if (toAccount != null) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                modifier = Modifier.size(AssistChipDefaults.IconSize),
-            )
-            AccountChip(toAccount, showAccountColor, nav)
+        if (isTransfer) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    modifier = Modifier.size(AssistChipDefaults.IconSize),
+                )
+                AccountChip(toAccount, showAccountColor, nav)
+            }
         }
     }
 }
@@ -227,7 +250,10 @@ private fun AccountChip(account: Account?, showColor: Boolean, nav: Navigation) 
 @Composable
 private fun Tags(tags: ImmutableList<LegacyTag>) {
     if (tags.isEmpty()) return
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
         tags.forEach { tag ->
             Text(
                 text = "#${tag.name}",
@@ -254,7 +280,7 @@ private fun Amounts(transaction: Transaction, currency: String, toCurrency: Stri
                 tint = type.color(),
             )
             AmountText(
-                amount = if (type == TransactionType.EXPENSE && amount != 0.0) -abs(amount) else amount,
+                amount = if (type == TransactionType.EXPENSE) -abs(amount) else amount,
                 currency = currency,
                 style = MaterialTheme.typography.titleMediumEmphasized.copy(color = type.color()),
                 showPlusSign = type == TransactionType.INCOME,
@@ -264,7 +290,7 @@ private fun Amounts(transaction: Transaction, currency: String, toCurrency: Stri
             AmountText(
                 amount = transaction.toAmount.toDouble(),
                 currency = toCurrency,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
             )
         }
     }

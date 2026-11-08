@@ -1,18 +1,15 @@
 package com.ivy.legacy.ui.component.transaction
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.ivy.base.model.TransactionType
 import com.ivy.legacy.ui.component.AmountText
 import com.ivy.legacy.ui.component.color
@@ -40,52 +36,46 @@ fun SectionDivider(
     actions: @Composable RowScope.() -> Unit = {},
     setExpanded: (Boolean) -> Unit
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 8.dp, top = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
+    ListItem(
+        headlineContent = {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
                 color = titleColor
             )
+        },
+        modifier = modifier,
+        supportingContent = if (showIncomeExpenseRow) {
+            { TransactionTotals(income = income, expenses = expenses, currency = baseCurrency) }
+        } else {
+            null
+        },
+        trailingContent = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                actions()
 
-            if (showIncomeExpenseRow) {
-                TransactionTotals(
-                    income = income,
-                    expenses = expenses,
-                    currency = baseCurrency
-                )
+                IconButton(onClick = { setExpanded(!expanded) }) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                        contentDescription = stringResource(if (expanded) R.string.collapse else R.string.expand)
+                    )
+                }
             }
-        }
-
-        actions()
-
-        IconButton(onClick = { setExpanded(!expanded) }) {
-            Icon(
-                imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                contentDescription = stringResource(if (expanded) R.string.collapse else R.string.expand)
-            )
-        }
-    }
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+    )
 }
 
-/** Income as `+amount` and expenses as `-amount`, each only when it is not zero. */
-@OptIn(ExperimentalLayoutApi::class)
+/** Expenses as `-amount` and income as `+amount`, each only when it is not zero. */
 @Composable
 internal fun TransactionTotals(
     income: Double,
     expenses: Double,
     currency: String,
     modifier: Modifier = Modifier,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
 ) {
-    FlowRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    Column(modifier = modifier, horizontalAlignment = horizontalAlignment) {
         if (expenses > 0) {
             AmountText(
                 amount = -expenses,

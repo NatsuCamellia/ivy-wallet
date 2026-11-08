@@ -264,8 +264,7 @@ private fun LazyListScope.historySection(
                 is TransactionHistoryDateDivider -> {
                     HistoryDateDivider(
                         date = it.date,
-                        spacerTop = dateDividerMarginTop
-                            ?: if (it == history.firstOrNull()) 16.dp else 24.dp,
+                        modifier = dateDividerMarginTop?.let { top -> Modifier.padding(top = top) } ?: Modifier,
                         baseCurrency = baseData.baseCurrency,
                         income = it.income,
                         expenses = it.expenses

@@ -235,6 +235,10 @@
     <string name="includes_uppercase">INCLUDES</string>
     <string name="add_keyword">Add a keyword</string>
     <string name="excludes_uppercase">EXCLUDES</string>
+    <string name="filter_includes">Includes</string>
+    <string name="filter_excludes">Excludes</string>
+    <string name="filter_amount_from">From %1$s</string>
+    <string name="filter_amount_to">To %1$s</string>
     <string name="no_transactions_for_your_filter">No matching transactions for the selected filter.</string>
     <string name="no_filter">No Filter</string>
     <string name="invalid_filter_warning">You need to apply a valid filter before generating a report.</string>
@@ -520,5 +524,6 @@
     <string name="planned_for_date">Planned for %1$s</string>
     <string name="planned_starts_date">Starts %1$s</string>
     <string name="planned_repeats_every">Repeats every %1$d %2$s</string>
+    <string name="planned_starts_repeats_every">Starts %1$s · Repeats every %2$d %3$s</string>
     <string name="invalid_planned_rule">Invalid repeat rule</string>
 </resources>

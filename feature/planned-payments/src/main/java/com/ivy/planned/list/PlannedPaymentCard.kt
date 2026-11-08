@@ -3,13 +3,6 @@ package com.ivy.planned.list
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material3.AssistChipDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedListItem
@@ -18,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,10 +27,10 @@ import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.datamodel.PlannedPaymentRule
 import com.ivy.legacy.forDisplay
 import com.ivy.legacy.ui.WalletPreview
-import com.ivy.legacy.ui.component.AmountText
+import com.ivy.legacy.ui.component.TypeAmount
 import com.ivy.legacy.ui.component.NavigationChips
 import com.ivy.legacy.ui.component.TransactionBadge
-import com.ivy.legacy.ui.component.color
+import com.ivy.legacy.ui.component.label
 import com.ivy.legacy.utils.isNotNullOrBlank
 import com.ivy.navigation.Navigation
 import com.ivy.navigation.NavigationRoot
@@ -53,7 +45,6 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.UUID
-import kotlin.math.abs
 
 /**
  * One planned payment in a list. [index] and [count] place it in its group of rows so the group gets
@@ -117,23 +108,7 @@ private fun Headline(headline: String, type: TransactionType, amount: Double, cu
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Icon(
-                imageVector = type.icon(),
-                contentDescription = type.label(),
-                modifier = Modifier.size(AssistChipDefaults.IconSize),
-                tint = type.color(),
-            )
-            AmountText(
-                amount = if (type == TransactionType.EXPENSE) -abs(amount) else amount,
-                currency = currency,
-                style = MaterialTheme.typography.titleMediumEmphasized.copy(color = type.color()),
-                showPlusSign = type == TransactionType.INCOME,
-            )
-        }
+        TypeAmount(type = type, amount = amount, currency = currency)
     }
 }
 
@@ -146,8 +121,9 @@ private fun RuleText(rule: PlannedPaymentRule) {
         Text(stringResource(R.string.planned_for_date, startDate))
     } else if (intervalN != null && intervalType != null) {
         Text(
-            text = stringResource(R.string.planned_starts_date, startDate) + " · " + stringResource(
-                R.string.planned_repeats_every,
+            text = stringResource(
+                R.string.planned_starts_repeats_every,
+                startDate,
                 intervalN,
                 intervalType.forDisplay(intervalN)
             )
@@ -166,21 +142,6 @@ private fun RuleText(rule: PlannedPaymentRule) {
 @Composable
 private fun Instant.formatted(): String = with(LocalTimeFormatter.current) {
     formatLocal(TimeFormatter.Style.DateOnly(includeWeekDay = false))
-}
-
-@Composable
-private fun TransactionType.label(): String = stringResource(
-    when (this) {
-        TransactionType.INCOME -> R.string.income
-        TransactionType.EXPENSE -> R.string.expense
-        TransactionType.TRANSFER -> R.string.transfer
-    }
-)
-
-private fun TransactionType.icon(): ImageVector = when (this) {
-    TransactionType.INCOME -> Icons.Default.ArrowDownward
-    TransactionType.EXPENSE -> Icons.Default.ArrowUpward
-    TransactionType.TRANSFER -> Icons.Default.SwapHoriz
 }
 
 @Suppress("MagicNumber")

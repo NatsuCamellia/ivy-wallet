@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
@@ -24,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,7 +48,6 @@ import com.ivy.ui.time.TimeFormatter
 import kotlinx.collections.immutable.ImmutableList
 import java.time.Instant
 import java.time.LocalDateTime
-import kotlin.math.abs
 
 private enum class DueState { Upcoming, Overdue, Due }
 
@@ -276,23 +272,7 @@ private fun Amounts(transaction: Transaction, currency: String, toCurrency: Stri
     val type = transaction.type
     val amount = transaction.amount.toDouble()
     Column(horizontalAlignment = Alignment.End) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            Icon(
-                imageVector = type.icon(),
-                contentDescription = type.label(),
-                modifier = Modifier.size(AssistChipDefaults.IconSize),
-                tint = type.color(),
-            )
-            AmountText(
-                amount = if (type == TransactionType.EXPENSE) -abs(amount) else amount,
-                currency = currency,
-                style = MaterialTheme.typography.titleMediumEmphasized.copy(color = type.color()),
-                showPlusSign = type == TransactionType.INCOME,
-            )
-        }
+        TypeAmount(type = type, amount = amount, currency = currency)
         if (type == TransactionType.TRANSFER && toCurrency != currency) {
             AmountText(
                 amount = transaction.toAmount.toDouble(),
@@ -323,21 +303,6 @@ private fun PayOrSkipButtons(
             Text(stringResource(if (isExpense) R.string.pay else R.string.get))
         }
     }
-}
-
-@Composable
-private fun TransactionType.label(): String = stringResource(
-    when (this) {
-        TransactionType.INCOME -> R.string.income
-        TransactionType.EXPENSE -> R.string.expense
-        TransactionType.TRANSFER -> R.string.transfer
-    }
-)
-
-private fun TransactionType.icon(): ImageVector = when (this) {
-    TransactionType.INCOME -> Icons.Default.ArrowDownward
-    TransactionType.EXPENSE -> Icons.Default.ArrowUpward
-    TransactionType.TRANSFER -> Icons.Default.SwapHoriz
 }
 
 @Composable

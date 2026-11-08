@@ -3,21 +3,13 @@ package com.ivy.transactions
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
@@ -60,7 +52,7 @@ import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.IconBadge
-import com.ivy.legacy.ui.component.color
+import com.ivy.legacy.ui.component.SummaryCard
 import com.ivy.legacy.ui.component.transaction.transactions
 import com.ivy.legacy.ui.sheet.AccountModal
 import com.ivy.legacy.ui.sheet.AccountModalData
@@ -591,14 +583,14 @@ private fun IncomeExpenses(
             currency = currency,
             amount = income,
             count = trns.count { it.type == TransactionType.INCOME },
-            addLabel = stringResource(R.string.add_income),
+            modifier = Modifier.weight(1f),
             onClick = if (hasSummaryAction) {
                 { onSummaryClick(TransactionType.INCOME) }
             } else {
                 null
             },
+            addLabel = stringResource(R.string.add_income),
             onAdd = { onAdd(TransactionType.INCOME) },
-            modifier = Modifier.weight(1f),
         )
 
         SummaryCard(
@@ -607,78 +599,15 @@ private fun IncomeExpenses(
             currency = currency,
             amount = 0.0 - expenses.absoluteValue,
             count = trns.count { it.type == TransactionType.EXPENSE },
-            addLabel = stringResource(R.string.add_expense),
+            modifier = Modifier.weight(1f),
             onClick = if (hasSummaryAction) {
                 { onSummaryClick(TransactionType.EXPENSE) }
             } else {
                 null
             },
+            addLabel = stringResource(R.string.add_expense),
             onAdd = { onAdd(TransactionType.EXPENSE) },
-            modifier = Modifier.weight(1f),
         )
-    }
-}
-
-@Composable
-private fun SummaryCard(
-    type: TransactionType,
-    label: String,
-    currency: String,
-    amount: Double,
-    count: Int,
-    addLabel: String,
-    onClick: (() -> Unit)?,
-    onAdd: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val content: @Composable ColumnScope.() -> Unit = {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Icon(
-                    imageVector = if (type == TransactionType.INCOME) {
-                        Icons.Default.ArrowDownward
-                    } else {
-                        Icons.Default.ArrowUpward
-                    },
-                    contentDescription = null,
-                    modifier = Modifier.size(ButtonDefaults.IconSize),
-                    tint = type.color(),
-                )
-                Text(text = label, style = MaterialTheme.typography.labelLarge)
-            }
-
-            Text(
-                text = "${if (type == TransactionType.INCOME && amount > 0) "+" else ""}" +
-                    "${amount.format(currency)} $currency",
-                style = MaterialTheme.typography.titleMediumEmphasized,
-                color = type.color(),
-            )
-
-            Column {
-                Text(text = count.toString(), style = MaterialTheme.typography.titleSmall)
-                Text(
-                    text = stringResource(R.string.transactions),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-
-            FilledTonalButton(onClick = onAdd, modifier = Modifier.fillMaxWidth()) {
-                Text(text = addLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-        }
-    }
-
-    if (onClick != null) {
-        Card(onClick = onClick, modifier = modifier, content = content)
-    } else {
-        Card(modifier = modifier, content = content)
     }
 }
 

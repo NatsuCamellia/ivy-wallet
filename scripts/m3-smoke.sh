@@ -960,12 +960,50 @@ flow_planned_payments() {
   sleep 1
   shot planned-3-edit
   tap_node text exact "Set" || return 1
-  wait_for text exact "smokeplanned" || { log "saved planned payment missing from the list"; return 1; }
-  has text exact "Recurring payments" || { log "recurring section missing"; return 1; }
+  wait_for text exact "Recurring payments" || { log "recurring section missing"; return 1; }
+  dump || return 1
+  has text exact "smokeplanned" || { log "saved planned payment missing from the list"; return 1; }
   has text exact "-30.00 USD" || { log "amount missing in the list"; return 1; }
   shot planned-4-list-item
   back
   wait_for text exact "Quick access" || { log "back from the list should return to the open More sheet"; return 1; }
+  crashed && return 1
+  return 0
+}
+
+# Home More -> Reports: empty state with Set Filter, the filter sheet (Apply stays disabled until the filter is valid),
+# pick the Expenses type, the Cash account, the Groceries category and the default period, Apply: the seeded
+# smokecoffee expense is listed; back returns to the open More sheet. Seeded by flow_add_expense.
+flow_reports() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Reports" || return 1
+  wait_for desc exact "Filter" || return 1
+  has desc exact "Back" && has desc exact "Export" || { log "reports top bar buttons missing"; return 1; }
+  has text exact "No Filter" && has text exact "Set Filter" || { log "no-filter empty state missing"; return 1; }
+  shot reports-1-empty
+  tap_node text exact "Set Filter" || return 1
+  wait_for text exact "By Type" || { log "filter sheet did not open"; return 1; }
+  has text exact "Apply filter" && has text exact "Clear filter" || { log "filter sheet actions missing"; return 1; }
+  shot reports-2-sheet
+  local n
+  n=$(find_node text exact "Expenses" 1 >/dev/null 2>&1 && echo 1 || echo 0)
+  tap_node text exact "Expenses" "$n" || return 1
+  tap_node text exact "Cash" || return 1
+  tap_node text exact "Groceries" || return 1
+  tap_node text exact "Select time range" || return 1
+  wait_for text exact "Choose month" || { log "period sheet did not open"; return 1; }
+  tap_node text exact "Set" || return 1
+  wait_gone text exact "Choose month" || return 1
+  sleep 1
+  shot reports-3-filled
+  tap_node text exact "Apply filter" || return 1
+  wait_gone text exact "By Type" || { log "Apply did not close the sheet"; return 1; }
+  wait_for text exact "smokecoffee" 20 || { log "matching row missing: run flow_add_expense first, it seeds the smokecoffee transaction"; return 1; }
+  shot reports-4-result
+  back
+  wait_for text exact "Quick access" || { log "back from Reports should return to the open More sheet"; return 1; }
   crashed && return 1
   return 0
 }
@@ -997,7 +1035,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_search}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_search flow_reports}; do
   run_flow "$flow"
 done
 

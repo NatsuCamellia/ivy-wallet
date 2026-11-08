@@ -585,6 +585,92 @@ flow_choose_period() {
   return 0
 }
 
+# created_date_label: the clickable "Mon D" text of the Created on row, from the current dump
+created_date_label() {
+  python3 -I - "$XML" <<'PY'
+import re, sys, xml.etree.ElementTree as ET
+for n in ET.parse(sys.argv[1]).iter('node'):
+    text = n.get('text') or ''
+    if n.get('clickable') == 'true' and re.match(r'^[A-Z][a-z]{2} \d{1,2}$', text):
+        print(text)
+        sys.exit(0)
+sys.exit(1)
+PY
+}
+
+# Add expense -> Created on: the date dialog opens on today, Cancel leaves the date, a picked day and OK change
+# it; the time dialog opens and Cancel leaves the time.
+flow_date_picker() {
+  go_home || return 1
+  tap_node desc exact "circle button" || return 1
+  wait_for text exact "ADD EXPENSE" || return 1
+  tap_node text exact "ADD EXPENSE" || return 1
+  wait_for text exact "Enter" || return 1
+  tap_node desc exact "Close" || return 1
+  wait_for text exact "Created on" || return 1
+  local before today other other_label after
+  before=$(created_date_label) || { log "created date label not found"; return 1; }
+  today=$(adb shell date +%-d | tr -d '\r')
+  other=15
+  [ "$today" = 15 ] && other=16
+  other_label="$(adb shell date +%b | tr -d '\r') $other"
+  log "created on '$before', will pick day $other ('$other_label')"
+  tap_node text exact "$before" || return 1
+  wait_for text exact "Select date" || return 1
+  has text exact "OK" && has text exact "Cancel" || { log "OK or Cancel missing"; return 1; }
+  has any sub "Today, " || { log "today not marked in the dialog"; return 1; }
+  shot date-picker-1-open
+  tap_node text exact "Cancel" || return 1
+  wait_gone text exact "Select date" || return 1
+  dump || return 1
+  after=$(created_date_label) || return 1
+  [ "$after" = "$before" ] || { log "Cancel changed the date to '$after'"; return 1; }
+  tap_node text exact "$before" || return 1
+  wait_for text exact "Select date" || return 1
+  tap_node any sub ", $(adb shell date +%B | tr -d '\r') $other," || return 1
+  sleep 1
+  shot date-picker-2-picked
+  tap_node text exact "OK" || return 1
+  wait_gone text exact "Select date" || return 1
+  dump || return 1
+  after=$(created_date_label) || return 1
+  [ "$after" = "$other_label" ] || { log "date is '$after', expected '$other_label'"; return 1; }
+  shot date-picker-3-changed
+  tap_node any sub " AM" 0 || tap_node any sub " PM" 0 || return 1
+  wait_for text exact "Select Time" || return 1
+  shot date-picker-4-time
+  tap_node text exact "Cancel" || return 1
+  wait_gone text exact "OK" || return 1
+  crashed && return 1
+  return 0
+}
+
+# Home period -> Choose period -> From: Cancel keeps "Add date", a picked day and OK fill it in.
+flow_period_date_picker() {
+  go_home || return 1
+  dump || return 1
+  local label
+  label=$(home_period_label) || { log "period label not found on Home"; return 1; }
+  tap_node text exact "$label" || return 1
+  wait_for text exact "Choose month" || return 1
+  tap_node text exact "Add date" 0 || return 1
+  wait_for text exact "Select date" || return 1
+  tap_node text exact "Cancel" || return 1
+  wait_gone text exact "Select date" || return 1
+  dump || return 1
+  has text exact "Add date" 1 || { log "Cancel filled in a date"; return 1; }
+  tap_node text exact "Add date" 0 || return 1
+  wait_for text exact "Select date" || return 1
+  tap_node any sub ", $(adb shell date +%B | tr -d '\r') 15," || return 1
+  tap_node text exact "OK" || return 1
+  wait_gone text exact "Select date" || return 1
+  dump || return 1
+  has text exact "Add date" 0 && ! has text exact "Add date" 1 || { log "OK did not fill in the From date"; return 1; }
+  shot period-date-picker
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -612,7 +698,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period}; do
+for flow in ${FLOWS:-flow_onboarding flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker}; do
   run_flow "$flow"
 done
 

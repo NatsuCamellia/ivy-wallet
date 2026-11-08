@@ -1,16 +1,16 @@
 package com.ivy.ui.time.impl
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
+import android.text.format.DateFormat
 import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerDefaults
+import androidx.compose.material3.TimePickerDialog
+import androidx.compose.material3.TimePickerDialogDefaults
+import androidx.compose.material3.TimePickerDisplayMode
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -18,10 +18,10 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.ivy.base.time.TimeConverter
 import com.ivy.base.time.TimeProvider
 import java.time.Instant
@@ -29,6 +29,8 @@ import java.time.LocalDate
 import java.time.LocalTime
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000L
 
 @Stable
 @Singleton
@@ -47,99 +49,93 @@ class AndroidDateTimePicker @Inject constructor(
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun DatePicker(
-        viewState: DatePickerViewState,
-        modifier: Modifier = Modifier
-    ) {
+    private fun DatePicker(viewState: DatePickerViewState) {
         val pickerState = rememberDatePickerState(
-            initialSelectedDateMillis = viewState.initialDate?.toEpochMilli(),
+            initialSelectedDateMillis = viewState.initialDate.toEpochDay() * MILLISECONDS_IN_DAY,
         )
+        val dismiss = { datePickerViewState = null }
         DatePickerDialog(
-            modifier = modifier,
-            onDismissRequest = { datePickerViewState = null },
+            onDismissRequest = dismiss,
             confirmButton = {
-                ConfirmButton(onClick = {
-                    datePickerViewState = null
-                    pickerState.selectedDateMillis?.let(Instant::ofEpochMilli)
-                        ?.let {
-                            with(timeConverter) { it.toLocalDate() }
-                    }?.let(viewState.onDatePicked)
-                })
+                TextButton(
+                    onClick = {
+                        dismiss()
+                        pickerState.selectedDateMillis?.let {
+                            viewState.onDatePicked(LocalDate.ofEpochDay(it / MILLISECONDS_IN_DAY))
+                        }
+                    },
+                    enabled = pickerState.selectedDateMillis != null,
+                ) {
+                    Text(stringResource(android.R.string.ok))
+                }
             },
-            colors = DatePickerDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
+            dismissButton = {
+                TextButton(onClick = dismiss) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
         ) {
-            DatePicker(
-                state = pickerState,
-                colors = DatePickerDefaults.colors(
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
-                    selectedDayContainerColor = MaterialTheme.colorScheme.primary,
-                    todayContentColor = MaterialTheme.colorScheme.onBackground,
-                    todayDateBorderColor = MaterialTheme.colorScheme.onBackground,
-                    dayContentColor = MaterialTheme.colorScheme.onBackground
-                )
-            )
+            DatePicker(state = pickerState)
         }
     }
 
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
-    fun TimePicker(
-        viewState: TimePickerViewState,
-        modifier: Modifier = Modifier
-    ) {
+    private fun TimePicker(viewState: TimePickerViewState) {
         val time = viewState.initialTime ?: timeProvider.localNow().toLocalTime()
         val pickerState = rememberTimePickerState(
             initialHour = time.hour,
             initialMinute = time.minute,
+            is24Hour = DateFormat.is24HourFormat(LocalContext.current),
         )
-        DatePickerDialog(
-            modifier = modifier,
-            onDismissRequest = { timePickerViewState = null },
+        var displayMode by remember { mutableStateOf(TimePickerDisplayMode.Picker) }
+        val dismiss = { timePickerViewState = null }
+        TimePickerDialog(
+            onDismissRequest = dismiss,
             confirmButton = {
-                ConfirmButton(
+                TextButton(
                     onClick = {
-                        timePickerViewState = null
-                        viewState.onTimePicked(
-                            LocalTime.of(pickerState.hour, pickerState.minute)
-                        )
+                        dismiss()
+                        viewState.onTimePicked(LocalTime.of(pickerState.hour, pickerState.minute))
                     }
+                ) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = dismiss) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            },
+            modeToggleButton = {
+                TimePickerDialogDefaults.DisplayModeToggle(
+                    onDisplayModeChange = {
+                        displayMode = if (displayMode == TimePickerDisplayMode.Picker) {
+                            TimePickerDisplayMode.Input
+                        } else {
+                            TimePickerDisplayMode.Picker
+                        }
+                    },
+                    displayMode = displayMode,
                 )
             },
-            colors = DatePickerDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            )
+            title = { TimePickerDialogDefaults.Title(displayMode = displayMode) },
         ) {
-            Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                TimePicker(
-                    modifier = Modifier.padding(16.dp),
-                    state = pickerState,
-                    colors = TimePickerDefaults.colors(
-                        selectorColor = MaterialTheme.colorScheme.primary,
-                        timeSelectorSelectedContainerColor = MaterialTheme.colorScheme.primary
-                    )
-                )
+            if (displayMode == TimePickerDisplayMode.Picker) {
+                TimePicker(state = pickerState)
+            } else {
+                TimeInput(state = pickerState)
             }
         }
     }
 
-    @Composable
-    fun ConfirmButton(
-        modifier: Modifier = Modifier,
-        onClick: () -> Unit,
-    ) {
-        Button(
-            modifier = modifier,
-            onClick = onClick
-        ) {
-            Text(text = "Select")
-        }
+    override fun pickDate(initialDate: Instant?, onDatePick: (LocalDate) -> Unit) {
+        pickCalendarDate(initialDate?.let { with(timeConverter) { it.toLocalDate() } }, onDatePick)
     }
 
-    override fun pickDate(initialDate: Instant?, onDatePick: (LocalDate) -> Unit) {
+    override fun pickCalendarDate(initialDate: LocalDate?, onDatePick: (LocalDate) -> Unit) {
         datePickerViewState = DatePickerViewState(
-            initialDate = initialDate,
+            initialDate = initialDate ?: timeProvider.localDateNow(),
             onDatePicked = onDatePick
         )
     }
@@ -152,13 +148,13 @@ class AndroidDateTimePicker @Inject constructor(
     }
 
     @Immutable
-    data class DatePickerViewState(
-        val initialDate: Instant?,
+    private data class DatePickerViewState(
+        val initialDate: LocalDate,
         val onDatePicked: (LocalDate) -> Unit
     )
 
     @Immutable
-    data class TimePickerViewState(
+    private data class TimePickerViewState(
         val initialTime: LocalTime?,
         val onTimePicked: (LocalTime) -> Unit
     )

@@ -1,26 +1,45 @@
 package com.ivy.budgets
 
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.Row
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
@@ -29,31 +48,25 @@ import com.ivy.data.model.CategoryId
 import com.ivy.data.model.primitive.ColorInt
 import com.ivy.data.model.primitive.IconAsset
 import com.ivy.data.model.primitive.NotBlankTrimmedString
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.domain.legacy.ui.theme.components.ListItem
-import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.datamodel.Budget
-import com.ivy.legacy.legacy.ui.theme.modal.ModalNameInput
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.AmountItem
+import com.ivy.legacy.ui.component.IconBadge
+import com.ivy.legacy.ui.sheet.ActionSheet
+import com.ivy.legacy.ui.sheet.AmountModal
+import com.ivy.legacy.ui.sheet.DeleteModal
+import com.ivy.legacy.utils.capitalizeLocal
 import com.ivy.legacy.utils.isNotNullOrBlank
 import com.ivy.legacy.utils.selectEndTextFieldValue
+import com.ivy.legacy.utils.toLowerCaseLocal
 import com.ivy.ui.R
-import com.ivy.wallet.domain.deprecated.logic.model.CreateBudgetData
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.Purple1Dark
 import com.ivy.ui.color.Red3Light
-import com.ivy.legacy.ui.sheet.DeleteModal
-import com.ivy.wallet.ui.theme.modal.IvyModal
-import com.ivy.wallet.ui.theme.modal.ModalAddSave
-import com.ivy.wallet.ui.theme.modal.ModalAmountSection
-import com.ivy.wallet.ui.theme.modal.ModalDelete
-import com.ivy.wallet.ui.theme.modal.ModalTitle
-import com.ivy.legacy.ui.sheet.AmountModal
-import com.ivy.wallet.ui.theme.toComposeColor
+import com.ivy.wallet.domain.deprecated.logic.model.CreateBudgetData
 import java.util.UUID
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
 data class BudgetModalData(
     val budget: Budget?,
 
@@ -65,9 +78,9 @@ data class BudgetModalData(
     val autoFocusKeyboard: Boolean = true,
 )
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@SuppressLint("ComposeModifierMissing")
 @Composable
-fun BoxWithConstraintsScope.BudgetModal(
+fun BudgetModal(
     modal: BudgetModalData?,
 
     onCreate: (CreateBudgetData) -> Unit,
@@ -75,143 +88,150 @@ fun BoxWithConstraintsScope.BudgetModal(
     onDelete: (Budget) -> Unit,
     dismiss: () -> Unit
 ) {
-    val initialBudget = modal?.budget
-    var nameTextFieldValue by remember(modal) {
-        mutableStateOf(selectEndTextFieldValue(initialBudget?.name))
-    }
-    var amount by remember(modal) {
-        mutableDoubleStateOf(initialBudget?.amount ?: 0.0)
-    }
-    var categoryIds by remember(modal) {
-        mutableStateOf(modal?.budget?.parseCategoryIds() ?: emptyList())
-    }
-    var accountIds by remember(modal) {
-        mutableStateOf(modal?.budget?.parseAccountIds() ?: emptyList())
-    }
+    if (modal == null) return
 
-    var amountModalVisible by remember(modal) { mutableStateOf(false) }
-    var deleteModalVisible by remember(modal) { mutableStateOf(false) }
+    key(modal.id) {
+        val initialBudget = modal.budget
+        var nameTextFieldValue by remember {
+            mutableStateOf(selectEndTextFieldValue(initialBudget?.name))
+        }
+        var amount by remember { mutableDoubleStateOf(initialBudget?.amount ?: 0.0) }
+        var categoryIds by remember {
+            mutableStateOf(initialBudget?.parseCategoryIds() ?: emptyList())
+        }
+        var accountIds by remember {
+            mutableStateOf(initialBudget?.parseAccountIds() ?: emptyList())
+        }
 
-    IvyModal(
-        id = modal?.id,
-        visible = modal != null,
-        dismiss = dismiss,
-        PrimaryAction = {
-            ModalAddSave(
-                item = modal?.budget,
-                enabled = nameTextFieldValue.text.isNotNullOrBlank() && amount > 0.0
-            ) {
-                if (initialBudget != null) {
-                    onEdit(
-                        initialBudget.copy(
-                            name = nameTextFieldValue.text.trim(),
-                            amount = amount,
-                            categoryIdsSerialized = Budget.serialize(categoryIds),
-                            accountIdsSerialized = Budget.serialize(accountIds)
-                        )
-                    )
-                } else {
-                    onCreate(
-                        CreateBudgetData(
-                            name = nameTextFieldValue.text.trim(),
-                            amount = amount,
-                            categoryIdsSerialized = Budget.serialize(categoryIds),
-                            accountIdsSerialized = Budget.serialize(accountIds)
-                        )
-                    )
-                }
+        var amountModalVisible by remember { mutableStateOf(false) }
+        var deleteModalVisible by remember { mutableStateOf(false) }
 
-                dismiss()
+        val nameFocus = remember { FocusRequester() }
+        val keyboard = LocalSoftwareKeyboardController.current
+        LaunchedEffect(Unit) {
+            if (modal.autoFocusKeyboard) {
+                nameFocus.requestFocus()
             }
         }
-    ) {
-        Spacer(Modifier.height(32.dp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ModalTitle(
-                text = if (modal?.budget != null) {
-                    stringResource(
-                        R.string.edit_budget
-                    )
-                } else {
-                    stringResource(R.string.create_budget)
+        val gutter = Modifier.padding(horizontal = 16.dp)
+
+        ActionSheet(
+            onDismiss = dismiss,
+            title = stringResource(if (initialBudget != null) R.string.edit_budget else R.string.create_budget),
+            actions = { dismissSheet ->
+                if (initialBudget != null) {
+                    IconButton(
+                        onClick = { deleteModalVisible = true },
+                        modifier = Modifier.testTag("modal_delete"),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.delete),
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                    }
                 }
-            )
 
-            if (initialBudget != null) {
                 Spacer(Modifier.weight(1f))
 
-                ModalDelete {
-                    deleteModalVisible = true
+                Button(
+                    onClick = {
+                        if (initialBudget != null) {
+                            onEdit(
+                                initialBudget.copy(
+                                    name = nameTextFieldValue.text.trim(),
+                                    amount = amount,
+                                    categoryIdsSerialized = Budget.serialize(categoryIds),
+                                    accountIdsSerialized = Budget.serialize(accountIds)
+                                )
+                            )
+                        } else {
+                            onCreate(
+                                CreateBudgetData(
+                                    name = nameTextFieldValue.text.trim(),
+                                    amount = amount,
+                                    categoryIdsSerialized = Budget.serialize(categoryIds),
+                                    accountIdsSerialized = Budget.serialize(accountIds)
+                                )
+                            )
+                        }
+
+                        dismissSheet()
+                    },
+                    enabled = nameTextFieldValue.text.isNotNullOrBlank() && amount > 0.0,
+                    modifier = if (initialBudget == null) Modifier.testTag("modal_add") else Modifier,
+                ) {
+                    Text(stringResource(if (initialBudget != null) R.string.save else R.string.add))
                 }
+            }
+        ) { dismissSheet ->
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                OutlinedTextField(
+                    value = nameTextFieldValue,
+                    onValueChange = { nameTextFieldValue = it },
+                    modifier = gutter
+                        .fillMaxWidth()
+                        .focusRequester(nameFocus)
+                        .testTag("base_input"),
+                    label = { Text(stringResource(R.string.budget_name)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Words,
+                        imeAction = ImeAction.Done,
+                        keyboardType = KeyboardType.Text,
+                        autoCorrect = true
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { keyboard?.hide() }),
+                )
 
-                Spacer(Modifier.width(24.dp))
+                CategoriesRow(
+                    categories = modal.categories,
+                    budgetCategoryIds = categoryIds,
+                    onSetBudgetCategoryIds = { categoryIds = it },
+                )
+
+                AmountItem(
+                    label = stringResource(R.string.budget_amount_uppercase).toLowerCaseLocal().capitalizeLocal(),
+                    currency = modal.baseCurrency,
+                    amount = amount,
+                    index = 0,
+                    count = 1,
+                    onClick = { amountModalVisible = true },
+                    modifier = gutter,
+                )
+            }
+
+            DeleteModal(
+                visible = deleteModalVisible,
+                title = stringResource(R.string.confirm_deletion),
+                description = stringResource(
+                    R.string.confirm_budget_deletion_warning,
+                    nameTextFieldValue.text
+                ),
+                dismiss = { deleteModalVisible = false }
+            ) {
+                if (initialBudget != null) {
+                    onDelete(initialBudget)
+                }
+                deleteModalVisible = false
+                dismissSheet()
             }
         }
 
-        Spacer(Modifier.height(24.dp))
-
-        ModalNameInput(
-            hint = stringResource(R.string.budget_name),
-            autoFocusKeyboard = modal?.autoFocusKeyboard ?: true,
-            textFieldValue = nameTextFieldValue,
-            setTextFieldValue = {
-                nameTextFieldValue = it
-            }
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        CategoriesRow(
-            categories = modal?.categories ?: emptyList(),
-            budgetCategoryIds = categoryIds,
-            onSetBudgetCategoryIds = {
-                categoryIds = it
-            }
-        )
-
-        Spacer(Modifier.height(24.dp))
-
-        ModalAmountSection(
-            label = stringResource(R.string.budget_amount_uppercase),
-            currency = modal?.baseCurrency ?: "",
-            amount = amount,
-            amountPaddingTop = 24.dp,
-            amountPaddingBottom = 0.dp
+        val amountModalId = remember(amount) { UUID.randomUUID() }
+        AmountModal(
+            id = amountModalId,
+            visible = amountModalVisible,
+            currency = modal.baseCurrency,
+            initialAmount = amount,
+            dismiss = { amountModalVisible = false }
         ) {
-            amountModalVisible = true
+            amount = it
         }
-    }
-
-    val amountModalId = remember(modal, amount) {
-        UUID.randomUUID()
-    }
-    AmountModal(
-        id = amountModalId,
-        visible = amountModalVisible,
-        currency = modal?.baseCurrency ?: "",
-        initialAmount = amount,
-        dismiss = { amountModalVisible = false }
-    ) {
-        amount = it
-    }
-
-    DeleteModal(
-        visible = deleteModalVisible,
-        title = stringResource(R.string.confirm_deletion),
-        description = stringResource(
-            R.string.confirm_budget_deletion_warning,
-            nameTextFieldValue.text
-        ),
-        dismiss = { deleteModalVisible = false }
-    ) {
-        if (initialBudget != null) {
-            onDelete(initialBudget)
-        }
-        deleteModalVisible = false
-        dismiss()
     }
 }
 
@@ -219,48 +239,44 @@ fun BoxWithConstraintsScope.BudgetModal(
 private fun CategoriesRow(
     categories: List<Category>,
     budgetCategoryIds: List<UUID>,
-
     onSetBudgetCategoryIds: (List<UUID>) -> Unit,
 ) {
-    Text(
-        modifier = Modifier.padding(start = 32.dp),
-        text = determineBudgetType(budgetCategoryIds.size),
-        style = UI.typo.b1.style(
-            fontWeight = FontWeight.Medium,
-            color = UI.colors.pureInverse
+    Column {
+        Text(
+            text = determineBudgetType(budgetCategoryIds.size),
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(horizontal = 16.dp),
         )
-    )
 
-    Spacer(Modifier.height(16.dp))
-
-    LazyRow(
-        modifier = Modifier.testTag("budget_categories_row")
-    ) {
-        item {
-            Spacer(Modifier.width(24.dp))
-        }
-
-        items(items = categories) { category ->
-            ListItem(
-                icon = category.icon?.id,
-                defaultIcon = R.drawable.ic_custom_category_s,
-                text = category.name.value,
-                selectedColor = category.color.value.toComposeColor().takeIf {
-                    budgetCategoryIds.contains(category.id.value)
-                }
-            ) { selected ->
-                if (selected) {
-                    // remove category
-                    onSetBudgetCategoryIds(budgetCategoryIds.filter { it != category.id.value })
-                } else {
-                    // add category
-                    onSetBudgetCategoryIds(budgetCategoryIds.plus(category.id.value))
-                }
+        LazyRow(
+            modifier = Modifier.testTag("budget_categories_row"),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            items(items = categories, key = { it.id.value }) { category ->
+                val selected = budgetCategoryIds.contains(category.id.value)
+                FilterChip(
+                    selected = selected,
+                    onClick = {
+                        onSetBudgetCategoryIds(
+                            if (selected) {
+                                budgetCategoryIds.filter { it != category.id.value }
+                            } else {
+                                budgetCategoryIds.plus(category.id.value)
+                            }
+                        )
+                    },
+                    label = { Text(category.name.value) },
+                    leadingIcon = {
+                        IconBadge(
+                            color = Color(category.color.value),
+                            iconName = category.icon?.id,
+                            defaultIcon = R.drawable.ic_custom_category_m,
+                            size = FilterChipDefaults.IconSize,
+                        )
+                    },
+                )
             }
-        }
-
-        item {
-            Spacer(Modifier.width(24.dp))
         }
     }
 }
@@ -268,7 +284,7 @@ private fun CategoriesRow(
 @Preview
 @Composable
 private fun Preview_create(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
+    WalletPreview(theme) {
         val cat1 = Category(
             name = NotBlankTrimmedString.unsafe("Science"),
             color = ColorInt(Purple1Dark.toArgb()),
@@ -311,7 +327,7 @@ private fun Preview_create(theme: Theme = Theme.LIGHT) {
 @Preview
 @Composable
 private fun Preview_edit(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
+    WalletPreview(theme) {
         val cat1 = Category(
             name = NotBlankTrimmedString.unsafe("Science"),
             color = ColorInt(Purple1Dark.toArgb()),
@@ -326,7 +342,7 @@ private fun Preview_edit(theme: Theme = Theme.LIGHT) {
                     name = "Shopping",
                     amount = 1250.0,
                     accountIdsSerialized = null,
-                    categoryIdsSerialized = null,
+                    categoryIdsSerialized = Budget.serialize(listOf(cat1.id.value)),
                     orderId = 0.0
                 ),
                 baseCurrency = "BGN",

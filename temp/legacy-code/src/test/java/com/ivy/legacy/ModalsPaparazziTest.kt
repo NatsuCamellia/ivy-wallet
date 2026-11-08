@@ -19,10 +19,8 @@ import com.ivy.legacy.ui.sheet.DeleteConfirmationModalUiTest
 import com.ivy.legacy.ui.sheet.DeleteModalUiTest
 import com.ivy.legacy.ui.sheet.EditLoanModalUiTest
 import com.ivy.legacy.ui.sheet.EditLoanRecordModalUiTest
-import com.ivy.wallet.ui.theme.modal.IvyModalUiTest
 import com.ivy.legacy.ui.sheet.LoanModalUiTest
 import com.ivy.legacy.ui.sheet.LoanRecordModalUiTest
-import com.ivy.wallet.ui.theme.modal.MonthPickerModalUiTest
 import com.ivy.legacy.ui.sheet.NameModalUiTest
 import com.ivy.legacy.ui.sheet.ProgressModalUiTest
 import com.ivy.legacy.ui.sheet.RecurringRuleModalMultipleTimesUiTest
@@ -52,10 +50,8 @@ enum class ModalUnderTest(val content: @Composable (isDark: Boolean) -> Unit) {
     Currency({ CurrencyModalUiTest(it) }),
     Delete({ DeleteModalUiTest(it) }),
     DeleteConfirmation({ DeleteConfirmationModalUiTest(it) }),
-    IvyModal({ IvyModalUiTest(it) }),
     Loan({ LoanModalUiTest(it) }),
     LoanRecord({ LoanRecordModalUiTest(it) }),
-    MonthPicker({ MonthPickerModalUiTest(it) }),
     Name({ NameModalUiTest(it) }),
     Progress({ ProgressModalUiTest(it) }),
     RecurringRuleOneTime({ RecurringRuleModalOneTimeUiTest(it) }),

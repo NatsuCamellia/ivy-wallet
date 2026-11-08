@@ -1,23 +1,16 @@
 package com.ivy.wallet.ui.theme.modal
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
 import com.ivy.ui.R
 import com.ivy.wallet.ui.theme.GradientGreen
-import com.ivy.wallet.ui.theme.GradientRed
-import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.IvyButton
-import com.ivy.wallet.ui.theme.components.IvyCircleButton
+
+@Deprecated("Old design system. Use `:ivy-design` and Material3")
+const val DURATION_MODAL_ANIM = 200
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable
@@ -50,26 +43,6 @@ fun ModalCheck(
         enabled = enabled,
         onClick = onClick
     )
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
-fun <T> ModalAddSave(
-    item: T,
-    enabled: Boolean = true,
-    onClick: () -> Unit
-) {
-    if (item != null) {
-        ModalSave(
-            enabled = enabled,
-            onClick = onClick
-        )
-    } else {
-        ModalAdd(
-            enabled = enabled,
-            onClick = onClick
-        )
-    }
 }
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
@@ -120,39 +93,5 @@ fun ModalPositiveButton(
         iconStart = iconStart,
         onClick = onClick,
         enabled = enabled
-    )
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
-fun ModalDelete(
-    enabled: Boolean = true,
-    testTag: String = "modal_delete",
-    onClick: () -> Unit
-) {
-    IvyCircleButton(
-        modifier = Modifier
-            .size(40.dp)
-            .testTag(testTag),
-        icon = R.drawable.ic_delete,
-        backgroundGradient = GradientRed,
-        enabled = enabled,
-        tint = White,
-        onClick = onClick
-    )
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
-fun ModalTitle(
-    text: String
-) {
-    Text(
-        modifier = Modifier.padding(horizontal = 32.dp),
-        text = text,
-        style = UI.typo.b1.style(
-            color = UI.colors.pureInverse,
-            fontWeight = FontWeight.ExtraBold
-        )
     )
 }

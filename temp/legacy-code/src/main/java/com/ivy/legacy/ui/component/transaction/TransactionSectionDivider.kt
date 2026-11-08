@@ -16,6 +16,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.res.stringResource
 import com.ivy.base.model.TransactionType
 import com.ivy.legacy.ui.component.AmountText
@@ -54,10 +56,19 @@ fun SectionDivider(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 actions()
 
-                IconButton(onClick = { setExpanded(!expanded) }) {
+                val stateDescription = stringResource(
+                    if (expanded) R.string.section_expanded else R.string.section_collapsed
+                )
+                IconButton(
+                    onClick = { setExpanded(!expanded) },
+                    modifier = Modifier.semantics { this.stateDescription = stateDescription }
+                ) {
                     Icon(
                         imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
-                        contentDescription = stringResource(if (expanded) R.string.collapse else R.string.expand)
+                        contentDescription = stringResource(
+                            if (expanded) R.string.collapse_section else R.string.expand_section,
+                            title
+                        )
                     )
                 }
             }

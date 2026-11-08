@@ -728,6 +728,38 @@ flow_fab_menu() {
   return 0
 }
 
+# Home more button: opens the More sheet, an item navigates (and back returns to the sheet), Close dismisses it,
+# the Savings goal row opens the Buffer sheet on top and back closes only that one.
+flow_more_menu() {
+  go_home || return 1
+  has desc exact "More" || { log "more button missing on Home"; return 1; }
+  shot more-1-home
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  has text exact "Search transactions..." && has text exact "Settings" && has text exact "Loans" || { log "menu items missing"; return 1; }
+  shot more-2-sheet
+  tap_node text exact "Settings" || return 1
+  wait_for text exact "Set currency" || return 1
+  back
+  wait_for text exact "Quick access" || { log "back from Settings should return to the open More sheet"; return 1; }
+  tap_node desc exact "Close" || return 1
+  wait_gone text exact "Quick access" || { log "Close did not dismiss the sheet"; return 1; }
+  has desc exact "More" || { log "Home missing after Close"; return 1; }
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Savings goal" || return 1
+  tap_node text exact "Savings goal" || return 1
+  wait_for text exact "Save" || return 1
+  shot more-3-buffer
+  back
+  wait_gone text exact "Save" || { log "back did not close the Buffer sheet"; return 1; }
+  has text exact "Quick access" || { log "back closed the More sheet too"; return 1; }
+  back
+  wait_gone text exact "Quick access" || { log "back did not close the More sheet"; return 1; }
+  shot more-4-closed
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -755,7 +787,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu}; do
   run_flow "$flow"
 done
 

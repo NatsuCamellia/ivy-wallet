@@ -2,6 +2,7 @@ package com.ivy.home
 
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import com.ivy.home.customerjourney.CustomerJourneyUiTest
 import com.ivy.ui.testing.PaparazziScreenshotTest
 import com.ivy.ui.testing.PaparazziTheme
 import com.ivy.ui.testing.WithFakeRootScreen
@@ -26,6 +27,20 @@ class HomePaparazziTest(
             WithFakeRootScreen {
                 HomeUiTest(theme == PaparazziTheme.Dark, moreMenuExpanded = true)
             }
+        }
+    }
+
+    @Test
+    fun snapshotHomeEmpty() {
+        snapshot(theme) {
+            HomeUiTest(theme == PaparazziTheme.Dark, empty = true)
+        }
+    }
+
+    @Test
+    fun snapshotCustomerJourneyCards() {
+        snapshot(theme) {
+            CustomerJourneyUiTest(theme == PaparazziTheme.Dark)
         }
     }
 }

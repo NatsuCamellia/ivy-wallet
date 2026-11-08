@@ -103,7 +103,7 @@ fun BufferModal(
 }
 
 @Composable
-private fun BufferStatus(
+fun BufferStatus(
     buffer: Double,
     balance: Double,
     currency: String,

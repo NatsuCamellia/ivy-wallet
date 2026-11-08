@@ -99,19 +99,13 @@ print((x1 + x2) // 2, (y1 + y2) // 2, x1, y1, x2, y2)
 PY
 }
 
-# find_icon <bottom|topright|tabright>: unnamed clickable (content-desc "icon", or the right
-# bottom-bar tab, which has no label until selected) by screen region
+# find_icon <bottom|topright>: unnamed clickable (content-desc "icon") by screen region
 find_icon() {
-  python3 -I - "$XML" "$1" "$(screen_height)" "$(screen_width)" <<'PY'
+  python3 -I - "$XML" "$1" "$(screen_height)" <<'PY'
 import re, sys, xml.etree.ElementTree as ET
-path, region, height, width = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
+path, region, height = sys.argv[1], sys.argv[2], int(sys.argv[3])
 best = None
 for n in ET.parse(path).iter('node'):
-    if region == 'tabright':
-        x1, y1, x2, y2 = map(int, re.findall(r'\d+', n.get('bounds')))
-        if n.get('clickable') == 'true' and y1 >= height * 0.9 and x1 >= width * 0.5 and x2 - x1 > width * 0.25:
-            best = (x1, y1, x2, y2)
-        continue
     if n.get('clickable') != 'true' or n.get('content-desc') != 'icon' or n.get('class') != 'android.widget.ImageView':
         continue
     x1, y1, x2, y2 = map(int, re.findall(r'\d+', n.get('bounds')))
@@ -123,6 +117,20 @@ if not best:
     sys.exit(1)
 x1, y1, x2, y2 = best
 print((x1 + x2) // 2, (y1 + y2) // 2, x1, y1, x2, y2)
+PY
+}
+
+# find_tab <label>: the navigation bar item label (text in the bottom 10% of the screen)
+find_tab() {
+  python3 -I - "$XML" "$1" "$(screen_height)" <<'PY'
+import re, sys, xml.etree.ElementTree as ET
+path, label, height = sys.argv[1], sys.argv[2], int(sys.argv[3])
+for n in ET.parse(path).iter('node'):
+    x1, y1, x2, y2 = map(int, re.findall(r'\d+', n.get('bounds')))
+    if n.get('text') == label and y1 >= height * 0.9:
+        print((x1 + x2) // 2, (y1 + y2) // 2, x1, y1, x2, y2)
+        sys.exit(0)
+sys.exit(1)
 PY
 }
 
@@ -189,6 +197,19 @@ tap_node() {
   dump
   pos=$(find_node "$@") || { log "node not found: $*"; return 1; }
   tap_xy $pos
+}
+
+tap_tab() {
+  local pos
+  dump
+  pos=$(find_tab "$1") || { log "tab not found: $1"; return 1; }
+  tap_xy $pos
+}
+
+# The Home FAB is the toggle button named "Add" (it is named "Close" while the menu is open)
+open_fab_menu() {
+  tap_node desc exact "Add" || return 1
+  wait_for text exact "Add expense" 5
 }
 
 tap_icon() {
@@ -259,7 +280,7 @@ PY
 
 open_account_edit_sheet() {
   go_home || return 1
-  tap_icon tabright || return 1
+  tap_tab Accounts || return 1
   wait_for text exact "Total Balance" || return 1
   tap_node text exact "Cash" || return 1
   wait_for text exact "Edit" || return 1
@@ -467,7 +488,7 @@ text_y() { find_node text exact "$1" | awk '{print $2}'; }
 
 open_reorder_sheet() {
   go_home || return 1
-  tap_icon tabright || return 1
+  tap_tab Accounts || return 1
   wait_for text exact "Total Balance" || return 1
   tap_node desc exact "Reorder" || return 1
   wait_for text exact "Done" || return 1
@@ -602,9 +623,8 @@ PY
 # it; the time dialog opens and Cancel leaves the time.
 flow_date_picker() {
   go_home || return 1
-  tap_node desc exact "circle button" || return 1
-  wait_for text exact "ADD EXPENSE" || return 1
-  tap_node text exact "ADD EXPENSE" || return 1
+  open_fab_menu || return 1
+  tap_node text exact "Add expense" || return 1
   wait_for text exact "Enter" || return 1
   tap_node desc exact "Close" || return 1
   wait_for text exact "Created on" || return 1
@@ -671,6 +691,32 @@ flow_period_date_picker() {
   return 0
 }
 
+# Home FAB: tap opens the menu, back collapses it (still on Home), reopen, Add expense opens the edit screen.
+flow_fab_menu() {
+  go_home || return 1
+  has desc exact "Add" || { log "FAB missing on Home"; return 1; }
+  shot fab-1-collapsed
+  open_fab_menu || return 1
+  has text exact "Add income" && has text exact "Transfer" && has text exact "Add planned payment" || { log "menu items missing"; return 1; }
+  has desc exact "Close" || { log "FAB should read Close while expanded"; return 1; }
+  shot fab-2-expanded
+  back
+  wait_gone text exact "Add expense" || { log "back did not collapse the menu"; return 1; }
+  has text exact "Home" && has desc exact "Add" || { log "back left the main screen"; return 1; }
+  shot fab-3-collapsed-by-back
+  open_fab_menu || return 1
+  tap_node text exact "Add expense" || return 1
+  wait_for text exact "Enter" || return 1
+  tap_node desc exact "Close" || return 1
+  wait_for text exact "Created on" || return 1
+  shot fab-4-edit-transaction
+  back
+  wait_for text exact "Home" || return 1
+  wait_for desc exact "Add" || return 1
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -698,7 +744,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker}; do
   run_flow "$flow"
 done
 

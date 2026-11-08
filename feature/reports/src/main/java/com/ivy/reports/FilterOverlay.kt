@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,7 +72,6 @@ import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
 import com.ivy.ui.time.LocalTimeProvider
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import java.time.Instant
 import java.util.UUID
@@ -226,7 +224,7 @@ fun FilterOverlay(
     TagSelectModal(
         visible = includedTagModalVisible,
         allTags = allTags,
-        selected = current.includedTags,
+        selected = current.includedTags.toImmutableList(),
         onDismiss = { includedTagModalVisible = false },
         onTagSelect = { tag -> update { it.copy(includedTags = it.includedTags.plus(tag.id)) } },
         onTagDeselect = { tag -> update { it.copy(includedTags = it.includedTags.minus(tag.id)) } },
@@ -236,7 +234,7 @@ fun FilterOverlay(
     TagSelectModal(
         visible = excludedTagModalVisible,
         allTags = allTags,
-        selected = current.excludedTags,
+        selected = current.excludedTags.toImmutableList(),
         onDismiss = { excludedTagModalVisible = false },
         onTagSelect = { tag -> update { it.copy(excludedTags = it.excludedTags.plus(tag.id)) } },
         onTagDeselect = { tag -> update { it.copy(excludedTags = it.excludedTags.minus(tag.id)) } },
@@ -269,13 +267,12 @@ private fun AmountFilterModal(
 private fun TagSelectModal(
     visible: Boolean,
     allTags: ImmutableList<Tag>,
-    selected: List<TagId>,
+    selected: ImmutableList<TagId>,
     onDismiss: () -> Unit,
     onTagSelect: (Tag) -> Unit,
     onTagDeselect: (Tag) -> Unit,
     onTagSearch: (String) -> Unit,
 ) {
-    val selectedTags by remember(selected) { derivedStateOf { selected.toImmutableList() } }
     ShowTagModal(
         visible = visible,
         selectOnlyMode = true,
@@ -285,7 +282,7 @@ private fun TagSelectModal(
             onTagSearch("")
         },
         allTagList = allTags,
-        selectedTagList = selectedTags,
+        selectedTagList = selected,
         onTagAdd = {},
         onTagEdit = { _, _ -> },
         onTagDelete = {},
@@ -566,7 +563,7 @@ private fun KeywordsFilter(
     FilterSection(title = stringResource(R.string.keywords_optional)) {
         KeywordGroup(
             label = stringResource(R.string.filter_includes),
-            keywords = filter?.includeKeywords.orEmpty(),
+            keywords = filter?.includeKeywords.orEmpty().toImmutableList(),
             onRemove = { keyword ->
                 onChange { it.copy(includeKeywords = it.includeKeywords.filter { k -> k != keyword }) }
             },
@@ -574,7 +571,7 @@ private fun KeywordsFilter(
         )
         KeywordGroup(
             label = stringResource(R.string.filter_excludes),
-            keywords = filter?.excludeKeywords.orEmpty(),
+            keywords = filter?.excludeKeywords.orEmpty().toImmutableList(),
             onRemove = { keyword ->
                 onChange { it.copy(excludeKeywords = it.excludeKeywords.filter { k -> k != keyword }) }
             },
@@ -586,7 +583,7 @@ private fun KeywordsFilter(
 @Composable
 private fun KeywordGroup(
     label: String,
-    keywords: List<String>,
+    keywords: ImmutableList<String>,
     onRemove: (String) -> Unit,
     onAdd: () -> Unit,
 ) {
@@ -612,14 +609,14 @@ private fun TagsFilter(
     FilterSection(title = stringResource(R.string.tags_optional)) {
         TagGroup(
             label = stringResource(R.string.filter_includes),
-            selected = filter?.includedTags.orEmpty(),
+            selected = filter?.includedTags.orEmpty().toImmutableList(),
             allTags = allTags,
             onRemove = { id -> onChange { it.copy(includedTags = it.includedTags.minus(id)) } },
             onSelect = onShowIncludedTagModal,
         )
         TagGroup(
             label = stringResource(R.string.filter_excludes),
-            selected = filter?.excludedTags.orEmpty(),
+            selected = filter?.excludedTags.orEmpty().toImmutableList(),
             allTags = allTags,
             onRemove = { id -> onChange { it.copy(excludedTags = it.excludedTags.minus(id)) } },
             onSelect = onShowExcludedTagModal,
@@ -630,7 +627,7 @@ private fun TagsFilter(
 @Composable
 private fun TagGroup(
     label: String,
-    selected: List<TagId>,
+    selected: ImmutableList<TagId>,
     allTags: ImmutableList<Tag>,
     onRemove: (TagId) -> Unit,
     onSelect: () -> Unit,

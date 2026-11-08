@@ -32,4 +32,11 @@ class AccountsTabPaparazziTest(
             AccountsTabEmptyUITest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotAccountCardHugeAmount() {
+        snapshot(theme) {
+            AccountsTabHugeAmountUITest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package com.ivy.accounts
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -121,6 +122,7 @@ private fun AccountsUi(
             listState = listState,
             contentPadding = PaddingValues(
                 top = innerPadding.calculateTopPadding(),
+                // clears the add-account FAB that the main screen draws over the list
                 bottom = innerPadding.calculateBottomPadding() + LocalMinimumInteractiveComponentSize.current * 2
             ),
             modifier = Modifier.padding(horizontal = 16.dp)
@@ -279,14 +281,15 @@ private fun NameAndBalance(accountData: AccountData, currency: String, baseCurre
             )
             val baseBalance = accountData.balanceBaseCurrency
             if (currency != baseCurrency && baseBalance != null) {
-                AmountText(
-                    amount = baseBalance,
-                    currency = baseCurrency,
-                    modifier = Modifier.testTag("baseCurrencyEquivalent"),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    ),
-                )
+                Box(modifier = Modifier.testTag("baseCurrencyEquivalent")) {
+                    AmountText(
+                        amount = baseBalance,
+                        currency = baseCurrency,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                    )
+                }
             }
         }
     }
@@ -359,16 +362,17 @@ private fun PreviewAccountsTab(
     theme: Theme = Theme.LIGHT,
     compact: Boolean = false,
     empty: Boolean = false,
+    hugeAmountOnly: Boolean = false,
 ) {
     WalletPreview(theme) {
         NavigationRoot(navigation = Navigation()) {
-            AccountsUi(state = previewState(compact = compact, empty = empty))
+            AccountsUi(state = previewState(compact = compact, empty = empty, hugeAmountOnly = hugeAmountOnly))
         }
     }
 }
 
 @Suppress("MagicNumber", "LongMethod")
-private fun previewState(compact: Boolean, empty: Boolean): AccountsState {
+private fun previewState(compact: Boolean, empty: Boolean, hugeAmountOnly: Boolean): AccountsState {
     fun account(name: String, color: Color, currency: String = "BGN", icon: String? = null, included: Boolean = true) =
         Account(
             id = AccountId(UUID.randomUUID()),
@@ -380,21 +384,24 @@ private fun previewState(compact: Boolean, empty: Boolean): AccountsState {
             orderNum = 0.0,
         )
 
+    val hugeAmount = AccountData(
+        account("Long-term savings and investments for the whole family", Color(0xFF6200EE)),
+        balance = 123456789012.34,
+        balanceBaseCurrency = null,
+        monthlyExpenses = 98765432.1,
+        monthlyIncome = 123456789.01
+    )
     val accounts = if (empty) {
         persistentListOf()
+    } else if (hugeAmountOnly) {
+        persistentListOf(hugeAmount)
     } else {
         persistentListOf(
             AccountData(account("Phyre", Green), 2125.0, null, 920.0, 3045.0),
             AccountData(account("DSK", GreenLight, included = false), 12125.21, null, 1350.50, 8000.48),
             AccountData(account("Revolut", Color(0xFFFFF59D), "USD", "revolut"), 1200.0, 1979.64, 750.0, 1000.30),
             AccountData(account("Cash", Color(0xFF212121), icon = "cash"), 820.0, null, 340.0, 400.0),
-            AccountData(
-                account("Long-term savings and investments for the whole family", Color(0xFF6200EE)),
-                balance = 123456789012.34,
-                balanceBaseCurrency = null,
-                monthlyExpenses = 98765432.1,
-                monthlyIncome = 123456789.01
-            ),
+            hugeAmount,
         )
     }
     return AccountsState(
@@ -406,7 +413,7 @@ private fun previewState(compact: Boolean, empty: Boolean): AccountsState {
         totalBalanceWithoutExcludedText = "",
         reorderVisible = false,
         compactAccountsModeEnabled = compact,
-        hideTotalBalance = false
+        hideTotalBalance = hugeAmountOnly
     )
 }
 
@@ -426,6 +433,12 @@ fun AccountsTabCompactUITest(dark: Boolean) {
 @Composable
 fun AccountsTabEmptyUITest(dark: Boolean) {
     PreviewAccountsTab(theme = dark.theme(), empty = true)
+}
+
+/** For screen shot testing **/
+@Composable
+fun AccountsTabHugeAmountUITest(dark: Boolean) {
+    PreviewAccountsTab(theme = dark.theme(), hugeAmountOnly = true)
 }
 
 private fun Boolean.theme(): Theme = if (this) Theme.DARK else Theme.LIGHT

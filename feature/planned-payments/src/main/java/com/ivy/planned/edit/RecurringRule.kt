@@ -38,6 +38,7 @@ fun RecurringRule(
         intervalType = intervalType,
         oneTime = oneTime
     )
+    val repeats = hasRule && !oneTime
     Card(onClick = onShowRecurringRuleModal, modifier = modifier.fillMaxWidth()) {
         ListItem(
             leadingContent = { Icon(Icons.Default.EventRepeat, contentDescription = null) },
@@ -50,7 +51,7 @@ fun RecurringRule(
             } else {
                 null
             },
-            supportingContent = if (hasRule && !oneTime && intervalType != null && intervalN != null) {
+            supportingContent = if (repeats && intervalType != null && intervalN != null) {
                 {
                     Text(
                         stringResource(

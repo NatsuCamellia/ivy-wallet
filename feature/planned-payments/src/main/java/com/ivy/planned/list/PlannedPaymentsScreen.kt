@@ -153,7 +153,7 @@ private fun previewRule(
     intervalType: IntervalType? = null,
     type: TransactionType = TransactionType.EXPENSE,
     id: Long = 0,
-) = PlannedPaymentRule(
+): PlannedPaymentRule = PlannedPaymentRule(
     accountId = previewAccount.id,
     title = title,
     categoryId = category.id.value,
@@ -166,20 +166,42 @@ private fun previewRule(
     id = UUID(1, id),
 )
 
-private val previewOneTime = previewRule("Lidl pazar", previewFood, 250.75, oneTime = true, id = 1)
+private val previewOneTime = previewRule(
+    title = "Lidl pazar",
+    category = previewFood,
+    amount = 250.75,
+    oneTime = true,
+    id = 1
+)
 private val previewRecurring = previewRule(
-    "Tabu", previewShisha, 1025.5, oneTime = false, intervalType = IntervalType.MONTH, id = 2
+    title = "Tabu",
+    category = previewShisha,
+    amount = 1025.5,
+    oneTime = false,
+    intervalType = IntervalType.MONTH,
+    id = 2
 )
 private val previewIncome = previewRule(
-    "Salary", previewFood, 3200.0, oneTime = false, intervalType = IntervalType.MONTH, type = TransactionType.INCOME,
+    title = "Salary",
+    category = previewFood,
+    amount = 3200.0,
+    oneTime = false,
+    intervalType = IntervalType.MONTH,
+    type = TransactionType.INCOME,
     id = 3
 )
-private val previewInvalid = previewRule("Gym", previewShisha, 40.0, oneTime = false, id = 4)
+private val previewInvalid = previewRule(
+    title = "Gym",
+    category = previewShisha,
+    amount = 40.0,
+    oneTime = false,
+    id = 4
+)
 
 private fun previewState(
     oneTime: List<PlannedPaymentRule> = emptyList(),
     recurring: List<PlannedPaymentRule> = emptyList(),
-) = PlannedPaymentsScreenState(
+): PlannedPaymentsScreenState = PlannedPaymentsScreenState(
     currency = "BGN",
     accounts = persistentListOf(previewAccount),
     categories = persistentListOf(previewFood, previewShisha),
@@ -218,12 +240,15 @@ private fun PreviewEmpty(theme: Theme = Theme.LIGHT) {
 @Composable
 private fun PreviewInvalidRule(theme: Theme = Theme.LIGHT) {
     PreviewUI(
-        previewState(oneTime = listOf(previewOneTime), recurring = listOf(previewRecurring, previewIncome, previewInvalid)),
-        theme
+        state = previewState(
+            oneTime = listOf(previewOneTime),
+            recurring = listOf(previewRecurring, previewIncome, previewInvalid)
+        ),
+        theme = theme
     )
 }
 
-private fun Boolean.toTheme() = if (this) Theme.DARK else Theme.LIGHT
+private fun Boolean.toTheme(): Theme = if (this) Theme.DARK else Theme.LIGHT
 
 /** For screenshot testing */
 @Composable

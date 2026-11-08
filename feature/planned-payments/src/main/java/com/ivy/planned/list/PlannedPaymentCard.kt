@@ -153,11 +153,13 @@ private fun RuleText(rule: PlannedPaymentRule) {
             )
         )
     } else {
-        Text(stringResource(R.string.planned_starts_date, startDate))
-        Text(
-            text = stringResource(R.string.invalid_planned_rule),
-            color = MaterialTheme.colorScheme.error,
-        )
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(stringResource(R.string.planned_starts_date, startDate))
+            Text(
+                text = stringResource(R.string.invalid_planned_rule),
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
     }
 }
 

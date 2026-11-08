@@ -1,7 +1,8 @@
 package com.ivy.search
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -9,7 +10,10 @@ import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.SearchBar
+import androidx.compose.material3.AppBarWithSearch
+import androidx.compose.material3.ExpandedFullScreenSearchBar
+import androidx.compose.material3.SearchBarValue
+import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -18,14 +22,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -56,6 +56,7 @@ import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.first
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -82,14 +83,8 @@ private fun SearchUi(
     val nav = navigation()
     val listState = rememberLazyListState()
     val queryState = rememberTextFieldState(uiState.searchQuery)
-    val focusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val inspecting = LocalInspectionMode.current
+    val searchBarState = rememberSearchBarState(initialValue = SearchBarValue.Expanded)
     val currentOnEvent by rememberUpdatedState(onEvent)
-
-    LaunchedEffect(Unit) {
-        if (!inspecting) focusRequester.requestFocus()
-    }
 
     LaunchedEffect(queryState) {
         snapshotFlow { queryState.text.toString() }
@@ -97,56 +92,57 @@ private fun SearchUi(
             .collect { currentOnEvent(SearchEvent.Search(it)) }
     }
 
+    LaunchedEffect(searchBarState) {
+        snapshotFlow { searchBarState.currentValue }
+            .first { it == SearchBarValue.Collapsed }
+        nav.back()
+    }
+
     LaunchedEffect(uiState.transactions) {
         // scroll to top when transactions are changed
         listState.animateScrollToItem(index = 0, scrollOffset = 0)
     }
 
+    val inputField: @Composable () -> Unit = {
+        // read inside the field: the expanded bar is its own window with its own keyboard controller
+        val keyboardController = LocalSoftwareKeyboardController.current
+        SearchBarDefaults.InputField(
+            textFieldState = queryState,
+            searchBarState = searchBarState,
+            onSearch = { keyboardController?.hide() },
+            modifier = Modifier.testTag("search_input"),
+            placeholder = { Text(stringResource(R.string.search_transactions)) },
+            leadingIcon = { BackButton(onClick = { nav.back() }) },
+            trailingIcon = if (queryState.text.isNotEmpty()) {
+                {
+                    IconButton(onClick = { queryState.clearText() }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = stringResource(R.string.clear_search)
+                        )
+                    }
+                }
+            } else {
+                null
+            },
+        )
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = {
-            @Suppress("DEPRECATION")
-            SearchBar(
-                inputField = {
-                    SearchBarDefaults.InputField(
-                        state = queryState,
-                        onSearch = { keyboardController?.hide() },
-                        expanded = false,
-                        onExpandedChange = {},
-                        modifier = Modifier
-                            .focusRequester(focusRequester)
-                            .testTag("search_input"),
-                        placeholder = { Text(stringResource(R.string.search_transactions)) },
-                        leadingIcon = { BackButton(onClick = { nav.back() }) },
-                        trailingIcon = if (queryState.text.isNotEmpty()) {
-                            {
-                                IconButton(onClick = { queryState.clearText() }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = stringResource(R.string.clear_search)
-                                    )
-                                }
-                            }
-                        } else {
-                            null
-                        },
-                    )
-                },
-                expanded = false,
-                onExpandedChange = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                content = {},
-            )
-        }
+        topBar = { AppBarWithSearch(state = searchBarState, inputField = inputField) }
     ) { innerPadding ->
+        Box(Modifier.padding(innerPadding))
+    }
+
+    ExpandedFullScreenSearchBar(state = searchBarState, inputField = inputField) {
         val emptyStateTitle = stringResource(R.string.no_transactions)
         val emptyStateText = stringResource(R.string.no_transactions_for_query, queryState.text.toString())
         LazyColumn(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding(),
             state = listState,
-            contentPadding = innerPadding,
         ) {
             transactions(
                 baseData = AppBaseData(

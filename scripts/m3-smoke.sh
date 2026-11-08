@@ -906,6 +906,18 @@ flow_search() {
   wait_gone text exact "smokecoffee" 5 || wait_for text exact "smokecoffeex" 5 || return 1
   has class exact android.widget.EditText && has desc exact "Clear search" || { log "search bar lost after tapping the field"; return 1; }
   has text exact "smokecoffee" 1 && { log "typing after the re-tap did not filter"; return 1; }
+  # the keyboard's Search action (bottom right key) hides the keyboard, tapping the field brings it back
+  tap_xy $(($(screen_width) * 92 / 100)) $(($(screen_height) * 908 / 1000))
+  sleep 2
+  [ -z "$(ime_top)" ] || { log "the keyboard's Search action did not hide the keyboard"; return 1; }
+  has class exact android.widget.EditText || { log "search bar lost after the Search action"; return 1; }
+  tap_node class exact android.widget.EditText || return 1
+  for k in 1 2 3 4 5 6 7 8; do
+    sleep 1
+    ime=$(ime_top)
+    [ "${ime:-0}" -gt 0 ] && break
+  done
+  [ "${ime:-0}" -gt 0 ] || { log "tapping the field after the Search action did not bring the keyboard back"; return 1; }
   tap_node desc exact "Clear search" || return 1
   wait_gone desc exact "Clear search" 5 || { log "Clear search did not empty the field"; return 1; }
   adb shell input text zzzznomatch

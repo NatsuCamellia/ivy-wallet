@@ -13,7 +13,7 @@ open class PaparazziScreenshotTest {
     @get:Rule
     val paparazzi = Paparazzi(
         deviceConfig = DeviceConfig.PIXEL_6_PRO,
-        showSystemUi = true,
+        showSystemUi = false,
         maxPercentDifference = 0.001
     )
 

@@ -57,7 +57,6 @@ fun MoreMenu(
     onDismiss: () -> Unit,
     onSwitchTheme: () -> Unit,
     onBufferClick: () -> Unit,
-    onCurrencyClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val nav = navigation()
@@ -220,8 +219,7 @@ private fun PreviewMoreMenu() {
             theme = Theme.LIGHT,
             onDismiss = {},
             onSwitchTheme = {},
-            onBufferClick = {},
-            onCurrencyClick = {}
+            onBufferClick = {}
         )
     }
 }

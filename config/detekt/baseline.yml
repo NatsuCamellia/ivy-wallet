@@ -10556,7 +10556,6 @@
     <ID>UnusedParameter:DateExt.kt$secondsLabel: String = "s"</ID>
     <ID>UnusedParameter:FileUtil.kt$context: Context</ID>
     <ID>UnusedParameter:FileUtil.kt$directoryType: String</ID>
-    <ID>UnusedParameter:HomeMoreMenu.kt$onCurrencyClick: () -&gt; Unit</ID>
     <ID>UnusedParameter:HomeViewModel.kt$HomeViewModel$unit: Unit</ID>
     <ID>UnusedParameter:IvyBasicTextField.kt$textColor: Color = UI.colors.pureInverse</ID>
     <ID>UnusedParameter:IvyLineChart.kt$cellSize: Float</ID>

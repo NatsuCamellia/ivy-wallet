@@ -34,7 +34,6 @@ import com.ivy.frp.forward
 import com.ivy.frp.then2
 import com.ivy.home.customerjourney.CustomerJourney
 import com.ivy.home.customerjourney.CustomerJourneyCardModel
-import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.data.BufferInfo
 import com.ivy.legacy.data.LegacyDueSection
@@ -42,14 +41,15 @@ import com.ivy.legacy.data.model.Month
 import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.ivyWalletCtx
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.transaction.transactions
 import com.ivy.legacy.ui.sheet.BufferModal
 import com.ivy.legacy.ui.sheet.BufferModalData
 import com.ivy.legacy.ui.sheet.ChoosePeriodModal
 import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
-import com.ivy.legacy.ui.sheet.CurrencyModal
 import com.ivy.legacy.ui.sheet.DeleteModal
-import com.ivy.navigation.IvyPreview
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
 import com.ivy.ui.color.Green
@@ -58,7 +58,6 @@ import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
 import com.ivy.ui.time.LocalTimeProvider
-import com.ivy.wallet.domain.data.IvyCurrency
 import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
 import com.ivy.wallet.domain.pure.data.IncomeExpensePair
 import kotlinx.collections.immutable.ImmutableList
@@ -87,7 +86,6 @@ fun HomeUi(
     val ivyContext = ivyWalletCtx()
 
     var bufferModalData: BufferModalData? by remember { mutableStateOf(null) }
-    var currencyModalVisible by remember { mutableStateOf(false) }
     var choosePeriodModal: ChoosePeriodModalData? by remember {
         mutableStateOf(null)
     }
@@ -191,9 +189,6 @@ fun HomeUi(
                     buffer = uiState.buffer.amount.toDouble()
                 )
             },
-            onCurrencyClick = {
-                currencyModalVisible = true
-            }
         )
     }
 
@@ -204,18 +199,6 @@ fun HomeUi(
         },
         onBufferChanged = forward<Double>() then2 {
             HomeEvent.SetBuffer(it)
-        } then2 onEvent
-    )
-
-    CurrencyModal(
-        title = stringResource(R.string.set_currency),
-        initialCurrency = IvyCurrency.fromCode(baseCurrency),
-        visible = currencyModalVisible,
-        dismiss = {
-            currencyModalVisible = false
-        },
-        onSetCurrency = forward<String>() then2 {
-            HomeEvent.SetCurrency(it)
         } then2 onEvent
     )
 
@@ -344,16 +327,18 @@ fun HomeLazyColumn(
 @Preview
 @Composable
 private fun PreviewHomeTab(
-    isDark: Boolean = false,
+    theme: Theme = Theme.LIGHT,
     moreMenuExpanded: Boolean = false,
     empty: Boolean = false,
 ) {
-    IvyPreview(isDark) {
-        ivyWalletCtx().setMoreMenuExpanded(moreMenuExpanded)
-        HomeUi(
-            uiState = if (empty) emptyHomeState() else populatedHomeState(),
-            onEvent = {}
-        )
+    WalletPreview(theme) {
+        NavigationRoot(navigation = Navigation()) {
+            ivyWalletCtx().setMoreMenuExpanded(moreMenuExpanded)
+            HomeUi(
+                uiState = if (empty) emptyHomeState() else populatedHomeState(),
+                onEvent = {}
+            )
+        }
     }
 }
 
@@ -443,7 +428,5 @@ fun HomeUiTest(isDark: Boolean, moreMenuExpanded: Boolean = false, empty: Boolea
         true -> Theme.DARK
         false -> Theme.LIGHT
     }
-    IvyWalletPreview(theme) {
-        PreviewHomeTab(isDark, moreMenuExpanded, empty)
-    }
+    PreviewHomeTab(theme, moreMenuExpanded, empty)
 }

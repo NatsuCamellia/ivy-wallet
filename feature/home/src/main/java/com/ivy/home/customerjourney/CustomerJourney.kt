@@ -26,10 +26,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
 import com.ivy.domain.RootScreen
-import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.rootScreen
-import com.ivy.navigation.IvyPreview
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
 import kotlinx.collections.immutable.ImmutableList
@@ -129,7 +128,7 @@ private fun CardHeader(cardData: CustomerJourneyCardModel, onDismiss: () -> Unit
 @Preview
 @Composable
 private fun PreviewCard() {
-    IvyPreview {
+    WalletPreview {
         CustomerJourneyCard(
             cardData = CustomerJourneyCardsProvider.adjustBalanceCard(),
             onCTA = { },
@@ -141,15 +140,13 @@ private fun PreviewCard() {
 /** For screenshot testing */
 @Composable
 fun CustomerJourneyUiTest(isDark: Boolean, modifier: Modifier = Modifier) {
-    IvyWalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
-        IvyPreview(isDark) {
-            Column(
-                modifier = modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                CustomerJourneyCard(CustomerJourneyCardsProvider.adjustBalanceCard(), onDismiss = {}, onCTA = {})
-                CustomerJourneyCard(CustomerJourneyCardsProvider.addPlannedPaymentCard(), onDismiss = {}, onCTA = {})
-            }
+    WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        Column(
+            modifier = modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CustomerJourneyCard(CustomerJourneyCardsProvider.adjustBalanceCard(), onDismiss = {}, onCTA = {})
+            CustomerJourneyCard(CustomerJourneyCardsProvider.addPlannedPaymentCard(), onDismiss = {}, onCTA = {})
         }
     }
 }

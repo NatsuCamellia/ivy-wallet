@@ -46,10 +46,8 @@ fun ChooseIconModal(
     visible: Boolean,
     initialIcon: String?,
     color: Color,
-
-    id: UUID = remember { UUID.randomUUID() },
-
     dismiss: () -> Unit,
+    id: UUID = remember { UUID.randomUUID() },
     onIconChosen: (String?) -> Unit
 ) {
     if (visible) {

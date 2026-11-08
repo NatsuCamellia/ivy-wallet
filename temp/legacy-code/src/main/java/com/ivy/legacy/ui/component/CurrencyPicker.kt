@@ -36,6 +36,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -50,21 +51,17 @@ import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.utils.toLowerCaseLocal
 import com.ivy.ui.R
 import com.ivy.wallet.domain.data.IvyCurrency
-import java.util.Locale
 
 @OptIn(ExperimentalLayoutApi::class)
 @Suppress("ParameterNaming")
 @Composable
 fun CurrencyPicker(
-    modifier: Modifier = Modifier,
     initialSelectedCurrency: IvyCurrency?,
-    preselectedCurrency: IvyCurrency = IvyCurrency.getDefault(),
-
     includeKeyboardShownInsetSpacer: Boolean,
+    modifier: Modifier = Modifier,
+    preselectedCurrency: IvyCurrency = IvyCurrency.getDefault(),
     lastItemSpacer: Dp = 0.dp,
-
     onKeyboardShown: (keyboardVisible: Boolean) -> Unit = {},
-
     onSelectedCurrencyChanged: (IvyCurrency) -> Unit
 ) {
     val keyboardShown = WindowInsets.isImeVisible
@@ -100,7 +97,7 @@ fun CurrencyPicker(
         }
 
         CurrencyList(
-            searchQueryLowercase = searchTextFieldValue.text.lowercase(Locale.getDefault()),
+            searchQueryLowercase = searchTextFieldValue.text.lowercase(LocalConfiguration.current.locales[0]),
             selectedCurrency = selectedCurrency,
             lastItemSpacer = if (includeKeyboardShownInsetSpacer) {
                 WindowInsets.ime.asPaddingValues().calculateBottomPadding() + lastItemSpacer

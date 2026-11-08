@@ -289,7 +289,6 @@
     <ID>ComposableParamOrder:IvyIcon.kt$IvyIcon</ID>
     <ID>ComposableParamOrder:IvyIcon.kt$IvyIconScaled</ID>
     <ID>ComposableParamOrder:IvyLineChart.kt$IvyLineChart</ID>
-    <ID>ComposableParamOrder:IvyModal.kt$IvyModal</ID>
     <ID>ComposableParamOrder:IvyModalComponents.kt$ModalCheck</ID>
     <ID>ComposableParamOrder:IvyModalComponents.kt$ModalDynamicPrimaryAction</ID>
     <ID>ComposableParamOrder:IvyModalComponents.kt$ModalPositiveButton</ID>
@@ -306,7 +305,6 @@
     <ID>ComposableParamOrder:LoanModal.kt$LoanModal</ID>
     <ID>ComposableParamOrder:LoanRecordModal.kt$AccountsRow</ID>
     <ID>ComposableParamOrder:LoanRecordModal.kt$LoanRecordModal</ID>
-    <ID>ComposableParamOrder:MonthPickerModal.kt$MonthPickerModal</ID>
     <ID>ComposableParamOrder:OnboardingComponents.kt$OnboardingButton</ID>
     <ID>ComposableParamOrder:OnboardingProgressSlider.kt$OnboardingProgressSlider</ID>
     <ID>ComposableParamOrder:PeriodSelector.kt$PeriodSelector</ID>
@@ -2362,10 +2360,6 @@
     <ID>FunctionParameterNaming:ItemIcon.kt$Default: (@Composable () -&gt; Unit)? = null</ID>
     <ID>FunctionParameterNaming:IvyComponents.kt$Content: @Composable RowScope.() -&gt; Unit</ID>
     <ID>FunctionParameterNaming:IvyComposeApp.kt$Content: @Composable BoxScope.() -&gt; Unit</ID>
-    <ID>FunctionParameterNaming:IvyModal.kt$Content: @Composable ColumnScope.() -&gt; Unit</ID>
-    <ID>FunctionParameterNaming:IvyModal.kt$PrimaryAction: @Composable () -&gt; Unit</ID>
-    <ID>FunctionParameterNaming:IvyModal.kt$SecondaryActions: (@Composable () -&gt; Unit)? = null</ID>
-    <ID>FunctionParameterNaming:IvyModalDomainComponents.kt$Header: (@Composable () -&gt; Unit)? = null</ID>
     <ID>FunctionParameterNaming:IvyToolbar.kt$Content: @Composable RowScope.() -&gt; Unit = { }</ID>
     <ID>FunctionParameterNaming:PlannedPaymentsLazyColumn.kt$Header: @Composable () -&gt; Unit</ID>
     <ID>FunctionParameterNaming:Preview.kt$Content: @Composable BoxWithConstraintsScope.() -&gt; Unit</ID>
@@ -2403,9 +2397,7 @@
     <ID>InvalidPackageDeclaration:CalcTrnsIncomeExpenseAct.kt$package com.ivy.wallet.domain.action.transaction</ID>
     <ID>InvalidPackageDeclaration:CalcWalletBalanceAct.kt$package com.ivy.wallet.domain.action.wallet</ID>
     <ID>InvalidPackageDeclaration:CatValueFunctions.kt$package com.ivy.wallet.domain.pure.transaction</ID>
-    <ID>InvalidPackageDeclaration:CategoriesAct.kt$package com.ivy.wallet.domain.action.category</ID>
     <ID>InvalidPackageDeclaration:Category.kt$package com.ivy.wallet.ui.edit.core</ID>
-    <ID>InvalidPackageDeclaration:CategoryByIdAct.kt$package com.ivy.wallet.domain.action.category</ID>
     <ID>InvalidPackageDeclaration:CategoryCreator.kt$package com.ivy.wallet.domain.deprecated.logic</ID>
     <ID>InvalidPackageDeclaration:CategoryIncomeWithAccountFiltersAct.kt$package com.ivy.wallet.domain.action.category</ID>
     <ID>InvalidPackageDeclaration:CategoryTrnsBetweenAct.kt$package com.ivy.wallet.domain.action.category</ID>
@@ -2442,7 +2434,6 @@
     <ID>InvalidPackageDeclaration:ExchangeAct.kt$package com.ivy.wallet.domain.action.exchange</ID>
     <ID>InvalidPackageDeclaration:ExchangeRatesLogic.kt$package com.ivy.wallet.domain.deprecated.logic.currency</ID>
     <ID>InvalidPackageDeclaration:ExchangeTrns.kt$package com.ivy.wallet.domain.pure.exchange</ID>
-    <ID>InvalidPackageDeclaration:ExportCSVLogic.kt$package com.ivy.wallet.domain.deprecated.logic.csv</ID>
     <ID>InvalidPackageDeclaration:FPAction.kt$package com.ivy.frp.action</ID>
     <ID>InvalidPackageDeclaration:FRPComposable.kt$package com.ivy.frp.view</ID>
     <ID>InvalidPackageDeclaration:FRPViewModel.kt$package com.ivy.frp.viewmodel</ID>
@@ -2473,9 +2464,7 @@
     <ID>InvalidPackageDeclaration:IvyDomainUtils.kt$package com.ivy.wallet.domain.pure.util</ID>
     <ID>InvalidPackageDeclaration:IvyIcon.kt$package com.ivy.wallet.ui.theme.components</ID>
     <ID>InvalidPackageDeclaration:IvyLineChart.kt$package com.ivy.wallet.ui.theme.components.charts.linechart</ID>
-    <ID>InvalidPackageDeclaration:IvyModal.kt$package com.ivy.wallet.ui.theme.modal</ID>
     <ID>InvalidPackageDeclaration:IvyModalComponents.kt$package com.ivy.wallet.ui.theme.modal</ID>
-    <ID>InvalidPackageDeclaration:IvyModalDomainComponents.kt$package com.ivy.wallet.ui.theme.modal</ID>
     <ID>InvalidPackageDeclaration:IvyNameTextFieldValue.kt$package com.ivy.wallet.ui.theme.components</ID>
     <ID>InvalidPackageDeclaration:IvyNotification.kt$package com.ivy.wallet.android.notification</ID>
     <ID>InvalidPackageDeclaration:IvyNotificationChannel.kt$package com.ivy.wallet.android.notification</ID>
@@ -2513,7 +2502,6 @@
     <ID>InvalidPackageDeclaration:Migration119to120_LoanTransactions.kt$package com.ivy.domain.db.migration</ID>
     <ID>InvalidPackageDeclaration:Migration120to121_DropWishlistItem.kt$package com.ivy.domain.db.migration</ID>
     <ID>InvalidPackageDeclaration:Migration122to123_ExchangeRates.kt$package com.ivy.domain.db.migration</ID>
-    <ID>InvalidPackageDeclaration:MonthPickerModal.kt$package com.ivy.wallet.ui.theme.modal</ID>
     <ID>InvalidPackageDeclaration:NameModal.kt$package com.ivy.wallet.ui.theme.modal</ID>
     <ID>InvalidPackageDeclaration:NotificationService.kt$package com.ivy.wallet.android.notification</ID>
     <ID>InvalidPackageDeclaration:OnboardingComponents.kt$package com.ivy.wallet.ui.theme.components</ID>
@@ -2656,9 +2644,6 @@
     <ID>MagicNumber:InputField.kt$100</ID>
     <ID>MagicNumber:IntervalPickerRow.kt$180f</ID>
     <ID>MagicNumber:IvyLineChart.kt$3</ID>
-    <ID>MagicNumber:IvyModal.kt$0.01f</ID>
-    <ID>MagicNumber:IvyModal.kt$1000f</ID>
-    <ID>MagicNumber:IvyModal.kt$1100f</ID>
     <ID>MagicNumber:LoanDetailsScreen.kt$100</ID>
     <ID>MagicNumber:LoanTransactionsCore.kt$LoanTransactionsCore$12</ID>
     <ID>MagicNumber:LoanViewModel.kt$LoanViewModel$100</ID>
@@ -4394,9 +4379,6 @@
     <ID>ModifierMissing:IvyColorPicker.kt$IvyColorPicker</ID>
     <ID>ModifierMissing:IvyComposeApp.kt$IvyWalletComponentPreview</ID>
     <ID>ModifierMissing:IvyDividerDot.kt$IvyDividerDot</ID>
-    <ID>ModifierMissing:IvyModal.kt$IvyModal</ID>
-    <ID>ModifierMissing:IvyModal.kt$ModalActionsRow</ID>
-    <ID>ModifierMissing:IvyModal.kt$ModalPreviewActionRowSpacer</ID>
     <ID>ModifierMissing:IvyModalComponents.kt$ModalAdd</ID>
     <ID>ModifierMissing:IvyModalComponents.kt$ModalDelete</ID>
     <ID>ModifierMissing:IvyModalComponents.kt$ModalDynamicPrimaryAction</ID>
@@ -4410,7 +4392,6 @@
     <ID>ModifierMissing:MainBottomBar.kt$BottomBar</ID>
     <ID>ModifierMissing:MonefySteps.kt$MonefySteps</ID>
     <ID>ModifierMissing:MoneyManagerPraseSteps.kt$MoneyManagerPraseSteps</ID>
-    <ID>ModifierMissing:MonthPickerModal.kt$MonthPickerModal</ID>
     <ID>ModifierMissing:NameModal.kt$NameModal</ID>
     <ID>ModifierMissing:OnboardingAccounts.kt$OnboardingAccounts</ID>
     <ID>ModifierMissing:OnboardingCategories.kt$OnboardingCategories</ID>
@@ -5008,7 +4989,6 @@
     <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient.Companion$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun from(gradient: com.ivy.design.l0_system.Gradient)</ID>
     <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient.Companion$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun from(startColor: Int, endColor: Int?)</ID>
     <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient.Companion$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun solid(color: Color)</ID>
-    <ID>NoImplicitFunctionReturnType:IvyModal.kt$@Composable fun modalPreviewActionRowHeight()</ID>
     <ID>NoImplicitFunctionReturnType:IvyRoomDatabase.kt$IvyRoomDatabase.Companion$fun migrations()</ID>
     <ID>NoImplicitFunctionReturnType:LoanTransactionsCore.kt$LoanTransactionsCore$suspend fun fetchAccounts()</ID>
     <ID>NoImplicitFunctionReturnType:LoanTransactionsCore.kt$LoanTransactionsCore$suspend fun fetchAllLoanRecords(loanId: UUID)</ID>
@@ -5041,7 +5021,6 @@
     <ID>NoImplicitFunctionReturnType:RoomTypeConverters.kt$RoomTypeConverters$@TypeConverter fun saveTheme(value: Theme?)</ID>
     <ID>NoImplicitFunctionReturnType:RoomTypeConverters.kt$RoomTypeConverters$@TypeConverter fun saveTransactionType(value: TransactionType?)</ID>
     <ID>NoImplicitFunctionReturnType:RoomTypeConverters.kt$RoomTypeConverters$@TypeConverter fun saveUUID(id: UUID?)</ID>
-    <ID>NoImplicitFunctionReturnType:SyncExchangeRatesAct.kt$SyncExchangeRatesAct$override suspend fun Input.willDo()</ID>
     <ID>NoImplicitFunctionReturnType:TransactionReminderWorker.kt$TransactionReminderWorker$override suspend fun doWork()</ID>
     <ID>NoImplicitFunctionReturnType:TypographyExt.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun TextStyle.style( color: Color = UI.colors.pureInverse, fontWeight: FontWeight = FontWeight.Bold, textAlign: TextAlign = TextAlign.Start )</ID>
     <ID>NoImplicitFunctionReturnType:TypographyExt.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun TextStyle.colorAs(color: Color)</ID>
@@ -10028,7 +10007,6 @@
     <ID>PrintStackTrace:CSVViewModel.kt$CSVViewModel$e</ID>
     <ID>PrintStackTrace:CategoryCreator.kt$CategoryCreator$e</ID>
     <ID>PrintStackTrace:EditTransactionViewModel.kt$EditTransactionViewModel$e</ID>
-    <ID>PrintStackTrace:ExportCSVLogic.kt$ExportCSVLogic$e</ID>
     <ID>PrintStackTrace:FileUtil.kt$e</ID>
     <ID>PrintStackTrace:IvyCurrency.kt$IvyCurrency.Companion$e</ID>
     <ID>PrintStackTrace:Keyboard.kt$e</ID>
@@ -10037,7 +10015,6 @@
     <ID>PrintStackTrace:MigrationsManager.kt$MigrationsManager$e</ID>
     <ID>PrintStackTrace:NotificationService.kt$NotificationService$e</ID>
     <ID>PrintStackTrace:RootActivity.kt$RootActivity$e</ID>
-    <ID>PrintStackTrace:SyncExchangeRatesAct.kt$SyncExchangeRatesAct$e</ID>
     <ID>PrintStackTrace:UIExt.kt$e</ID>
     <ID>PropertyWrapping:Accessors162pciy5rjslcjghvy6dixygh.kt$/** * Provides the existing [kotlinNativeCompilerPluginClasspath][org.gradle.api.artifacts.Configuration] element. */ internal val org.gradle.api.NamedDomainObjectContainer&lt;org.gradle.api.artifacts.Configuration&gt;.`kotlinNativeCompilerPluginClasspath`: NamedDomainObjectProvider&lt;org.gradle.api.artifacts.Configuration&gt; get() = named&lt;org.gradle.api.artifacts.Configuration&gt;("kotlinNativeCompilerPluginClasspath")</ID>
     <ID>PropertyWrapping:Accessors1a3myc2xcjkjlhq7vkxcb1wim.kt$/** * Provides the existing [testImplementationDependenciesMetadata][org.gradle.api.artifacts.Configuration] element. */ internal val org.gradle.api.NamedDomainObjectContainer&lt;org.gradle.api.artifacts.Configuration&gt;.`testImplementationDependenciesMetadata`: NamedDomainObjectProvider&lt;org.gradle.api.artifacts.Configuration&gt; get() = named&lt;org.gradle.api.artifacts.Configuration&gt;("testImplementationDependenciesMetadata")</ID>
@@ -10110,7 +10087,6 @@
     <ID>ReturnCount:LoanRecordCreator.kt$LoanRecordCreator$suspend fun create( loanId: UUID, data: CreateLoanRecordData, onRefreshUI: suspend (LoanRecord) -&gt; Unit ): UUID?</ID>
     <ID>ReturnCount:PlannedPaymentsLogic.kt$PlannedPaymentsLogic$private suspend fun amountForMonthInBaseCurrency( plannedPayment: PlannedPaymentRule, baseCurrency: String, accounts: List&lt;Account&gt; ): Double</ID>
     <ID>ReturnCount:ReportFilter.kt$ReportFilter$fun validate(): Boolean</ID>
-    <ID>ReturnCount:SyncExchangeRatesAct.kt$SyncExchangeRatesAct$private suspend fun sync(baseCurrency: String)</ID>
     <ID>SpreadOperator:UiText.kt$UiText$(resId, *args)</ID>
     <ID>TopLevelPropertyNaming:Accessors11xxvwy0y6zsdmgi5tg7sgrcq.kt$/** * Provides the existing [androidTestAnnotationProcessor][org.gradle.api.artifacts.Configuration] element. */ internal val org.gradle.api.NamedDomainObjectContainer&lt;org.gradle.api.artifacts.Configuration&gt;.`androidTestAnnotationProcessor`: NamedDomainObjectProvider&lt;org.gradle.api.artifacts.Configuration&gt; get() = named&lt;org.gradle.api.artifacts.Configuration&gt;("androidTestAnnotationProcessor")</ID>
     <ID>TopLevelPropertyNaming:Accessors12l04gyw3iri7cbpx1tj9yrz6.kt$/** * Provides the existing [release][org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet] element. */ internal val org.gradle.api.NamedDomainObjectContainer&lt;org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet&gt;.`release`: NamedDomainObjectProvider&lt;org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet&gt; get() = named&lt;org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet&gt;("release")</ID>
@@ -10377,8 +10353,6 @@
     <ID>TopLevelPropertyNaming:ChooseIconModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") private const val ICON_PICKER_ICONS_PER_ROW = 5</ID>
     <ID>TopLevelPropertyNaming:EditBottomSheet.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") const val SWIPE_UP_EXPANDED_THRESHOLD = 200</ID>
     <ID>TopLevelPropertyNaming:HomeMoreMenu.kt$private const val SWIPE_UP_THRESHOLD_CLOSE_MORE_MENU = 300</ID>
-    <ID>TopLevelPropertyNaming:IvyModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") const val DurationModalAnim = 200</ID>
-    <ID>TopLevelPropertyNaming:IvyModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") private const val DURATION_BACKGROUND_BLUR_ANIM = 400</ID>
     <ID>TopLevelPropertyNaming:ParseStatus.kt$const val SAMPLE_SIZE = 20</ID>
     <ID>TopLevelPropertyNaming:PieChart.kt$const val PIE_CHART_RADIUS_DP = 128</ID>
     <ID>TopLevelPropertyNaming:PieChart.kt$const val RADIUS_DP = 112f</ID>

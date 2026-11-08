@@ -30,8 +30,6 @@ import java.time.LocalTime
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val MillisecondsInDay = 24 * 60 * 60 * 1000L
-
 @Stable
 @Singleton
 class AndroidDateTimePicker @Inject constructor(
@@ -51,7 +49,7 @@ class AndroidDateTimePicker @Inject constructor(
     @Composable
     private fun DatePicker(viewState: DatePickerViewState) {
         val pickerState = rememberDatePickerState(
-            initialSelectedDateMillis = viewState.initialDate.toEpochDay() * MillisecondsInDay,
+            initialSelectedDateMillis = viewState.initialDate.toDatePickerMillis(),
         )
         val dismiss = { datePickerViewState = null }
         DatePickerDialog(
@@ -61,7 +59,7 @@ class AndroidDateTimePicker @Inject constructor(
                     onClick = {
                         dismiss()
                         pickerState.selectedDateMillis?.let {
-                            viewState.onDatePicked(LocalDate.ofEpochDay(it / MillisecondsInDay))
+                            viewState.onDatePicked(it.toDatePickerDate())
                         }
                     },
                     enabled = pickerState.selectedDateMillis != null,
@@ -130,7 +128,7 @@ class AndroidDateTimePicker @Inject constructor(
     }
 
     override fun pickDate(initialDate: Instant?, onDatePick: (LocalDate) -> Unit) {
-        pickCalendarDate(initialDate?.let { with(timeConverter) { it.toLocalDate() } }, onDatePick)
+        pickCalendarDate(initialDate?.let { timeConverter.toPickerDate(it) }, onDatePick)
     }
 
     override fun pickCalendarDate(initialDate: LocalDate?, onDatePick: (LocalDate) -> Unit) {

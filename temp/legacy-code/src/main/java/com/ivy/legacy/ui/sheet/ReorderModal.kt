@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
@@ -49,9 +50,9 @@ import java.util.UUID
 @Composable
 fun <T : Reorderable> ReorderModalSingleType(
     visible: Boolean,
-    id: UUID = remember { UUID.randomUUID() },
     initialItems: List<T>,
     dismiss: () -> Unit,
+    id: UUID = remember { UUID.randomUUID() },
     onUpdateItemOrderNum: (item: T, newOrderNum: Double) -> Unit = { _, _ -> },
     onReordered: ((List<T>) -> Unit)? = null,
     itemContent: @Composable (Int, T) -> Unit
@@ -80,9 +81,9 @@ fun <T : Reorderable> ReorderModalSingleType(
 @Composable
 fun <T : Reorderable> ReorderModal(
     visible: Boolean,
-    id: UUID = remember { UUID.randomUUID() },
     initialItems: List<Any>,
     dismiss: () -> Unit,
+    id: UUID = remember { UUID.randomUUID() },
     onUpdateItemOrderNum: (
         itemsInNewOrder: List<Any>,
         item: T,
@@ -370,18 +371,19 @@ private data class ReorderItem(val name: String, val orderNum: Double) : Reorder
 }
 
 /** For screenshot testing */
-@Suppress("ModifierMissing")
 @Composable
-fun ReorderModalUiTest(isDark: Boolean) {
+fun ReorderModalUiTest(isDark: Boolean, modifier: Modifier = Modifier) {
     WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
-        ReorderModalSingleType(
-            visible = true,
-            initialItems = listOf("Cash", "Bank", "Savings").mapIndexed { index, name ->
-                ReorderItem(name, index.toDouble())
-            },
-            dismiss = {}
-        ) { _, item ->
-            Text(item.name)
+        Box(modifier) {
+            ReorderModalSingleType(
+                visible = true,
+                initialItems = listOf("Cash", "Bank", "Savings").mapIndexed { index, name ->
+                    ReorderItem(name, index.toDouble())
+                },
+                dismiss = {}
+            ) { _, item ->
+                Text(item.name)
+            }
         }
     }
 }

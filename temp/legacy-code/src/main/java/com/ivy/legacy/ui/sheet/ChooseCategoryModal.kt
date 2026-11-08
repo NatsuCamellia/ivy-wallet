@@ -47,13 +47,12 @@ import java.util.UUID
 @Suppress("ParameterNaming")
 @Composable
 fun ChooseCategoryModal(
-    id: UUID = remember { UUID.randomUUID() },
     visible: Boolean,
     initialCategory: Category?,
     categories: List<Category>,
-
     showCategoryModal: (Category?) -> Unit,
     onCategoryChanged: (Category?) -> Unit,
+    id: UUID = remember { UUID.randomUUID() },
     dismiss: () -> Unit
 ) {
     var selectedCategory by remember(initialCategory) {

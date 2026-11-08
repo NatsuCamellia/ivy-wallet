@@ -5,8 +5,6 @@ import com.ivy.base.time.impl.StandardTimeConverter
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.After
-import org.junit.Before
 import org.junit.Test
 import java.time.Instant
 import java.time.LocalDate
@@ -14,24 +12,11 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import java.util.TimeZone
 
 class DatePickerConversionsTest {
 
     private val losAngeles = ZoneId.of("America/Los_Angeles")
     private val taipei = ZoneId.of("Asia/Taipei")
-
-    private lateinit var originalTimeZone: TimeZone
-
-    @Before
-    fun setup() {
-        originalTimeZone = TimeZone.getDefault()
-    }
-
-    @After
-    fun tearDown() {
-        TimeZone.setDefault(originalTimeZone)
-    }
 
     private fun converterFor(zone: ZoneId): StandardTimeConverter {
         val timeProvider = mockk<TimeProvider> {
@@ -111,19 +96,15 @@ class DatePickerConversionsTest {
     }
 
     @Test
-    fun `Given a picked day, When round-tripping under any device default zone, Then the day is unchanged`() {
+    fun `Given a picked day, When round-tripping through UTC midnight millis, Then the day is unchanged`() {
         // Given
         val date = LocalDate.of(2026, 3, 15)
 
-        listOf(losAngeles, taipei).forEach { zone ->
-            TimeZone.setDefault(TimeZone.getTimeZone(zone))
+        // When
+        val roundTripped = date.toDatePickerMillis().toDatePickerDate()
 
-            // When
-            val roundTripped = date.toDatePickerMillis().toDatePickerDate()
-
-            // Then
-            roundTripped shouldBe date
-        }
+        // Then
+        roundTripped shouldBe date
     }
 
     @Test

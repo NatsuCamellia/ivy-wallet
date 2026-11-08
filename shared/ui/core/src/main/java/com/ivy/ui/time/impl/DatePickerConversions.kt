@@ -10,4 +10,4 @@ internal fun LocalDate.toDatePickerMillis(): Long = toEpochDay() * MillisecondsI
 
 internal fun Long.toDatePickerDate(): LocalDate = LocalDate.ofEpochDay(this / MillisecondsInDay)
 
-internal fun TimeConverter.toPickerDate(instant: Instant): LocalDate = with(this) { instant.toLocalDate() }
+internal fun TimeConverter.toPickerDate(instant: Instant): LocalDate = instant.toLocalDate()

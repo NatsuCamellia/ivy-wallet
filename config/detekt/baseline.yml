@@ -257,18 +257,14 @@
     <ID>ComposableParamOrder:ChangeTransactionTypeModal.kt$ChangeTransactionTypeModal</ID>
     <ID>ComposableParamOrder:Checkbox.kt$Checkbox</ID>
     <ID>ComposableParamOrder:Checkbox.kt$CheckboxWithText</ID>
-    <ID>ComposableParamOrder:ChooseCategoryModal.kt$ChooseCategoryModal</ID>
-    <ID>ComposableParamOrder:ChooseIconModal.kt$ChooseIconModal</ID>
     <ID>ComposableParamOrder:ChoosePeriodModal.kt$MonthButton</ID>
     <ID>ComposableParamOrder:ChooseStartDateOfMonthModal.kt$ChooseStartDateOfMonthModal</ID>
     <ID>ComposableParamOrder:CircleButtons.kt$CircleButton</ID>
     <ID>ComposableParamOrder:CircleButtons.kt$CircleButtonFilled</ID>
     <ID>ComposableParamOrder:CircleButtons.kt$CircleButtonFilledGradient</ID>
-    <ID>ComposableParamOrder:CurrencyPicker.kt$CurrencyPicker</ID>
     <ID>ComposableParamOrder:CustomExchangeRateCard.kt$CustomExchangeRateCard</ID>
     <ID>ComposableParamOrder:DeleteModal.kt$DeleteConfirmationModal</ID>
     <ID>ComposableParamOrder:DeleteModal.kt$DeleteModal</ID>
-    <ID>ComposableParamOrder:DescriptionModal.kt$DescriptionModal</ID>
     <ID>ComposableParamOrder:FilterOverlay.kt$TypeFilterCheckbox</ID>
     <ID>ComposableParamOrder:IconButton.kt$IconButton</ID>
     <ID>ComposableParamOrder:ImportInstructions.kt$InstructionButton</ID>
@@ -313,8 +309,6 @@
     <ID>ComposableParamOrder:PrimaryAttributeColumn.kt$PrimaryAttributeColumn</ID>
     <ID>ComposableParamOrder:ProgressBar.kt$ProgressBar</ID>
     <ID>ComposableParamOrder:ProgressModal.kt$ProgressModal</ID>
-    <ID>ComposableParamOrder:ReorderModal.kt$ReorderModal</ID>
-    <ID>ComposableParamOrder:ReorderModal.kt$ReorderModalSingleType</ID>
     <ID>ComposableParamOrder:ScreenTitle.kt$ScreenTitle</ID>
     <ID>ComposableParamOrder:Shapes.kt$Shape</ID>
     <ID>ComposableParamOrder:Shapes.kt$ShapeOutlined</ID>

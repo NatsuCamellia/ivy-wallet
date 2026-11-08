@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import com.ivy.ui.color.findContrastTextColor
 import com.ivy.wallet.ui.theme.components.getCustomIconId
 
+private const val IconInsetDivisor = 12
+
 @DrawableRes
 @Composable
 fun customIconResource(iconName: String?, @DrawableRes defaultIcon: Int, size: String): Int {
@@ -45,7 +47,7 @@ fun IconBadge(
         Icon(
             painter = painterResource(iconRes),
             contentDescription = null,
-            modifier = Modifier.padding(size / 12),
+            modifier = Modifier.padding(size / IconInsetDivisor),
         )
     }
 }

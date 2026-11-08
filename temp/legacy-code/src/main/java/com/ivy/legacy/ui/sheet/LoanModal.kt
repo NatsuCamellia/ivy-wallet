@@ -383,7 +383,7 @@ private fun save(
     dismiss()
 }
 
-internal fun previewAccounts() = listOf(
+internal fun previewAccounts(): List<Account> = listOf(
     Account(name = "Cash", color = Ivy.toArgb(), currency = "BGN", id = UUID(0, 1)),
     Account(name = "Bank", color = Orange.toArgb(), currency = "BGN", id = UUID(0, 2)),
 )

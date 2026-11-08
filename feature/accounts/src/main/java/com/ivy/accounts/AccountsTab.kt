@@ -249,7 +249,7 @@ private fun AccountCard(
                 )
                 LabelledAmount(
                     label = stringResource(R.string.month_expenses),
-                    amount = -accountData.monthlyExpenses.absoluteValue,
+                    amount = 0.0 - accountData.monthlyExpenses.absoluteValue,
                     currency = currency,
                     amountStyle = MaterialTheme.typography.titleSmall,
                     amountColor = TransactionType.EXPENSE.color(),

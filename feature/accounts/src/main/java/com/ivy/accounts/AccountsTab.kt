@@ -390,7 +390,10 @@ private fun previewState(compact: Boolean, empty: Boolean): AccountsState {
             AccountData(account("Cash", Color(0xFF212121), icon = "cash"), 820.0, null, 340.0, 400.0),
             AccountData(
                 account("Long-term savings and investments for the whole family", Color(0xFF6200EE)),
-                123456789012.34, null, 98765432.1, 123456789.01
+                balance = 123456789012.34,
+                balanceBaseCurrency = null,
+                monthlyExpenses = 98765432.1,
+                monthlyIncome = 123456789.01
             ),
         )
     }
@@ -425,4 +428,4 @@ fun AccountsTabEmptyUITest(dark: Boolean) {
     PreviewAccountsTab(theme = dark.theme(), empty = true)
 }
 
-private fun Boolean.theme() = if (this) Theme.DARK else Theme.LIGHT
+private fun Boolean.theme(): Theme = if (this) Theme.DARK else Theme.LIGHT

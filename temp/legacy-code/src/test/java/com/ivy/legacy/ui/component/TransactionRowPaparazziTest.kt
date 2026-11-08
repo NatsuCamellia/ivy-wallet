@@ -23,6 +23,8 @@ import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.ui.WalletPreview
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.ui.R
 import com.ivy.ui.testing.PaparazziScreenshotTest
 import com.ivy.ui.testing.PaparazziTheme
@@ -138,18 +140,20 @@ private fun Badges(theme: PaparazziTheme, color: Color) {
 @Composable
 private fun Rows(theme: PaparazziTheme, vararg transactions: Transaction, showAccountColors: Boolean = false) {
     WalletPreview(theme.toTheme()) {
-        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-            transactions.forEachIndexed { index, transaction ->
-                TransactionRow(
-                    baseData = BaseData,
-                    transaction = transaction,
-                    shouldShowAccountSpecificColorInTransactions = showAccountColors,
-                    onPayOrGet = {},
-                    onClick = {},
-                    modifier = Modifier.padding(top = 8.dp),
-                    index = index,
-                    count = transactions.size,
-                )
+        NavigationRoot(navigation = Navigation()) {
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                transactions.forEachIndexed { index, transaction ->
+                    TransactionRow(
+                        baseData = BaseData,
+                        transaction = transaction,
+                        shouldShowAccountSpecificColorInTransactions = showAccountColors,
+                        onPayOrGet = {},
+                        onClick = {},
+                        modifier = Modifier.padding(top = 8.dp),
+                        index = index,
+                        count = transactions.size,
+                    )
+                }
             }
         }
     }

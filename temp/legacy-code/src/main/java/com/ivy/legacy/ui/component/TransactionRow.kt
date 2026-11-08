@@ -11,6 +11,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -40,6 +41,9 @@ import com.ivy.legacy.utils.capitalizeLocal
 import com.ivy.legacy.utils.dateNowUTC
 import com.ivy.legacy.utils.isNotNullOrBlank
 import com.ivy.legacy.utils.timeNowUTC
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.TransactionsScreen
+import com.ivy.navigation.navigation
 import com.ivy.ui.R
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
@@ -75,13 +79,10 @@ fun TransactionRow(
     val description = transactionDescription(transaction)
     val categoryName = category?.name?.value
     val headline = title ?: description ?: categoryName ?: transaction.type.label()
-    val detail = listOfNotNull(
-        transaction.dateTime?.let { dateTime ->
-            val time = with(LocalTimeConverter.current) { dateTime.toLocalDateTime() }.toLocalTime()
-            with(LocalTimeFormatter.current) { time.format() }
-        },
-        categoryName.takeIf { it != headline },
-    ).joinToString(" · ")
+    val time = transaction.dateTime?.let { dateTime ->
+        val localTime = with(LocalTimeConverter.current) { dateTime.toLocalDateTime() }.toLocalTime()
+        with(LocalTimeFormatter.current) { localTime.format() }
+    }
 
     SegmentedListItem(
         onClick = { if (account != null) onClick(transaction) },
@@ -95,11 +96,12 @@ fun TransactionRow(
                 if (title != null && description != null) {
                     Text(text = description, maxLines = 3, overflow = TextOverflow.Ellipsis)
                 }
-                if (detail.isNotEmpty()) Text(detail)
-                Accounts(
+                if (time != null) Text(time)
+                NavigationChips(
+                    category = category,
                     account = account,
                     toAccount = toAccount.takeIf { transaction.type == TransactionType.TRANSFER },
-                    showColor = shouldShowAccountSpecificColorInTransactions,
+                    showAccountColor = shouldShowAccountSpecificColorInTransactions,
                 )
                 Tags(transaction.tags)
                 if (transaction.dueDate != null && transaction.dateTime == null) {
@@ -168,22 +170,57 @@ private fun DueOverline(dueDate: Instant, due: DueState?) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun Accounts(account: Account?, toAccount: Account?, showColor: Boolean) {
+private fun NavigationChips(
+    category: Category?,
+    account: Account?,
+    toAccount: Account?,
+    showAccountColor: Boolean,
+) {
+    val nav = navigation()
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
         itemVerticalAlignment = Alignment.CenterVertically,
     ) {
-        AccountLabel(account, showColor)
+        if (category != null) {
+            AssistChip(
+                onClick = {
+                    nav.navigateTo(TransactionsScreen(accountId = null, categoryId = category.id.value))
+                },
+                label = { Text(category.name.value) },
+            )
+        }
+        AccountChip(account, showAccountColor, nav)
         if (toAccount != null) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = null,
                 modifier = Modifier.size(AssistChipDefaults.IconSize),
             )
-            AccountLabel(toAccount, showColor)
+            AccountChip(toAccount, showAccountColor, nav)
         }
     }
+}
+
+@Composable
+private fun AccountChip(account: Account?, showColor: Boolean, nav: Navigation) {
+    AssistChip(
+        onClick = {
+            account?.let { nav.navigateTo(TransactionsScreen(accountId = it.id, categoryId = null)) }
+        },
+        label = { Text(account?.name ?: stringResource(R.string.deleted)) },
+        leadingIcon = if (showColor && account != null) {
+            {
+                IconBadge(
+                    color = Color(account.color),
+                    iconName = account.icon,
+                    defaultIcon = R.drawable.ic_custom_account_m,
+                    size = AssistChipDefaults.IconSize,
+                )
+            }
+        } else {
+            null
+        },
+    )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -230,25 +267,6 @@ private fun Amounts(transaction: Transaction, currency: String, toCurrency: Stri
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
-    }
-}
-
-@Composable
-private fun AccountLabel(account: Account?, showColor: Boolean, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        if (showColor && account != null) {
-            IconBadge(
-                color = Color(account.color),
-                iconName = account.icon,
-                defaultIcon = R.drawable.ic_custom_account_m,
-                size = AssistChipDefaults.IconSize,
-            )
-        }
-        Text(account?.name ?: stringResource(R.string.deleted))
     }
 }
 

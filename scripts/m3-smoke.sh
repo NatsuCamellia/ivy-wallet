@@ -713,6 +713,17 @@ flow_fab_menu() {
   back
   wait_for text exact "Home" || return 1
   wait_for desc exact "Add" || return 1
+  # Menu open, switch to Accounts: the menu must not stay armed. One Back on Accounts is handled by the app (it
+  # returns to the Home tab); it must not be swallowed by a stale menu, and Home must show the menu collapsed.
+  open_fab_menu || return 1
+  tap_tab Accounts || return 1
+  wait_for text exact "Total Balance" || return 1
+  has desc exact "Add" && { log "Home FAB shown on Accounts"; return 1; }
+  back
+  dump || return 1
+  has text exact "Total Balance" && { log "Back was swallowed on Accounts (stale menu state)"; return 1; }
+  has desc exact "Add" && ! has text exact "Add expense" || { log "Home should show the collapsed menu"; return 1; }
+  shot fab-5-home-after-accounts
   crashed && return 1
   return 0
 }

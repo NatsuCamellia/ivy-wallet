@@ -7,7 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
@@ -43,7 +43,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -173,7 +172,7 @@ private fun MainShell(
     initiallyExpanded: Boolean = false,
     content: @Composable BoxWithConstraintsScope.() -> Unit,
 ) {
-    var expanded by rememberSaveable { mutableStateOf(initiallyExpanded) }
+    var expanded by rememberSaveable(tab) { mutableStateOf(initiallyExpanded && tab == MainTab.HOME) }
 
     BackHandler(enabled = expanded) {
         expanded = false
@@ -272,7 +271,7 @@ private fun MainShell(
             content()
 
             AnimatedVisibility(
-                visible = expanded && tab == MainTab.HOME,
+                visible = expanded,
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
@@ -280,9 +279,11 @@ private fun MainShell(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(MaterialTheme.colorScheme.scrim.copy(alpha = ScrimAlpha))
-                        .pointerInput(Unit) {
-                            detectTapGestures { expanded = false }
-                        }
+                        .clickable(
+                            interactionSource = null,
+                            indication = null,
+                            onClickLabel = stringResource(R.string.close)
+                        ) { expanded = false }
                 )
             }
         }

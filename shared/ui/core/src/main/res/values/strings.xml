@@ -500,4 +500,6 @@
     <string name="language">Language</string>
     <string name="advanced_features">Advanced features</string>
     <string name="close">Close</string>
+    <string name="expand">Expand</string>
+    <string name="collapse">Collapse</string>
 </resources>

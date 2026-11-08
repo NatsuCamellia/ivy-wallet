@@ -38,7 +38,6 @@ import com.ivy.design.l0_system.style
 import com.ivy.ui.util.thenIf
 import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.ivyWalletCtx
-import com.ivy.legacy.ui.component.transaction.TransactionsDividerLine
 import com.ivy.legacy.utils.clickableNoIndication
 import com.ivy.legacy.utils.drawColoredShadow
 import com.ivy.legacy.utils.format
@@ -105,13 +104,6 @@ internal fun HomeHeader(
         )
 
         Spacer(Modifier.height(16.dp))
-
-        if (percentExpanded < 0.5f) {
-            TransactionsDividerLine(
-                modifier = Modifier.alpha(1f - percentExpanded),
-                paddingHorizontal = 0.dp
-            )
-        }
     }
 }
 

@@ -1,28 +1,32 @@
 package com.ivy.legacy.ui.component.transaction
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Transaction
 import com.ivy.base.legacy.TransactionHistoryItem
 import com.ivy.base.legacy.stringRes
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
 import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.data.LegacyDueSection
 import com.ivy.legacy.ui.component.TransactionRow
@@ -31,14 +35,6 @@ import com.ivy.navigation.Navigation
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
 import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
-import com.ivy.ui.color.Black
-import com.ivy.wallet.ui.theme.Gradient
-import com.ivy.wallet.ui.theme.Gray
-import com.ivy.ui.color.Orange
-import com.ivy.ui.color.Red
-import com.ivy.ui.color.White
-import com.ivy.wallet.ui.theme.components.IvyButton
-import com.ivy.wallet.ui.theme.components.IvyIcon
 import java.util.UUID
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
@@ -130,7 +126,7 @@ private fun LazyListScope.upcomingSection(
                 expanded = upcoming.expanded,
                 setExpanded = setExpanded,
                 title = stringRes(R.string.upcoming),
-                titleColor = Orange,
+                titleColor = MaterialTheme.colorScheme.secondary,
                 baseCurrency = baseData.baseCurrency,
                 income = upcoming.stats.income.toDouble(),
                 expenses = upcoming.stats.expense.abs().toDouble()
@@ -170,37 +166,21 @@ private fun LazyListScope.overdueSection(
                 expanded = overdue.expanded,
                 setExpanded = setExpanded,
                 title = stringRes(R.string.overdue),
-                titleColor = Red,
+                titleColor = MaterialTheme.colorScheme.error,
                 baseCurrency = baseData.baseCurrency,
                 income = overdue.stats.income.toDouble(),
-                expenses = overdue.stats.expense.abs().toDouble()
+                expenses = overdue.stats.expense.abs().toDouble(),
+                actions = {
+                    if (overdue.expanded) {
+                        TextButton(onClick = { onSkipAllTransactions(overdue.trns) }) {
+                            Text(text = stringResource(R.string.skip_all))
+                        }
+                    }
+                }
             )
         }
 
         if (overdue.expanded) {
-            item {
-                val isLightTheme = UI.colors.pure == White
-                IvyButton(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    text = stringRes(R.string.skip_all),
-                    wrapContentMode = false,
-                    backgroundGradient = if (isLightTheme) {
-                        Gradient(White, White)
-                    } else {
-                        Gradient(
-                            Black,
-                            Black
-                        )
-                    },
-                    textStyle = UI.typo.b2.style(
-                        color = if (isLightTheme) Black else White,
-                        fontWeight = FontWeight.Bold
-                    )
-                ) {
-                    onSkipAllTransactions(overdue.trns)
-                }
-            }
-
             trnItems(
                 baseData = baseData,
 
@@ -285,7 +265,7 @@ private fun LazyListScope.historySection(
                     HistoryDateDivider(
                         date = it.date,
                         spacerTop = dateDividerMarginTop
-                            ?: if (it == history.firstOrNull()) 24.dp else 32.dp,
+                            ?: if (it == history.firstOrNull()) 16.dp else 24.dp,
                         baseCurrency = baseData.baseCurrency,
                         income = it.income,
                         expenses = it.expenses
@@ -322,44 +302,36 @@ private fun onTransactionClick(
 }
 
 @Composable
-private fun LazyItemScope.NoTransactionsEmptyState(
+private fun NoTransactionsEmptyState(
     emptyStateTitle: String,
     emptyStateText: String,
+    modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Spacer(Modifier.height(32.dp))
-
-        IvyIcon(
-            icon = R.drawable.ic_notransactions,
-            tint = Gray
+        Icon(
+            imageVector = Icons.AutoMirrored.Outlined.ReceiptLong,
+            contentDescription = null,
+            modifier = Modifier.size(48.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
-
-        Spacer(Modifier.height(24.dp))
 
         Text(
             text = emptyStateTitle,
-            style = UI.typo.b1.style(
-                color = Gray,
-                fontWeight = FontWeight.ExtraBold
-            )
+            style = MaterialTheme.typography.titleMedium
         )
-
-        Spacer(Modifier.height(8.dp))
 
         Text(
-            modifier = Modifier.padding(horizontal = 32.dp),
             text = emptyStateText,
-            style = UI.typo.b2.style(
-                color = Gray,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center
-            )
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
         )
-
-        Spacer(Modifier.height(96.dp))
     }
 }
 

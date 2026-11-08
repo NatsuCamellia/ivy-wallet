@@ -44,7 +44,6 @@ import com.ivy.legacy.data.model.MainTab
 import com.ivy.legacy.data.model.Month
 import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.ivyWalletCtx
-import com.ivy.legacy.ui.component.transaction.TransactionsDividerLine
 import com.ivy.legacy.ui.component.transaction.transactions
 import com.ivy.legacy.utils.horizontalSwipeListener
 import com.ivy.legacy.utils.rememberSwipeListenerState
@@ -359,8 +358,6 @@ fun HomeLazyColumn(
         }
         item {
             Spacer(Modifier.height(16.dp))
-
-            TransactionsDividerLine()
         }
 
         item {

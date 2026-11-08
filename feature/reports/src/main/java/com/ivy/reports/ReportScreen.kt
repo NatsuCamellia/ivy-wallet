@@ -41,7 +41,6 @@ import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.data.LegacyDueSection
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.ui.component.IncomeExpensesCards
-import com.ivy.legacy.ui.component.transaction.TransactionsDividerLine
 import com.ivy.legacy.ui.component.transaction.transactions
 import com.ivy.legacy.utils.clickableNoIndication
 import com.ivy.legacy.utils.rememberInteractionSource
@@ -216,10 +215,6 @@ private fun BoxWithConstraintsScope.UI(
             } else {
                 Spacer(Modifier.height(32.dp))
             }
-
-            TransactionsDividerLine(
-                paddingHorizontal = 0.dp
-            )
 
             Spacer(Modifier.height(4.dp))
         }

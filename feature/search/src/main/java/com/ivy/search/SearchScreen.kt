@@ -33,7 +33,7 @@ import com.ivy.navigation.IvyPreview
 import com.ivy.navigation.SearchScreen
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.modal.DURATION_MODAL_ANIM
+import com.ivy.wallet.ui.theme.modal.DurationModalAnim
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -115,7 +115,7 @@ private fun SearchUi(
                     targetValue = densityScope {
                         if (keyboardVisible) keyboardOnlyWindowInsets().bottom.toDp() else 0.dp
                     },
-                    animationSpec = tween(DURATION_MODAL_ANIM)
+                    animationSpec = tween(DurationModalAnim)
                 )
 
                 Spacer(Modifier.height(keyboardShownInsetDp))

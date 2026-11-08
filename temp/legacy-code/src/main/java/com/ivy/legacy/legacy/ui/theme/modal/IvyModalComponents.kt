@@ -10,7 +10,7 @@ import com.ivy.wallet.ui.theme.GradientGreen
 import com.ivy.wallet.ui.theme.components.IvyButton
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
-const val DURATION_MODAL_ANIM = 200
+const val DurationModalAnim = 200
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable

@@ -10377,7 +10377,7 @@
     <ID>TopLevelPropertyNaming:ChooseIconModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") private const val ICON_PICKER_ICONS_PER_ROW = 5</ID>
     <ID>TopLevelPropertyNaming:EditBottomSheet.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") const val SWIPE_UP_EXPANDED_THRESHOLD = 200</ID>
     <ID>TopLevelPropertyNaming:HomeMoreMenu.kt$private const val SWIPE_UP_THRESHOLD_CLOSE_MORE_MENU = 300</ID>
-    <ID>TopLevelPropertyNaming:IvyModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") const val DURATION_MODAL_ANIM = 200</ID>
+    <ID>TopLevelPropertyNaming:IvyModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") const val DurationModalAnim = 200</ID>
     <ID>TopLevelPropertyNaming:IvyModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") private const val DURATION_BACKGROUND_BLUR_ANIM = 400</ID>
     <ID>TopLevelPropertyNaming:ParseStatus.kt$const val SAMPLE_SIZE = 20</ID>
     <ID>TopLevelPropertyNaming:PieChart.kt$const val PIE_CHART_RADIUS_DP = 128</ID>

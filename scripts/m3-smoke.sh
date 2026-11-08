@@ -885,8 +885,27 @@ flow_search() {
   adb shell input text smokecoffee
   wait_for desc exact "Clear search" || { log "clear button missing after typing"; return 1; }
   wait_for text exact "smokecoffee" || return 1
-  has text exact "smokecoffee" 1 || { log "result row missing under the search field"; return 1; }
+  has text exact "smokecoffee" 1 || { log "result row missing: run flow_add_expense first, it seeds the smokecoffee transaction"; return 1; }
   shot search-1-result
+  # hide the keyboard, tap the field again: the keyboard must return, the bar stay usable and typing still filter
+  adb shell input keyevent KEYCODE_BACK
+  sleep 1.5
+  dump || return 1
+  has class exact android.widget.EditText && has desc exact "Clear search" || { log "back with the keyboard open left the search screen"; return 1; }
+  [ -z "$(ime_top)" ] || { log "keyboard still visible after back"; return 1; }
+  tap_node class exact android.widget.EditText || return 1
+  local ime="" k
+  for k in 1 2 3 4 5 6 7 8; do
+    sleep 1
+    ime=$(ime_top)
+    [ "${ime:-0}" -gt 0 ] && break
+  done
+  [ "${ime:-0}" -gt 0 ] || { log "tapping the search field did not bring the keyboard back"; return 1; }
+  shot search-1b-keyboard-back
+  adb shell input text x
+  wait_gone text exact "smokecoffee" 5 || wait_for text exact "smokecoffeex" 5 || return 1
+  has class exact android.widget.EditText && has desc exact "Clear search" || { log "search bar lost after tapping the field"; return 1; }
+  has text exact "smokecoffee" 1 && { log "typing after the re-tap did not filter"; return 1; }
   tap_node desc exact "Clear search" || return 1
   wait_gone desc exact "Clear search" 5 || { log "Clear search did not empty the field"; return 1; }
   adb shell input text zzzznomatch

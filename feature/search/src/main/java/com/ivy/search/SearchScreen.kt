@@ -1,19 +1,20 @@
 package com.ivy.search
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.AppBarWithSearch
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -81,7 +82,6 @@ private fun SearchUi(
     val nav = navigation()
     val listState = rememberLazyListState()
     val queryState = rememberTextFieldState(uiState.searchQuery)
-    val searchBarState = rememberSearchBarState()
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     val inspecting = LocalInspectionMode.current
@@ -105,17 +105,19 @@ private fun SearchUi(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            AppBarWithSearch(
-                state = searchBarState,
+            @Suppress("DEPRECATION")
+            SearchBar(
                 inputField = {
                     SearchBarDefaults.InputField(
-                        textFieldState = queryState,
-                        searchBarState = searchBarState,
+                        state = queryState,
                         onSearch = { keyboardController?.hide() },
+                        expanded = false,
+                        onExpandedChange = {},
                         modifier = Modifier
                             .focusRequester(focusRequester)
                             .testTag("search_input"),
                         placeholder = { Text(stringResource(R.string.search_transactions)) },
+                        leadingIcon = { BackButton(onClick = { nav.back() }) },
                         trailingIcon = if (queryState.text.isNotEmpty()) {
                             {
                                 IconButton(onClick = { queryState.clearText() }) {
@@ -130,7 +132,12 @@ private fun SearchUi(
                         },
                     )
                 },
-                navigationIcon = { BackButton(onClick = { nav.back() }) },
+                expanded = false,
+                onExpandedChange = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                content = {},
             )
         }
     ) { innerPadding ->

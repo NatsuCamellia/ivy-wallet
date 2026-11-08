@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -86,6 +87,7 @@ import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
 import com.ivy.ui.time.LocalTimeProvider
+import com.ivy.ui.util.thenIf
 import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
 import com.ivy.wallet.domain.pure.data.IncomeExpensePair
 import com.ivy.wallet.ui.theme.toComposeColor
@@ -321,10 +323,10 @@ private fun TransactionsUi(
                             balance = balance,
                             balanceBaseCurrency = balanceBaseCurrency,
                             prefix = category?.let { balancePrefix(income = income, expenses = expenses) },
-                            onClick = {
-                                if (account != null) {
+                            onClick = account?.let {
+                                {
                                     accountModalData = AccountModalData(
-                                        account = account,
+                                        account = it,
                                         baseCurrency = currency,
                                         balance = balance,
                                         adjustBalanceMode = true,
@@ -496,7 +498,11 @@ private fun TransactionsTopBar(
     LargeFlexibleTopAppBar(
         title = {
             Row(
-                modifier = Modifier.clickable(onClick = onEdit),
+                modifier = Modifier.clickable(
+                    onClickLabel = stringResource(R.string.edit),
+                    role = Role.Button,
+                    onClick = onEdit
+                ),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
@@ -542,12 +548,12 @@ private fun Balance(
     balance: Double,
     balanceBaseCurrency: Double?,
     prefix: String?,
-    onClick: () -> Unit,
+    onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
-            .clickable(onClick = onClick)
+            .thenIf(onClick != null) { clickable(onClick = onClick!!) }
             .testTag("balance")
     ) {
         Text(

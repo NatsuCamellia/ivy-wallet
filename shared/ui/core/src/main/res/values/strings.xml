@@ -132,7 +132,7 @@
     <string name="unspecified">Unspecified</string>
     <string name="percent">%1$s\%%</string>
     <string name="account_transfers">Account Transfers</string>
-    <string name="no_transactions_for_period">You don\'t have any transactions for %1$s.\nTo add one, scroll down and tap the \"Add income\" or \"Add expense\" button at the top.</string>
+    <string name="no_transactions_for_period">You don\'t have any transactions for %1$s.\nTo add one, tap the \"Add income\" or \"Add expense\" button above.</string>
     <string name="account_confirm_deletion_description">Note: Deleting this account will permanently remove all related transactions.</string>
     <string name="category_confirm_deletion_description">Note: Deleting this category will remove it permanently.</string>
     <string name="account_confirm_deletion_type_account_name">Type \"%s\" to delete your account</string>

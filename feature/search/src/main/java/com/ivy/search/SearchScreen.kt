@@ -1,40 +1,65 @@
 package com.ivy.search
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.input.clearText
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AppBarWithSearch
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
-import com.ivy.design.utils.IvyComponentPreview
+import com.ivy.base.legacy.Transaction
+import com.ivy.base.legacy.TransactionHistoryItem
+import com.ivy.base.model.TransactionType
+import com.ivy.data.model.Category
+import com.ivy.data.model.CategoryId
+import com.ivy.data.model.primitive.ColorInt
+import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.legacy.data.AppBaseData
-import com.ivy.legacy.ui.SearchInput
+import com.ivy.legacy.datamodel.Account
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.transaction.transactions
-import com.ivy.legacy.utils.densityScope
-import com.ivy.legacy.utils.keyboardOnlyWindowInsets
-import com.ivy.legacy.utils.keyboardVisibleState
-import com.ivy.legacy.utils.selectEndTextFieldValue
-import com.ivy.navigation.IvyPreview
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.SearchScreen
+import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.modal.DurationModalAnim
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.Purple
+import com.ivy.ui.component.BackButton
+import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.flow.drop
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.util.UUID
 
 @Composable
 fun SearchScreen(screen: SearchScreen) {
@@ -50,46 +75,71 @@ fun SearchScreen(screen: SearchScreen) {
 @Composable
 private fun SearchUi(
     uiState: SearchState,
-    onEvent: (SearchEvent) -> Unit
+    onEvent: (SearchEvent) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-    ) {
-        Spacer(Modifier.height(24.dp))
+    val nav = navigation()
+    val listState = rememberLazyListState()
+    val queryState = rememberTextFieldState(uiState.searchQuery)
+    val searchBarState = rememberSearchBarState()
+    val focusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val inspecting = LocalInspectionMode.current
+    val currentOnEvent by rememberUpdatedState(onEvent)
 
-        val listState = rememberLazyListState()
+    LaunchedEffect(Unit) {
+        if (!inspecting) focusRequester.requestFocus()
+    }
 
-        var searchQueryTextFieldValue by remember {
-            mutableStateOf(selectEndTextFieldValue(uiState.searchQuery))
+    LaunchedEffect(queryState) {
+        snapshotFlow { queryState.text.toString() }
+            .drop(1)
+            .collect { currentOnEvent(SearchEvent.Search(it)) }
+    }
+
+    LaunchedEffect(uiState.transactions) {
+        // scroll to top when transactions are changed
+        listState.animateScrollToItem(index = 0, scrollOffset = 0)
+    }
+
+    Scaffold(
+        modifier = modifier.fillMaxSize(),
+        topBar = {
+            AppBarWithSearch(
+                state = searchBarState,
+                inputField = {
+                    SearchBarDefaults.InputField(
+                        textFieldState = queryState,
+                        searchBarState = searchBarState,
+                        onSearch = { keyboardController?.hide() },
+                        modifier = Modifier
+                            .focusRequester(focusRequester)
+                            .testTag("search_input"),
+                        placeholder = { Text(stringResource(R.string.search_transactions)) },
+                        trailingIcon = if (queryState.text.isNotEmpty()) {
+                            {
+                                IconButton(onClick = { queryState.clearText() }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = stringResource(R.string.clear_search)
+                                    )
+                                }
+                            }
+                        } else {
+                            null
+                        },
+                    )
+                },
+                navigationIcon = { BackButton(onClick = { nav.back() }) },
+            )
         }
-
-        SearchInput(
-            searchQueryTextFieldValue = searchQueryTextFieldValue,
-            hint = stringResource(R.string.search_transactions),
-            showClearIcon = searchQueryTextFieldValue.text.isNotEmpty(),
-            onSetSearchQueryTextField = {
-                searchQueryTextFieldValue = it
-                onEvent(SearchEvent.Search(it.text))
-            }
-        )
-
-        LaunchedEffect(uiState.transactions) {
-            // scroll to top when transactions are changed
-            listState.animateScrollToItem(index = 0, scrollOffset = 0)
-        }
-
-        Spacer(Modifier.height(16.dp))
+    ) { innerPadding ->
         val emptyStateTitle = stringResource(R.string.no_transactions)
-        val emptyStateText = stringResource(
-            R.string.no_transactions_for_query,
-            searchQueryTextFieldValue.text
-        )
+        val emptyStateText = stringResource(R.string.no_transactions_for_query, queryState.text.toString())
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = listState
-
+            state = listState,
+            contentPadding = innerPadding,
         ) {
             transactions(
                 baseData = AppBaseData(
@@ -105,50 +155,86 @@ private fun SearchUi(
                 onPayOrGet = { },
                 emptyStateTitle = emptyStateTitle,
                 emptyStateText = emptyStateText,
-                dateDividerMarginTop = 16.dp,
+                lastItemSpacer = 0.dp,
                 shouldShowAccountSpecificColorInTransactions = uiState.shouldShowAccountSpecificColorInTransactions
             )
+        }
+    }
+}
 
-            item {
-                val keyboardVisible by keyboardVisibleState()
-                val keyboardShownInsetDp by animateDpAsState(
-                    targetValue = densityScope {
-                        if (keyboardVisible) keyboardOnlyWindowInsets().bottom.toDp() else 0.dp
-                    },
-                    animationSpec = tween(DurationModalAnim)
-                )
+private val previewAccount = Account(name = "Cash", color = Green.toArgb())
 
-                Spacer(Modifier.height(keyboardShownInsetDp))
-                // add keyboard height margin at bototm so the list can scroll to bottom
-            }
+private val previewCategory = Category(
+    name = NotBlankTrimmedString.unsafe("Food"),
+    color = ColorInt(Purple.toArgb()),
+    icon = null,
+    id = CategoryId(UUID.randomUUID()),
+    orderNum = 0.0,
+)
+
+@Suppress("MagicNumber")
+private fun previewHistory(): ImmutableList<TransactionHistoryItem> {
+    val at = LocalDateTime.of(2023, 1, 12, 12, 30).toInstant(ZoneOffset.UTC)
+    return persistentListOf(
+        TransactionHistoryDateDivider(LocalDate.of(2023, 1, 12), income = 0.0, expenses = 98.8),
+        Transaction(
+            accountId = previewAccount.id,
+            type = TransactionType.EXPENSE,
+            amount = BigDecimal.valueOf(84.3),
+            title = "Groceries at the corner shop",
+            categoryId = previewCategory.id.value,
+            dateTime = at,
+        ),
+        Transaction(
+            accountId = previewAccount.id,
+            type = TransactionType.EXPENSE,
+            amount = BigDecimal.valueOf(14.5),
+            title = "Groceries delivery",
+            description = "Weekly groceries",
+            dateTime = at,
+        ),
+    )
+}
+
+@Composable
+private fun SearchPreview(
+    theme: Theme,
+    query: String,
+    transactions: ImmutableList<TransactionHistoryItem>,
+) {
+    WalletPreview(theme) {
+        NavigationRoot(navigation = Navigation()) {
+            SearchUi(
+                uiState = SearchState(
+                    searchQuery = query,
+                    transactions = transactions,
+                    baseCurrency = "BGN",
+                    accounts = persistentListOf(previewAccount),
+                    categories = persistentListOf(previewCategory),
+                    shouldShowAccountSpecificColorInTransactions = false
+                ),
+                onEvent = {}
+            )
         }
     }
 }
 
 @Preview
 @Composable
-private fun Preview(isDark: Boolean = false) {
-    IvyPreview(isDark) {
-        SearchUi(
-            uiState = SearchState(
-                searchQuery = "",
-                transactions = persistentListOf(),
-                baseCurrency = "",
-                accounts = persistentListOf(),
-                categories = persistentListOf(),
-                shouldShowAccountSpecificColorInTransactions = false
-            ),
-            onEvent = {}
-        )
-    }
+private fun PreviewEmptyQuery() {
+    SearchPreview(Theme.LIGHT, query = "", transactions = persistentListOf())
 }
 
-/** For screenshot testing */
-@OptIn(ExperimentalFoundationApi::class)
+private fun themeOf(isDark: Boolean): Theme = if (isDark) Theme.DARK else Theme.LIGHT
+
+/** For screenshot testing: a query with matching transactions */
 @Composable
 fun SearchUiTest(isDark: Boolean) {
-    val theme = if (isDark) Theme.DARK else Theme.LIGHT
-    IvyComponentPreview(theme = theme) {
-        Preview(isDark)
-    }
+    SearchPreview(themeOf(isDark), query = "groceries", transactions = previewHistory())
+}
+
+/** For screenshot testing: a query nothing matches */
+@Composable
+fun SearchNoResultsUiTest(isDark: Boolean) {
+    SearchPreview(themeOf(isDark), query = "no such payment", transactions = persistentListOf())
 }

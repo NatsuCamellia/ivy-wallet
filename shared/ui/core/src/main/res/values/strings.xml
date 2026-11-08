@@ -132,7 +132,7 @@
     <string name="unspecified">Unspecified</string>
     <string name="percent">%1$s\%%</string>
     <string name="account_transfers">Account Transfers</string>
-    <string name="no_transactions_for_period">You don\'t have any transactions for %1$s.\nTo add one, scroll down and tap the "Add income" or "Add expense" button at the top.</string>
+    <string name="no_transactions_for_period">You don\'t have any transactions for %1$s.\nTo add one, scroll down and tap the \"Add income\" or \"Add expense\" button at the top.</string>
     <string name="account_confirm_deletion_description">Note: Deleting this account will permanently remove all related transactions.</string>
     <string name="category_confirm_deletion_description">Note: Deleting this category will remove it permanently.</string>
     <string name="account_confirm_deletion_type_account_name">Type \"%s\" to delete your account</string>
@@ -240,7 +240,7 @@
     <string name="invalid_filter_warning">You need to apply a valid filter before generating a report.</string>
     <string name="set_filter">Set Filter</string>
     <string name="export">Export</string>
-    <string name="no_transactions_for_query">There are no transactions for the "%1$s" query.</string>
+    <string name="no_transactions_for_query">There are no transactions for the \"%1$s\" query.</string>
     <string name="import_export"><![CDATA[Import & Export]]></string>
     <string name="backup_data">Backup data</string>
     <string name="import_data">Import data</string>
@@ -303,6 +303,7 @@
     <string name="edit_transfer">Edit transfer</string>
     <string name="duplicate">Duplicate</string>
     <string name="reset_exchange_rate">Reset exchange rate</string>
+    <string name="clear_search">Clear search</string>
     <string name="keyword">Keyword</string>
     <string name="edit_budget">Edit budget</string>
     <string name="create_budget">Create budget</string>

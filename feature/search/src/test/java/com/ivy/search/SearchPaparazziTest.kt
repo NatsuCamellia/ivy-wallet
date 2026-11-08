@@ -18,4 +18,11 @@ class SearchPaparazziTest(
             SearchUiTest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotSearchNoResults() {
+        snapshot(theme) {
+            SearchNoResultsUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

@@ -18,4 +18,25 @@ class TransactionsPaparazziTest(
             TransactionsUiTest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotTransactionsCategory() {
+        snapshot(theme) {
+            TransactionsCategoryUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotTransactionsEmptyPeriod() {
+        snapshot(theme) {
+            TransactionsEmptyPeriodUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotTransactionsHugeBalance() {
+        snapshot(theme) {
+            TransactionsHugeBalanceUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

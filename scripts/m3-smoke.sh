@@ -283,8 +283,8 @@ open_account_edit_sheet() {
   tap_tab Accounts || return 1
   wait_for text exact "Total Balance" || return 1
   tap_node text exact "Cash" || return 1
-  wait_for text exact "Edit" || return 1
-  tap_node text exact "Edit" || return 1
+  wait_for desc exact "Edit" || return 1
+  tap_node desc exact "Edit" || return 1
   wait_for text exact "Edit account" || return 1
 }
 
@@ -310,7 +310,7 @@ flow_nested_back() {
   shot nested-5-after-back-2
   back
   dump
-  has text exact "Edit" && ! has text exact "Edit account" || { log "back 3: expected the account screen"; return 1; }
+  has desc exact "Edit" && ! has text exact "Edit account" || { log "back 3: expected the account screen"; return 1; }
   has text exact "Cash" || { log "back 3: account screen missing"; return 1; }
   shot nested-6-after-back-3
   crashed && return 1
@@ -463,8 +463,8 @@ flow_cancelled_hide() {
       adb shell input keyevent KEYCODE_BACK
       sleep 3
     fi
-    wait_for text exact "Edit" || break
-    tap_node text exact "Edit" || break
+    wait_for desc exact "Edit" || break
+    tap_node desc exact "Edit" || break
     wait_for text exact "Edit account" || break
   done
   adb shell settings put global animator_duration_scale 1
@@ -477,7 +477,7 @@ flow_cancelled_hide() {
   wait_gone text exact "Edit account" || return 1
   sleep 1
   dump || return 1
-  has text exact "Edit" && has text exact "Cash" || { log "expected the account screen after the second close"; return 1; }
+  has desc exact "Edit" && has text exact "Cash" || { log "expected the account screen after the second close"; return 1; }
   shot cancelled-hide-2-closed
   crashed && return 1
   return 0
@@ -760,6 +760,8 @@ flow_add_expense() {
   set -- $bar
   log "amount bottom=$6 ime top=$ime"
   [ "$6" -le "$ime" ] || { log "bottom bar is under the keyboard"; return 1; }
+  adb shell input text smokecoffee
+  sleep 1
   tap_node text exact "Add" || return 1
   wait_for text exact "Groceries" || { log "saved row missing on Home"; return 1; }
   has text exact "-125.00 USD" || { log "saved amount missing on Home"; return 1; }
@@ -819,6 +821,88 @@ flow_more_menu() {
   return 0
 }
 
+# period_label_anywhere: text of the first period button (a month name, or "Mon, YYYY") in the current dump
+period_label_anywhere() {
+  python3 -I - "$XML" <<'PY'
+import re, sys, xml.etree.ElementTree as ET
+months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October",
+          "November", "December"]
+for n in ET.parse(sys.argv[1]).iter('node'):
+    text = n.get('text') or ''
+    m = re.match(r'^([A-Za-z]+)(, \d{4})?$', text)
+    if m and any(name == m.group(1) or name[:3] == m.group(1) for name in months):
+        print(text)
+        sys.exit(0)
+sys.exit(1)
+PY
+}
+
+# Accounts -> Cash: the detail screen shows the name, balance, income and expense cards with their add buttons and the
+# period row; Next and Previous change the period and come back, Edit opens the account sheet and Close dismisses it,
+# back returns to Accounts.
+flow_account_detail() {
+  go_home || return 1
+  tap_tab Accounts || return 1
+  wait_for text exact "Total Balance" || return 1
+  tap_node text exact "Cash" || return 1
+  wait_for desc exact "Edit" || return 1
+  has desc exact "Delete" && has text exact "Add income" && has text exact "Add expense" || { log "detail actions missing"; return 1; }
+  has text exact "Cash" || { log "account name missing"; return 1; }
+  shot account-detail-1
+  local before after
+  before=$(period_label_anywhere) || { log "period label not found"; return 1; }
+  tap_node desc exact "Next" || return 1
+  sleep 1
+  dump || return 1
+  after=$(period_label_anywhere) || { log "period label missing after Next"; return 1; }
+  [ "$after" != "$before" ] || { log "Next did not change the period ('$before')"; return 1; }
+  shot account-detail-2-next
+  tap_node desc exact "Previous" || return 1
+  sleep 1
+  dump || return 1
+  after=$(period_label_anywhere) || { log "period label missing after Previous"; return 1; }
+  [ "$after" = "$before" ] || { log "Previous gave '$after', expected '$before'"; return 1; }
+  tap_node desc exact "Edit" || return 1
+  wait_for text exact "Edit account" || return 1
+  shot account-detail-3-edit
+  tap_node desc exact "Close" || return 1
+  wait_gone text exact "Edit account" || return 1
+  has desc exact "Edit" && has text exact "Cash" || { log "expected the account screen after Close"; return 1; }
+  back
+  wait_for text exact "Total Balance" || { log "back did not return to Accounts"; return 1; }
+  crashed && return 1
+  return 0
+}
+
+# Home More -> Search transactions: type the title of the seeded expense (flow_add_expense), its row is listed under the
+# search field, Clear search empties the field, back leaves the screen. Needs flow_add_expense to have run.
+flow_search() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Search transactions..." || return 1
+  wait_for class exact android.widget.EditText || return 1
+  adb shell input text smokecoffee
+  wait_for desc exact "Clear search" || { log "clear button missing after typing"; return 1; }
+  wait_for text exact "smokecoffee" || return 1
+  has text exact "smokecoffee" 1 || { log "result row missing under the search field"; return 1; }
+  shot search-1-result
+  tap_node desc exact "Clear search" || return 1
+  wait_gone desc exact "Clear search" 5 || { log "Clear search did not empty the field"; return 1; }
+  adb shell input text zzzznomatch
+  wait_for text sub "no transactions" 5 || wait_for text exact "No transactions" 5 || { log "empty state missing for an unmatched query"; return 1; }
+  shot search-2-empty
+  local i
+  for i in 1 2 3; do
+    back
+    dump || return 1
+    has class exact android.widget.EditText || break
+  done
+  has class exact android.widget.EditText && { log "back did not leave the search screen"; return 1; }
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -846,7 +930,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_add_expense}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_add_expense flow_search}; do
   run_flow "$flow"
 done
 

@@ -1,15 +1,16 @@
 package com.ivy.planned.edit
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -36,13 +37,12 @@ import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
 import com.ivy.wallet.ui.edit.core.Category
 import com.ivy.legacy.ui.component.edit.core.Description
-import com.ivy.wallet.ui.edit.core.EditBottomSheet
+import com.ivy.legacy.ui.component.edit.core.EditBottomBar
 import com.ivy.wallet.ui.edit.core.Title
 import com.ivy.wallet.ui.edit.core.Toolbar
 import com.ivy.ui.color.Orange
 import com.ivy.legacy.ui.sheet.ChangeTransactionTypeModal
 import com.ivy.legacy.ui.sheet.DeleteModal
-import com.ivy.wallet.ui.theme.modal.ModalSet
 import com.ivy.legacy.ui.sheet.RecurringRuleModal
 import com.ivy.legacy.ui.sheet.RecurringRuleModalData
 import com.ivy.legacy.ui.sheet.AccountModal
@@ -92,109 +92,171 @@ private fun BoxWithConstraintsScope.UI(
     }
     val titleFocus = FocusRequester()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .verticalScroll(rememberScrollState())
-    ) {
-        Spacer(Modifier.height(16.dp))
+    Scaffold(
+        topBar = {
+            Toolbar(
+                title = stringResource(R.string.add_planned_payment),
+                type = state.transactionType,
+                initialTransactionId = screen.plannedPaymentRuleId,
+                onDeleteTrnModal = {
+                    onEvent(EditPlannedScreenEvent.OnDeleteTransactionModalVisible(true))
+                },
+                onChangeTransactionTypeModal = {
+                    onEvent(EditPlannedScreenEvent.OnTransactionTypeModalVisible(true))
+                },
+                showDuplicateButton = false,
+                onDuplicate = {}
+            )
+        },
+        bottomBar = {
+            EditBottomBar(
+                initialTransactionId = screen.plannedPaymentRuleId,
+                type = state.transactionType,
+                accounts = state.accounts,
+                selectedAccount = state.account,
+                toAccount = null,
+                amount = state.amount,
+                currency = state.currency,
 
-        Toolbar(
-            type = state.transactionType,
-            initialTransactionId = screen.plannedPaymentRuleId,
-            onDeleteTrnModal = {
-                onEvent(EditPlannedScreenEvent.OnDeleteTransactionModalVisible(true))
-            },
-            onChangeTransactionTypeModal = {
-                onEvent(EditPlannedScreenEvent.OnTransactionTypeModalVisible(true))
-            },
-            showDuplicateButton = false,
-            onDuplicate = {}
-        )
+                amountModalShown = state.amountModalVisible,
+                setAmountModalShown = {
+                    onEvent(EditPlannedScreenEvent.OnAmountModalVisible(it))
+                },
 
-        Spacer(Modifier.height(32.dp))
+                onAmountChange = {
+                    onEvent(EditPlannedScreenEvent.OnAmountChanged(it))
+                    when {
+                        shouldFocusCategory(state.category, state.transactionType) -> {
+                            onEvent(EditPlannedScreenEvent.OnCategoryModalVisible(true))
+                        }
 
-        Title(
-            type = state.transactionType,
-            titleFocus = titleFocus,
-            initialTransactionId = screen.plannedPaymentRuleId,
-
-            titleTextFieldValue = titleTextFieldValue,
-            setTitleTextFieldValue = {
-                titleTextFieldValue = it
-            },
-            suggestions = emptySet(), // DO NOT display title suggestions for "Planned Payments"
-            onTitleChanged = { onEvent(EditPlannedScreenEvent.OnTitleChanged(it)) },
-            onNext = {
-                when {
-                    shouldFocusRecurring(
-                        state.startDate,
-                        state.intervalN,
-                        state.intervalType,
-                        state.oneTime
-                    ) -> {
-                        onEvent(
-                            EditPlannedScreenEvent.OnRecurringRuleModalDataChanged(
-                                RecurringRuleModalData(
-                                    initialStartDate = state.startDate,
-                                    initialIntervalN = state.intervalN,
-                                    initialIntervalType = state.intervalType,
-                                    initialOneTime = state.oneTime
+                        shouldFocusRecurring(
+                            state.startDate,
+                            state.intervalN,
+                            state.intervalType,
+                            state.oneTime
+                        ) -> {
+                            onEvent(
+                                EditPlannedScreenEvent.OnRecurringRuleModalDataChanged(
+                                    RecurringRuleModalData(
+                                        initialStartDate = state.startDate,
+                                        initialIntervalN = state.intervalN,
+                                        initialIntervalType = state.intervalType,
+                                        initialOneTime = state.oneTime
+                                    )
                                 )
                             )
-                        )
+                        }
+
+                        shouldFocusTitle(titleTextFieldValue, state.transactionType) -> {
+                            titleFocus.requestFocus()
+                        }
                     }
-
-                    else -> {
-                        onEvent(EditPlannedScreenEvent.OnSave())
-                    }
-                }
-            }
-        )
-
-        if (state.transactionType != TransactionType.TRANSFER) {
-            Spacer(Modifier.height(32.dp))
-
-            Category(
-                category = state.category,
-                onChooseCategory = {
-                    onEvent(EditPlannedScreenEvent.OnCategoryModalVisible(true))
-                }
-            )
-        }
-
-        Spacer(Modifier.height(32.dp))
-
-        RecurringRule(
-            startDate = state.startDate,
-            intervalN = state.intervalN,
-            intervalType = state.intervalType,
-            oneTime = state.oneTime,
-            onShowRecurringRuleModal = {
-                onEvent(
-                    EditPlannedScreenEvent.OnRecurringRuleModalDataChanged(
-                        RecurringRuleModalData(
-                            initialStartDate = state.startDate,
-                            initialIntervalN = state.intervalN,
-                            initialIntervalType = state.intervalType,
-                            initialOneTime = state.oneTime
+                },
+                onSelectedAccountChange = { onEvent(EditPlannedScreenEvent.OnAccountChanged(it)) },
+                onToAccountChange = { },
+                onAddNewAccount = {
+                    onEvent(
+                        EditPlannedScreenEvent.OnAccountModalDataChanged(
+                            AccountModalData(
+                                account = null,
+                                baseCurrency = state.currency,
+                                balance = 0.0
+                            )
                         )
                     )
+                }
+            ) {
+                Button(
+                    onClick = { onEvent(EditPlannedScreenEvent.OnSave()) },
+                    modifier = Modifier.testTag("editPlannedScreen_set"),
+                ) {
+                    Text(stringResource(R.string.set))
+                }
+            }
+        },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            Title(
+                type = state.transactionType,
+                titleFocus = titleFocus,
+                modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp),
+
+                titleTextFieldValue = titleTextFieldValue,
+                setTitleTextFieldValue = {
+                    titleTextFieldValue = it
+                },
+                suggestions = emptySet(), // DO NOT display title suggestions for "Planned Payments"
+                onTitleChange = { onEvent(EditPlannedScreenEvent.OnTitleChanged(it)) },
+                onNext = {
+                    when {
+                        shouldFocusRecurring(
+                            state.startDate,
+                            state.intervalN,
+                            state.intervalType,
+                            state.oneTime
+                        ) -> {
+                            onEvent(
+                                EditPlannedScreenEvent.OnRecurringRuleModalDataChanged(
+                                    RecurringRuleModalData(
+                                        initialStartDate = state.startDate,
+                                        initialIntervalN = state.intervalN,
+                                        initialIntervalType = state.intervalType,
+                                        initialOneTime = state.oneTime
+                                    )
+                                )
+                            )
+                        }
+
+                        else -> {
+                            onEvent(EditPlannedScreenEvent.OnSave())
+                        }
+                    }
+                }
+            )
+
+            if (state.transactionType != TransactionType.TRANSFER) {
+                Category(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    category = state.category,
+                    onChooseCategory = {
+                        onEvent(EditPlannedScreenEvent.OnCategoryModalVisible(true))
+                    }
                 )
             }
-        )
 
-        Spacer(Modifier.height(12.dp))
+            RecurringRule(
+                startDate = state.startDate,
+                intervalN = state.intervalN,
+                intervalType = state.intervalType,
+                oneTime = state.oneTime,
+                onShowRecurringRuleModal = {
+                    onEvent(
+                        EditPlannedScreenEvent.OnRecurringRuleModalDataChanged(
+                            RecurringRuleModalData(
+                                initialStartDate = state.startDate,
+                                initialIntervalN = state.intervalN,
+                                initialIntervalType = state.intervalType,
+                                initialOneTime = state.oneTime
+                            )
+                        )
+                    )
+                }
+            )
 
-        Description(
-            description = state.description,
-            onAddDescription = { onEvent(EditPlannedScreenEvent.OnDescriptionModalVisible(true)) },
-            onEditDescription = { onEvent(EditPlannedScreenEvent.OnDescriptionModalVisible(true)) }
-        )
-
-        Spacer(Modifier.height(600.dp)) // scroll hack
+            Description(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                description = state.description,
+                onAddDescription = { onEvent(EditPlannedScreenEvent.OnDescriptionModalVisible(true)) },
+                onEditDescription = { onEvent(EditPlannedScreenEvent.OnDescriptionModalVisible(true)) }
+            )
+        }
     }
 
     onScreenStart {
@@ -218,73 +280,6 @@ private fun BoxWithConstraintsScope.UI(
             }
         }
     }
-
-    EditBottomSheet(
-        initialTransactionId = screen.plannedPaymentRuleId,
-        type = state.transactionType,
-        accounts = state.accounts,
-        selectedAccount = state.account,
-        toAccount = null,
-        amount = state.amount,
-        currency = state.currency,
-
-        ActionButton = {
-            ModalSet(
-                modifier = Modifier.testTag("editPlannedScreen_set")
-            ) {
-                onEvent(EditPlannedScreenEvent.OnSave())
-            }
-        },
-
-        amountModalShown = state.amountModalVisible,
-        setAmountModalShown = {
-            onEvent(EditPlannedScreenEvent.OnAmountModalVisible(it))
-        },
-
-        onAmountChanged = {
-            onEvent(EditPlannedScreenEvent.OnAmountChanged(it))
-            when {
-                shouldFocusCategory(state.category, state.transactionType) -> {
-                    onEvent(EditPlannedScreenEvent.OnCategoryModalVisible(true))
-                }
-
-                shouldFocusRecurring(
-                    state.startDate,
-                    state.intervalN,
-                    state.intervalType,
-                    state.oneTime
-                ) -> {
-                    onEvent(
-                        EditPlannedScreenEvent.OnRecurringRuleModalDataChanged(
-                            RecurringRuleModalData(
-                                initialStartDate = state.startDate,
-                                initialIntervalN = state.intervalN,
-                                initialIntervalType = state.intervalType,
-                                initialOneTime = state.oneTime
-                            )
-                        )
-                    )
-                }
-
-                shouldFocusTitle(titleTextFieldValue, state.transactionType) -> {
-                    titleFocus.requestFocus()
-                }
-            }
-        },
-        onSelectedAccountChanged = { onEvent(EditPlannedScreenEvent.OnAccountChanged(it)) },
-        onToAccountChanged = { },
-        onAddNewAccount = {
-            onEvent(
-                EditPlannedScreenEvent.OnAccountModalDataChanged(
-                    AccountModalData(
-                        account = null,
-                        baseCurrency = state.currency,
-                        balance = 0.0
-                    )
-                )
-            )
-        }
-    )
 
     // Modals
     ChooseCategoryModal(

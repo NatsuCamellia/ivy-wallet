@@ -606,13 +606,13 @@ flow_choose_period() {
   return 0
 }
 
-# created_date_label: the clickable "Mon D" text of the Created on row, from the current dump
+# created_date_label: the "Mon D" text of the Created on row, from the current dump
 created_date_label() {
   python3 -I - "$XML" <<'PY'
 import re, sys, xml.etree.ElementTree as ET
 for n in ET.parse(sys.argv[1]).iter('node'):
     text = n.get('text') or ''
-    if n.get('clickable') == 'true' and re.match(r'^[A-Z][a-z]{2} \d{1,2}$', text):
+    if re.match(r'^[A-Z][a-z]{2} \d{1,2}$', text):
         print(text)
         sys.exit(0)
 sys.exit(1)
@@ -728,6 +728,45 @@ flow_fab_menu() {
   return 0
 }
 
+# Home FAB -> Add expense: enter an amount in the amount sheet, pick a category, the bottom bar must stay above the
+# keyboard, Add saves and the row shows on Home.
+flow_add_expense() {
+  go_home || return 1
+  open_fab_menu || return 1
+  tap_node text exact "Add expense" || return 1
+  wait_for text exact "Enter" || return 1
+  tap_node text exact "1" || return 1
+  tap_node text exact "2" || return 1
+  tap_node text exact "5" || return 1
+  shot add-expense-1-amount
+  tap_node text exact "Enter" || return 1
+  wait_for text exact "Choose category" || return 1
+  tap_node text exact "Groceries" || return 1
+  wait_for text exact "Add expense" || return 1
+  wait_for text exact "125.00 USD" || { log "amount missing from the bottom bar"; return 1; }
+  local ime="" i
+  for i in 1 2 3 4 5 6 7 8; do
+    sleep 1
+    ime=$(ime_top)
+    [ "${ime:-0}" -gt 0 ] && break
+  done
+  [ "${ime:-0}" -gt 0 ] || { log "title field did not take focus after the category"; return 1; }
+  sleep 1
+  shot add-expense-2-keyboard
+  dump
+  local bar
+  bar=$(find_node text exact "125.00 USD") || return 1
+  set -- $bar
+  log "amount bottom=$6 ime top=$ime"
+  [ "$6" -le "$ime" ] || { log "bottom bar is under the keyboard"; return 1; }
+  tap_node text exact "Add" || return 1
+  wait_for text exact "Groceries" || { log "saved row missing on Home"; return 1; }
+  has text exact "-125.00 USD" || { log "saved amount missing on Home"; return 1; }
+  shot add-expense-3-home
+  crashed && return 1
+  return 0
+}
+
 # Home more button: opens the More sheet, an item navigates (and back returns to the sheet), Close dismisses it,
 # the Savings goal row opens the Buffer sheet on top and back closes only that one.
 flow_more_menu() {
@@ -787,7 +826,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_add_expense flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu}; do
   run_flow "$flow"
 done
 

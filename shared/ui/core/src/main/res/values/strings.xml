@@ -297,6 +297,12 @@
     <string name="backspace">Backspace</string>
     <string name="deselect">Deselect</string>
     <string name="reorder">Reorder</string>
+    <string name="add_transfer">Add transfer</string>
+    <string name="edit_income">Edit income</string>
+    <string name="edit_expense">Edit expense</string>
+    <string name="edit_transfer">Edit transfer</string>
+    <string name="duplicate">Duplicate</string>
+    <string name="reset_exchange_rate">Reset exchange rate</string>
     <string name="keyword">Keyword</string>
     <string name="edit_budget">Edit budget</string>
     <string name="create_budget">Create budget</string>

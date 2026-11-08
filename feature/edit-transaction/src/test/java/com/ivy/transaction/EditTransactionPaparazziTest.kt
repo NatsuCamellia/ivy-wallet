@@ -25,4 +25,32 @@ class EditTransactionPaparazziTest(
             EditTransactionScreenUiTest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotEditTransactionNewExpense() {
+        snapshot(theme) {
+            EditTransactionNewExpenseUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotEditTransactionEditIncome() {
+        snapshot(theme) {
+            EditTransactionEditIncomeUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotEditTransactionTransferBetweenCurrencies() {
+        snapshot(theme) {
+            EditTransactionTransferUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotEditTransactionHugeAmount() {
+        snapshot(theme) {
+            EditTransactionHugeAmountUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

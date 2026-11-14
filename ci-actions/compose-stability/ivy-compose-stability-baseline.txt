@@ -63,7 +63,6 @@ com.ivy.wallet.ui.edit.core.Toolbar
 com.ivy.legacy.ui.component.transaction.HistoryDateDivider
 com.ivy.legacy.ui.component.transaction.TransactionHeaderRow
 com.ivy.legacy.ui.component.transaction.TransferHeader
-com.ivy.legacy.ui.component.transaction.TypeAmountCurrency
 com.ivy.legacy.ui.component.transaction.category
 com.ivy.legacy.ui.component.transaction.account
 com.ivy.legacy.utils.windowInsets

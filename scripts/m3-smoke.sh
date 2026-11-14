@@ -1136,7 +1136,7 @@ flow_budgets() {
 
 # Home More -> Loans: the top bar has back and reorder, the tabs are Pending and Completed and the add button is a FAB;
 # add a loan through the New loan sheet and the amount sheet, it is listed under Pending (not under Completed), tapping
-# it opens the details screen, back returns to the list, back again returns to the open More sheet.
+# it opens the details screen (top bar, summary, starting record), Add record adds a 20 record through the sheet and the left amount drops to 30, back returns to the list, back again returns to the open More sheet.
 flow_loans() {
   go_home || return 1
   tap_node desc exact "More" || return 1
@@ -1173,6 +1173,19 @@ flow_loans() {
   wait_gone desc exact "Add loan" 5 || { log "tapping the loan did not leave the list"; return 1; }
   shot loans-4-details
   has text exact "smokeloan" || { log "details screen does not show the loan"; return 1; }
+  has desc exact "Back" && has desc exact "Edit" && has desc exact "Delete" && has desc exact "Add record" || { log "loan details top bar or Add record missing"; return 1; }
+  has text exact "Left to pay" && has any sub "50.00 USD" && has text exact "Starting record" || { log "loan summary or starting record missing"; return 1; }
+  tap_node desc exact "Add record" || return 1
+  wait_for text exact "Enter" || { log "record sheet did not open its amount sheet"; return 1; }
+  tap_node text exact "2" || return 1
+  tap_node text exact "0" || return 1
+  tap_node text exact "Enter" || return 1
+  wait_gone text exact "Enter" 5 || { log "Enter did not close the record amount sheet"; return 1; }
+  tap_node text exact "Add" || return 1
+  wait_gone text exact "New record" 5 || { log "Add did not close the record sheet"; return 1; }
+  wait_for any sub "30.00 USD" || { log "left amount did not change after the record"; return 1; }
+  has any sub "20.00 USD" && has text exact "Decrease" || { log "the new record row is missing"; return 1; }
+  shot loans-5-record
   back
   wait_for desc exact "Add loan" || { log "back from the details did not return to the list"; return 1; }
   has text exact "smokeloan" || { log "loan list missing after back"; return 1; }

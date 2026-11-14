@@ -122,7 +122,7 @@
     <string name="add_record">Eintrag hinzufügen</string>
     <string name="interest">Zinsen</string>
     <string name="no_records">Keine Einträge</string>
-    <string name="no_records_for_the_loan">Du hast keine Einträge für dieses Darlehen. Tippe auf " Eintrag hinzufügen", um einen zu erstellen.</string>
+    <string name="no_records_for_the_loan">Du hast keine Einträge für dieses Darlehen. Tippe auf \"Eintrag hinzufügen\", um einen zu erstellen.</string>
     <string name="add_income">Einnahme hinzufügen</string>
     <string name="add_expense">Ausgabe hinzufügen</string>
     <string name="unspecified">Unspezifiziert</string>

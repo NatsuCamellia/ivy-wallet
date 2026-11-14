@@ -136,7 +136,7 @@
     <string name="add_record">Add record</string>
     <string name="interest">Interest</string>
     <string name="no_records">No records</string>
-    <string name="no_records_for_the_loan">You don\'t have any records for this loan. Tap "Add record" to create one.</string>
+    <string name="no_records_for_the_loan">You don\'t have any records for this loan. Tap the \"Add record\" button to create one.</string>
     <string name="add_income">Add income</string>
     <string name="add_expense">Add expense</string>
     <string name="unspecified">Unspecified</string>

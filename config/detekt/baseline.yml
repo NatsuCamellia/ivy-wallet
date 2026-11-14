@@ -296,7 +296,6 @@
     <ID>ComposableParamOrder:IvySwitch.kt$IvySwitch</ID>
     <ID>ComposableParamOrder:IvyText.kt$IvyText</ID>
     <ID>ComposableParamOrder:IvyTitleTextField.kt$IvyTitleTextField</ID>
-    <ID>ComposableParamOrder:LoanDetailsScreen.kt$Header</ID>
     <ID>ComposableParamOrder:LoanModal.kt$AccountsRow</ID>
     <ID>ComposableParamOrder:LoanModal.kt$LoanModal</ID>
     <ID>ComposableParamOrder:LoanRecordModal.kt$AccountsRow</ID>
@@ -2550,7 +2549,6 @@
     <ID>LongMethod:EditTransactionScreen.kt$@ExperimentalFoundationApi @Composable private fun BoxWithConstraintsScope.UI( screen: EditTransactionScreen, transactionType: TransactionType, baseCurrency: String, initialTitle: String?, titleSuggestions: ImmutableSet&lt;String&gt;, description: String?, category: Category?, dateTime: LocalDateTime?, account: Account?, toAccount: Account?, dueDate: LocalDateTime?, amount: Double, customExchangeRateState: CustomExchangeRateState, categories: ImmutableList&lt;Category&gt;, accounts: ImmutableList&lt;Account&gt;, onTitleChanged: (String?) -&gt; Unit, onDescriptionChanged: (String?) -&gt; Unit, onAmountChanged: (Double) -&gt; Unit, onCategoryChanged: (Category?) -&gt; Unit, onAccountChanged: (Account) -&gt; Unit, onToAccountChanged: (Account) -&gt; Unit, onDueDateChanged: (LocalDateTime?) -&gt; Unit, onSetDate: (LocalDate) -&gt; Unit, onSetTime: (LocalTime) -&gt; Unit, onSetTransactionType: (TransactionType) -&gt; Unit, onCreateCategory: (CreateCategoryData) -&gt; Unit, onEditCategory: (Category) -&gt; Unit, onPayPlannedPayment: () -&gt; Unit, onSave: (closeScreen: Boolean) -&gt; Unit, onSetHasChanges: (hasChanges: Boolean) -&gt; Unit, onDelete: () -&gt; Unit, onCreateAccount: (CreateAccountData) -&gt; Unit, onExchangeRateChanged: (Double?) -&gt; Unit = { }, loanData: EditTransactionDisplayLoan = EditTransactionDisplayLoan(), backgroundProcessing: Boolean = false, hasChanges: Boolean = false, )</ID>
     <ID>LongMethod:FilterOverlay.kt$@Composable fun BoxWithConstraintsScope.FilterOverlay( visible: Boolean, baseCurrency: String, accounts: List&lt;Account&gt;, categories: List&lt;Category&gt;, filter: ReportFilter?, onClose: () -&gt; Unit, onSetFilter: (ReportFilter?) -&gt; Unit )</ID>
     <ID>LongMethod:ImportResultUI.kt$@Composable fun ImportResultUI( result: ImportResult, launchedFromOnboarding: Boolean, isManualCsvImport: Boolean = false, onTryAgain: (() -&gt; Unit)? = null, onFinish: () -&gt; Unit )</ID>
-    <ID>LongMethod:LoanDetailsScreen.kt$@Composable private fun LoanInfoCard( loan: Loan, baseCurrency: String, amountPaid: Double, loanAmountPaid: Double = 0.0, selectedLoanAccount: Account? = null, onAddRecord: () -&gt; Unit )</ID>
     <ID>LongMethod:LoanModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun BoxWithConstraintsScope.LoanModal( accounts: List&lt;Account&gt; = emptyList(), onCreateAccount: (CreateAccountData) -&gt; Unit = {}, modal: LoanModalData?, onCreateLoan: (CreateLoanData) -&gt; Unit, onEditLoan: (Loan, Boolean) -&gt; Unit, onPerformCalculations: () -&gt; Unit = {}, dismiss: () -&gt; Unit, )</ID>
     <ID>LongMethod:LoanRecordModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun BoxWithConstraintsScope.LoanRecordModal( modal: LoanRecordModalData?, accounts: List&lt;Account&gt; = emptyList(), onCreateAccount: (CreateAccountData) -&gt; Unit = {}, onCreate: (CreateLoanRecordData) -&gt; Unit, onEdit: (EditLoanRecordData) -&gt; Unit, onDelete: (LoanRecord) -&gt; Unit, dismiss: () -&gt; Unit )</ID>
     <ID>LongMethod:MainBottomBar.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun BoxWithConstraintsScope.BottomBar( tab: MainTab, selectTab: (MainTab) -&gt; Unit, onAddIncome: () -&gt; Unit, onAddExpense: () -&gt; Unit, onAddTransfer: () -&gt; Unit, onAddPlannedPayment: () -&gt; Unit, showAddAccountModal: () -&gt; Unit, )</ID>
@@ -4408,7 +4406,6 @@
     <ID>ModifierMissing:Title.kt$Title</ID>
     <ID>ModifierMissing:Toolbar.kt$Toolbar</ID>
     <ID>ModifierMissing:TransactionCard.kt$TransactionCard</ID>
-    <ID>ModifierMissing:TransactionCard.kt$TypeAmountCurrency</ID>
     <ID>ModifierMissing:TransactionSectionDivider.kt$SectionDivider</ID>
     <ID>ModifierMissing:WalletBalanceWidgetContent.kt$BalanceSection</ID>
     <ID>ModifierMissing:WalletBalanceWidgetContent.kt$ButtonsSection</ID>

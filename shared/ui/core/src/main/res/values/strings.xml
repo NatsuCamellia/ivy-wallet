@@ -82,6 +82,10 @@
     <string name="add_account">Add account</string>
     <string name="no_accounts">No accounts</string>
     <string name="no_accounts_description">You don\'t have any accounts yet.\nYou can add one by tapping the \"+\" button.</string>
+    <string name="no_categories">No categories</string>
+    <string name="no_categories_description">You don\'t have any categories yet.\nTap the \"Add category\" button to add one.</string>
+    <string name="no_categories_for_search">No categories match your search.</string>
+    <string name="search_categories">Search categories</string>
     <string name="income_title">Income title</string>
     <string name="expense_title">Expense title</string>
     <string name="transfer_title">Transfer title</string>

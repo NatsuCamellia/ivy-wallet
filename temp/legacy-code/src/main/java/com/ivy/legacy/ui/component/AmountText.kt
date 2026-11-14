@@ -19,6 +19,15 @@ import com.ivy.base.model.TransactionType
 import com.ivy.legacy.utils.format
 import kotlin.math.abs
 
+/** The amount and its currency code. A zero amount is never signed, even as -0.0 or a rounded-down negative. */
+fun amountLabel(amount: Double, currency: String, showPlusSign: Boolean = false): String {
+    val formatted = amount.format(currency)
+    val isZero = formatted.none { (it.digitToIntOrNull() ?: 0) > 0 }
+    val sign = if (showPlusSign && amount > 0 && !isZero) "+" else ""
+    val digits = if (isZero) formatted.trimStart('-') else formatted
+    return "$sign$digits $currency"
+}
+
 /** An amount followed by its currency code. Never truncates; it wraps when the space is short. */
 @Composable
 fun AmountText(
@@ -28,14 +37,17 @@ fun AmountText(
     style: TextStyle = LocalTextStyle.current,
     showPlusSign: Boolean = false,
 ) {
-    val sign = if (showPlusSign && amount > 0) "+" else ""
     Text(
-        text = "$sign${amount.format(currency)} $currency",
+        text = amountLabel(amount, currency, showPlusSign),
         modifier = modifier.testTag("amount_text"),
         style = style,
         textAlign = TextAlign.End,
     )
 }
+
+/** The amount with its type's sign: expenses are negative, the other types keep theirs. */
+fun signedAmount(type: TransactionType, amount: Double): Double =
+    if (type == TransactionType.EXPENSE) 0.0 - abs(amount) else amount
 
 /** The type icon and the signed amount in the type colour: expenses are negative, incomes get a plus. */
 @Composable
@@ -57,7 +69,7 @@ fun TypeAmount(
             tint = type.color(),
         )
         AmountText(
-            amount = if (type == TransactionType.EXPENSE) -abs(amount) else amount,
+            amount = signedAmount(type, amount),
             currency = currency,
             style = MaterialTheme.typography.titleMediumEmphasized.copy(color = type.color()),
             showPlusSign = type == TransactionType.INCOME,

@@ -39,4 +39,18 @@ class CategoriesScreenPaparazziTest(
             CategoriesScreenWithSearchBarCompactUiTest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotCategoriesEmpty() {
+        snapshot(theme) {
+            CategoriesScreenEmptyUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotCategoriesHugeAmount() {
+        snapshot(theme) {
+            CategoriesScreenHugeAmountUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

@@ -104,6 +104,7 @@ private fun Hub(
 
     Column(
         modifier = modifier
+            // the hub is half the pie diameter, so RADIUS_DP (the pie radius) is used as its diameter
             .size(RADIUS_DP.dp)
             .background(MaterialTheme.colorScheme.surface, CircleShape)
             .padding(8.dp),

@@ -1039,6 +1039,58 @@ flow_reports() {
   return 0
 }
 
+# Home More -> Categories: the top bar has back, sort and reorder, the add button is a FAB; add a category through the
+# Create category sheet, it is listed and opens its transactions, back returns to the list; Sort by opens and closes;
+# the reorder sheet opens and Done closes it; back returns to the open More sheet. Needs the Groceries category.
+flow_categories() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Categories" || return 1
+  wait_for desc exact "Add category" || return 1
+  has desc exact "Back" && has desc exact "Sort by" && has desc exact "Reorder" || { log "categories top bar buttons missing"; return 1; }
+  has text exact "Groceries" || { log "seeded category missing"; return 1; }
+  shot categories-1-list
+  tap_node desc exact "Add category" || return 1
+  wait_for text exact "Create category" || { log "category sheet did not open"; return 1; }
+  tap_node class exact android.widget.EditText || return 1
+  adb shell input text smokecat
+  sleep 1
+  shot categories-2-sheet
+  tap_node text exact "Add" || return 1
+  wait_gone text exact "Create category" || { log "Add did not close the category sheet"; return 1; }
+  # the new category is last in the list: scroll until it is on screen
+  local w h i
+  w=$(screen_width); h=$(screen_height)
+  for i in 1 2 3 4 5 6; do
+    sleep 1
+    dump || return 1
+    has text exact "smokecat" && break
+    adb shell input swipe $((w / 2)) $((h * 70 / 100)) $((w / 2)) $((h * 30 / 100)) 300 </dev/null
+  done
+  has text exact "smokecat" || { log "new category missing from the list"; return 1; }
+  shot categories-3-created
+  tap_node text exact "smokecat" || return 1
+  wait_for desc exact "Edit" || { log "category transactions did not open"; return 1; }
+  has text exact "smokecat" || { log "category name missing on its transactions screen"; return 1; }
+  back
+  wait_for desc exact "Add category" || { log "back from the category should return to the list"; return 1; }
+  tap_node desc exact "Sort by" || return 1
+  wait_for text exact "Sort by" || { log "sort sheet did not open"; return 1; }
+  shot categories-4-sort
+  tap_node desc exact "Close" || return 1
+  wait_gone text exact "Sort by" || { log "Close did not dismiss the sort sheet"; return 1; }
+  tap_node desc exact "Reorder" || return 1
+  wait_for text exact "Done" || { log "reorder sheet did not open"; return 1; }
+  shot categories-5-reorder
+  tap_node text exact "Done" || return 1
+  wait_gone text exact "Done" || { log "Done did not close the reorder sheet"; return 1; }
+  back
+  wait_for text exact "Quick access" || { log "back from Categories should return to the open More sheet"; return 1; }
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -1066,7 +1118,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories}; do
   run_flow "$flow"
 done
 

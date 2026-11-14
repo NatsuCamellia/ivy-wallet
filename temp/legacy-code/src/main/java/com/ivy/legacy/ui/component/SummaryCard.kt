@@ -23,7 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ivy.base.model.TransactionType
-import com.ivy.legacy.utils.format
 import com.ivy.ui.R
 
 /** Income or expense total with the number of transactions, and an optional add button. */
@@ -62,8 +61,7 @@ fun SummaryCard(
             }
 
             Text(
-                text = "${if (type == TransactionType.INCOME && amount > 0) "+" else ""}" +
-                    "${amount.format(currency)} $currency",
+                text = amountLabel(amount, currency, showPlusSign = type == TransactionType.INCOME),
                 style = MaterialTheme.typography.titleMediumEmphasized,
                 color = type.color(),
             )

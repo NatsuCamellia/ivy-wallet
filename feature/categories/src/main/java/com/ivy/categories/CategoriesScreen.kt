@@ -1,99 +1,98 @@
 package com.ivy.categories
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Paid
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.SwapVert
+import androidx.compose.material.icons.outlined.Category
+import androidx.compose.material3.Card
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
-import com.ivy.legacy.IvyWalletPreview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.ivy.base.legacy.Theme
+import com.ivy.base.model.TransactionType
 import com.ivy.data.model.Category
 import com.ivy.data.model.CategoryId
 import com.ivy.data.model.primitive.ColorInt
 import com.ivy.data.model.primitive.IconAsset
 import com.ivy.data.model.primitive.NotBlankTrimmedString
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.legacy.ui.SearchInput
-import com.ivy.legacy.utils.balancePrefix
-import com.ivy.legacy.utils.compactBalancePrefix
-import com.ivy.legacy.utils.format
-import com.ivy.legacy.utils.selectEndTextFieldValue
+import com.ivy.legacy.ivyWalletCtx
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.AmountText
+import com.ivy.legacy.ui.component.IconBadge
+import com.ivy.legacy.ui.component.color
+import com.ivy.legacy.ui.component.signedAmount
+import com.ivy.legacy.ui.component.transaction.EmptyState
+import com.ivy.legacy.ui.sheet.ActionSheet
+import com.ivy.legacy.ui.sheet.CategoryModal
+import com.ivy.legacy.ui.sheet.CategoryModalData
+import com.ivy.legacy.ui.sheet.ReorderModalSingleType
 import com.ivy.navigation.CategoriesScreen
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.TransactionsScreen
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
-import com.ivy.ui.rememberScrollPositionListState
-import com.ivy.wallet.domain.data.SortOrder
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.GreenDark
 import com.ivy.ui.color.GreenLight
 import com.ivy.ui.color.IvyDark
 import com.ivy.ui.color.Orange
-import com.ivy.wallet.ui.theme.components.BalanceRow
-import com.ivy.wallet.ui.theme.components.CircleButtonFilled
-import com.ivy.wallet.ui.theme.components.ItemIconSDefaultIcon
-import com.ivy.legacy.ui.sheet.ReorderButton
-import com.ivy.legacy.ui.sheet.ReorderModalSingleType
-import com.ivy.ui.color.findContrastTextColor
-import com.ivy.legacy.ui.WalletPreview
-import com.ivy.legacy.ui.sheet.ActionSheet
-import com.ivy.legacy.ui.sheet.CategoryModal
-import com.ivy.legacy.ui.sheet.CategoryModalData
-import com.ivy.wallet.ui.theme.toComposeColor
-import com.ivy.wallet.ui.theme.wallet.AmountCurrencyB1
+import com.ivy.ui.component.BackButton
+import com.ivy.ui.rememberScrollPositionListState
+import com.ivy.wallet.domain.data.SortOrder
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import java.util.UUID
 
 @Composable
-fun BoxWithConstraintsScope.CategoriesScreen(screen: CategoriesScreen) {
+fun CategoriesScreen(screen: CategoriesScreen) {
     val viewModel: CategoriesViewModel = screenScopedViewModel()
     val state = viewModel.uiState()
 
@@ -104,15 +103,14 @@ fun BoxWithConstraintsScope.CategoriesScreen(screen: CategoriesScreen) {
 }
 
 @Composable
-private fun BoxWithConstraintsScope.UI(
-    state: CategoriesScreenState = CategoriesScreenState(
-        compactCategoriesModeEnabled = false,
-        showCategorySearchBar = false
-    ),
+private fun UI(
+    state: CategoriesScreenState,
+    modifier: Modifier = Modifier,
     onEvent: (CategoriesScreenEvent) -> Unit = {}
 ) {
     val nav = navigation()
-    val ivyContext = com.ivy.legacy.ivyWalletCtx()
+    val ivyContext = ivyWalletCtx()
+    var query by rememberSaveable { mutableStateOf("") }
     var listState = rememberLazyListState()
     if (!state.categories.isEmpty()) {
         listState = rememberScrollPositionListState(
@@ -123,90 +121,103 @@ private fun BoxWithConstraintsScope.UI(
                 ?: 0
         )
     }
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-        state = listState
-    ) {
-        item {
-            Spacer(Modifier.height(32.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Spacer(Modifier.width(24.dp))
-
-                Text(
-                    text = stringResource(R.string.categories),
-                    style = UI.typo.h2.style(
-                        color = UI.colors.pureInverse,
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                )
-
-                Spacer(Modifier.weight(1f))
-
-                CircleButtonFilled(
-                    icon = R.drawable.ic_sort_by_alpha_24,
-                    onClick = {
-                        onEvent(CategoriesScreenEvent.OnSortOrderModalVisible(visible = true))
-                    },
-                    clickAreaPadding = 12.dp
-                )
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                ReorderButton {
-                    onEvent(CategoriesScreenEvent.OnReorderModalVisible(true))
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.categories)) },
+                navigationIcon = { BackButton(onClick = { nav.back() }) },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            onEvent(CategoriesScreenEvent.OnSortOrderModalVisible(visible = true))
+                        }
+                    ) {
+                        Icon(Icons.Default.SortByAlpha, contentDescription = stringResource(R.string.sort_by))
+                    }
+                    IconButton(
+                        onClick = { onEvent(CategoriesScreenEvent.OnReorderModalVisible(true)) },
+                        modifier = Modifier.testTag("reorder_button")
+                    ) {
+                        Icon(Icons.Default.SwapVert, contentDescription = stringResource(R.string.reorder))
+                    }
                 }
-
-                Spacer(Modifier.width(24.dp))
-            }
-
-            if (state.showCategorySearchBar) {
-                Spacer(Modifier.height(16.dp))
-                SearchField(onSearch = { onEvent(CategoriesScreenEvent.OnSearchQueryUpdate(it)) })
-            }
-            Spacer(Modifier.height(16.dp))
-        }
-
-        items(state.categories, key = { it.category.id.value }) { categoryData ->
-            CategoryCard(
-                currency = state.baseCurrency,
-                categoryData = categoryData,
-                compactModeEnabled = state.compactCategoriesModeEnabled,
-                onLongClick = {
-                    onEvent(CategoriesScreenEvent.OnReorderModalVisible(true))
-                }
-            ) {
-                nav.navigateTo(
-                    TransactionsScreen(
-                        accountId = null,
-                        categoryId = categoryData.category.id.value
-                    )
-                )
-            }
-        }
-
-        item {
-            Spacer(Modifier.height(150.dp)) // scroll hack
-        }
-    }
-    CategoriesBottomBar(
-        onAddCategory = {
-            onEvent(
-                CategoriesScreenEvent.OnCategoryModalVisible(
-                    CategoryModalData(category = null)
-                )
             )
         },
-        onClose = {
-            nav.back()
-        },
-    )
+        floatingActionButton = {
+            val addLabel = stringResource(R.string.add_category)
+            ExtendedFloatingActionButton(
+                onClick = {
+                    onEvent(
+                        CategoriesScreenEvent.OnCategoryModalVisible(
+                            CategoryModalData(category = null)
+                        )
+                    )
+                },
+                icon = { Icon(Icons.Default.Add, contentDescription = null) },
+                text = { Text(addLabel) },
+                modifier = Modifier
+                    .testTag("categories_add")
+                    .semantics { contentDescription = addLabel }
+            )
+        }
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            state = listState,
+            contentPadding = PaddingValues(
+                top = innerPadding.calculateTopPadding(),
+                // clears the add button that the Scaffold draws over the list
+                bottom = innerPadding.calculateBottomPadding() + LocalMinimumInteractiveComponentSize.current * 2
+            ),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if (state.showCategorySearchBar) {
+                item(key = "search") {
+                    SearchField(
+                        query = query,
+                        onQueryChange = {
+                            query = it
+                            onEvent(CategoriesScreenEvent.OnSearchQueryUpdate(it))
+                        }
+                    )
+                }
+            }
+            if (state.categories.isEmpty()) {
+                item(key = "empty") {
+                    EmptyState(
+                        emptyStateTitle = stringResource(R.string.no_categories),
+                        emptyStateText = stringResource(
+                            if (query.isEmpty()) {
+                                R.string.no_categories_description
+                            } else {
+                                R.string.no_categories_for_search
+                            }
+                        ),
+                        icon = Icons.Outlined.Category,
+                    )
+                }
+            }
+            items(state.categories, key = { it.category.id.value }) { categoryData ->
+                CategoryCard(
+                    currency = state.baseCurrency,
+                    categoryData = categoryData,
+                    compactModeEnabled = state.compactCategoriesModeEnabled,
+                    onClick = {
+                        nav.navigateTo(
+                            TransactionsScreen(
+                                accountId = null,
+                                categoryId = categoryData.category.id.value
+                            )
+                        )
+                    }
+                )
+            }
+        }
+    }
 
     ReorderModalSingleType(
         visible = state.reorderModalVisible,
@@ -218,17 +229,13 @@ private fun BoxWithConstraintsScope.UI(
             onEvent(CategoriesScreenEvent.OnReorder(it))
         }
     ) { _, item ->
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(end = 24.dp)
-                .padding(vertical = 8.dp),
-            text = item.category.name.value,
-            style = UI.typo.b1.style(
-                color = item.category.color.value.toComposeColor(),
-                fontWeight = FontWeight.Bold
-            )
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            CategoryBadge(item.category)
+            Text(text = item.category.name.value, style = MaterialTheme.typography.bodyLarge)
+        }
     }
 
     CategoryModal(
@@ -256,308 +263,118 @@ private fun BoxWithConstraintsScope.UI(
 }
 
 @Composable
+private fun SearchField(
+    query: String,
+    onQueryChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        modifier = modifier.fillMaxWidth(),
+        placeholder = { Text(stringResource(R.string.search_categories)) },
+        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+        trailingIcon = if (query.isNotEmpty()) {
+            {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.clear_search))
+                }
+            }
+        } else {
+            null
+        },
+        singleLine = true,
+    )
+}
+
+@Composable
 private fun CategoryCard(
     currency: String,
     categoryData: CategoryData,
     compactModeEnabled: Boolean,
-    onLongClick: () -> Unit,
-    onClick: () -> Unit
-) {
-    val contrastColor = findContrastTextColor(categoryData.category.color.value.toComposeColor())
-
-    if (!compactModeEnabled) {
-        Spacer(Modifier.height(16.dp))
-        DefaultCategoryCard(onClick, categoryData, currency)
-    } else {
-        Spacer(Modifier.height(8.dp))
-        CompactCategoryCard(
-            categoryData = categoryData,
-            contrastColor = contrastColor,
-            currency = currency,
-            onClick = onClick
-        )
-    }
-}
-
-@Composable
-private fun DefaultCategoryCard(
     onClick: () -> Unit,
-    categoryData: CategoryData,
-    currency: String
-) {
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth()
-            .clip(UI.shapes.r4)
-            .border(2.dp, UI.colors.medium, UI.shapes.r4)
-            .clickable(
-                onClick = onClick
-            )
-    ) {
-        CategoryHeader(
-            categoryData = categoryData,
-            currency = currency,
-            contrastColor = findContrastTextColor(categoryData.category.color.value.toComposeColor())
-        )
-
-        Spacer(Modifier.height(12.dp))
-
-        // Emitting content
-        AddedSpent(
-            currency = currency,
-            monthlyIncome = categoryData.monthlyIncome,
-            monthlyExpenses = categoryData.monthlyExpenses
-        )
-
-        Spacer(Modifier.height(12.dp))
-    }
-}
-
-@Composable
-private fun CompactCategoryCard(
-    categoryData: CategoryData,
-    contrastColor: Color,
-    currency: String,
-    onClick: () -> Unit
-) {
-    val category = categoryData.category
-    val balancePrefixValue = compactBalancePrefix(
-        income = categoryData.monthlyIncome,
-        expenses = categoryData.monthlyExpenses
-    )
-
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .border(2.dp, UI.colors.medium, UI.shapes.r4)
-            .clickable(
-                onClick = onClick
-            ),
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(all = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(category.color.value.toComposeColor()),
-                contentAlignment = Alignment.Center,
-            ) {
-                ItemIconSDefaultIcon(
-                    iconName = category.icon?.id,
-                    defaultIcon = R.drawable.ic_custom_account_s,
-                    tint = contrastColor
-                )
-            }
-
-            Row(
-                modifier =
-                Modifier
-                    .padding(horizontal = 8.dp)
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = category.name.value,
-                    style = UI.typo.b2.style(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Format the monthly balance according to the currency format and remove
-                    // any '+' or '-' signs that might be included from the prefix to ensure
-                    // a clean and consistent representation.
-                    val currencyFormatted =
-                        categoryData.monthlyBalance.format(currency).replace(Regex("[+-]"), "")
-
-                    Text(
-                        text = "$balancePrefixValue$currencyFormatted",
-                        style = UI.typo.nB1.style(
-                            color = UI.colors.pureInverse,
-                            fontWeight = FontWeight.Bold
-                        )
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = currency,
-                        style = UI.typo.nB2.style(
-                            color = UI.colors.pureInverse,
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun AddedSpent(
-    monthlyIncome: Double,
-    monthlyExpenses: Double,
-    currency: String,
     modifier: Modifier = Modifier,
-    textColor: Color = UI.colors.pureInverse,
-    dividerColor: Color = UI.colors.medium,
-    center: Boolean = true,
-    dividerSpacer: Dp? = null,
-
-    ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        if (center) {
-            Spacer(Modifier.weight(1f))
+) {
+    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
+        ListItem(
+            leadingContent = { CategoryBadge(categoryData.category) },
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        ) {
+            NameAndBalance(categoryData, currency)
         }
 
-        LabelAmount(
-            textColor = textColor,
-            label = stringResource(R.string.month_expenses),
-            amount = monthlyExpenses,
-            currency = currency,
-            center = center
-        )
-
-        if (center) {
-            Spacer(Modifier.weight(1f))
-        }
-
-        if (dividerSpacer != null) {
-            Spacer(modifier = Modifier.width(dividerSpacer))
-        }
-
-        // Divider
-        Spacer(
-            modifier = Modifier
-                .width(2.dp)
-                .height(48.dp)
-                .background(dividerColor, UI.shapes.rFull)
-        )
-
-        if (center) {
-            Spacer(Modifier.weight(1f))
-        }
-
-        if (dividerSpacer != null) {
-            Spacer(modifier = Modifier.width(dividerSpacer))
-        }
-
-        LabelAmount(
-            textColor = textColor,
-            label = stringResource(R.string.month_income),
-            amount = monthlyIncome,
-            currency = currency,
-            center = center
-        )
-
-        if (center) {
-            Spacer(Modifier.weight(1f))
+        if (!compactModeEnabled) {
+            Row {
+                LabelledAmount(
+                    label = stringResource(R.string.month_income),
+                    amount = categoryData.monthlyIncome,
+                    currency = currency,
+                    amountColor = TransactionType.INCOME.color(),
+                    showPlusSign = true,
+                    modifier = Modifier.weight(1f)
+                )
+                LabelledAmount(
+                    label = stringResource(R.string.month_expenses),
+                    amount = signedAmount(TransactionType.EXPENSE, categoryData.monthlyExpenses),
+                    currency = currency,
+                    amountColor = TransactionType.EXPENSE.color(),
+                    modifier = Modifier.weight(1f)
+                )
+            }
         }
     }
 }
 
+/** The name and the balance share a line; when the balance is too wide for that it moves to its own line. */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun LabelAmount(
+private fun NameAndBalance(categoryData: CategoryData, currency: String) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = categoryData.category.name.value,
+            modifier = Modifier.weight(1f)
+        )
+        AmountText(
+            amount = categoryData.monthlyBalance,
+            currency = currency,
+            style = MaterialTheme.typography.titleMediumEmphasized,
+            showPlusSign = true,
+        )
+    }
+}
+
+@Composable
+private fun LabelledAmount(
     label: String,
     amount: Double,
     currency: String,
-    textColor: Color,
-    center: Boolean
+    amountColor: Color,
+    modifier: Modifier = Modifier,
+    showPlusSign: Boolean = false,
 ) {
-    Column(
-        horizontalAlignment = if (center) Alignment.CenterHorizontally else Alignment.Start
+    ListItem(
+        modifier = modifier,
+        overlineContent = { Text(label) },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     ) {
-        Text(
-            text = label,
-            style = UI.typo.c.style(
-                color = textColor,
-                fontWeight = FontWeight.ExtraBold
-            )
+        AmountText(
+            amount = amount,
+            currency = currency,
+            style = MaterialTheme.typography.titleSmall.copy(color = amountColor),
+            showPlusSign = showPlusSign,
         )
-
-        Spacer(Modifier.height(4.dp))
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            AmountCurrencyB1(
-                textColor = textColor,
-                amount = amount,
-                currency = currency
-            )
-        }
     }
 }
 
 @Composable
-private fun CategoryHeader(
-    categoryData: CategoryData,
-    currency: String,
-    contrastColor: Color,
-) {
-    val category = categoryData.category
-    val balancePrefixValue = balancePrefix(
-        income = categoryData.monthlyIncome,
-        expenses = categoryData.monthlyExpenses
+private fun CategoryBadge(category: Category) {
+    IconBadge(
+        color = Color(category.color.value),
+        iconName = category.icon?.id,
+        defaultIcon = R.drawable.ic_custom_category_m,
     )
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(category.color.value.toComposeColor(), UI.shapes.r4Top)
-    ) {
-        Spacer(Modifier.height(16.dp))
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Spacer(Modifier.width(20.dp))
-
-            ItemIconSDefaultIcon(
-                iconName = category.icon?.id,
-                defaultIcon = R.drawable.ic_custom_category_s,
-                tint = contrastColor
-            )
-
-            Spacer(Modifier.width(8.dp))
-
-            Text(
-                text = category.name.value,
-                style = UI.typo.b1.style(
-                    color = contrastColor,
-                    fontWeight = FontWeight.ExtraBold
-                )
-            )
-        }
-
-        Spacer(Modifier.height(4.dp))
-
-        BalanceRow(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-
-            textColor = contrastColor,
-            currency = currency,
-            balance = categoryData.monthlyBalance,
-
-            balanceFontSize = 30.sp,
-            currencyFontSize = 30.sp,
-
-            currencyUpfront = false,
-            balanceAmountPrefix = balancePrefixValue
-        )
-
-        Spacer(Modifier.height(16.dp))
-    }
 }
 
 @Composable
@@ -624,235 +441,94 @@ fun SortModal(
 
 @Preview
 @Composable
-private fun PreviewCategoriesCompactModeEnabled(theme: Theme = Theme.LIGHT) {
-    Preview(theme = theme, compactModeEnabled = true)
-}
-
-@Preview
-@Composable
-private fun PreviewCategoriesCompactModeEnabledAndSearchBarEnabled(theme: Theme = Theme.LIGHT) {
-    Preview(theme = theme, compactModeEnabled = true, displaySearchBarEnabled = true)
-}
-
-@Preview
-@Composable
-private fun Preview(
+private fun PreviewCategories(
     theme: Theme = Theme.LIGHT,
     compactModeEnabled: Boolean = false,
-    displaySearchBarEnabled: Boolean = false
+    searchBarEnabled: Boolean = false,
+    empty: Boolean = false,
+    hugeAmountOnly: Boolean = false,
 ) {
-    IvyWalletPreview(theme) {
-        val state = CategoriesScreenState(
-            baseCurrency = "BGN",
-            compactCategoriesModeEnabled = compactModeEnabled,
-            showCategorySearchBar = displaySearchBarEnabled,
-            categories = persistentListOf(
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Groceries"),
-                        color = ColorInt(Green.toArgb()),
-                        icon = IconAsset.unsafe("groceries"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 2125.0,
-                    monthlyExpenses = 920.0,
-                    monthlyIncome = 3045.0
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Fun"),
-                        color = ColorInt(Orange.toArgb()),
-                        icon = IconAsset.unsafe("game"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 1200.0,
-                    monthlyExpenses = 750.0,
-                    monthlyIncome = 0.0
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Ivy"),
-                        color = ColorInt(IvyDark.toArgb()),
-                        icon = IconAsset.unsafe("star"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 1200.0,
-                    monthlyExpenses = 0.0,
-                    monthlyIncome = 5000.0
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Food"),
-                        color = ColorInt(GreenLight.toArgb()),
-                        icon = IconAsset.unsafe("atom"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 12125.21,
-                    monthlyExpenses = 1350.50,
-                    monthlyIncome = 8000.48
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Shisha"),
-                        color = ColorInt(GreenDark.toArgb()),
-                        icon = IconAsset.unsafe("drink"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 820.0,
-                    monthlyExpenses = 340.0,
-                    monthlyIncome = 400.0
-                ),
-
+    WalletPreview(theme) {
+        NavigationRoot(navigation = Navigation()) {
+            UI(
+                state = CategoriesScreenState(
+                    baseCurrency = "BGN",
+                    compactCategoriesModeEnabled = compactModeEnabled,
+                    showCategorySearchBar = searchBarEnabled,
+                    categories = previewCategories(empty = empty, hugeAmountOnly = hugeAmountOnly),
                 )
-        )
-        UI(state = state)
-    }
-}
-
-@Preview
-@Composable
-private fun PreviewWithSearchBarEnabled(
-    theme: Theme = Theme.LIGHT,
-    compactModeEnabled: Boolean = false,
-    displaySearchBarEnabled: Boolean = true
-) {
-    IvyWalletPreview(theme) {
-        val state = CategoriesScreenState(
-            baseCurrency = "BGN",
-            compactCategoriesModeEnabled = compactModeEnabled,
-            showCategorySearchBar = displaySearchBarEnabled,
-            categories = persistentListOf(
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Groceries"),
-                        color = ColorInt(Green.toArgb()),
-                        icon = IconAsset.unsafe("groceries"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 2125.0,
-                    monthlyExpenses = 920.0,
-                    monthlyIncome = 3045.0
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Fun"),
-                        color = ColorInt(Orange.toArgb()),
-                        icon = IconAsset.unsafe("game"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 1200.0,
-                    monthlyExpenses = 750.0,
-                    monthlyIncome = 0.0
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Ivy"),
-                        color = ColorInt(IvyDark.toArgb()),
-                        icon = IconAsset.unsafe("star"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 1200.0,
-                    monthlyExpenses = 0.0,
-                    monthlyIncome = 5000.0
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Food"),
-                        color = ColorInt(GreenLight.toArgb()),
-                        icon = IconAsset.unsafe("atom"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 12125.21,
-                    monthlyExpenses = 1350.50,
-                    monthlyIncome = 8000.48
-                ),
-                CategoryData(
-                    category = Category(
-                        id = CategoryId(UUID.randomUUID()),
-                        name = NotBlankTrimmedString.unsafe("Shisha"),
-                        color = ColorInt(GreenDark.toArgb()),
-                        icon = IconAsset.unsafe("drink"),
-                        orderNum = 0.0,
-                    ),
-                    monthlyBalance = 820.0,
-                    monthlyExpenses = 340.0,
-                    monthlyIncome = 400.0
-                ),
-
-                )
-        )
-        UI(state = state)
-    }
-}
-
-@Composable
-private fun SearchField(
-    onSearch: (String) -> Unit,
-) {
-    var searchQueryTextFieldValue by remember {
-        mutableStateOf(selectEndTextFieldValue(""))
-    }
-
-    SearchInput(
-        searchQueryTextFieldValue = searchQueryTextFieldValue,
-        hint = "Search categories",
-        focus = false,
-        showClearIcon = searchQueryTextFieldValue.text.isNotEmpty(),
-        onSetSearchQueryTextField = {
-            searchQueryTextFieldValue = it
-            onSearch(it.text)
+            )
         }
+    }
+}
+
+@Suppress("MagicNumber", "LongMethod")
+private fun previewCategories(empty: Boolean, hugeAmountOnly: Boolean): ImmutableList<CategoryData> {
+    fun category(name: String, color: Color, icon: String?) = Category(
+        id = CategoryId(UUID.randomUUID()),
+        name = NotBlankTrimmedString.unsafe(name),
+        color = ColorInt(color.toArgb()),
+        icon = icon?.let { IconAsset.unsafe(it) },
+        orderNum = 0.0,
     )
+
+    val hugeAmount = CategoryData(
+        category("Long-term savings and investments for the whole family", Color(0xFF6200EE), null),
+        monthlyBalance = 123456789012.34,
+        monthlyExpenses = 98765432.1,
+        monthlyIncome = 123456789.01
+    )
+    return when {
+        empty -> persistentListOf()
+        hugeAmountOnly -> persistentListOf(hugeAmount)
+        else -> persistentListOf(
+            CategoryData(category("Groceries", Green, "groceries"), 2125.0, 920.0, 3045.0),
+            CategoryData(category("Fun", Orange, "game"), -750.0, 750.0, 0.0),
+            CategoryData(category("Ivy", IvyDark, "star"), 5000.0, 0.0, 5000.0),
+            CategoryData(category("Food", GreenLight, "atom"), 12125.21, 1350.50, 8000.48),
+            CategoryData(category("Shisha", GreenDark, null), 0.0, 0.0, 0.0),
+            hugeAmount,
+        )
+    }
 }
 
 /** For screenshot testing */
 @Composable
 fun CategoriesScreenUiTest(isDark: Boolean) {
-    val theme = when (isDark) {
-        true -> Theme.DARK
-        false -> Theme.LIGHT
-    }
-    Preview(theme)
+    PreviewCategories(theme = isDark.theme())
 }
 
 /** For screenshot testing */
 @Composable
 fun CategoriesScreenWithSearchBarUiTest(isDark: Boolean) {
-    val theme = when (isDark) {
-        true -> Theme.DARK
-        false -> Theme.LIGHT
-    }
-    Preview(theme = theme, displaySearchBarEnabled = true)
+    PreviewCategories(theme = isDark.theme(), searchBarEnabled = true)
 }
 
 /** For screenshot testing */
 @Composable
 fun CategoriesScreenCompactUiTest(isDark: Boolean) {
-    val theme = when (isDark) {
-        true -> Theme.DARK
-        false -> Theme.LIGHT
-    }
-    Preview(theme, compactModeEnabled = true)
+    PreviewCategories(theme = isDark.theme(), compactModeEnabled = true)
 }
 
 /** For screenshot testing */
 @Composable
 fun CategoriesScreenWithSearchBarCompactUiTest(isDark: Boolean) {
-    val theme = when (isDark) {
-        true -> Theme.DARK
-        false -> Theme.LIGHT
-    }
-    Preview(theme, compactModeEnabled = true, displaySearchBarEnabled = true)
+    PreviewCategories(theme = isDark.theme(), compactModeEnabled = true, searchBarEnabled = true)
 }
+
+/** For screenshot testing */
+@Composable
+fun CategoriesScreenEmptyUiTest(isDark: Boolean) {
+    PreviewCategories(theme = isDark.theme(), empty = true)
+}
+
+/** For screenshot testing */
+@Composable
+fun CategoriesScreenHugeAmountUiTest(isDark: Boolean) {
+    PreviewCategories(theme = isDark.theme(), hugeAmountOnly = true)
+}
+
+private fun Boolean.theme(): Theme = if (this) Theme.DARK else Theme.LIGHT
 
 /** For screenshot testing */
 @Composable

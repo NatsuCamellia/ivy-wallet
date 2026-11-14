@@ -39,6 +39,7 @@ import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.AmountText
 import com.ivy.legacy.ui.component.IconBadge
 import com.ivy.legacy.ui.component.color
+import com.ivy.legacy.ui.component.signedAmount
 import com.ivy.legacy.ui.component.transaction.EmptyState
 import com.ivy.legacy.ui.sheet.ChoosePeriodModal
 import com.ivy.legacy.utils.format
@@ -67,7 +68,6 @@ import com.ivy.wallet.ui.theme.wallet.PeriodSelector
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import java.util.UUID
-import kotlin.math.abs
 
 @Composable
 fun PieChartStatisticScreen(
@@ -140,7 +140,7 @@ private fun UI(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     AmountText(
-                        amount = signed(type, state.totalAmount),
+                        amount = signedAmount(type, state.totalAmount),
                         currency = state.baseCurrency,
                         modifier = gutter.testTag("piechart_total_amount"),
                         style = MaterialTheme.typography.displaySmallEmphasized.copy(color = type.color()),
@@ -214,9 +214,6 @@ private fun UI(
     }
 }
 
-private fun signed(type: TransactionType, amount: Double): Double =
-    if (type == TransactionType.EXPENSE) 0.0 - abs(amount) else amount
-
 @Composable
 private fun emptyText(state: PieChartStatisticState): String {
     if (state.showCloseButtonOnly) return stringResource(R.string.no_transactions_for_your_filter)
@@ -262,7 +259,7 @@ private fun CategoryAmountRow(
         supportingContent = { PercentText(amount = categoryAmount.amount, totalAmount = totalAmount) },
         trailingContent = {
             AmountText(
-                amount = signed(type, categoryAmount.amount),
+                amount = signedAmount(type, categoryAmount.amount),
                 currency = currency,
                 style = MaterialTheme.typography.titleMedium.copy(color = type.color()),
                 showPlusSign = type == TransactionType.INCOME,

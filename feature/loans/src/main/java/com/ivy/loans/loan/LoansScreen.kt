@@ -293,7 +293,13 @@ private fun LoanItem(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = stringResource(if (paidOff) R.string.loan_paid_off else R.string.loan_left_to_pay),
+                text = stringResource(
+                    when {
+                        paidOff -> R.string.loan_paid_off
+                        loan.type == LoanType.LEND -> R.string.loan_left_to_receive
+                        else -> R.string.loan_left_to_pay
+                    }
+                ),
                 style = MaterialTheme.typography.labelLarge,
                 color = statusColor
             )

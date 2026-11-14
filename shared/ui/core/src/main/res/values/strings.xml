@@ -123,6 +123,7 @@
     <string name="loans_completed">Completed</string>
     <string name="loan_paid_off">Paid off</string>
     <string name="loan_left_to_pay">Left to pay</string>
+    <string name="loan_left_to_receive">Left to receive</string>
     <string name="loan_percent_paid">%1$s%% paid</string>
     <string name="no_loans">No loans</string>
     <string name="no_loans_description">You don\'t have any loans.\nTap the \"+ Add loan\" to add one.</string>

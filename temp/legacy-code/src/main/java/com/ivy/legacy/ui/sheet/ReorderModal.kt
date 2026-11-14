@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DragHandle
-import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
@@ -320,19 +318,6 @@ private fun <T : Reorderable> itemTouchHelper(
 @Suppress("UNCHECKED_CAST")
 private fun <T : Reorderable> RecyclerView.adapter() = adapter as? Adapter<T>
     ?: error("Adapter not set or wrong adapter set to recyclerview.")
-
-@Composable
-fun ReorderButton(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    FilledTonalIconButton(
-        onClick = onClick,
-        modifier = modifier.testTag("reorder_button"),
-    ) {
-        Icon(Icons.Default.SwapVert, contentDescription = stringResource(R.string.reorder))
-    }
-}
 
 @Suppress("UNCHECKED_CAST")
 private fun <T : Reorderable> calculateOrderNum(

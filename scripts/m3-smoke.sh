@@ -1134,6 +1134,54 @@ flow_budgets() {
   return 0
 }
 
+# Home More -> Loans: the top bar has back and reorder, the tabs are Pending and Completed and the add button is a FAB;
+# add a loan through the New loan sheet and the amount sheet, it is listed under Pending (not under Completed), tapping
+# it opens the details screen, back returns to the list, back again returns to the open More sheet.
+flow_loans() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Loans" || return 1
+  wait_for desc exact "Add loan" || return 1
+  has desc exact "Back" && has desc exact "Reorder" && has text exact "Loans" && has text exact "Pending" && has text exact "Completed" || { log "loans top bar or tabs missing"; return 1; }
+  shot loans-1-list
+  tap_node desc exact "Add loan" || return 1
+  wait_for text exact "New loan" || { log "loan sheet did not open"; return 1; }
+  tap_node class exact android.widget.EditText || return 1
+  adb shell input text smokeloan
+  sleep 1
+  adb shell input keyevent KEYCODE_BACK
+  sleep 1
+  tap_node any sub "Enter loan amount" || return 1
+  wait_for text exact "Enter" || { log "amount sheet did not open"; return 1; }
+  tap_node text exact "5" || return 1
+  tap_node text exact "0" || return 1
+  tap_node text exact "Enter" || return 1
+  wait_gone text exact "Enter" 5 || { log "Enter did not close the amount sheet"; return 1; }
+  has any sub "50.00" || { log "amount missing from the loan sheet"; return 1; }
+  shot loans-2-sheet
+  tap_node text exact "Add" || return 1
+  wait_gone text exact "New loan" || { log "Add did not close the loan sheet"; return 1; }
+  wait_for text exact "smokeloan" || { log "new loan missing from the list"; return 1; }
+  has any sub "50.00 USD" || { log "amounts missing on the loan card"; return 1; }
+  shot loans-3-created
+  tap_node text exact "Completed" || return 1
+  wait_gone text exact "smokeloan" 5 || { log "a pending loan is listed under Completed"; return 1; }
+  tap_node text exact "Pending" || return 1
+  wait_for text exact "smokeloan" || { log "loan missing after switching back to Pending"; return 1; }
+  tap_node text exact "smokeloan" || return 1
+  wait_gone desc exact "Add loan" 5 || { log "tapping the loan did not leave the list"; return 1; }
+  shot loans-4-details
+  has text exact "smokeloan" || { log "details screen does not show the loan"; return 1; }
+  back
+  wait_for desc exact "Add loan" || { log "back from the details did not return to the list"; return 1; }
+  has text exact "smokeloan" || { log "loan list missing after back"; return 1; }
+  back
+  wait_for text exact "Quick access" || { log "back from Loans should return to the open More sheet"; return 1; }
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -1161,7 +1209,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories flow_budgets}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories flow_budgets flow_loans}; do
   run_flow "$flow"
 done
 

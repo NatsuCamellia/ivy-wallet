@@ -33,6 +33,8 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 @Stable
@@ -59,6 +61,10 @@ class AccountsViewModel @Inject constructor(
     private var totalBalanceWithoutExcluded by mutableStateOf("")
     private var totalBalanceWithoutExcludedText by mutableStateOf("")
     private var reorderVisible by mutableStateOf(false)
+
+    // every saved account posts an event that starts a reload; unordered reloads let one that read the
+    // database mid-reorder finish last and put the old order back
+    private val reloadLock = Mutex()
 
     init {
         viewModelScope.launch {
@@ -165,7 +171,7 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun startInternally() {
+    private suspend fun startInternally(): Unit = reloadLock.withLock {
         val period = com.ivy.legacy.data.model.TimePeriod.currentMonth(
             startDayOfMonth = ivyContext.startDayOfMonth
         ) // this must be monthly

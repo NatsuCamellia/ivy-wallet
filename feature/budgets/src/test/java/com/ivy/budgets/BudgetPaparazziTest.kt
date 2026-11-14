@@ -18,4 +18,25 @@ class BudgetPaparazziTest(
             BudgetScreenUiTest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotBudgetScreenProgress() {
+        snapshot(theme) {
+            BudgetScreenProgressUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotBudgetScreenEmpty() {
+        snapshot(theme) {
+            BudgetScreenEmptyUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotBudgetScreenHugeAmount() {
+        snapshot(theme) {
+            BudgetScreenHugeAmountUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

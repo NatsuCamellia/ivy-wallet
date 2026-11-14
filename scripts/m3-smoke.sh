@@ -1091,6 +1091,49 @@ flow_categories() {
   return 0
 }
 
+# Home More -> Budgets: the top bar has back and reorder, the add button is a FAB; add a budget through the Create
+# budget sheet and the amount sheet, it is listed with its progress, tapping it opens the Edit budget sheet, back
+# closes the sheet, back again returns to the open More sheet.
+flow_budgets() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Budgets" || return 1
+  wait_for desc exact "Add budget" || return 1
+  has desc exact "Back" && has desc exact "Reorder" && has text exact "Budgets" || { log "budgets top bar missing"; return 1; }
+  shot budgets-1-list
+  tap_node desc exact "Add budget" || return 1
+  wait_for text exact "Create budget" || { log "budget sheet did not open"; return 1; }
+  tap_node class exact android.widget.EditText || return 1
+  adb shell input text smokebudget
+  sleep 1
+  adb shell input keyevent KEYCODE_BACK
+  sleep 1
+  tap_node any sub "Budget amount" || return 1
+  wait_for text exact "Enter" || { log "amount sheet did not open"; return 1; }
+  tap_node text exact "5" || return 1
+  tap_node text exact "0" || return 1
+  tap_node text exact "Enter" || return 1
+  wait_gone text exact "Enter" 5 || { log "Enter did not close the amount sheet"; return 1; }
+  has any sub "50.00" || { log "amount missing from the budget sheet"; return 1; }
+  shot budgets-2-sheet
+  tap_node text exact "Add" || return 1
+  wait_gone text exact "Create budget" || { log "Add did not close the budget sheet"; return 1; }
+  wait_for text exact "smokebudget" || { log "new budget missing from the list"; return 1; }
+  has any sub "50.00 USD" || { log "amounts missing on the budget card"; return 1; }
+  shot budgets-3-created
+  tap_node text exact "smokebudget" || return 1
+  wait_for text exact "Edit budget" || { log "edit sheet did not open"; return 1; }
+  shot budgets-4-edit
+  back
+  wait_gone text exact "Edit budget" 5 || { log "back did not close the edit sheet"; return 1; }
+  has text exact "smokebudget" || { log "budget list missing after the edit sheet closed"; return 1; }
+  back
+  wait_for text exact "Quick access" || { log "back from Budgets should return to the open More sheet"; return 1; }
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -1118,7 +1161,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories flow_budgets}; do
   run_flow "$flow"
 done
 

@@ -19,7 +19,7 @@
     <string name="remove_customer">Kund*in entfernen</string>
     <string name="add_budget">Budget hinzufügen</string>
     <string name="no_budgets">Keine Budgets</string>
-    <string name="no_budgets_text">Du hast keine Budgets festgelegt.\nTippe auf "+ Budget hinzufügen", um eines hinzuzufügen.</string>
+    <string name="no_budgets_text">Du hast keine Budgets festgelegt.\nTippe auf \"Budget hinzufügen\", um eines hinzuzufügen.</string>
     <string name="budgets">Budgets</string>
     <string name="for_categories">%1$s %2$s für Kategorien</string>
     <string name="app_budget">%1$s %2$s App-Budget</string>

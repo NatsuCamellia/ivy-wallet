@@ -53,6 +53,7 @@ import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.IconBadge
 import com.ivy.legacy.ui.component.SummaryCard
+import com.ivy.legacy.ui.component.amountLabel
 import com.ivy.legacy.ui.component.transaction.transactions
 import com.ivy.legacy.ui.sheet.AccountModal
 import com.ivy.legacy.ui.sheet.AccountModalData
@@ -62,8 +63,6 @@ import com.ivy.legacy.ui.sheet.ChoosePeriodModal
 import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
 import com.ivy.legacy.ui.sheet.DeleteConfirmationModal
 import com.ivy.legacy.ui.sheet.DeleteModal
-import com.ivy.legacy.utils.balancePrefix
-import com.ivy.legacy.utils.format
 import com.ivy.navigation.EditTransactionScreen
 import com.ivy.navigation.Navigation
 import com.ivy.navigation.NavigationRoot
@@ -314,7 +313,7 @@ private fun TransactionsUi(
                             baseCurrency = baseCurrency,
                             balance = balance,
                             balanceBaseCurrency = balanceBaseCurrency,
-                            prefix = category?.let { balancePrefix(income = income, expenses = expenses) },
+                            showPlusSign = category != null,
                             onClick = account?.let {
                                 {
                                     accountModalData = AccountModalData(
@@ -539,7 +538,7 @@ private fun Balance(
     baseCurrency: String,
     balance: Double,
     balanceBaseCurrency: Double?,
-    prefix: String?,
+    showPlusSign: Boolean,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
@@ -549,13 +548,13 @@ private fun Balance(
             .testTag("balance")
     ) {
         Text(
-            text = "${prefix.orEmpty()}${balance.format(currency)} $currency",
+            text = amountLabel(balance, currency, showPlusSign),
             style = MaterialTheme.typography.displaySmallEmphasized,
         )
 
         if (currency != baseCurrency && balanceBaseCurrency != null) {
             Text(
-                text = "${prefix.orEmpty()}${balanceBaseCurrency.format(baseCurrency)} $baseCurrency",
+                text = amountLabel(balanceBaseCurrency, baseCurrency, showPlusSign),
                 modifier = Modifier.testTag("balance_base_currency"),
                 style = MaterialTheme.typography.titleMediumEmphasized,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -761,7 +760,7 @@ private fun categoryPreview(): PreviewData = PreviewData(
     },
     upcoming = persistentListOf(),
     currency = "BGN",
-    balance = 84.3,
+    balance = -84.3,
     balanceBaseCurrency = null,
     income = 0.0,
     expenses = -84.3,

@@ -24,7 +24,7 @@ fun amountLabel(amount: Double, currency: String, showPlusSign: Boolean = false)
     val formatted = amount.format(currency)
     val isZero = formatted.none { (it.digitToIntOrNull() ?: 0) > 0 }
     val sign = if (showPlusSign && amount > 0 && !isZero) "+" else ""
-    val digits = if (isZero) formatted.trimStart('-') else formatted
+    val digits = if (isZero) formatted.dropWhile { it.digitToIntOrNull() == null } else formatted
     return "$sign$digits $currency"
 }
 

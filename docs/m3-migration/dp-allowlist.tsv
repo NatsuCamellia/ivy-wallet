@@ -2,3 +2,4 @@ path	count	reason
 temp/legacy-code/src/main/java/com/ivy/legacy/ui/component/IconBadge.kt	2	icon size
 temp/legacy-code/src/main/java/com/ivy/legacy/ui/component/transaction/Transactions.kt	1	icon size
 feature/accounts/src/main/java/com/ivy/accounts/AccountsTab.kt	1	icon size
+feature/piechart/src/main/java/com/ivy/piechart/PieChart.kt	2	chart geometry

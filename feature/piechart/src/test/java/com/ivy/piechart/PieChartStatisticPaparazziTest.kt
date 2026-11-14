@@ -18,4 +18,25 @@ class PieChartStatisticPaparazziTest(
             PieChartStatisticUiTest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotPieChartStatisticIncome() {
+        snapshot(theme) {
+            PieChartStatisticIncomeUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotPieChartStatisticSelected() {
+        snapshot(theme) {
+            PieChartStatisticSelectedUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotPieChartStatisticEmpty() {
+        snapshot(theme) {
+            PieChartStatisticEmptyUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

@@ -130,10 +130,15 @@ private fun UI(
                     IconButton(
                         onClick = { onEventHandler(ReportScreenEvent.OnExport(context = context)) },
                         modifier = Modifier.testTag("report_export"),
+                        enabled = !state.loading,
                     ) {
                         Icon(Icons.Default.FileDownload, contentDescription = stringResource(R.string.export))
                     }
-                    IconButton(onClick = showFilter, modifier = Modifier.testTag("report_filter")) {
+                    IconButton(
+                        onClick = showFilter,
+                        modifier = Modifier.testTag("report_filter"),
+                        enabled = !state.loading,
+                    ) {
                         BadgedBox(badge = { if (state.filter != null) Badge() }) {
                             Icon(Icons.Default.FilterList, contentDescription = stringResource(R.string.filter))
                         }

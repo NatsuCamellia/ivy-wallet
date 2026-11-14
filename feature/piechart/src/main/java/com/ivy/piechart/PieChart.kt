@@ -8,20 +8,24 @@ import android.graphics.RectF
 import android.view.MotionEvent
 import android.view.View
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -31,17 +35,16 @@ import com.ivy.data.model.Category
 import com.ivy.data.model.CategoryId
 import com.ivy.data.model.primitive.ColorInt
 import com.ivy.data.model.primitive.NotBlankTrimmedString
-import com.ivy.design.l0_system.UI
-import com.ivy.legacy.utils.drawColoredShadow
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.color
+import com.ivy.legacy.ui.component.icon
+import com.ivy.legacy.ui.component.label
 import com.ivy.legacy.utils.timeNowUTC
 import com.ivy.ui.R
-import com.ivy.ui.color.Black
-import com.ivy.wallet.ui.theme.Gradient
-import com.ivy.wallet.ui.theme.Gray
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.IvyDark
 import com.ivy.ui.color.RedLight
-import com.ivy.wallet.ui.theme.components.IvyIcon
+import com.ivy.wallet.ui.theme.Gray
 import com.ivy.wallet.ui.theme.toComposeColor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -50,9 +53,9 @@ import java.util.UUID
 import kotlin.math.acos
 import kotlin.math.sqrt
 
-const val PIE_CHART_RADIUS_DP = 128
 const val RADIUS_DP = 112f
 
+/** The pie in its category colours with a hub in the middle: the type icon, or the selected category and its share. */
 @Composable
 fun PieChart(
     type: TransactionType,
@@ -66,23 +69,7 @@ fun PieChart(
         contentAlignment = Alignment.Center
     ) {
         AndroidView(
-            modifier = Modifier
-                .size((PIE_CHART_RADIUS_DP * 2).dp)
-                .drawColoredShadow(
-                    color = Black,
-                    alpha = if (UI.colors.isLight) 0.05f else 0.5f,
-                    offsetY = 32.dp,
-                    shadowRadius = 48.dp
-                )
-                .clip(CircleShape)
-                .background(
-                    brush = Gradient(
-                        UI.colors.medium,
-                        UI.colors.pure
-                    ).asVerticalBrush(),
-                    shape = CircleShape
-                )
-                .padding(all = 16.dp),
+            modifier = Modifier.size((2 * RADIUS_DP).dp),
             factory = {
                 PieChartView(it)
             },
@@ -95,15 +82,53 @@ fun PieChart(
             }
         )
 
-        IvyIcon(
-            modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .background(UI.colors.medium)
-                .padding(all = 20.dp),
-            icon = if (type == TransactionType.INCOME) R.drawable.ic_income else R.drawable.ic_expense,
-            tint = Gray
+        Hub(
+            type = type,
+            categoryAmounts = categoryAmounts,
+            selectedCategory = selectedCategory,
         )
+    }
+}
+
+@Composable
+private fun Hub(
+    type: TransactionType,
+    categoryAmounts: ImmutableList<CategoryAmount>,
+    selectedCategory: SelectedCategory?,
+    modifier: Modifier = Modifier,
+) {
+    val selected = selectedCategory?.let { selection ->
+        categoryAmounts.firstOrNull { it.category == selection.category }
+    }
+    val total = categoryAmounts.sumOf { it.amount }
+
+    Column(
+        modifier = modifier
+            .size(RADIUS_DP.dp)
+            .background(MaterialTheme.colorScheme.surface, CircleShape)
+            .padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        if (selected == null) {
+            Icon(
+                imageVector = type.icon(),
+                contentDescription = type.label(),
+                tint = type.color(),
+            )
+        } else {
+            Text(
+                text = selected.category?.name?.value ?: stringResource(R.string.unspecified),
+                style = MaterialTheme.typography.labelLarge,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                text = percentLabel(selected.amount, total),
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
     }
 }
 
@@ -280,64 +305,25 @@ private class PieChartView(context: Context) : View(context) {
 @Preview
 @Composable
 private fun Preview() {
-    com.ivy.legacy.IvyWalletComponentPreview {
-        Column(
-            Modifier.fillMaxSize()
-        ) {
-            Spacer(Modifier.weight(1f))
-
-            PieChart(
-                type = TransactionType.EXPENSE,
-                categoryAmounts = persistentListOf(
-                    CategoryAmount(
-                        category = Category(
-                            name = NotBlankTrimmedString.unsafe("Bills"),
-                            color = ColorInt(Green.toArgb()),
-                            icon = null,
-                            id = CategoryId(UUID.randomUUID()),
-                            orderNum = 0.0,
-                            ),
-                        amount = 791.0
-                    ),
-                    CategoryAmount(
-                        category = Category(
-                            name = NotBlankTrimmedString.unsafe("Shisha"),
-                            color = ColorInt(Green.toArgb()),
-                            icon = null,
-                            id = CategoryId(UUID.randomUUID()),
-                            orderNum = 0.0,
-                            ),
-                        amount = 411.93
-                    ),
-                    CategoryAmount(
-                        category = Category(
-                            name = NotBlankTrimmedString.unsafe("Food & Drink"),
-                            color = ColorInt(IvyDark.toArgb()),
-                            icon = null,
-                            id = CategoryId(UUID.randomUUID()),
-                            orderNum = 0.0,
-                        ),
-                        amount = 260.03
-                    ),
-                    CategoryAmount(
-                        category = Category(
-                            name = NotBlankTrimmedString.unsafe("Gifts"),
-                            color = ColorInt(RedLight.toArgb()),
-                            icon = null,
-                            id = CategoryId(UUID.randomUUID()),
-                            orderNum = 0.0,
-                        ),
-                        amount = 160.0
-                    ),
-                    CategoryAmount(
-                        category = null,
-                        amount = 497.0
-                    ),
-                ),
-                selectedCategory = null
-            )
-
-            Spacer(Modifier.weight(1f))
-        }
+    val categories = listOf("Bills" to Green, "Food & Drink" to IvyDark, "Gifts" to RedLight).map { (name, color) ->
+        Category(
+            name = NotBlankTrimmedString.unsafe(name),
+            color = ColorInt(color.toArgb()),
+            icon = null,
+            id = CategoryId(UUID.randomUUID()),
+            orderNum = 0.0,
+        )
+    }
+    WalletPreview {
+        PieChart(
+            type = TransactionType.EXPENSE,
+            categoryAmounts = persistentListOf(
+                CategoryAmount(category = categories[0], amount = 791.0),
+                CategoryAmount(category = categories[1], amount = 260.03),
+                CategoryAmount(category = categories[2], amount = 160.0),
+                CategoryAmount(category = null, amount = 497.0),
+            ),
+            selectedCategory = null
+        )
     }
 }

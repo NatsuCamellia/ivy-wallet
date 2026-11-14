@@ -769,6 +769,37 @@ flow_add_expense() {
   return 0
 }
 
+# Accounts -> Cash -> the Expenses card opens the pie chart: title, back, add, period buttons and the seeded Groceries
+# row; Previous shows the empty state and Next brings the row back; the row opens the category transactions; back twice
+# returns to the account. Needs flow_add_expense to have run (it seeds the Groceries expense).
+flow_piechart() {
+  go_home || return 1
+  tap_tab Accounts || return 1
+  wait_for text exact "Total Balance" || return 1
+  tap_node text exact "Cash" || return 1
+  wait_for desc exact "Edit" || return 1
+  tap_node text exact "Expenses" || return 1
+  wait_for desc exact "Add expense" || { log "pie chart screen did not open"; return 1; }
+  has desc exact "Back" && has desc exact "Next" && has desc exact "Previous" || { log "pie chart controls missing"; return 1; }
+  wait_for text exact "Groceries" || { log "category row missing: run flow_add_expense first"; return 1; }
+  shot piechart-1
+  tap_node desc exact "Previous" || return 1
+  wait_for text exact "No transactions" || { log "empty state missing for the previous month"; return 1; }
+  shot piechart-2-empty
+  tap_node desc exact "Next" || return 1
+  wait_for text exact "Groceries" || { log "row missing after Next"; return 1; }
+  tap_node text exact "Groceries" || return 1
+  wait_for desc exact "Edit" || { log "category transactions did not open"; return 1; }
+  shot piechart-3-category
+  back
+  wait_for desc exact "Add expense" || { log "back from the category should return to the pie chart"; return 1; }
+  back
+  wait_for desc exact "Edit" || { log "back from the pie chart should return to the account"; return 1; }
+  has text exact "Cash" || { log "expected the account screen"; return 1; }
+  crashed && return 1
+  return 0
+}
+
 # Edit account -> Amount sheet -> type a number, Enter: one press closes the amount sheet (it must not be recreated
 # when the value changes), the account sheet stays open with the new amount, Back closes only the account sheet.
 flow_amount_sheet_close() {
@@ -1035,7 +1066,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_search flow_reports}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports}; do
   run_flow "$flow"
 done
 

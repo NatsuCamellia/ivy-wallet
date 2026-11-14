@@ -239,6 +239,12 @@
     <string name="filter_excludes">Excludes</string>
     <string name="filter_amount_from">From %1$s</string>
     <string name="filter_amount_to">To %1$s</string>
+    <string name="filter_error_type">Select at least one type</string>
+    <string name="filter_error_period">Select a time period</string>
+    <string name="filter_error_accounts">Select at least one account</string>
+    <string name="filter_error_categories">Select at least one category</string>
+    <string name="filter_error_amount_range">The minimum amount must not exceed the maximum</string>
+    <string name="tag">Tag</string>
     <string name="no_transactions_for_your_filter">No matching transactions for the selected filter.</string>
     <string name="no_filter">No Filter</string>
     <string name="invalid_filter_warning">You need to apply a valid filter before generating a report.</string>

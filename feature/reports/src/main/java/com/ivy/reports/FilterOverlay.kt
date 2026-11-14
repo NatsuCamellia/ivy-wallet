@@ -296,7 +296,7 @@ private fun TagSelectModal(
 private fun FilterSection(
     title: String,
     modifier: Modifier = Modifier,
-    invalid: Boolean = false,
+    error: String? = null,
     action: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -306,11 +306,18 @@ private fun FilterSection(
                 text = title,
                 modifier = Modifier.weight(1f),
                 style = MaterialTheme.typography.titleSmall,
-                color = if (invalid) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+                color = if (error != null) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
             )
             action()
         }
         content()
+        if (error != null) {
+            Text(
+                text = error,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
     }
 }
 
@@ -335,7 +342,10 @@ private fun TypeFilter(
     onChange: ((ReportFilter) -> ReportFilter) -> Unit,
 ) {
     val types = filter?.trnTypes.orEmpty()
-    FilterSection(title = stringResource(R.string.by_type), invalid = types.isEmpty()) {
+    FilterSection(
+        title = stringResource(R.string.by_type),
+        error = stringResource(R.string.filter_error_type).takeIf { types.isEmpty() },
+    ) {
         ChipRow {
             TransactionType.entries.forEach { type ->
                 val selected = types.contains(type)
@@ -386,7 +396,10 @@ private fun PeriodFilter(
     val timeProvider = LocalTimeProvider.current
     val timeConverter = LocalTimeConverter.current
     val timeFormatter = LocalTimeFormatter.current
-    FilterSection(title = stringResource(R.string.time_period), invalid = filter?.period == null) {
+    FilterSection(
+        title = stringResource(R.string.time_period),
+        error = stringResource(R.string.filter_error_period).takeIf { filter?.period == null },
+    ) {
         AssistChip(
             onClick = onShowPeriodChooserModal,
             label = {
@@ -420,7 +433,7 @@ private fun AccountsFilter(
     val selected = filter?.accounts.orEmpty()
     FilterSection(
         title = stringResource(R.string.accounts_number, selected.size),
-        invalid = selected.isEmpty(),
+        error = stringResource(R.string.filter_error_accounts).takeIf { selected.isEmpty() },
         action = {
             SelectAllButton(
                 anySelected = selected.isNotEmpty(),
@@ -467,7 +480,7 @@ private fun CategoriesFilter(
     val selected = filter?.categories.orEmpty()
     FilterSection(
         title = stringResource(R.string.categories_number, selected.size),
-        invalid = selected.isEmpty(),
+        error = stringResource(R.string.filter_error_categories).takeIf { selected.isEmpty() },
         action = {
             SelectAllButton(
                 anySelected = selected.isNotEmpty(),
@@ -523,7 +536,12 @@ private fun AmountFilter(
     onShowMinAmountModal: () -> Unit,
     onShowMaxAmountModal: () -> Unit,
 ) {
-    FilterSection(title = stringResource(R.string.amount_optional)) {
+    val min = filter?.minAmount
+    val max = filter?.maxAmount
+    FilterSection(
+        title = stringResource(R.string.amount_optional),
+        error = stringResource(R.string.filter_error_amount_range).takeIf { min != null && max != null && min > max },
+    ) {
         ChipRow {
             AssistChip(
                 onClick = onShowMinAmountModal,
@@ -636,9 +654,8 @@ private fun TagGroup(
         Text(text = label, style = MaterialTheme.typography.labelLarge)
         ChipRow {
             selected.forEach { id ->
-                allTags.firstOrNull { it.id == id }?.let { tag ->
-                    RemovableChip(text = "#${tag.name.value}", onRemove = { onRemove(id) })
-                }
+                val name = allTags.firstOrNull { it.id == id }?.let { "#${it.name.value}" }
+                RemovableChip(text = name ?: stringResource(R.string.tag), onRemove = { onRemove(id) })
             }
             AddChip(text = stringResource(R.string.select_tags), onClick = onSelect)
         }
@@ -688,7 +705,7 @@ private fun AddChip(
 
 @Suppress("MagicNumber")
 @Composable
-private fun Preview(theme: Theme = Theme.LIGHT) {
+private fun Preview(theme: Theme = Theme.LIGHT, invalid: Boolean = false) {
     val accounts = listOf(
         Account("Cash", color = Green.toArgb()),
         Account("DSK", color = GreenDark.toArgb()),
@@ -741,8 +758,9 @@ private fun Preview(theme: Theme = Theme.LIGHT) {
                 trnTypes = listOf(TransactionType.INCOME, TransactionType.EXPENSE),
                 period = TimePeriod(month = Month.monthsList().first(), year = 2023),
                 accounts = accounts.take(2),
-                categories = categories.take(1),
-                maxAmount = 13256.27,
+                categories = if (invalid) emptyList() else categories.take(1),
+                minAmount = if (invalid) 500.0 else null,
+                maxAmount = if (invalid) 100.0 else 13256.27,
                 includeKeywords = listOf("salary"),
                 excludeKeywords = listOf("refund"),
                 includedTags = listOf(tags[0].id),
@@ -764,4 +782,10 @@ private fun PreviewLight() {
 @Composable
 fun ReportFilterUiTest(isDark: Boolean) {
     Preview(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing */
+@Composable
+fun ReportFilterInvalidUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT, invalid = true)
 }

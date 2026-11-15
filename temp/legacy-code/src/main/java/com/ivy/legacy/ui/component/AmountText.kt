@@ -56,6 +56,7 @@ fun TypeAmount(
     amount: Double,
     currency: String,
     modifier: Modifier = Modifier,
+    iconDescription: String = type.label(),
 ) {
     Row(
         modifier = modifier,
@@ -64,7 +65,7 @@ fun TypeAmount(
     ) {
         Icon(
             imageVector = type.icon(),
-            contentDescription = type.label(),
+            contentDescription = iconDescription,
             modifier = Modifier.size(AssistChipDefaults.IconSize),
             tint = type.color(),
         )

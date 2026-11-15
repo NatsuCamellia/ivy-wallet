@@ -542,4 +542,12 @@
     <string name="planned_repeats_every">Repeats every %1$d %2$s</string>
     <string name="planned_starts_repeats_every">Starts %1$s · Repeats every %2$d %3$s</string>
     <string name="invalid_planned_rule">Invalid repeat rule</string>
+    <string name="rates_manual">Manual</string>
+    <string name="rates_automatic">Automatic</string>
+    <string name="currency_code">Currency</string>
+    <string name="delete_rate">Delete rate</string>
+    <string name="no_exchange_rates">No exchange rates</string>
+    <string name="no_exchange_rates_description">Rates appear once they sync. You can also add one with Add rate.</string>
+    <string name="no_exchange_rates_for_search">No currency matches your search.</string>
+    <string name="balance_title">Balance</string>
 </resources>

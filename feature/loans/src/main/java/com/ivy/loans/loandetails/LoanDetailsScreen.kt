@@ -64,6 +64,7 @@ import com.ivy.legacy.ui.component.AmountText
 import com.ivy.legacy.ui.component.IconBadge
 import com.ivy.legacy.ui.component.TypeAmount
 import com.ivy.legacy.ui.component.amountLabel
+import com.ivy.legacy.ui.component.label
 import com.ivy.legacy.ui.component.transaction.EmptyState
 import com.ivy.legacy.ui.sheet.DeleteModal
 import com.ivy.legacy.ui.sheet.LoanModal
@@ -508,6 +509,7 @@ private fun LoanRecordRow(
         count = count,
         onClick = onClick,
         modifier = modifier,
+        typeDescription = typeLabel,
         converted = converted,
         convertedCurrency = displayRecord.loanCurrencyCode,
         chips = if (account != null || record.interest) {
@@ -540,11 +542,12 @@ private fun InitialRecordRow(
     modifier: Modifier = Modifier,
 ) {
     val timeFormatter = LocalTimeFormatter.current
+    val startingLabel = stringResource(R.string.initial_loan_record)
     RecordRow(
         date = loan.dateTime?.let {
             with(timeFormatter) { it.format(TimeFormatter.Style.DateAndTime(includeWeekDay = true)) }
         },
-        headline = stringResource(R.string.initial_loan_record),
+        headline = startingLabel,
         supporting = loan.note?.takeIf { it.isNotNullOrBlank() },
         type = if (loan.type == LoanType.LEND) TransactionType.EXPENSE else TransactionType.INCOME,
         amount = loan.amount,
@@ -553,6 +556,7 @@ private fun InitialRecordRow(
         count = count,
         onClick = onClick,
         modifier = modifier,
+        typeDescription = startingLabel,
     )
 }
 
@@ -584,6 +588,7 @@ private fun RecordRow(
     count: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    typeDescription: String = type.label(),
     converted: Double? = null,
     convertedCurrency: String = "",
     chips: (@Composable () -> Unit)? = null,
@@ -616,7 +621,7 @@ private fun RecordRow(
         ) {
             Text(text = headline, modifier = Modifier.weight(1f), maxLines = 2, overflow = TextOverflow.Ellipsis)
             Column(horizontalAlignment = Alignment.End) {
-                TypeAmount(type = type, amount = amount, currency = currency)
+                TypeAmount(type = type, amount = amount, currency = currency, iconDescription = typeDescription)
                 if (converted != null) {
                     AmountText(
                         amount = converted,

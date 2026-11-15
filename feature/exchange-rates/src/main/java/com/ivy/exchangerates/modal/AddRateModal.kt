@@ -80,10 +80,10 @@ fun AddRateModal(
                 value = toCurrency,
                 onValueChange = { toCurrency = it },
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Currency") },
+                label = { Text(stringResource(R.string.currency_code)) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
-                    capitalization = KeyboardCapitalization.Sentences,
+                    capitalization = KeyboardCapitalization.Characters,
                     imeAction = ImeAction.Done,
                 ),
             )

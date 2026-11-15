@@ -1195,6 +1195,95 @@ flow_loans() {
   return 0
 }
 
+# Home More -> Settings -> Exchange rates: top bar with back, the search field and the Add rate FAB; add a manual SMK rate
+# through the Add rate sheet and the amount sheet, it is listed under Manual, searching for another code hides it and the
+# empty state shows, clearing the search brings it back, its delete button removes it, back returns to Settings.
+flow_exchange_rates() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Settings" || return 1
+  wait_for text exact "Set currency" || return 1
+  local w h i
+  w=$(screen_width); h=$(screen_height)
+  for i in 1 2 3 4 5 6; do
+    dump || return 1
+    has text exact "Exchange rates" && break
+    adb shell input swipe $((w / 2)) $((h * 70 / 100)) $((w / 2)) $((h * 30 / 100)) 300 </dev/null
+    sleep 1
+  done
+  tap_node text exact "Exchange rates" || return 1
+  wait_for desc exact "Add rate" || { log "exchange rates screen did not open"; return 1; }
+  has desc exact "Back" && has text exact "Exchange rates" && has any sub "Search" || { log "exchange rates top bar or search missing"; return 1; }
+  shot rates-1-list
+  tap_node desc exact "Add rate" || return 1
+  wait_for text exact "Exchange rate" || { log "add rate sheet did not open"; return 1; }
+  tap_node class exact android.widget.EditText || return 1
+  adb shell input text smk
+  sleep 1
+  adb shell input keyevent KEYCODE_BACK
+  sleep 1
+  tap_node text exact "Exchange rate" || return 1
+  wait_for text exact "Enter" || { log "amount sheet did not open"; return 1; }
+  tap_node text exact "2" || return 1
+  tap_node text exact "Enter" || return 1
+  wait_gone text exact "Enter" 5 || { log "Enter did not close the amount sheet"; return 1; }
+  shot rates-2-sheet
+  tap_node text exact "Add" || return 1
+  wait_for text exact "Manual" || { log "the Manual section is missing after adding a rate"; return 1; }
+  has any sub "SMK" || { log "new rate missing from the list"; return 1; }
+  shot rates-3-added
+  tap_node class exact android.widget.EditText || return 1
+  adb shell input text xyz
+  wait_for text exact "No exchange rates" || { log "empty state missing for a search with no match"; return 1; }
+  wait_gone any sub "SMK" 5 || { log "rate still listed for another search"; return 1; }
+  shot rates-4-no-result
+  tap_node desc exact "Clear search" || return 1
+  wait_for any sub "SMK" || { log "rate missing after clearing the search"; return 1; }
+  sleep 1
+  tap_node desc exact "Delete rate" || return 1
+  wait_gone any sub "SMK" 10 || { log "Delete rate did not remove the rate"; return 1; }
+  shot rates-5-deleted
+  back
+  dump || return 1
+  # the first back only hides the keyboard of the focused search field
+  ! has desc exact "Add rate" || back
+  wait_gone desc exact "Add rate" 5 || { log "back from Exchange rates should return to Settings"; return 1; }
+  wait_for text exact "Set currency" || { log "Settings missing after back"; return 1; }
+  crashed && return 1
+  return 0
+}
+
+# Home (needs the seeded smokecoffee expense of flow_add_expense): the balance opens the Balance screen with the back
+# button, the period row and the current / planned / after-planned amounts; Next and Previous change the period, back
+# returns to Home.
+flow_balance() {
+  go_home || return 1
+  dump || return 1
+  has text exact "Cashflow" || has any sub "Cashflow" || { log "home balance missing"; return 1; }
+  tap_node text sub " USD" 0 || return 1
+  wait_for text exact "Balance" 10 || { log "balance screen did not open: run flow_add_expense first, the balance opens only with transactions"; return 1; }
+  has desc exact "Back" && has text exact "CURRENT BALANCE" && has text exact "Planned payments" && has text exact "BALANCE AFTER PLANNED PAYMENTS" || { log "balance rows or back button missing"; return 1; }
+  shot balance-1
+  local before after
+  before=$(period_label_anywhere) || { log "period label not found"; return 1; }
+  tap_node desc exact "Next" || return 1
+  sleep 1
+  dump || return 1
+  after=$(period_label_anywhere) || { log "period label missing after Next"; return 1; }
+  [ "$after" != "$before" ] || { log "Next did not change the period ('$before')"; return 1; }
+  shot balance-2-next
+  tap_node desc exact "Previous" || return 1
+  sleep 1
+  dump || return 1
+  after=$(period_label_anywhere) || { log "period label missing after Previous"; return 1; }
+  [ "$after" = "$before" ] || { log "Previous gave '$after', expected '$before'"; return 1; }
+  back
+  wait_for desc exact "More" || { log "back from Balance should return to Home"; return 1; }
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -1222,7 +1311,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories flow_budgets flow_loans}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance}; do
   run_flow "$flow"
 done
 

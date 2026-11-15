@@ -18,4 +18,11 @@ class BalanceScreenPaparazziTest(
             BalanceScreenUiTest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotBalanceHugeAmount() {
+        snapshot(theme) {
+            BalanceHugeAmountUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

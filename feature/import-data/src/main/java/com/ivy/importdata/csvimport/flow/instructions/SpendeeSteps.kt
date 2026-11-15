@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import com.ivy.ui.R
 
 @Composable
-fun SpendeeSteps() {
+internal fun SpendeeSteps() {
     InstructionStep(
         number = 1,
         title = stringResource(R.string.export_csv_file),

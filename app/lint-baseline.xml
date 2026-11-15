@@ -9467,17 +9467,6 @@
     <issue
         id="ComposeModifierMissing"
         message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
-        errorLine1="fun DefaultImportSteps("
-        errorLine2="    ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/ivy/importdata/csvimport/flow/instructions/DefaultImportSteps.kt"
-            line="12"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposeModifierMissing"
-        message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
         errorLine1="fun BoxWithConstraintsScope.DescriptionModal("
         errorLine2="                            ~~~~~~~~~~~~~~~~">
         <location
@@ -9517,17 +9506,6 @@
             file="src/main/java/com/ivy/design/l1_buildingBlocks/Dividers.kt"
             line="74"
             column="14"/>
-    </issue>
-
-    <issue
-        id="ComposeModifierMissing"
-        message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
-        errorLine1="fun FinancistoSteps("
-        errorLine2="    ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/ivy/importdata/csvimport/flow/instructions/FinancistoSteps.kt"
-            line="12"
-            column="5"/>
     </issue>
 
 
@@ -9724,17 +9702,6 @@
     <issue
         id="ComposeModifierMissing"
         message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
-        errorLine1="fun IvyWalletSteps("
-        errorLine2="    ~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/ivy/importdata/csvimport/flow/instructions/IvyWalletSteps.kt"
-            line="12"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposeModifierMissing"
-        message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
         errorLine1="fun ListItem("
         errorLine2="    ~~~~~~~~">
         <location
@@ -9763,28 +9730,6 @@
             file="src/main/java/com/ivy/main/MainBottomBar.kt"
             line="78"
             column="29"/>
-    </issue>
-
-    <issue
-        id="ComposeModifierMissing"
-        message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
-        errorLine1="fun MonefySteps("
-        errorLine2="    ~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/ivy/importdata/csvimport/flow/instructions/MonefySteps.kt"
-            line="12"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="ComposeModifierMissing"
-        message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
-        errorLine1="fun MoneyManagerPraseSteps("
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/ivy/importdata/csvimport/flow/instructions/MoneyManagerPraseSteps.kt"
-            line="14"
-            column="5"/>
     </issue>
 
     <issue
@@ -10038,17 +9983,6 @@
             file="src/main/java/com/ivy/design/l1_buildingBlocks/Spacers.kt"
             line="26"
             column="14"/>
-    </issue>
-
-    <issue
-        id="ComposeModifierMissing"
-        message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
-        errorLine1="fun SpendeeSteps("
-        errorLine2="    ~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/ivy/importdata/csvimport/flow/instructions/SpendeeSteps.kt"
-            line="12"
-            column="5"/>
     </issue>
 
     <issue

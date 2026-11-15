@@ -17,11 +17,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FileUpload
@@ -30,6 +33,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -257,7 +261,6 @@ private fun CSVCell(
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun <M> MappingCard(
     columns: CSVRow,
@@ -286,15 +289,15 @@ private fun <M> MappingCard(
                 text = "Choose a matching CSV column:",
                 style = MaterialTheme.typography.labelLarge,
             )
-            FlowRow(
+            LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                columns.values.forEachIndexed { index, column ->
-                    FilterChip(
+                itemsIndexed(columns.values) { index, column ->
+                    CheckedFilterChip(
                         selected = column == mapping.name,
                         onClick = { onMapTo(index, column) },
-                        label = { Text(text = column) },
+                        label = column,
                     )
                 }
             }
@@ -315,6 +318,32 @@ private fun <M> MappingCard(
             }
         }
     }
+}
+
+@Composable
+private fun CheckedFilterChip(
+    selected: Boolean,
+    onClick: () -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+) {
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = { Text(text = label) },
+        modifier = modifier,
+        leadingIcon = if (selected) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(FilterChipDefaults.IconSize),
+                )
+            }
+        } else {
+            null
+        },
+    )
 }
 
 @Composable
@@ -575,19 +604,19 @@ private fun DateMetadataUI(
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(text = "Which is first in the format?", style = MaterialTheme.typography.labelLarge)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            FilterChip(
+            CheckedFilterChip(
                 selected = metadata == DateMetadata.DateFirst,
                 onClick = {
                     onEvent(CSVEvent.DataMetaChange(DateMetadata.DateFirst))
                 },
-                label = { Text(text = "Date/Day (1,2,3...31)") },
+                label = "Date/Day (1,2,3...31)",
             )
-            FilterChip(
+            CheckedFilterChip(
                 selected = metadata == DateMetadata.MonthFirst,
                 onClick = {
                     onEvent(CSVEvent.DataMetaChange(DateMetadata.MonthFirst))
                 },
-                label = { Text(text = "Month (1,2..12 / Jan, Feb..Dec)") },
+                label = "Month (1,2..12 / Jan, Feb..Dec)",
             )
         }
     }
@@ -688,20 +717,23 @@ fun LazyListScope.optionalFields(
     )
 }
 
-private fun previewColumns(): CSVRow = CSVRow(listOf("Date", "Account", "Amount", "Category"))
+private fun previewColumns(extraColumns: Int = 0): CSVRow = CSVRow(
+    listOf("Date", "Account", "Amount", "Category") +
+        List(extraColumns) { "Extra column ${it + 1}" }
+)
 
-private fun previewCsv(): ImmutableList<CSVRow> = persistentListOf(
-    previewColumns(),
+private fun previewCsv(extraColumns: Int): ImmutableList<CSVRow> = persistentListOf(
+    previewColumns(extraColumns),
     CSVRow(listOf("2023-04-27", "Cash", "-12.50", "Food")),
     CSVRow(listOf("2023-04-28", "Bank", "1500.00", "Salary")),
 )
 
 private fun previewColumn(name: String): Int = previewColumns().values.indexOf(name)
 
-private fun previewState(mapped: Boolean): CSVState = CSVState(
+private fun previewState(mapped: Boolean, extraColumns: Int): CSVState = CSVState(
     uiState = UIState.Idle,
-    columns = if (mapped) previewColumns() else null,
-    csv = previewCsv(),
+    columns = if (mapped) previewColumns(extraColumns) else null,
+    csv = previewCsv(extraColumns),
     important = if (mapped) {
         ImportantFields(
             amount = ColumnMapping("Amount", "The transaction amount", "Amount", 2, 1, true),
@@ -768,11 +800,16 @@ private fun previewState(mapped: Boolean): CSVState = CSVState(
 
 @Preview
 @Composable
-private fun Preview(theme: Theme = Theme.LIGHT, mapped: Boolean = false, firstVisibleItem: Int = 0) {
+private fun Preview(
+    theme: Theme = Theme.LIGHT,
+    mapped: Boolean = false,
+    firstVisibleItem: Int = 0,
+    extraColumns: Int = 0,
+) {
     WalletPreview(theme) {
         NavigationRoot(navigation = Navigation()) {
             ImportUI(
-                state = previewState(mapped),
+                state = previewState(mapped, extraColumns),
                 launchedFromOnboarding = false,
                 onEvent = {},
                 listState = rememberLazyListState(initialFirstVisibleItemIndex = firstVisibleItem),
@@ -809,4 +846,10 @@ fun CSVScreenInvalidMappingUiTest(isDark: Boolean) {
 @Composable
 fun CSVScreenTransferFieldsUiTest(isDark: Boolean) {
     Preview(if (isDark) Theme.DARK else Theme.LIGHT, mapped = true, firstVisibleItem = 9)
+}
+
+/** For screenshot testing */
+@Composable
+fun CSVScreenManyColumnsUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT, mapped = true, firstVisibleItem = 2, extraColumns = 16)
 }

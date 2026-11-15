@@ -166,6 +166,15 @@ screen_height() { adb shell wm size | grep -oE '[0-9]+x[0-9]+' | tail -1 | cut -
 
 has() { find_node "$@" >/dev/null 2>&1; }
 
+# has_clickable <text>: a clickable node whose text is exactly <text> (a button, not a label with the same words)
+has_clickable() {
+  python3 -I - "$XML" "$1" <<'PY'
+import sys, xml.etree.ElementTree as ET
+path, text = sys.argv[1:3]
+sys.exit(0 if any(n.get('text') == text and n.get('clickable') == 'true' for n in ET.parse(path).iter('node')) else 1)
+PY
+}
+
 # wait_for <text|desc|any> <exact|sub> <needle> [timeout-seconds]
 wait_for() {
   local attr=$1 match=$2 needle=$3 timeout=${4:-15} i
@@ -1453,7 +1462,9 @@ flow_import_data() {
   shot import-1-sources
   tap_node text exact "Money Manager" || return 1
   wait_for text exact "How to import" || { log "instructions did not open"; return 1; }
-  has text exact "Steps" && has text exact "Upload a CSV file" && has text exact "Export Excel file" || { log "instruction steps missing"; return 1; }
+  has text exact "Steps" && has text exact "Export Excel file" || { log "instruction steps missing"; return 1; }
+  has_clickable "Upload a CSV file" || { log "pinned upload button missing"; return 1; }
+  has text exact "Skip" && { log "instructions: Skip shown when entering from Settings"; return 1; }
   shot import-2-instructions
   tap_node desc exact "Back" || return 1
   wait_for text exact "Import from" || { log "back from the instructions should return to the sources"; return 1; }

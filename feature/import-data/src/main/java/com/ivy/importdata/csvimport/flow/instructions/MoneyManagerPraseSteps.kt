@@ -11,7 +11,7 @@ import com.ivy.ui.R
 private const val ConverterUrl = "https://www.zamzar.com/converters/document/xls-to-csv/"
 
 @Composable
-fun MoneyManagerPraseSteps() {
+internal fun MoneyManagerPraseSteps() {
     val context = LocalContext.current
 
     InstructionStep(

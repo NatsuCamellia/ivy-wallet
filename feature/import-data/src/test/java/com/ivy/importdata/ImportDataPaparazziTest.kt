@@ -3,6 +3,7 @@ package com.ivy.importdata
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import com.ivy.importdata.csv.CSVScreenInvalidMappingUiTest
+import com.ivy.importdata.csv.CSVScreenManyColumnsUiTest
 import com.ivy.importdata.csv.CSVScreenMappedUiTest
 import com.ivy.importdata.csv.CSVScreenTransferFieldsUiTest
 import com.ivy.importdata.csv.CSVScreenTypeFieldsUiTest
@@ -89,6 +90,13 @@ class ImportDataPaparazziTest(
     fun snapshotCsvTypeFieldsScreen() {
         snapshot(theme) {
             CSVScreenTypeFieldsUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotCsvManyColumnsScreen() {
+        snapshot(theme) {
+            CSVScreenManyColumnsUiTest(theme == PaparazziTheme.Dark)
         }
     }
 }

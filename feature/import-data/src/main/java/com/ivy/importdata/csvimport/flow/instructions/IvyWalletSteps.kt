@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import com.ivy.ui.R
 
 @Composable
-fun IvyWalletSteps() {
+internal fun IvyWalletSteps() {
     InstructionStep(
         number = 1,
         title = stringResource(R.string.export_data),

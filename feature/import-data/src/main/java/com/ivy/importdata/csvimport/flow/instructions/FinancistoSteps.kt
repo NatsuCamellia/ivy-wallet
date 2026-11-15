@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import com.ivy.ui.R
 
 @Composable
-fun FinancistoSteps() {
+internal fun FinancistoSteps() {
     InstructionStep(
         number = 1,
         title = stringResource(R.string.export_csv_file_standard),

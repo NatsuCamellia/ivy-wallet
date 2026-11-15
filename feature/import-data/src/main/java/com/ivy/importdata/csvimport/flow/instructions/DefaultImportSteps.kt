@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import com.ivy.ui.R
 
 @Composable
-fun DefaultImportSteps(
+internal fun DefaultImportSteps(
     videoUrl: String? = null,
     articleUrl: String? = null,
 ) {

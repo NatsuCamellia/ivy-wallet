@@ -5,7 +5,7 @@ import androidx.compose.ui.res.stringResource
 import com.ivy.ui.R
 
 @Composable
-fun MonefySteps() {
+internal fun MonefySteps() {
     InstructionStep(
         number = 1,
         title = stringResource(R.string.export_to_file),

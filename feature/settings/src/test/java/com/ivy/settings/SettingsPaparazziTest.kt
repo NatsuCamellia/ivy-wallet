@@ -21,4 +21,31 @@ class SettingsPaparazziTest(
             }
         }
     }
+
+    @Test
+    fun snapshotSettingsAppSettings() {
+        snapshot(theme) {
+            WithFakeRootScreen {
+                SettingsAppSettingsUiTest(theme == PaparazziTheme.Dark)
+            }
+        }
+    }
+
+    @Test
+    fun snapshotSettingsOther() {
+        snapshot(theme) {
+            WithFakeRootScreen {
+                SettingsOtherUiTest(theme == PaparazziTheme.Dark)
+            }
+        }
+    }
+
+    @Test
+    fun snapshotSettingsEnd() {
+        snapshot(theme) {
+            WithFakeRootScreen {
+                SettingsEndUiTest(theme == PaparazziTheme.Dark)
+            }
+        }
+    }
 }

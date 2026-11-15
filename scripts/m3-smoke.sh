@@ -1284,6 +1284,128 @@ flow_balance() {
   return 0
 }
 
+# scroll_to <attr> <match> <needle>: swipes the list up until the node is in the dump
+scroll_to() {
+  local w h i
+  w=$(screen_width); h=$(screen_height)
+  for i in 1 2 3 4 5 6 7 8; do
+    dump || return 1
+    has "$@" && return 0
+    adb shell input swipe $((w / 2)) $((h * 70 / 100)) $((w / 2)) $((h * 30 / 100)) 300 </dev/null
+    sleep 1
+  done
+  log "never scrolled to: $*"
+  return 1
+}
+
+# row_checked <text>: "true" or "false", the checked state of the toggleable row that contains the text
+row_checked() {
+  python3 -I - "$XML" "$1" <<'PY'
+import sys, xml.etree.ElementTree as ET
+path, needle = sys.argv[1:3]
+for n in ET.parse(path).iter('node'):
+    if n.get('checkable') != 'true':
+        continue
+    texts = [m.get('text') for m in n.iter('node')]
+    if needle in texts:
+        print(n.get('checked'))
+        sys.exit(0)
+sys.exit(1)
+PY
+}
+
+# theme_label: the current theme label ("Light mode", "Auto mode"...) in the dump
+theme_label() {
+  python3 -I - "$XML" <<'PY'
+import sys, xml.etree.ElementTree as ET
+for n in ET.parse(sys.argv[1]).iter('node'):
+    t = n.get('text') or ''
+    if t.endswith(' mode'):
+        print(t)
+        sys.exit(0)
+sys.exit(1)
+PY
+}
+
+# Home More -> Settings: the large top bar with back, the grouped rows; the Hide balance switch flips and Home shows
+# the hidden balance, the theme row cycles through its four values and back, Exchange rates opens and returns, the
+# currency sheet opens and closes, the last groups are reachable and Delete all user data asks before deleting.
+flow_settings() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Settings" || return 1
+  wait_for text exact "Set currency" || { log "settings did not open"; return 1; }
+  has desc exact "Back" && has text exact "Settings" && has text exact "Import & Export" && has text exact "App Settings" || { log "settings top bar or groups missing"; return 1; }
+  shot settings-1-top
+  scroll_to text exact "Hide balance" || return 1
+  [ "$(row_checked "Hide balance")" = false ] || { log "Hide balance should start off (seeded state)"; return 1; }
+  tap_node text exact "Hide balance" || return 1
+  sleep 1
+  dump || return 1
+  [ "$(row_checked "Hide balance")" = true ] || { log "the Hide balance row did not turn on"; return 1; }
+  shot settings-2-switch-on
+  back
+  wait_for text exact "Quick access" || { log "back from Settings should return to the open More sheet"; return 1; }
+  tap_node desc exact "Close" || return 1
+  wait_for any sub "****" 10 || { log "Home does not show the hidden balance"; return 1; }
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Settings" || return 1
+  wait_for text exact "Set currency" || return 1
+  scroll_to text exact "Hide balance" || return 1
+  [ "$(row_checked "Hide balance")" = true ] || { log "Hide balance did not stay on"; return 1; }
+  tap_node text exact "Hide balance" || return 1
+  sleep 1
+  dump || return 1
+  [ "$(row_checked "Hide balance")" = false ] || { log "the Hide balance row did not turn off"; return 1; }
+  scroll_to text exact "Tap to toggle theme" || return 1
+  local mode first i
+  first=$(theme_label) || { log "theme label not found"; return 1; }
+  mode=$first
+  for i in 1 2 3 4; do
+    tap_node text exact "Tap to toggle theme" || return 1
+    sleep 1
+    dump || return 1
+    mode=$(theme_label) || { log "theme label missing after tap $i"; return 1; }
+    [ "$i" = 4 ] || [ "$mode" != "$first" ] || { log "theme did not change on tap $i"; return 1; }
+    shot settings-3-theme-$i
+  done
+  [ "$mode" = "$first" ] || { log "four taps should return to '$first', got '$mode'"; return 1; }
+  has text exact "Tap to toggle theme" || { log "settings lost after the theme cycle"; return 1; }
+  tap_node text exact "Exchange rates" || return 1
+  wait_for desc exact "Add rate" || { log "exchange rates did not open from settings"; return 1; }
+  back
+  wait_gone desc exact "Add rate" 5 || { log "back from Exchange rates should return to Settings"; return 1; }
+  wait_for text exact "Exchange rates" || { log "Settings missing after back"; return 1; }
+  local w h
+  w=$(screen_width); h=$(screen_height)
+  for i in 1 2 3 4 5 6 7 8; do
+    dump || return 1
+    has text exact "Set currency" && break
+    adb shell input swipe $((w / 2)) $((h * 30 / 100)) $((w / 2)) $((h * 70 / 100)) 300 </dev/null
+    sleep 1
+  done
+  tap_node text exact "Set currency" || return 1
+  wait_for desc exact "Close" || { log "currency sheet did not open"; return 1; }
+  shot settings-4-currency
+  back
+  wait_gone desc exact "Close" 5 || { log "back did not close the currency sheet"; return 1; }
+  has text exact "Import & Export" || { log "settings missing after the currency sheet"; return 1; }
+  scroll_to text exact "Delete all user data" || return 1
+  has text exact "Danger zone" && has text exact "Product" || { log "last groups missing"; return 1; }
+  shot settings-5-end
+  tap_node text exact "Delete all user data" || return 1
+  wait_for text exact "Delete all user data?" || { log "the delete confirmation did not open"; return 1; }
+  back
+  wait_gone text exact "Delete all user data?" 5 || { log "back did not close the delete confirmation"; return 1; }
+  has text exact "Danger zone" || { log "settings missing after the confirmation"; return 1; }
+  back
+  wait_for text exact "Quick access" || { log "back from Settings should return to the open More sheet"; return 1; }
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -1311,7 +1433,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings}; do
   run_flow "$flow"
 done
 

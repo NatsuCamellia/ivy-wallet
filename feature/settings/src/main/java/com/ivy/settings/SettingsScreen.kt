@@ -1,532 +1,220 @@
 package com.ivy.settings
 
-import androidx.annotation.DrawableRes
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Attribution
+import androidx.compose.material.icons.filled.Backup
+import androidx.compose.material.icons.filled.BrightnessAuto
+import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Contrast
+import androidx.compose.material.icons.filled.CurrencyExchange
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.filled.Fingerprint
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.NewReleases
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.SupportAgent
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeFlexibleTopAppBar
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.ivy.base.legacy.Theme
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.design.l1_buildingBlocks.IconScale
-import com.ivy.design.l1_buildingBlocks.IvyIconScaled
-import com.ivy.ui.util.thenIf
 import com.ivy.legacy.Constants
-import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.rootScreen
-import com.ivy.legacy.utils.drawColoredShadow
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.sheet.ChooseStartDateOfMonthModal
+import com.ivy.legacy.ui.sheet.CurrencyModal
+import com.ivy.legacy.ui.sheet.DeleteModal
+import com.ivy.legacy.ui.sheet.NameModal
+import com.ivy.legacy.ui.sheet.ProgressModal
 import com.ivy.navigation.AttributionsScreen
 import com.ivy.navigation.ContributorsScreen
 import com.ivy.navigation.ExchangeRatesScreen
 import com.ivy.navigation.FeaturesScreen
 import com.ivy.navigation.ImportScreen
 import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.ReleasesScreen
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
+import com.ivy.ui.component.BackButton
 import com.ivy.wallet.domain.data.IvyCurrency
-import com.ivy.ui.color.Blue
-import com.ivy.wallet.ui.theme.Gradient
-import com.ivy.wallet.ui.theme.GradientGreen
-import com.ivy.wallet.ui.theme.GradientIvy
-import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.MediumBlack
-import com.ivy.ui.color.Red
-import com.ivy.ui.color.Red3
-import com.ivy.ui.color.White
-import com.ivy.wallet.ui.theme.components.IvySwitch
-import com.ivy.wallet.ui.theme.components.IvyToolbar
-import com.ivy.legacy.ui.sheet.ChooseStartDateOfMonthModal
-import com.ivy.legacy.ui.sheet.CurrencyModal
-import com.ivy.legacy.ui.sheet.DeleteModal
-import com.ivy.legacy.ui.sheet.NameModal
-import com.ivy.legacy.ui.sheet.ProgressModal
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import java.util.Locale
 
-@ExperimentalFoundationApi
 @Composable
-fun BoxWithConstraintsScope.SettingsScreen() {
+fun SettingsScreen() {
     val viewModel: SettingsViewModel = screenScopedViewModel()
     val uiState = viewModel.uiState()
-    val rootScreen = rootScreen()
 
     UI(
-        currencyCode = uiState.currencyCode,
-        theme = uiState.currentTheme,
-        onSwitchTheme = {
-            viewModel.onEvent(SettingsEvent.SwitchTheme)
-        },
-        lockApp = uiState.lockApp,
-        showNotifications = uiState.showNotifications,
-        hideCurrentBalance = uiState.hideCurrentBalance,
-        hideIncome = uiState.hideIncome,
-        progressState = uiState.progressState,
-        treatTransfersAsIncomeExpense = uiState.treatTransfersAsIncomeExpense,
-        nameLocalAccount = uiState.name,
-        startDateOfMonth = uiState.startDateOfMonth.toInt(),
-        languageOptionVisible = uiState.languageOptionVisible,
-        onSetCurrency = {
-            viewModel.onEvent(SettingsEvent.SetCurrency(it))
-        },
-        onSetName = {
-            viewModel.onEvent(SettingsEvent.SetName(it))
-        },
-        onBackupData = {
-            viewModel.onEvent(SettingsEvent.BackupData(rootScreen))
-        },
-        onExportToCSV = {
-            viewModel.onEvent(SettingsEvent.ExportToCsv(rootScreen))
-        },
-        onSetLockApp = {
-            viewModel.onEvent(SettingsEvent.SetLockApp(it))
-        },
-        onSetShowNotifications = {
-            viewModel.onEvent(SettingsEvent.SetShowNotifications(it))
-        },
-        onSetHideCurrentBalance = {
-            viewModel.onEvent(SettingsEvent.SetHideCurrentBalance(it))
-        },
-        onSetHideIncome = {
-            viewModel.onEvent(SettingsEvent.SetHideIncome(it))
-        },
-        onSetStartDateOfMonth = {
-            viewModel.onEvent(SettingsEvent.SetStartDateOfMonth(it))
-        },
-        onSetTreatTransfersAsIncExp = {
-            viewModel.onEvent(SettingsEvent.SetTransfersAsIncomeExpense(it))
-        },
-        onDeleteAllUserData = {
-            viewModel.onEvent(SettingsEvent.DeleteAllUserData)
-        },
-        onDeleteCloudUserData = {
-            viewModel.onEvent(SettingsEvent.DeleteCloudUserData)
-        },
-        onSwitchLanguage = {
-            viewModel.onEvent(SettingsEvent.SwitchLanguage)
-        }
+        state = uiState,
+        onEvent = viewModel::onEvent,
     )
 }
 
-@ExperimentalFoundationApi
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-@Suppress("LongMethod")
-private fun BoxWithConstraintsScope.UI(
-    currencyCode: String,
-    theme: Theme,
-    onSwitchTheme: () -> Unit,
-    lockApp: Boolean,
-    nameLocalAccount: String?,
-    languageOptionVisible: Boolean,
-    onSetCurrency: (String) -> Unit,
-    startDateOfMonth: Int = 1,
-    showNotifications: Boolean = true,
-    hideCurrentBalance: Boolean = false,
-    hideIncome: Boolean = false,
-    progressState: Boolean = false,
-    treatTransfersAsIncomeExpense: Boolean = false,
-    onSetName: (String) -> Unit = {},
-    onBackupData: () -> Unit = {},
-    onExportToCSV: () -> Unit = {},
-    onSetLockApp: (Boolean) -> Unit = {},
-    onSetShowNotifications: (Boolean) -> Unit = {},
-    onSetTreatTransfersAsIncExp: (Boolean) -> Unit = {},
-    onSetHideCurrentBalance: (Boolean) -> Unit = {},
-    onSetHideIncome: (Boolean) -> Unit = {},
-    onSetStartDateOfMonth: (Int) -> Unit = {},
-    onDeleteAllUserData: () -> Unit = {},
-    onDeleteCloudUserData: () -> Unit = {},
-    onSwitchLanguage: () -> Unit = {}
+private fun UI(
+    state: SettingsState,
+    modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
+    onEvent: (SettingsEvent) -> Unit,
 ) {
     var currencyModalVisible by remember { mutableStateOf(false) }
     var nameModalVisible by remember { mutableStateOf(false) }
     var chooseStartDateOfMonthVisible by remember { mutableStateOf(false) }
-    var deleteCloudDataModalVisible by remember { mutableStateOf(false) }
     var deleteAllDataModalVisible by remember { mutableStateOf(false) }
     var deleteAllDataModalFinalVisible by remember { mutableStateOf(false) }
     val nav = navigation()
+    val rootScreen = rootScreen()
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    LazyColumn(
-        modifier = Modifier
+    Scaffold(
+        modifier = modifier
             .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .testTag("settings_lazy_column")
-    ) {
-        stickyHeader {
-            IvyToolbar(
-                onBack = { nav.onBackPressed() },
-            ) {
-                Spacer(Modifier.weight(1f))
-
-                val rootScreen = rootScreen()
-                Text(
-                    modifier = Modifier.clickable {
-                        nav.navigateTo(ReleasesScreen)
-                    },
-                    text = "${rootScreen.buildVersionName} (${rootScreen.buildVersionCode})",
-                    style = UI.typo.nC.style(
-                        color = UI.colors.gray,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-
-                Spacer(Modifier.width(32.dp))
-            }
-            // onboarding toolbar include paddingBottom 16.dp
-        }
-
-        item {
-            Spacer(Modifier.height(8.dp))
-
-            Text(
-                modifier = Modifier.padding(start = 32.dp),
-                text = stringResource(R.string.settings),
-                style = UI.typo.h2.style(
-                    fontWeight = FontWeight.Black
-                )
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeFlexibleTopAppBar(
+                title = { Text(stringResource(R.string.settings)) },
+                navigationIcon = { BackButton(onClick = { nav.back() }) },
+                scrollBehavior = scrollBehavior,
             )
-
-            Spacer(Modifier.height(24.dp))
-
-            CurrencyButton(currency = currencyCode) {
-                currencyModalVisible = true
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            AccountCard(
-                nameLocalAccount = nameLocalAccount,
-            ) {
-                nameModalVisible = true
-            }
-
-//            Spacer(Modifier.height(20.dp))
-//            Premium()
-        }
-
-        item {
-            SettingsSectionDivider(text = stringResource(R.string.import_export))
-
-            Spacer(Modifier.height(16.dp))
-
-            val nav = navigation()
-            ExportCSV {
-                onExportToCSV()
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            SettingsDefaultButton(
-                icon = R.drawable.ic_vue_security_shield,
-                text = stringResource(R.string.backup_data),
-                iconPadding = 8.dp
-            ) {
-                onBackupData()
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            SettingsPrimaryButton(
-                icon = R.drawable.ic_export_csv,
-                text = stringResource(R.string.import_data),
-                backgroundGradient = GradientGreen
-            ) {
-                nav.navigateTo(
-                    ImportScreen(
-                        launchedFromOnboarding = false
-                    )
+        },
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .testTag("settings_lazy_column"),
+            state = listState,
+            contentPadding = PaddingValues(
+                top = innerPadding.calculateTopPadding(),
+                bottom = innerPadding.calculateBottomPadding()
+            ),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item(key = "account") {
+                AccountGroup(
+                    currencyCode = state.currencyCode,
+                    name = state.name,
+                    onCurrencyClick = { currencyModalVisible = true },
+                    onNameClick = { nameModalVisible = true },
                 )
             }
-        }
-
-        item {
-            SettingsSectionDivider(text = stringResource(R.string.app_settings))
-
-            Spacer(Modifier.height(16.dp))
-
-            AppThemeButton(
-                icon = when (theme) {
-                    Theme.LIGHT -> R.drawable.home_more_menu_light_mode
-                    Theme.DARK -> R.drawable.home_more_menu_dark_mode
-                    Theme.AMOLED_DARK -> R.drawable.home_more_menu_amoled_dark_mode
-                    Theme.AUTO -> R.drawable.home_more_menu_auto_mode
-                },
-                label = when (theme) {
-                    Theme.LIGHT -> stringResource(R.string.light_mode)
-                    Theme.DARK -> stringResource(R.string.dark_mode)
-                    Theme.AMOLED_DARK -> stringResource(R.string.amoled_mode)
-                    Theme.AUTO -> stringResource(R.string.auto_mode)
-                }
-            ) {
-                onSwitchTheme()
+            item(key = "import_export") {
+                ImportExportGroup(onEvent = onEvent)
+            }
+            item(key = "app_settings") {
+                AppSettingsGroup(
+                    state = state,
+                    onStartDateClick = { chooseStartDateOfMonthVisible = true },
+                    onEvent = onEvent,
+                )
+            }
+            item(key = "other") {
+                OtherGroup()
+            }
+            item(key = "product") {
+                ProductGroup()
+            }
+            item(key = "danger_zone") {
+                DangerGroup(onDeleteClick = { deleteAllDataModalVisible = true })
             }
 
-            Spacer(Modifier.height(12.dp))
-
-            val nav = navigation()
-//            SettingsDefaultButton(
-//                icon = R.drawable.ic_custom_atom_m,
-//                text = "Features"
-//            ) {
-//                nav.navigateTo(FeaturesScreen)
-//            }
-//
-//            Spacer(Modifier.height(12.dp))
-
-            if (languageOptionVisible) {
-                SettingsDefaultButton(
-                    icon = R.drawable.ic_vue_location_global,
-                    iconPadding = 6.dp,
-                    text = stringResource(R.string.language),
-                    description = Locale.getDefault().displayName
+            item(key = "version") {
+                TextButton(
+                    onClick = { nav.navigateTo(ReleasesScreen) },
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    onSwitchLanguage()
+                    Text(
+                        text = "${rootScreen.buildVersionName} (${rootScreen.buildVersionCode})",
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Center,
+                    )
                 }
-
-                Spacer(Modifier.height(12.dp))
             }
-
-            SettingsDefaultButton(
-                icon = R.drawable.ic_currency,
-                text = stringResource(R.string.exchange_rates),
-            ) {
-                nav.navigateTo(ExchangeRatesScreen)
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            AppSwitch(
-                lockApp = lockApp,
-                onSetLockApp = onSetLockApp,
-                text = stringResource(R.string.lock_app),
-                icon = R.drawable.ic_custom_fingerprint_m
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            AppSwitch(
-                lockApp = showNotifications,
-                onSetLockApp = onSetShowNotifications,
-                text = stringResource(R.string.show_notifications),
-                icon = R.drawable.ic_notification_m
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            AppSwitch(
-                lockApp = hideCurrentBalance,
-                onSetLockApp = onSetHideCurrentBalance,
-                text = stringResource(R.string.hide_balance),
-                description = stringResource(R.string.hide_balance_description),
-                icon = R.drawable.ic_hide_m
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            AppSwitch(
-                lockApp = hideIncome,
-                onSetLockApp = onSetHideIncome,
-                text = stringResource(R.string.hide_income),
-                description = stringResource(R.string.hide_income_description),
-                icon = R.drawable.ic_hide_m
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            AppSwitch(
-                lockApp = treatTransfersAsIncomeExpense,
-                onSetLockApp = onSetTreatTransfersAsIncExp,
-                text = stringResource(R.string.transfers_as_income_expense),
-                description = stringResource(R.string.transfers_as_income_expense_description),
-                icon = R.drawable.ic_custom_transfer_m
-            )
-
-            Spacer(Modifier.height(12.dp))
-
-            StartDateOfMonth(
-                startDateOfMonth = startDateOfMonth
-            ) {
-                chooseStartDateOfMonthVisible = true
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            CustomFeatures(
-                onClick = { nav.navigateTo(FeaturesScreen) }
-            )
-        }
-
-//        item {
-//            SettingsSectionDivider(text = stringResource(R.string.experimental))
-//
-//            Spacer(Modifier.height(16.dp))
-//
-//            val nav = navigation()
-//            SettingsDefaultButton(
-//                icon = R.drawable.ic_custom_atom_m,
-//                text = stringResource(R.string.experimental_settings)
-//            ) {
-//                nav.navigateTo(ExperimentalScreen)
-//            }
-//        }
-
-        item {
-            SettingsSectionDivider(text = stringResource(R.string.other))
-
-            Spacer(Modifier.height(16.dp))
-
-            val rootScreen = rootScreen()
-            SettingsPrimaryButton(
-                icon = R.drawable.ic_custom_star_m,
-                text = stringResource(R.string.rate_us_on_google_play),
-                backgroundGradient = GradientIvy
-            ) {
-                rootScreen.reviewIvyWallet(dismissReviewCard = false)
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            SettingsPrimaryButton(
-                icon = R.drawable.ic_custom_family_m,
-                text = stringResource(R.string.share_ivy_wallet),
-                backgroundGradient = Gradient.solid(Red3)
-            ) {
-                rootScreen.shareIvyWallet()
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            SettingsPrimaryButton(
-                icon = R.drawable.github_logo,
-                iconPadding = 10.dp,
-                text = stringResource(R.string.ivy_wallet_is_opensource),
-                backgroundGradient = Gradient.solid(MediumBlack)
-            ) {
-                rootScreen.openUrlInBrowser(url = Constants.URL_IVY_WALLET_REPO)
-            }
-        }
-
-        item {
-            SettingsSectionDivider(text = stringResource(R.string.product))
-
-            Spacer(Modifier.height(12.dp))
-
-            IvyTelegram()
-
-            Spacer(Modifier.height(16.dp))
-
-            HelpCenter()
-
-            Spacer(Modifier.height(12.dp))
-
-            Releases(nav = nav)
-
-            Spacer(Modifier.height(12.dp))
-
-            ReportBug()
-
-            Spacer(Modifier.height(12.dp))
-
-            val rootActivity = rootScreen()
-            RequestFeature {
-                rootActivity.openUrlInBrowser(Constants.URL_GITHUB_NEW_ISSUE)
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            ContactSupport()
-
-            Spacer(Modifier.height(12.dp))
-
-            Contributors(nav = nav)
-
-            Spacer(Modifier.height(12.dp))
-
-            Attributions()
-
-            Spacer(Modifier.height(12.dp))
-
-            TCAndPrivacyPolicy()
-        }
-
-        item {
-            SettingsSectionDivider(
-                text = stringResource(R.string.danger_zone),
-                color = Red
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            SettingsPrimaryButton(
-                icon = R.drawable.ic_delete,
-                text = stringResource(R.string.delete_all_user_data),
-                backgroundGradient = Gradient.solid(Red)
-            ) {
-                deleteAllDataModalVisible = true
-            }
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(120.dp)) // last item spacer
         }
     }
 
     CurrencyModal(
         title = stringResource(R.string.set_currency),
-        initialCurrency = IvyCurrency.fromCode(currencyCode),
+        initialCurrency = IvyCurrency.fromCode(state.currencyCode),
         visible = currencyModalVisible,
         dismiss = { currencyModalVisible = false }
     ) {
-        onSetCurrency(it)
+        onEvent(SettingsEvent.SetCurrency(it))
     }
 
     NameModal(
         visible = nameModalVisible,
-        name = nameLocalAccount ?: "",
+        name = state.name,
         dismiss = { nameModalVisible = false }
     ) {
-        onSetName(it)
+        onEvent(SettingsEvent.SetName(it))
     }
 
     ChooseStartDateOfMonthModal(
         visible = chooseStartDateOfMonthVisible,
-        selectedStartDateOfMonth = startDateOfMonth,
+        selectedStartDateOfMonth = state.startDateOfMonth.toInt(),
         dismiss = { chooseStartDateOfMonthVisible = false }
     ) {
-        onSetStartDateOfMonth(it)
+        onEvent(SettingsEvent.SetStartDateOfMonth(it))
     }
 
     DeleteModal(
@@ -552,648 +240,421 @@ private fun BoxWithConstraintsScope.UI(
         visible = deleteAllDataModalFinalVisible,
         dismiss = { deleteAllDataModalFinalVisible = false },
         onDelete = {
-            onDeleteAllUserData()
-        }
-    )
-
-    DeleteModal(
-        title = stringResource(R.string.delete_all_cloud_data_question),
-        description = stringResource(
-            R.string.delete_all_user_cloud_data_warning,
-            stringResource(R.string.your_account)
-        ),
-        visible = deleteCloudDataModalVisible,
-        dismiss = { deleteCloudDataModalVisible = false },
-        onDelete = {
-            onDeleteCloudUserData()
-            deleteCloudDataModalVisible = false
+            onEvent(SettingsEvent.DeleteAllUserData)
         }
     )
 
     ProgressModal(
         title = stringResource(R.string.exporting_data),
         description = stringResource(R.string.exporting_data_description),
-        visible = progressState
+        visible = state.progressState
     )
 }
 
 @Composable
-private fun StartDateOfMonth(
-    startDateOfMonth: Int,
-    onClick: () -> Unit
+private fun AccountGroup(
+    currencyCode: String,
+    name: String,
+    onCurrencyClick: () -> Unit,
+    onNameClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    SettingsButtonRow(
-        onClick = onClick
-    ) {
-        Spacer(Modifier.width(12.dp))
-
-        IvyIconScaled(
-            icon = R.drawable.ic_custom_calendar_m,
-            tint = UI.colors.pureInverse,
-            iconScale = IconScale.M,
-            padding = 2.dp
+    SettingsGroup(
+        modifier = modifier,
+        items = persistentListOf(
+            SettingsItem(
+                icon = Icons.Default.AttachMoney,
+                title = stringResource(R.string.set_currency),
+                trailing = currencyCode,
+                onClick = onCurrencyClick,
+            ),
+            SettingsItem(
+                icon = Icons.Default.Person,
+                title = name.ifBlank { stringResource(R.string.anonymous) },
+                onClick = onNameClick,
+                modifier = Modifier.testTag("settings_profile_card"),
+                titleModifier = Modifier.testTag("local_account_name"),
+            ),
         )
-
-        Spacer(Modifier.width(8.dp))
-
-        Text(
-            modifier = Modifier.padding(vertical = 20.dp),
-            text = stringResource(R.string.start_date_of_month),
-            style = UI.typo.b2.style(
-                color = UI.colors.pureInverse,
-                fontWeight = FontWeight.Bold
-            )
-        )
-
-        Spacer(Modifier.weight(1f))
-
-        Text(
-            text = startDateOfMonth.toString(),
-            style = UI.typo.nB2.style(
-                fontWeight = FontWeight.ExtraBold,
-                color = UI.colors.pureInverse
-            )
-        )
-
-        Spacer(Modifier.width(32.dp))
-    }
+    )
 }
 
 @Composable
-private fun CustomFeatures(
-    onClick: () -> Unit
+private fun ImportExportGroup(
+    onEvent: (SettingsEvent) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    SettingsButtonRow(
-        onClick = onClick
-    ) {
-        Spacer(Modifier.width(12.dp))
-
-        IvyIconScaled(
-            icon = R.drawable.ic_custom_programming_m,
-            tint = UI.colors.pureInverse,
-            iconScale = IconScale.M,
-            padding = 0.dp
-        )
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        Text(
-            modifier = Modifier.padding(vertical = 20.dp),
-            text = stringResource(R.string.advanced_features),
-            style = UI.typo.b2.style(
-                color = UI.colors.pureInverse,
-                fontWeight = FontWeight.Bold
-            )
-        )
-    }
-}
-
-@Composable
-private fun IvyTelegram() {
-    val rootActivity = rootScreen()
-    SettingsPrimaryButton(
-        icon = R.drawable.ic_telegram_24dp,
-        text = stringResource(R.string.ivy_telegram),
-        backgroundGradient = Gradient.solid(Blue),
-        iconPadding = 10.dp
-    ) {
-        rootActivity.openUrlInBrowser(Constants.URL_IVY_TELEGRAM_INVITE)
-    }
-}
-
-@Composable
-private fun HelpCenter() {
-    val uriHandler = LocalUriHandler.current
-    SettingsDefaultButton(
-        icon = R.drawable.ic_custom_education_m,
-        text = stringResource(R.string.help_center),
-    ) {
-        uriHandler.openUri(Constants.URL_HELP_CENTER)
-    }
-}
-
-@Composable
-private fun ReportBug() {
-    val uriHandler = LocalUriHandler.current
-    SettingsDefaultButton(
-        icon = R.drawable.ic_vue_dev_arrow,
-        text = stringResource(R.string.report_bug),
-        iconPadding = 10.dp,
-    ) {
-        uriHandler.openUri(Constants.URL_GITHUB_NEW_ISSUE)
-    }
-}
-
-@Composable
-private fun RequestFeature(
-    onClick: () -> Unit
-) {
-    SettingsDefaultButton(
-        icon = R.drawable.ic_custom_programming_m,
-        text = stringResource(R.string.request_a_feature),
-    ) {
-        onClick()
-    }
-}
-
-@Composable
-private fun ContactSupport() {
-    val rootActivity = rootScreen()
-    SettingsDefaultButton(
-        icon = R.drawable.ic_support,
-        text = stringResource(R.string.contact_support),
-    ) {
-        rootActivity.openUrlInBrowser(Constants.URL_IVY_TELEGRAM_INVITE)
-    }
-}
-
-@Composable
-private fun Releases(nav: Navigation) {
-    SettingsDefaultButton(
-        icon = R.drawable.ic_vue_money_tag,
-        text = stringResource(R.string.releases),
-        iconPadding = 8.dp
-    ) {
-        nav.navigateTo(ReleasesScreen)
-    }
-}
-
-@Composable
-private fun Contributors(nav: Navigation) {
-    SettingsDefaultButton(
-        icon = R.drawable.ic_vue_people_people,
-        text = stringResource(R.string.project_contributors),
-        iconPadding = 8.dp
-    ) {
-        nav.navigateTo(ContributorsScreen)
-    }
-}
-
-@Composable
-private fun Attributions() {
     val nav = navigation()
-
-    SettingsDefaultButton(
-        icon = R.drawable.ic_vue_location_global,
-        text = stringResource(R.string.attributions),
-        iconPadding = 6.dp
-    ) {
-        nav.navigateTo(AttributionsScreen)
-    }
-}
-
-@Composable
-private fun AppThemeButton(
-    @DrawableRes icon: Int,
-    label: String,
-    onClick: () -> Unit
-) {
-    SettingsPrimaryButton(
-        icon = icon,
-        text = label,
-        backgroundGradient = Gradient.solid(UI.colors.medium),
-        textColor = UI.colors.pureInverse,
-        iconPadding = 6.dp,
-        description = stringResource(R.string.tap_to_switch_theme),
-        onClick = onClick
+    val rootScreen = rootScreen()
+    SettingsGroup(
+        modifier = modifier,
+        title = stringResource(R.string.import_export),
+        items = persistentListOf(
+            SettingsItem(
+                icon = Icons.Default.FileUpload,
+                title = stringResource(R.string.export_to_csv),
+                supporting = stringResource(R.string.do_not_use_for_backup_purposes),
+                onClick = { onEvent(SettingsEvent.ExportToCsv(rootScreen)) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.Backup,
+                title = stringResource(R.string.backup_data),
+                onClick = { onEvent(SettingsEvent.BackupData(rootScreen)) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.FileDownload,
+                title = stringResource(R.string.import_data),
+                onClick = { nav.navigateTo(ImportScreen(launchedFromOnboarding = false)) },
+            ),
+        )
     )
 }
 
 @Composable
-private fun AppSwitch(
-    lockApp: Boolean,
-    onSetLockApp: (Boolean) -> Unit,
-    text: String,
-    icon: Int,
-    description: String = "",
+private fun AppSettingsGroup(
+    state: SettingsState,
+    onStartDateClick: () -> Unit,
+    onEvent: (SettingsEvent) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    SettingsButtonRow(
-        onClick = {
-            onSetLockApp(!lockApp)
-        }
-    ) {
-        Spacer(Modifier.width(12.dp))
+    val nav = navigation()
+    SettingsGroup(
+        modifier = modifier,
+        title = stringResource(R.string.app_settings),
+        items = listOfNotNull(
+            SettingsItem(
+                icon = state.currentTheme.icon(),
+                title = state.currentTheme.label(),
+                supporting = stringResource(R.string.tap_to_switch_theme),
+                onClick = { onEvent(SettingsEvent.SwitchTheme) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.Language,
+                title = stringResource(R.string.language),
+                supporting = Locale.getDefault().displayName,
+                onClick = { onEvent(SettingsEvent.SwitchLanguage) },
+            ).takeIf { state.languageOptionVisible },
+            SettingsItem(
+                icon = Icons.Default.CurrencyExchange,
+                title = stringResource(R.string.exchange_rates),
+                onClick = { nav.navigateTo(ExchangeRatesScreen) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.Fingerprint,
+                title = stringResource(R.string.lock_app),
+                checked = state.lockApp,
+                onClick = { onEvent(SettingsEvent.SetLockApp(!state.lockApp)) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.Notifications,
+                title = stringResource(R.string.show_notifications),
+                checked = state.showNotifications,
+                onClick = { onEvent(SettingsEvent.SetShowNotifications(!state.showNotifications)) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.VisibilityOff,
+                title = stringResource(R.string.hide_balance),
+                supporting = stringResource(R.string.hide_balance_description),
+                checked = state.hideCurrentBalance,
+                onClick = { onEvent(SettingsEvent.SetHideCurrentBalance(!state.hideCurrentBalance)) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.VisibilityOff,
+                title = stringResource(R.string.hide_income),
+                supporting = stringResource(R.string.hide_income_description),
+                checked = state.hideIncome,
+                onClick = { onEvent(SettingsEvent.SetHideIncome(!state.hideIncome)) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.SwapHoriz,
+                title = stringResource(R.string.transfers_as_income_expense),
+                supporting = stringResource(R.string.transfers_as_income_expense_description),
+                checked = state.treatTransfersAsIncomeExpense,
+                onClick = {
+                    onEvent(
+                        SettingsEvent.SetTransfersAsIncomeExpense(!state.treatTransfersAsIncomeExpense)
+                    )
+                },
+            ),
+            SettingsItem(
+                icon = Icons.Default.CalendarMonth,
+                title = stringResource(R.string.start_date_of_month),
+                trailing = state.startDateOfMonth,
+                onClick = onStartDateClick,
+            ),
+            SettingsItem(
+                icon = Icons.Default.Tune,
+                title = stringResource(R.string.advanced_features),
+                onClick = { nav.navigateTo(FeaturesScreen) },
+            ),
+        ).toImmutableList()
+    )
+}
 
-        IvyIconScaled(
-            icon = icon,
-            tint = UI.colors.pureInverse,
-            iconScale = IconScale.M,
-            padding = 0.dp
+@Composable
+private fun OtherGroup(modifier: Modifier = Modifier) {
+    val rootScreen = rootScreen()
+    SettingsGroup(
+        modifier = modifier,
+        title = stringResource(R.string.other),
+        items = persistentListOf(
+            SettingsItem(
+                icon = Icons.Default.Star,
+                title = stringResource(R.string.rate_us_on_google_play),
+                onClick = { rootScreen.reviewIvyWallet(dismissReviewCard = false) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.Share,
+                title = stringResource(R.string.share_ivy_wallet),
+                onClick = { rootScreen.shareIvyWallet() },
+            ),
+            SettingsItem(
+                icon = Icons.Default.Code,
+                title = stringResource(R.string.ivy_wallet_is_opensource),
+                onClick = { rootScreen.openUrlInBrowser(url = Constants.URL_IVY_WALLET_REPO) },
+            ),
         )
+    )
+}
 
-        Spacer(Modifier.width(8.dp))
+@Composable
+private fun ProductGroup(modifier: Modifier = Modifier) {
+    val nav = navigation()
+    val rootScreen = rootScreen()
+    val uriHandler = LocalUriHandler.current
+    SettingsGroup(
+        modifier = modifier,
+        title = stringResource(R.string.product),
+        items = persistentListOf(
+            SettingsItem(
+                icon = Icons.AutoMirrored.Filled.Send,
+                title = stringResource(R.string.ivy_telegram),
+                onClick = { rootScreen.openUrlInBrowser(Constants.URL_IVY_TELEGRAM_INVITE) },
+            ),
+            SettingsItem(
+                icon = Icons.AutoMirrored.Filled.Help,
+                title = stringResource(R.string.help_center),
+                onClick = { uriHandler.openUri(Constants.URL_HELP_CENTER) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.NewReleases,
+                title = stringResource(R.string.releases),
+                onClick = { nav.navigateTo(ReleasesScreen) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.BugReport,
+                title = stringResource(R.string.report_bug),
+                onClick = { uriHandler.openUri(Constants.URL_GITHUB_NEW_ISSUE) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.Lightbulb,
+                title = stringResource(R.string.request_a_feature),
+                onClick = { rootScreen.openUrlInBrowser(Constants.URL_GITHUB_NEW_ISSUE) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.SupportAgent,
+                title = stringResource(R.string.contact_support),
+                onClick = { rootScreen.openUrlInBrowser(Constants.URL_IVY_TELEGRAM_INVITE) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.People,
+                title = stringResource(R.string.project_contributors),
+                onClick = { nav.navigateTo(ContributorsScreen) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.Attribution,
+                title = stringResource(R.string.attributions),
+                onClick = { nav.navigateTo(AttributionsScreen) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.Description,
+                title = stringResource(R.string.terms_conditions),
+                onClick = { uriHandler.openUri(Constants.URL_TC) },
+            ),
+            SettingsItem(
+                icon = Icons.Default.PrivacyTip,
+                title = stringResource(R.string.privacy_policy),
+                onClick = { uriHandler.openUri(Constants.URL_PRIVACY_POLICY) },
+            ),
+        )
+    )
+}
 
-        Column(
-            Modifier
-                .weight(1f)
-                .padding(top = 20.dp, bottom = 20.dp, end = 8.dp)
-        ) {
+@Composable
+private fun DangerGroup(
+    onDeleteClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SettingsGroup(
+        modifier = modifier,
+        title = stringResource(R.string.danger_zone),
+        items = persistentListOf(
+            SettingsItem(
+                icon = Icons.Default.Delete,
+                title = stringResource(R.string.delete_all_user_data),
+                destructive = true,
+                onClick = onDeleteClick,
+            ),
+        )
+    )
+}
+
+@Immutable
+private class SettingsItem(
+    val icon: ImageVector,
+    val title: String,
+    val onClick: () -> Unit,
+    val supporting: String? = null,
+    val trailing: String? = null,
+    val checked: Boolean? = null,
+    val destructive: Boolean = false,
+    val modifier: Modifier = Modifier,
+    val titleModifier: Modifier = Modifier,
+)
+
+@Composable
+private fun SettingsGroup(
+    items: ImmutableList<SettingsItem>,
+    modifier: Modifier = Modifier,
+    title: String? = null,
+) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        if (title != null) {
             Text(
-                text = text,
-                style = UI.typo.b2.style(
-                    color = UI.colors.pureInverse,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-            if (description.isNotEmpty()) {
-                Text(
-                    modifier = Modifier.padding(end = 8.dp),
-                    text = description,
-                    style = UI.typo.nB2.style(
-                        color = Gray,
-                        fontWeight = FontWeight.Normal
-                    ).copy(fontSize = 14.sp)
-                )
-            }
-        }
-
-        // Spacer(Modifier.weight(1f))
-
-        IvySwitch(enabled = lockApp) {
-            onSetLockApp(it)
-        }
-
-        Spacer(Modifier.width(16.dp))
-    }
-}
-
-@Composable
-private fun AccountCard(
-    nameLocalAccount: String?,
-    onCardClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth()
-            .clip(UI.shapes.r2)
-            .background(UI.colors.medium, UI.shapes.r2)
-            .clickable {
-                onCardClick()
-            }
-    ) {
-        Spacer(Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .testTag("settings_profile_card"),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Spacer(Modifier.width(24.dp))
-
-            Text(
-                text = stringResource(R.string.account_uppercase),
-                style = UI.typo.c.style(
-                    fontWeight = FontWeight.Black,
-                    color = UI.colors.gray
-                )
+                text = title,
+                modifier = Modifier.semantics { heading() },
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-
-        Spacer(Modifier.height(4.dp))
-
-        AccountCardLocalAccount(
-            name = nameLocalAccount,
-        )
-
-        Spacer(Modifier.height(24.dp))
-    }
-}
-
-@Composable
-private fun AccountCardLocalAccount(
-    name: String?
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(20.dp))
-        IvyIconScaled(
-            icon = R.drawable.ic_local_account,
-            iconScale = IconScale.M
-        )
-
-        Spacer(Modifier.width(12.dp))
-
-        Text(
-            modifier = Modifier
-                .weight(1f)
-                .testTag("local_account_name"),
-            text = if (!name.isNullOrBlank()) name else stringResource(R.string.anonymous),
-            style = UI.typo.b2.style(
-                fontWeight = FontWeight.Bold
-            )
-        )
-
-        Spacer(Modifier.width(12.dp))
-    }
-}
-
-@Composable
-private fun ExportCSV(
-    onExportToCSV: () -> Unit
-) {
-    SettingsDefaultButton(
-        icon = R.drawable.ic_vue_pc_printer,
-        text = stringResource(R.string.export_to_csv),
-        iconPadding = 6.dp,
-        description = stringResource(R.string.do_not_use_for_backup_purposes)
-    ) {
-        onExportToCSV()
-    }
-}
-
-@Composable
-private fun TCAndPrivacyPolicy() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(16.dp))
-
-        val uriHandler = LocalUriHandler.current
-
-        Text(
-            modifier = Modifier
-                .weight(1f)
-                .clip(UI.shapes.rFull)
-                .border(2.dp, UI.colors.medium, UI.shapes.rFull)
-                .clickable {
-                    uriHandler.openUri(Constants.URL_TC)
-                }
-                .padding(vertical = 14.dp),
-            text = stringResource(R.string.terms_conditions),
-            style = UI.typo.c.style(
-                fontWeight = FontWeight.ExtraBold,
-                color = UI.colors.pureInverse,
-                textAlign = TextAlign.Center
-            )
-        )
-
-        Spacer(Modifier.width(12.dp))
-
-        Text(
-            modifier = Modifier
-                .weight(1f)
-                .clip(UI.shapes.rFull)
-                .border(2.dp, UI.colors.medium, UI.shapes.rFull)
-                .clickable {
-                    uriHandler.openUri(Constants.URL_PRIVACY_POLICY)
-                }
-                .padding(vertical = 14.dp),
-            text = stringResource(R.string.privacy_policy),
-            style = UI.typo.c.style(
-                fontWeight = FontWeight.ExtraBold,
-                color = UI.colors.pureInverse,
-                textAlign = TextAlign.Center
-            )
-        )
-
-        Spacer(Modifier.width(16.dp))
-    }
-}
-
-@Composable
-private fun SettingsPrimaryButton(
-    @DrawableRes icon: Int,
-    text: String,
-    hasShadow: Boolean = false,
-    backgroundGradient: Gradient = Gradient.solid(UI.colors.medium),
-    textColor: Color = White,
-    iconPadding: Dp = 0.dp,
-    description: String? = null,
-    onClick: () -> Unit
-) {
-    SettingsButtonRow(
-        hasShadow = hasShadow,
-        backgroundGradient = backgroundGradient,
-        onClick = onClick
-    ) {
-        Spacer(Modifier.width(12.dp))
-
-        IvyIconScaled(
-            icon = icon,
-            tint = textColor,
-            iconScale = IconScale.M,
-            padding = iconPadding
-        )
-
-        Spacer(Modifier.width(8.dp))
-
-        Column(
-            Modifier
-                .weight(1f)
-                .padding(top = 20.dp, bottom = 20.dp, end = 8.dp)
-        ) {
-            Text(
-                text = text,
-                style = UI.typo.b2.style(
-                    color = textColor,
-                    fontWeight = FontWeight.Bold,
-                )
-            )
-            if (!description.isNullOrEmpty()) {
-                Text(
-                    modifier = Modifier.padding(end = 8.dp),
-                    text = description,
-                    style = UI.typo.nB2.style(
-                        color = Gray,
-                        fontWeight = FontWeight.Normal
-                    ).copy(fontSize = 14.sp)
-                )
+        Column(verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)) {
+            items.forEachIndexed { index, item ->
+                SettingsRow(item = item, index = index, count = items.size)
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun SettingsButtonRow(
-    onClick: (() -> Unit)?,
-    hasShadow: Boolean = false,
-    backgroundGradient: Gradient = Gradient.solid(UI.colors.medium),
-    content: @Composable RowScope.() -> Unit
+private fun SettingsRow(
+    item: SettingsItem,
+    index: Int,
+    count: Int,
+    modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .thenIf(hasShadow) {
-                drawColoredShadow(color = backgroundGradient.startColor)
-            }
-            .fillMaxWidth()
-            .clip(UI.shapes.r4)
-            .background(backgroundGradient.asHorizontalBrush(), UI.shapes.r4)
-            .thenIf(onClick != null) {
-                clickable {
-                    onClick?.invoke()
+    val contentColor = if (item.destructive) {
+        MaterialTheme.colorScheme.error
+    } else {
+        MaterialTheme.colorScheme.onSurface
+    }
+    val leading: @Composable () -> Unit = {
+        Icon(imageVector = item.icon, contentDescription = null, tint = contentColor)
+    }
+    val supporting: (@Composable () -> Unit)? = item.supporting?.let { { Text(it) } }
+    val headline: @Composable () -> Unit = {
+        Text(text = item.title, modifier = item.titleModifier, color = contentColor)
+    }
+    val shapes = ListItemDefaults.segmentedShapes(index = index, count = count)
+    val colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)
+
+    if (item.checked != null) {
+        SegmentedListItem(
+            checked = item.checked,
+            onCheckedChange = { item.onClick() },
+            shapes = shapes,
+            colors = colors,
+            modifier = modifier.then(item.modifier),
+            leadingContent = leading,
+            trailingContent = { Switch(checked = item.checked, onCheckedChange = null) },
+            supportingContent = supporting,
+            content = headline,
+        )
+    } else {
+        SegmentedListItem(
+            onClick = item.onClick,
+            shapes = shapes,
+            colors = colors,
+            modifier = modifier.then(item.modifier),
+            leadingContent = leading,
+            trailingContent = item.trailing?.let { trailing ->
+                {
+                    Text(text = trailing, style = MaterialTheme.typography.titleMedium)
                 }
             },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        content()
+            supportingContent = supporting,
+            content = headline,
+        )
     }
+}
+
+private fun Theme.icon(): ImageVector = when (this) {
+    Theme.LIGHT -> Icons.Default.LightMode
+    Theme.DARK -> Icons.Default.DarkMode
+    Theme.AMOLED_DARK -> Icons.Default.Contrast
+    Theme.AUTO -> Icons.Default.BrightnessAuto
 }
 
 @Composable
-private fun AccountCardButton(
-    @DrawableRes icon: Int,
-    text: String,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .clip(UI.shapes.rFull)
-            .background(UI.colors.pure, UI.shapes.rFull)
-            .clickable {
-                onClick()
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(12.dp))
-
-        IvyIconScaled(
-            icon = icon,
-            iconScale = IconScale.M
-        )
-
-        Spacer(Modifier.width(4.dp))
-
-        Text(
-            modifier = Modifier
-                .padding(vertical = 10.dp),
-            text = text,
-            style = UI.typo.b2.style(
-                fontWeight = FontWeight.Bold,
-                color = UI.colors.pureInverse
-            )
-        )
-
-        Spacer(Modifier.width(24.dp))
+private fun Theme.label(): String = stringResource(
+    when (this) {
+        Theme.LIGHT -> R.string.light_mode
+        Theme.DARK -> R.string.dark_mode
+        Theme.AMOLED_DARK -> R.string.amoled_mode
+        Theme.AUTO -> R.string.auto_mode
     }
-}
+)
 
-@Composable
-private fun CurrencyButton(
-    currency: String,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clip(UI.shapes.r4)
-            .border(2.dp, UI.colors.medium, UI.shapes.r4)
-            .clickable {
-                onClick()
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(12.dp))
-
-        IvyIconScaled(
-            icon = R.drawable.ic_currency,
-            iconScale = IconScale.M,
-            padding = 0.dp
-        )
-
-        Spacer(Modifier.width(8.dp))
-
-        Text(
-            modifier = Modifier.padding(vertical = 20.dp),
-            text = stringResource(R.string.set_currency),
-            style = UI.typo.b2.style(
-                color = UI.colors.pureInverse,
-                fontWeight = FontWeight.Bold
-            )
-        )
-
-        Spacer(Modifier.weight(1f))
-
-        Text(
-            text = currency,
-            style = UI.typo.b1.style(
-                color = UI.colors.pureInverse,
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
-
-        Spacer(Modifier.height(4.dp))
-
-        IvyIconScaled(
-            icon = R.drawable.ic_arrow_right,
-            iconScale = IconScale.M
-        )
-
-        Spacer(Modifier.width(24.dp))
-    }
-}
-
-@Composable
-private fun SettingsSectionDivider(
-    text: String,
-    color: Color = Gray
-) {
-    Column {
-        Spacer(Modifier.height(32.dp))
-
-        Text(
-            modifier = Modifier.padding(start = 32.dp),
-            text = text,
-            style = UI.typo.b2.style(
-                color = color,
-                fontWeight = FontWeight.Bold
-            )
-        )
-    }
-}
-
-@Composable
-private fun SettingsDefaultButton(
-    @DrawableRes icon: Int,
-    text: String,
-    iconPadding: Dp = 0.dp,
-    description: String? = null,
-    onClick: () -> Unit,
-) {
-    SettingsPrimaryButton(
-        icon = icon,
-        text = text,
-        backgroundGradient = Gradient.solid(UI.colors.medium),
-        textColor = UI.colors.pureInverse,
-        iconPadding = iconPadding,
-        description = description
-    ) {
-        onClick()
-    }
-}
-
-@ExperimentalFoundationApi
 @Preview
 @Composable
-private fun Preview(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
-        UI(
-            nameLocalAccount = null,
-            theme = Theme.AUTO,
-            onSwitchTheme = {},
-            lockApp = false,
-            currencyCode = "BGN",
-            onSetCurrency = {},
-            languageOptionVisible = true
-        )
+private fun Preview(
+    theme: Theme = Theme.LIGHT,
+    firstVisibleItem: Int = 0,
+    switches: Boolean = false,
+) {
+    WalletPreview(theme) {
+        NavigationRoot(navigation = Navigation()) {
+            UI(
+                state = SettingsState(
+                    currencyCode = "BGN",
+                    name = "Ivy",
+                    currentTheme = Theme.AUTO,
+                    lockApp = switches,
+                    showNotifications = switches,
+                    hideCurrentBalance = switches,
+                    hideIncome = switches,
+                    treatTransfersAsIncomeExpense = switches,
+                    startDateOfMonth = "1",
+                    progressState = false,
+                    languageOptionVisible = true,
+                ),
+                listState = rememberLazyListState(initialFirstVisibleItemIndex = firstVisibleItem),
+                onEvent = {}
+            )
+        }
     }
 }
 
 /** For screenshot testing */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SettingsUiTest(isDark: Boolean) {
-    val theme = when (isDark) {
-        true -> Theme.DARK
-        false -> Theme.LIGHT
-    }
-    Preview(theme)
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing: the app settings group with every switch on. */
+@Composable
+fun SettingsAppSettingsUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT, firstVisibleItem = 2, switches = true)
+}
+
+/** For screenshot testing: the other group. */
+@Composable
+fun SettingsOtherUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT, firstVisibleItem = 3)
+}
+
+/** For screenshot testing: the end of the list, down to the danger zone and the version. */
+@Composable
+fun SettingsEndUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT, firstVisibleItem = Int.MAX_VALUE)
 }

@@ -65,7 +65,7 @@ fun OnboardingType(
         ) {
             Image(
                 painter = painterResource(id = R.drawable.onboarding_illustration_import),
-                contentDescription = "import illustration",
+                contentDescription = null,
                 modifier = Modifier.fillMaxWidth(),
                 contentScale = ContentScale.Fit
             )

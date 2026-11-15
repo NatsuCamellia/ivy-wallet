@@ -293,7 +293,14 @@ PY
   wait_for text exact "Set currency" || return 1
   tap_node text exact "Set" || return 1
   wait_for text exact "Add accounts" || return 1
-  tap_node text exact "Skip" || return 1
+  # a suggested account chip becomes a list row, the chip is gone and Next replaces Skip
+  tap_node text exact "Cash" || return 1
+  wait_for text exact "Next" || { log "accounts step: Next missing after adding a suggestion"; return 1; }
+  has text exact "Cash" || { log "accounts step: added account row missing"; return 1; }
+  has text exact "Skip" && { log "accounts step: Skip still shown with an account"; return 1; }
+  find_node text exact "Cash" 1 >/dev/null 2>&1 && { log "accounts step: suggestion chip still shown"; return 1; }
+  shot onboarding-accounts-added
+  tap_node text exact "Next" || return 1
   wait_for text exact "Add categories" || return 1
   tap_node text exact "Skip" || return 1
   wait_for text exact "Home" 20 || return 1

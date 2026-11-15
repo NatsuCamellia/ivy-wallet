@@ -3,12 +3,16 @@ package com.ivy.onboarding.steps
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.Button
@@ -83,53 +87,58 @@ private fun Login(
     modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .heightIn(min = maxHeight),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Brand()
-
-            TextButton(
-                onClick = {
-                    openUrl(
-                        uriHandler = uriHandler,
-                        url = Constants.URL_IVY_WALLET_REPO
-                    )
-                }
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(stringResource(R.string.opensource))
+                Brand()
+
+                TextButton(
+                    onClick = {
+                        openUrl(
+                            uriHandler = uriHandler,
+                            url = Constants.URL_IVY_WALLET_REPO
+                        )
+                    }
+                ) {
+                    Text(stringResource(R.string.opensource))
+                }
             }
+
+            Text(
+                text = stringResource(R.string.enter_with_offline_account),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            Text(
+                text = stringResource(R.string.your_data_will_be_saved_only_locally),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+
+            Button(
+                onClick = onSkip,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.PhoneAndroid, contentDescription = null)
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                Text(stringResource(R.string.offline_account))
+            }
+
+            PrivacyPolicyAndTC()
         }
-
-        Text(
-            text = stringResource(R.string.enter_with_offline_account),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        Text(
-            text = stringResource(R.string.your_data_will_be_saved_only_locally),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-
-        Button(
-            onClick = onSkip,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(Icons.Default.PhoneAndroid, contentDescription = null)
-            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text(stringResource(R.string.offline_account))
-        }
-
-        PrivacyPolicyAndTC()
     }
 }
 
@@ -142,7 +151,7 @@ private fun Brand(modifier: Modifier = Modifier) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.ivy_wallet_logo),
-            contentDescription = "Ivy Wallet logo"
+            contentDescription = null
         )
 
         Text(

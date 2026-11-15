@@ -1,8 +1,11 @@
 package com.ivy.onboarding
 
+import app.cash.paparazzi.DeviceConfig
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import com.ivy.onboarding.steps.OnboardingAccountsEmptyUiTest
 import com.ivy.onboarding.steps.OnboardingAccountsUiTest
+import com.ivy.onboarding.steps.OnboardingCategoriesEmptyUiTest
 import com.ivy.onboarding.steps.OnboardingCategoriesUiTest
 import com.ivy.onboarding.steps.OnboardingLoginUiTest
 import com.ivy.onboarding.steps.OnboardingSetCurrencyUiTest
@@ -57,6 +60,28 @@ class OnboardingPaparazziTest(
     fun snapshotOnboardingCategoriesScreen() {
         snapshot(theme) {
             OnboardingCategoriesUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotOnboardingAccountsEmptyScreen() {
+        snapshot(theme) {
+            OnboardingAccountsEmptyUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotOnboardingCategoriesEmptyScreen() {
+        snapshot(theme) {
+            OnboardingCategoriesEmptyUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotOnboardingLoginLargeFontScale() {
+        paparazzi.unsafeUpdateConfig(DeviceConfig.PIXEL_6_PRO.copy(fontScale = 1.5f))
+        snapshot(theme) {
+            OnboardingLoginUiTest(theme == PaparazziTheme.Dark)
         }
     }
 }

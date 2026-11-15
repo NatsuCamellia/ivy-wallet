@@ -42,29 +42,6 @@ fun ItemIconL(
 
 @Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable
-fun ItemIconMDefaultIcon(
-    modifier: Modifier = Modifier,
-    iconName: String?,
-    tint: Color = UI.colors.pureInverse,
-    @DrawableRes defaultIcon: Int
-) {
-    ItemIconM(
-        modifier = modifier,
-        iconName = iconName,
-        tint = tint,
-        Default = {
-            Image(
-                modifier = modifier,
-                painter = painterResource(id = defaultIcon),
-                colorFilter = ColorFilter.tint(tint),
-                contentDescription = "item icon"
-            )
-        }
-    )
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
 fun ItemIconM(
     modifier: Modifier = Modifier,
     iconName: String?,

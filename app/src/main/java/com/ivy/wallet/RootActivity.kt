@@ -108,18 +108,16 @@ class RootActivity : AppCompatActivity(), RootScreen {
                     null -> { // display nothing
                     }
                     true -> {
-                        IvyWalletUI {
-                            AppLockedScreen(
-                                onShowOSBiometricsModal = {
-                                    authenticateWithOSBiometricsModal(
-                                        biometricPromptCallback = viewModel.handleBiometricAuthResult()
-                                    )
-                                },
-                                onContinueWithoutAuthentication = {
-                                    viewModel.unlockApp()
-                                }
-                            )
-                        }
+                        AppLockedScreen(
+                            onShowOSBiometricsModal = {
+                                authenticateWithOSBiometricsModal(
+                                    biometricPromptCallback = viewModel.handleBiometricAuthResult()
+                                )
+                            },
+                            onContinueWithoutAuthentication = {
+                                viewModel.unlockApp()
+                            }
+                        )
                     }
 
                     false -> {

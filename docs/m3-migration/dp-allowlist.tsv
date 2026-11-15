@@ -6,3 +6,4 @@ feature/piechart/src/main/java/com/ivy/piechart/PieChart.kt	2	chart geometry
 feature/import-data/src/main/java/com/ivy/importdata/csvimport/flow/ImportFrom.kt	1	icon size
 feature/import-data/src/main/java/com/ivy/importdata/csvimport/flow/instructions/ImportInstructions.kt	1	icon size
 feature/import-data/src/main/java/com/ivy/importdata/csv/CSVScreen.kt	1	chart geometry
+app/src/main/java/com/ivy/wallet/ui/applocked/AppLockedScreen.kt	1	icon size

@@ -64,7 +64,6 @@ import com.ivy.legacy.ui.component.AmountText
 import com.ivy.legacy.ui.component.IconBadge
 import com.ivy.legacy.ui.component.TypeAmount
 import com.ivy.legacy.ui.component.amountLabel
-import com.ivy.legacy.ui.component.label
 import com.ivy.legacy.ui.component.transaction.EmptyState
 import com.ivy.legacy.ui.sheet.DeleteModal
 import com.ivy.legacy.ui.sheet.LoanModal
@@ -586,9 +585,9 @@ private fun RecordRow(
     currency: String,
     index: Int,
     count: Int,
+    typeDescription: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    typeDescription: String = type.label(),
     converted: Double? = null,
     convertedCurrency: String = "",
     chips: (@Composable () -> Unit)? = null,

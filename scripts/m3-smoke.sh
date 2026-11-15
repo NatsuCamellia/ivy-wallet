@@ -178,6 +178,20 @@ wait_for() {
   return 1
 }
 
+# wait_stable <text|desc|any> <exact|sub> <needle> [timeout-seconds]: returns once the node has the same bounds in two
+# consecutive dumps (it is found and no longer moving, for example while the keyboard is still hiding)
+wait_stable() {
+  local attr=$1 match=$2 needle=$3 timeout=${4:-10} i prev="" cur=""
+  for i in $(seq 1 "$timeout"); do
+    dump || return 1
+    cur=$(find_node "$attr" "$match" "$needle") || cur=""
+    [ -n "$cur" ] && [ "$cur" = "$prev" ] && return 0
+    prev=$cur
+  done
+  log "'$needle' never settled"
+  return 1
+}
+
 wait_gone() {
   local attr=$1 match=$2 needle=$3 timeout=${4:-10} i
   for i in $(seq 1 "$timeout"); do
@@ -1235,14 +1249,14 @@ flow_exchange_rates() {
   shot rates-3-added
   tap_node class exact android.widget.EditText || return 1
   adb shell input text xyz
-  wait_for text exact "No exchange rates" || { log "empty state missing for a search with no match"; return 1; }
+  wait_for text exact "No matches" || { log "empty state missing for a search with no match"; return 1; }
   wait_gone any sub "SMK" 5 || { log "rate still listed for another search"; return 1; }
   shot rates-4-no-result
   tap_node desc exact "Clear search" || return 1
   wait_for any sub "SMK" || { log "rate missing after clearing the search"; return 1; }
-  sleep 1
-  tap_node desc exact "Delete rate" || return 1
-  wait_gone any sub "SMK" 10 || { log "Delete rate did not remove the rate"; return 1; }
+  wait_stable desc sub "–SMK" || return 1
+  tap_node desc sub "–SMK" || return 1
+  wait_gone any sub "SMK" 10 || { log "the delete button did not remove the rate"; return 1; }
   shot rates-5-deleted
   back
   dump || return 1

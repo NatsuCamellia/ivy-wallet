@@ -36,12 +36,13 @@ fun AmountText(
     modifier: Modifier = Modifier,
     style: TextStyle = LocalTextStyle.current,
     showPlusSign: Boolean = false,
+    textAlign: TextAlign = TextAlign.End,
 ) {
     Text(
         text = amountLabel(amount, currency, showPlusSign),
         modifier = modifier.testTag("amount_text"),
         style = style,
-        textAlign = TextAlign.End,
+        textAlign = textAlign,
     )
 }
 

@@ -44,7 +44,10 @@ fun RateItem(
                 )
                 if (onDelete != null) {
                     IconButton(onClick = onDelete) {
-                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete_rate))
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.delete_rate_pair, rate.from, rate.to)
+                        )
                     }
                 }
             }

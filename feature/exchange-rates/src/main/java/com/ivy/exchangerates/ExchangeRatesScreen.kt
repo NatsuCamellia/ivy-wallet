@@ -126,10 +126,13 @@ private fun UI(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
-            if (state.manual.isEmpty() && state.automatic.isEmpty()) {
+            // the rates and the base currency load together; nothing to say before that
+            if (state.baseCurrency.isNotEmpty() && state.manual.isEmpty() && state.automatic.isEmpty()) {
                 item(key = "empty") {
                     EmptyState(
-                        emptyStateTitle = stringResource(R.string.no_exchange_rates),
+                        emptyStateTitle = stringResource(
+                            if (query.isBlank()) R.string.no_exchange_rates else R.string.no_exchange_rates_match
+                        ),
                         emptyStateText = stringResource(
                             if (query.isBlank()) {
                                 R.string.no_exchange_rates_description
@@ -177,7 +180,7 @@ private fun UI(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    text = "${it.from}-${it.to}",
+                    text = "${it.from}–${it.to}",
                     style = MaterialTheme.typography.headlineSmallEmphasized,
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center,

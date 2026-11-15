@@ -545,9 +545,10 @@
     <string name="rates_manual">Manual</string>
     <string name="rates_automatic">Automatic</string>
     <string name="currency_code">Currency</string>
-    <string name="delete_rate">Delete rate</string>
+    <string name="delete_rate_pair">Delete %1$s–%2$s</string>
     <string name="no_exchange_rates">No exchange rates</string>
     <string name="no_exchange_rates_description">Rates appear once they sync. You can also add one with Add rate.</string>
+    <string name="no_exchange_rates_match">No matches</string>
     <string name="no_exchange_rates_for_search">No currency matches your search.</string>
     <string name="balance_title">Balance</string>
 </resources>

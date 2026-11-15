@@ -284,7 +284,7 @@ PY
   shot onboarding-type
   tap_node text exact "Start fresh" || return 1
   wait_for text exact "Set currency" || return 1
-  has text exact "USD" || { log "currency step: preselected USD missing"; return 1; }
+  has text exact "Pre-selected" || { log "currency step: pre-selected label missing"; return 1; }
   shot onboarding-currency
   # back from the currency step returns to the type step, and forward again
   tap_node desc exact "Back" || return 1
@@ -1451,6 +1451,11 @@ if [ -z "${SKIP_INSTALL:-}" ]; then
   log "installing debug build"
   ./gradlew --console=plain --max-workers=3 :app:installDebug >"$OUT/install.log" 2>&1 || { log "installDebug failed, see $OUT/install.log"; exit 2; }
 fi
+# a run must not depend on what an earlier one left behind: no accessibility services (TalkBack
+# raises a notification-permission dialog over Home after a fresh boot), default font scale
+adb shell "settings put secure enabled_accessibility_services ''" >/dev/null 2>&1
+adb shell settings put secure accessibility_enabled 0 >/dev/null 2>&1
+adb shell settings put system font_scale 1.0 >/dev/null 2>&1
 adb shell settings put global animator_duration_scale 1 >/dev/null 2>&1
 NIGHT_PREV=$(adb shell cmd uimode night 2>/dev/null | sed 's/.*: *//' | tr -d '\r')
 case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac

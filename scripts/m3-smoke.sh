@@ -277,8 +277,18 @@ PY
   sleep 1
   tap_node text exact "I accept and agree" || return 1
   wait_for text exact "Offline account" || return 1
+  shot onboarding-login
   tap_node text exact "Offline account" || return 1
   wait_for text exact "Start fresh" || return 1
+  has text exact "Import backup file" || { log "type step: import option missing"; return 1; }
+  shot onboarding-type
+  tap_node text exact "Start fresh" || return 1
+  wait_for text exact "Set currency" || return 1
+  has text exact "USD" || { log "currency step: preselected USD missing"; return 1; }
+  shot onboarding-currency
+  # back from the currency step returns to the type step, and forward again
+  tap_node desc exact "Back" || return 1
+  wait_for text exact "Start fresh" || { log "currency back did not reach the type step"; return 1; }
   tap_node text exact "Start fresh" || return 1
   wait_for text exact "Set currency" || return 1
   tap_node text exact "Set" || return 1

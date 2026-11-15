@@ -52,7 +52,6 @@ import com.ivy.wallet.domain.deprecated.logic.model.CreateCategoryData
 import com.ivy.wallet.ui.theme.GradientIvy
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.Ivy
-import com.ivy.ui.color.IvyDark
 import com.ivy.ui.color.Orange
 import com.ivy.ui.color.OrangeLight
 import com.ivy.ui.color.Red
@@ -126,8 +125,7 @@ fun BoxWithConstraintsScope.OnboardingCategories(
                     OnboardingProgressSlider(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         selectedStep = 3,
-                        stepsCount = 4,
-                        selectedColor = IvyDark
+                        stepsCount = 4
                     )
 
                     Spacer(Modifier.height(48.dp))

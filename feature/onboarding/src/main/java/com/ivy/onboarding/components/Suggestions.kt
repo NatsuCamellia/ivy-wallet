@@ -1,154 +1,84 @@
 package com.ivy.onboarding.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ivy.ui.color.Purple
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.legacy.IvyWalletComponentPreview
-import com.ivy.legacy.datamodel.Account
-import com.ivy.legacy.utils.drawColoredShadow
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.ui.R
 import com.ivy.wallet.domain.deprecated.logic.model.CreateAccountData
 import com.ivy.wallet.domain.deprecated.logic.model.CreateCategoryData
-import com.ivy.ui.color.Green
-import com.ivy.ui.color.Red
-import com.ivy.wallet.ui.theme.components.IvyIcon
-import com.ivy.wallet.ui.theme.components.WrapContentRow
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Suggestions(
     suggestions: List<Any>,
-
     onAddSuggestion: (Any) -> Unit,
+    modifier: Modifier = Modifier,
     onAddNew: () -> Unit
 ) {
-    val items = suggestions.plus(AddNew())
-
-    WrapContentRow(
-        modifier = Modifier
+    FlowRow(
+        modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp),
-        items = items,
-        horizontalMarginBetweenItems = 8.dp,
-        verticalMarginBetweenRows = 12.dp
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        when (it) {
-            is CreateAccountData -> {
-                Suggestion(name = it.name) {
-                    onAddSuggestion(it)
-                }
+        suggestions.forEach {
+            val name = when (it) {
+                is CreateAccountData -> it.name
+                is CreateCategoryData -> it.name
+                else -> null
             }
-
-            is CreateCategoryData -> {
-                Suggestion(name = it.name) {
-                    onAddSuggestion(it)
-                }
-            }
-
-            is AddNew -> {
-                AddNewButton {
-                    onAddNew()
-                }
+            if (name != null) {
+                NameChip(name = name, onClick = { onAddSuggestion(it) })
             }
         }
+
+        NameChip(
+            name = stringResource(R.string.add_new),
+            onClick = onAddNew,
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+        )
     }
 }
 
 @Composable
-private fun Suggestion(
+private fun NameChip(
     name: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    containerColor: Color = Color.Unspecified,
 ) {
-    Row(
-        modifier = Modifier
-            .clip(UI.shapes.rFull)
-            .background(UI.colors.medium, UI.shapes.rFull)
-            .clickable {
-                onClick()
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(16.dp))
-
-        IvyIcon(icon = R.drawable.ic_plus)
-
-        Spacer(Modifier.width(8.dp))
-
-        Text(
-            modifier = Modifier.padding(vertical = 16.dp),
-            text = name,
-            style = UI.typo.b2.style(
-                fontWeight = FontWeight.Bold
-            )
-        )
-
-        Spacer(Modifier.width(32.dp))
-    }
+    AssistChip(
+        onClick = onClick,
+        label = { Text(name) },
+        leadingIcon = { Icon(Icons.Default.Add, contentDescription = null) },
+        colors = AssistChipDefaults.assistChipColors(containerColor = containerColor),
+    )
 }
-
-@Composable
-private fun AddNewButton(
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .drawColoredShadow(color = UI.colors.mediumInverse)
-            .clip(UI.shapes.rFull)
-            .background(UI.colors.mediumInverse, UI.shapes.rFull)
-            .clickable {
-                onClick()
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(Modifier.width(16.dp))
-
-        IvyIcon(
-            icon = R.drawable.ic_plus,
-            tint = UI.colors.pure,
-        )
-
-        Spacer(Modifier.width(8.dp))
-
-        Text(
-            modifier = Modifier.padding(vertical = 16.dp),
-            text = stringResource(R.string.add_new),
-            style = UI.typo.b2.style(
-                color = UI.colors.pure,
-                fontWeight = FontWeight.Bold
-            )
-        )
-
-        Spacer(Modifier.width(32.dp))
-    }
-}
-
-private class AddNew
 
 @Preview
 @Composable
 private fun Preview() {
-    IvyWalletComponentPreview {
+    WalletPreview {
         Suggestions(
             suggestions = listOf(
-                Account("Cash", Green.toArgb()),
-                Account("Bank", Red.toArgb()),
-                Account("Revolut", Purple.toArgb())
+                CreateAccountData("Cash", "USD", Color.Green, null, 0.0),
+                CreateAccountData("Bank", "USD", Color.Red, null, 0.0),
+                CreateAccountData("Revolut", "USD", Color.Magenta, null, 0.0),
             ),
             onAddSuggestion = { }
         ) {

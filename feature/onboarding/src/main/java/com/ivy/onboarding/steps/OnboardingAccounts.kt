@@ -50,7 +50,6 @@ import com.ivy.wallet.ui.theme.GradientIvy
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.Ivy
 import com.ivy.ui.color.IvyDark
-import com.ivy.ui.color.Orange
 import com.ivy.ui.color.White
 import com.ivy.wallet.ui.theme.components.GradientCutBottom
 import com.ivy.wallet.ui.theme.components.ItemIconMDefaultIcon
@@ -123,8 +122,7 @@ fun BoxWithConstraintsScope.OnboardingAccounts(
                     OnboardingProgressSlider(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         selectedStep = 2,
-                        stepsCount = 4,
-                        selectedColor = Orange
+                        stepsCount = 4
                     )
 
                     Spacer(Modifier.height(48.dp))

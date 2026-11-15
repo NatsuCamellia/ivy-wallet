@@ -1,62 +1,48 @@
 package com.ivy.onboarding.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.legacy.IvyWalletComponentPreview
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.components.IvyToolbar
+import com.ivy.ui.component.BackButton
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OnboardingToolbar(
     hasSkip: Boolean,
-
     onBack: () -> Unit,
-    onSkip: () -> Unit
+    onSkip: () -> Unit,
+    modifier: Modifier = Modifier,
+    title: String? = null,
 ) {
-    IvyToolbar(onBack = onBack) {
-        if (hasSkip) {
-            Spacer(Modifier.weight(1f))
-
-            Text(
-                modifier = Modifier
-                    .clip(UI.shapes.rFull)
-                    .clickable {
-                        onSkip()
-                    }
-                    .padding(all = 16.dp), // enlarge click area
-                text = stringResource(R.string.skip),
-                style = UI.typo.b2.style(
-                    color = Gray,
-                    fontWeight = FontWeight.Bold
-                )
-            )
-
-            Spacer(Modifier.width(32.dp))
-        }
-    }
+    TopAppBar(
+        title = { title?.let { Text(it) } },
+        modifier = modifier,
+        navigationIcon = { BackButton(onClick = onBack) },
+        actions = {
+            if (hasSkip) {
+                TextButton(onClick = onSkip) {
+                    Text(stringResource(R.string.skip))
+                }
+            }
+        },
+    )
 }
 
 @Preview
 @Composable
 private fun Preview() {
-    IvyWalletComponentPreview {
+    WalletPreview {
         OnboardingToolbar(
             hasSkip = true,
-            onBack = {}
-        ) {
-        }
+            onBack = {},
+            onSkip = {},
+        )
     }
 }

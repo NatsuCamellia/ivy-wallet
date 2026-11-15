@@ -166,12 +166,14 @@ screen_height() { adb shell wm size | grep -oE '[0-9]+x[0-9]+' | tail -1 | cut -
 
 has() { find_node "$@" >/dev/null 2>&1; }
 
-# has_clickable <text>: a clickable node whose text is exactly <text> (a button, not a label with the same words)
+# has_clickable <text>: a clickable node that is, or contains, a node whose text is exactly <text> (a button, not a label with the same words)
 has_clickable() {
   python3 -I - "$XML" "$1" <<'PY'
 import sys, xml.etree.ElementTree as ET
 path, text = sys.argv[1:3]
-sys.exit(0 if any(n.get('text') == text and n.get('clickable') == 'true' for n in ET.parse(path).iter('node')) else 1)
+def found(n):
+    return any(m.get('text') == text for m in n.iter('node'))
+sys.exit(0 if any(n.get('clickable') == 'true' and found(n) for n in ET.parse(path).iter('node')) else 1)
 PY
 }
 
@@ -309,6 +311,9 @@ PY
   has text exact "Skip" && { log "accounts step: Skip still shown with an account"; return 1; }
   find_node text exact "Cash" 1 >/dev/null 2>&1 && { log "accounts step: suggestion chip still shown"; return 1; }
   shot onboarding-accounts-added
+  # the account flows later need two accounts: add the Bank suggestion as well
+  tap_node text exact "Bank" || return 1
+  sleep 1
   tap_node text exact "Next" || return 1
   wait_for text exact "Add categories" || return 1
   tap_node text exact "Skip" || return 1

@@ -1,5 +1,6 @@
 package com.ivy.legacy.ui.component
 
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,8 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.ivy.legacy.utils.toLowerCaseLocal
 import com.ivy.ui.color.findContrastTextColor
-import com.ivy.wallet.ui.theme.components.getCustomIconId
 
 private const val IconInsetDivisor = 12
 
@@ -25,8 +26,15 @@ private const val IconInsetDivisor = 12
 fun customIconResource(iconName: String?, @DrawableRes defaultIcon: Int, size: String): Int {
     val context = LocalContext.current
     return remember(context, iconName, defaultIcon, size) {
-        getCustomIconId(context, iconName, size)?.iconId ?: defaultIcon
+        customIconId(context, iconName, size) ?: defaultIcon
     }
+}
+
+private fun customIconId(context: Context, iconName: String?, size: String): Int? {
+    val name = iconName?.replace(" ", "")?.trim()?.toLowerCaseLocal() ?: return null
+    fun drawable(resName: String) =
+        context.resources.getIdentifier(resName, "drawable", context.packageName).takeIf { it != 0 }
+    return drawable("ic_custom_${name}_$size") ?: drawable(name)
 }
 
 /** The only place a user-picked colour and `ic_custom_*` icon are shown: a coloured circle with the icon on it. */

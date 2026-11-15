@@ -31,6 +31,7 @@ import com.ivy.legacy.utils.hasLockScreen
 import com.ivy.ui.R
 
 @Composable
+@Suppress("FunctionNaming")
 fun AppLockedScreen(
     onShowOSBiometricsModal: () -> Unit,
     onContinueWithoutAuthentication: () -> Unit,

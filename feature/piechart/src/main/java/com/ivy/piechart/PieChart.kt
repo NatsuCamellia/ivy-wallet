@@ -41,11 +41,10 @@ import com.ivy.legacy.ui.component.icon
 import com.ivy.legacy.ui.component.label
 import com.ivy.legacy.utils.timeNowUTC
 import com.ivy.ui.R
+import com.ivy.ui.color.Gray
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.IvyDark
 import com.ivy.ui.color.RedLight
-import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.toComposeColor
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import timber.log.Timber
@@ -160,7 +159,7 @@ private class PieChartView(context: Context) : View(context) {
         this.paints = categoryAmounts
             .map {
                 val category = it.category
-                val categoryColor = category?.color?.value?.toComposeColor() ?: Gray
+                val categoryColor = category?.color?.value?.let(::Color) ?: Gray
                 val color = if (selectedCategory == null) {
                     categoryColor
                 } else {

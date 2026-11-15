@@ -46,6 +46,7 @@ import com.ivy.legacy.utils.toLowerCaseLocal
 import com.ivy.legacy.utils.uiThread
 import com.ivy.ui.ComposeViewModel
 import com.ivy.ui.R
+import com.ivy.ui.color.Gray
 import com.ivy.wallet.domain.action.account.AccountsAct
 import com.ivy.wallet.domain.action.exchange.ExchangeAct
 import com.ivy.wallet.domain.action.settings.BaseCurrencyAct
@@ -56,7 +57,6 @@ import com.ivy.wallet.domain.pure.data.IncomeExpenseTransferPair
 import com.ivy.wallet.domain.pure.exchange.ExchangeData
 import com.ivy.wallet.domain.pure.transaction.trnCurrency
 import com.ivy.wallet.domain.pure.util.orZero
-import com.ivy.wallet.ui.theme.Gray
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

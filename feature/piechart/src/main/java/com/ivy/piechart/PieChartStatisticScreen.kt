@@ -19,6 +19,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -38,6 +39,7 @@ import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.AmountText
 import com.ivy.legacy.ui.component.IconBadge
+import com.ivy.legacy.ui.component.PeriodSelector
 import com.ivy.legacy.ui.component.color
 import com.ivy.legacy.ui.component.signedAmount
 import com.ivy.legacy.ui.component.transaction.EmptyState
@@ -51,6 +53,7 @@ import com.ivy.navigation.TransactionsScreen
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
+import com.ivy.ui.color.Gray
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.IvyDark
 import com.ivy.ui.color.IvyLight
@@ -62,9 +65,6 @@ import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
 import com.ivy.ui.time.LocalTimeProvider
-import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.toComposeColor
-import com.ivy.wallet.ui.theme.wallet.PeriodSelector
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import java.util.UUID
@@ -251,7 +251,7 @@ private fun CategoryAmountRow(
         modifier = modifier.testTag("piechart_category_row"),
         leadingContent = {
             IconBadge(
-                color = category?.color?.value?.toComposeColor() ?: Gray,
+                color = category?.color?.value?.let(::Color) ?: Gray,
                 iconName = category?.icon?.id,
                 defaultIcon = R.drawable.ic_custom_category_m,
             )

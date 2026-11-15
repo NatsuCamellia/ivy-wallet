@@ -268,11 +268,6 @@
     <ID>ComposableParamOrder:FilterOverlay.kt$TypeFilterCheckbox</ID>
     <ID>ComposableParamOrder:IconButton.kt$IconButton</ID>
     <ID>ComposableParamOrder:ImportInstructions.kt$InstructionButton</ID>
-    <ID>ComposableParamOrder:ItemIcon.kt$ItemIcon</ID>
-    <ID>ComposableParamOrder:ItemIcon.kt$ItemIconL</ID>
-    <ID>ComposableParamOrder:ItemIcon.kt$ItemIconM</ID>
-    <ID>ComposableParamOrder:ItemIcon.kt$ItemIconS</ID>
-    <ID>ComposableParamOrder:ItemIcon.kt$ItemIconSDefaultIcon</ID>
     <ID>ComposableParamOrder:IvyBasicTextField.kt$IvyBasicTextField</ID>
     <ID>ComposableParamOrder:IvyBorderButton.kt$IvyBorderButton</ID>
     <ID>ComposableParamOrder:IvyButton.kt$IvyButton</ID>
@@ -641,7 +636,6 @@
     <ID>DataClassTypedIDs:CategoryTrnsBetweenAct.kt$CategoryTrnsBetweenAct.Input$val categoryId: UUID</ID>
     <ID>DataClassTypedIDs:ChoosePeriodModal.kt$ChoosePeriodModalData$val id: UUID = UUID.randomUUID()</ID>
     <ID>DataClassTypedIDs:CustomerJourneyCardModel.kt$CustomerJourneyCardModel$val id: String</ID>
-    <ID>DataClassTypedIDs:ItemIcon.kt$IconInfo$@DrawableRes val iconId: Int</ID>
     <ID>DataClassTypedIDs:Loan.kt$Loan$val accountId: UUID? = null</ID>
     <ID>DataClassTypedIDs:Loan.kt$Loan$val id: UUID = UUID.randomUUID()</ID>
     <ID>DataClassTypedIDs:LoanModal.kt$LoanModalData$val id: UUID = UUID.randomUUID()</ID>
@@ -2348,7 +2342,6 @@
     <ID>FunctionParameterNaming:ColumnRoot.kt$Content: @Composable ColumnScope.() -&gt; Unit</ID>
     <ID>FunctionParameterNaming:EditBottomSheet.kt$ActionButton: @Composable () -&gt; Unit</ID>
     <ID>FunctionParameterNaming:FRPComposable.kt$UI: @Composable BoxWithConstraintsScope.( state: S, onEvent: (E) -&gt; Unit ) -&gt; Unit</ID>
-    <ID>FunctionParameterNaming:ItemIcon.kt$Default: (@Composable () -&gt; Unit)? = null</ID>
     <ID>FunctionParameterNaming:IvyComponents.kt$Content: @Composable RowScope.() -&gt; Unit</ID>
     <ID>FunctionParameterNaming:IvyComposeApp.kt$Content: @Composable BoxScope.() -&gt; Unit</ID>
     <ID>FunctionParameterNaming:IvyToolbar.kt$Content: @Composable RowScope.() -&gt; Unit = { }</ID>
@@ -2434,9 +2427,7 @@
     <ID>InvalidPackageDeclaration:HistoryWithDateDivsAct.kt$package com.ivy.wallet.domain.action.transaction</ID>
     <ID>InvalidPackageDeclaration:IncomeExpensePair.kt$package com.ivy.wallet.domain.pure.data</ID>
     <ID>InvalidPackageDeclaration:IncomeExpenseTransferPair.kt$package com.ivy.wallet.domain.pure.data</ID>
-    <ID>InvalidPackageDeclaration:IntervalPickerRow.kt$package com.ivy.wallet.ui.theme.components</ID>
     <ID>InvalidPackageDeclaration:IntervalType.kt$package com.ivy.data.model</ID>
-    <ID>InvalidPackageDeclaration:ItemIcon.kt$package com.ivy.wallet.ui.theme.components</ID>
     <ID>InvalidPackageDeclaration:IvyBasicTextField.kt$package com.ivy.wallet.ui.theme.components</ID>
     <ID>InvalidPackageDeclaration:IvyBorderButton.kt$package com.ivy.wallet.ui.theme.components</ID>
     <ID>InvalidPackageDeclaration:IvyButton.kt$package com.ivy.wallet.ui.theme.components</ID>
@@ -2466,7 +2457,6 @@
     <ID>InvalidPackageDeclaration:IvyToolbar.kt$package com.ivy.wallet.ui.theme.components</ID>
     <ID>InvalidPackageDeclaration:LTLoanMapper.kt$package com.ivy.wallet.domain.deprecated.logic.loantrasactions</ID>
     <ID>InvalidPackageDeclaration:LTLoanRecordMapper.kt$package com.ivy.wallet.domain.deprecated.logic.loantrasactions</ID>
-    <ID>InvalidPackageDeclaration:ListItem.kt$package com.ivy.domain.legacy.ui.theme.components</ID>
     <ID>InvalidPackageDeclaration:LoanByIdAct.kt$package com.ivy.wallet.domain.action.loan</ID>
     <ID>InvalidPackageDeclaration:LoanCreator.kt$package com.ivy.wallet.domain.deprecated.logic</ID>
     <ID>InvalidPackageDeclaration:LoanModal.kt$package com.ivy.wallet.ui.theme.modal</ID>
@@ -2495,7 +2485,6 @@
     <ID>InvalidPackageDeclaration:NameModal.kt$package com.ivy.wallet.ui.theme.modal</ID>
     <ID>InvalidPackageDeclaration:NotificationService.kt$package com.ivy.wallet.android.notification</ID>
     <ID>InvalidPackageDeclaration:OverdueAct.kt$package com.ivy.wallet.domain.action.viewmodel.home</ID>
-    <ID>InvalidPackageDeclaration:PeriodSelector.kt$package com.ivy.wallet.ui.theme.wallet</ID>
     <ID>InvalidPackageDeclaration:PlannedPaymentsGenerator.kt$package com.ivy.wallet.domain.deprecated.logic</ID>
     <ID>InvalidPackageDeclaration:PlannedPaymentsLogic.kt$package com.ivy.wallet.domain.deprecated.logic</ID>
     <ID>InvalidPackageDeclaration:PreloadDataLogic.kt$package com.ivy.wallet.domain.deprecated.logic</ID>
@@ -4350,7 +4339,6 @@
     <ID>ModifierMissing:ImportResultUI.kt$ImportResultUI</ID>
     <ID>ModifierMissing:IncomeExpenseCards.kt$IncomeExpensesCards</ID>
     <ID>ModifierMissing:IntervalPickerRow.kt$IntervalPickerRow</ID>
-    <ID>ModifierMissing:ItemStatisticToolbar.kt$ItemStatisticToolbar</ID>
     <ID>ModifierMissing:IvyColorPicker.kt$IvyColorPicker</ID>
     <ID>ModifierMissing:IvyComposeApp.kt$IvyWalletComponentPreview</ID>
     <ID>ModifierMissing:IvyDividerDot.kt$IvyDividerDot</ID>
@@ -4360,7 +4348,6 @@
     <ID>ModifierMissing:IvyModalComponents.kt$ModalTitle</ID>
     <ID>ModifierMissing:IvyToolbar.kt$IvyToolbar</ID>
     <ID>ModifierMissing:IvyUI.kt$IvyUI</ID>
-    <ID>ModifierMissing:ListItem.kt$ListItem</ID>
     <ID>ModifierMissing:LoanModal.kt$LoanModal</ID>
     <ID>ModifierMissing:LoanRecordModal.kt$LoanRecordModal</ID>
     <ID>ModifierMissing:MainBottomBar.kt$BottomBar</ID>
@@ -4385,7 +4372,6 @@
     <ID>ModifierMissing:ReorderModal.kt$ReorderModalSingleType</ID>
     <ID>ModifierMissing:ScreenTitle.kt$ScreenTitle</ID>
     <ID>ModifierMissing:ScreenTitle.kt$ScreenTitleLarge</ID>
-    <ID>ModifierMissing:SearchInput.kt$SearchInput</ID>
     <ID>ModifierMissing:Spacers.kt$SpacerHor</ID>
     <ID>ModifierMissing:Spacers.kt$SpacerVer</ID>
     <ID>ModifierMissing:Spacers.kt$SpacerWeight</ID>
@@ -4399,11 +4385,7 @@
     <ID>ModifierMissing:WalletBalanceWidgetContent.kt$IncomeExpenseSection</ID>
     <ID>ModifierMissing:WalletBalanceWidgetContent.kt$WalletBalanceWidgetContent</ID>
     <ID>ModifierMissing:WalletBalanceWidgetContent.kt$WidgetClickableItem</ID>
-    <ID>ModifierNotUsedAtRoot:ItemIcon.kt$modifier = modifier</ID>
     <ID>ModifierNotUsedAtRoot:IvyNameTextFieldValue.kt$modifier = modifier</ID>
-    <ID>ModifierReused:ItemIcon.kt$Image( modifier = modifier, painter = painterResource(id = defaultIcon), colorFilter = ColorFilter.tint(tint), contentDescription = "item icon" )</ID>
-    <ID>ModifierReused:ItemIcon.kt$ItemIconM( modifier = modifier, iconName = iconName, tint = tint, Default = { Image( modifier = modifier, painter = painterResource(id = defaultIcon), colorFilter = ColorFilter.tint(tint), contentDescription = "item icon" ) } )</ID>
-    <ID>ModifierReused:ItemIcon.kt$ItemIconS( modifier = modifier, iconName = iconName, tint = tint, Default = { Image( modifier = modifier, painter = painterResource(id = defaultIcon), colorFilter = ColorFilter.tint(tint), contentDescription = "item icon" ) } )</ID>
     <ID>ModifierReused:IvyChecklistTextField.kt$BasicTextField( modifier = textModifier .focusRequester(inputFieldFocus) .clickableNoIndication(rememberInteractionSource()) { inputFieldFocus.requestFocus() } .padding(vertical = paddingVertical), value = value, onValueChange = onValueChanged, readOnly = readOnly, textStyle = UI.typo.b2.style( color = textColor, fontWeight = fontWeight, textAlign = textAlign ), singleLine = false, cursorBrush = SolidColor(UI.colors.pureInverse), visualTransformation = visualTransformation, keyboardOptions = keyboardOptions ?: KeyboardOptions( capitalization = KeyboardCapitalization.Sentences, autoCorrect = true, keyboardType = KeyboardType.Text, imeAction = ImeAction.Done ), keyboardActions = keyboardActions ?: KeyboardActions( onDone = { hideKeyboard(view) } ) )</ID>
     <ID>ModifierReused:IvyChecklistTextField.kt$Text( modifier = textModifier .clickableNoIndication(rememberInteractionSource()) { inputFieldFocus.requestFocus() } .padding(vertical = paddingVertical), text = hint!!, textAlign = textAlign, style = UI.typo.b2.style( color = hintColor, fontWeight = hintFontWeight, textAlign = textAlign ) )</ID>
     <ID>ModifierReused:IvyDescriptionTextField.kt$BasicTextField( modifier = textModifier.testTag(testTag), value = value, onValueChange = onValueChanged, textStyle = UI.typo.nB2.style( color = textColor, fontWeight = fontWeight, textAlign = TextAlign.Start ), singleLine = false, cursorBrush = SolidColor(UI.colors.pureInverse), visualTransformation = visualTransformation, keyboardOptions = keyboardOptions ?: KeyboardOptions( capitalization = KeyboardCapitalization.Sentences, autoCorrect = true, keyboardType = KeyboardType.Text, imeAction = ImeAction.Done ), keyboardActions = keyboardActions ?: KeyboardActions( onDone = { hideKeyboard(view) } ) )</ID>
@@ -4443,7 +4425,6 @@
     <ID>MultipleEmitters:IvyButton.kt$IconStart</ID>
     <ID>MultipleEmitters:IvyColorPicker.kt$ColorItem</ID>
     <ID>MultipleEmitters:IvyWalletSteps.kt$IvyWalletSteps</ID>
-    <ID>MultipleEmitters:ListItem.kt$ListItem</ID>
     <ID>MultipleEmitters:LoanModal.kt$Account</ID>
     <ID>MultipleEmitters:LoanModal.kt$AddAccount</ID>
     <ID>MultipleEmitters:LoanRecordModal.kt$Account</ID>

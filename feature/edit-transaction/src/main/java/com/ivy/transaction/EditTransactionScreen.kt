@@ -34,7 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -47,7 +47,6 @@ import com.ivy.data.model.Tag
 import com.ivy.data.model.TagId
 import com.ivy.data.model.primitive.ColorInt
 import com.ivy.data.model.primitive.NotBlankTrimmedString
-import com.ivy.design.utils.hideKeyboard
 import com.ivy.legacy.data.EditTransactionDisplayLoan
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.ivyWalletCtx
@@ -104,7 +103,7 @@ fun EditTransactionScreen(screen: EditTransactionScreen) {
         viewModel.start(screen)
     }
 
-    val view = LocalView.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     UI(
         screen = screen,
@@ -168,7 +167,7 @@ fun EditTransactionScreen(screen: EditTransactionScreen) {
             viewModel.onEvent(EditTransactionViewEvent.OnPayPlannedPayment)
         },
         onSave = {
-            view.hideKeyboard()
+            keyboardController?.hide()
             viewModel.onEvent(EditTransactionViewEvent.Save(it))
         },
         onSetHasChanges = {

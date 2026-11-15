@@ -1,4 +1,4 @@
-package com.ivy.wallet.ui.theme.wallet
+package com.ivy.legacy.ui.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding

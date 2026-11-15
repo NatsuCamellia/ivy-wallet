@@ -1,4 +1,4 @@
-package com.ivy.wallet.ui.theme.components
+package com.ivy.legacy.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

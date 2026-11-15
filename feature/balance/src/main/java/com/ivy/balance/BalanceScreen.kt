@@ -42,7 +42,7 @@ import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
 import com.ivy.ui.component.BackButton
-import com.ivy.wallet.ui.theme.wallet.PeriodSelector
+import com.ivy.legacy.ui.component.PeriodSelector
 
 @Composable
 fun BalanceScreen(screen: BalanceScreen) {

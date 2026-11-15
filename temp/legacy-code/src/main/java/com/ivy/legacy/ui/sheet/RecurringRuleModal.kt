@@ -38,7 +38,7 @@ import com.ivy.legacy.utils.formatDateWeekDayLong
 import com.ivy.legacy.utils.formatNicely
 import com.ivy.ui.R
 import com.ivy.ui.time.LocalTimeProvider
-import com.ivy.wallet.ui.theme.components.IntervalPickerRow
+import com.ivy.legacy.ui.component.IntervalPickerRow
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID

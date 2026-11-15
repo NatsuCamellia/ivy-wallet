@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
@@ -52,6 +53,7 @@ import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.IconBadge
+import com.ivy.legacy.ui.component.PeriodSelector
 import com.ivy.legacy.ui.component.SummaryCard
 import com.ivy.legacy.ui.component.amountLabel
 import com.ivy.legacy.ui.component.transaction.transactions
@@ -81,8 +83,6 @@ import com.ivy.ui.time.LocalTimeProvider
 import com.ivy.ui.util.thenIf
 import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
 import com.ivy.wallet.domain.pure.data.IncomeExpensePair
-import com.ivy.wallet.ui.theme.toComposeColor
-import com.ivy.wallet.ui.theme.wallet.PeriodSelector
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.math.BigDecimal
@@ -476,8 +476,8 @@ private fun TransactionsTopBar(
 ) {
     val nav = navigation()
     val badgeColor = when {
-        account != null -> account.color.toComposeColor()
-        category != null -> category.color.value.toComposeColor()
+        account != null -> Color(account.color)
+        category != null -> Color(category.color.value)
         else -> MaterialTheme.colorScheme.secondaryContainer
     }
     val name = when {

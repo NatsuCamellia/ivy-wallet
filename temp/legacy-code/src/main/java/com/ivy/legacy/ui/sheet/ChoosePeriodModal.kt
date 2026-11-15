@@ -48,7 +48,7 @@ import com.ivy.legacy.utils.formatDateOnlyWithYear
 import com.ivy.ui.R
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeProvider
-import com.ivy.wallet.ui.theme.components.IntervalPickerRow
+import com.ivy.legacy.ui.component.IntervalPickerRow
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime

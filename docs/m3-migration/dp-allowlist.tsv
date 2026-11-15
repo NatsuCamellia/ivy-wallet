@@ -3,3 +3,6 @@ temp/legacy-code/src/main/java/com/ivy/legacy/ui/component/IconBadge.kt	2	icon s
 temp/legacy-code/src/main/java/com/ivy/legacy/ui/component/transaction/Transactions.kt	1	icon size
 feature/accounts/src/main/java/com/ivy/accounts/AccountsTab.kt	1	icon size
 feature/piechart/src/main/java/com/ivy/piechart/PieChart.kt	2	chart geometry
+feature/import-data/src/main/java/com/ivy/importdata/csvimport/flow/ImportFrom.kt	1	icon size
+feature/import-data/src/main/java/com/ivy/importdata/csvimport/flow/instructions/ImportInstructions.kt	1	icon size
+feature/import-data/src/main/java/com/ivy/importdata/csv/CSVScreen.kt	1	chart geometry

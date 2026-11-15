@@ -9364,16 +9364,6 @@
             column="29"/>
     </issue>
 
-    <issue
-        id="ComposeModifierMissing"
-        message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
-        errorLine1="fun Spacer8(horizontal: Boolean = false) {"
-        errorLine2="    ~~~~~~~">
-        <location
-            file="src/main/java/com/ivy/importdata/csv/CSVScreen.kt"
-            line="178"
-            column="5"/>
-    </issue>
 
     <issue
         id="ComposeModifierMissing"
@@ -9540,16 +9530,6 @@
             column="5"/>
     </issue>
 
-    <issue
-        id="ComposeModifierMissing"
-        message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
-        errorLine1="fun BoxWithConstraintsScope.GradientCutBottom("
-        errorLine2="                            ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/ivy/legacy/legacy/ui/theme/components/GradientCut.kt"
-            line="22"
-            column="29"/>
-    </issue>
 
     <issue
         id="ComposeModifierMissing"
@@ -9562,27 +9542,7 @@
             column="5"/>
     </issue>
 
-    <issue
-        id="ComposeModifierMissing"
-        message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
-        errorLine1="fun BoxWithConstraintsScope.ImportFrom("
-        errorLine2="                            ~~~~~~~~~~">
-        <location
-            file="src/main/java/com/ivy/importdata/csvimport/flow/ImportFrom.kt"
-            line="42"
-            column="29"/>
-    </issue>
 
-    <issue
-        id="ComposeModifierMissing"
-        message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
-        errorLine1="fun BoxWithConstraintsScope.ImportInstructions("
-        errorLine2="                            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/com/ivy/importdata/csvimport/flow/instructions/ImportInstructions.kt"
-            line="51"
-            column="29"/>
-    </issue>
 
     <issue
         id="ComposeModifierMissing"
@@ -9606,16 +9566,6 @@
             column="5"/>
     </issue>
 
-    <issue
-        id="ComposeModifierMissing"
-        message="This @Composable function emits content but doesn&apos;t have a modifier parameter.&#xA;&#xA;See https://slackhq.github.io/compose-lints/rules/#when-should-i-expose-modifier-parameters for more information."
-        errorLine1="fun StepTitle("
-        errorLine2="    ~~~~~~~~~">
-        <location
-            file="src/main/java/com/ivy/importdata/csvimport/flow/instructions/ImportInstructions.kt"
-            line="282"
-            column="5"/>
-    </issue>
 
     <issue
         id="ComposeModifierMissing"
@@ -11157,16 +11107,6 @@
             column="24"/>
     </issue>
 
-    <issue
-        id="ComposeParameterOrder"
-        message="Parameters in a composable function should be ordered following this pattern: params without defaults, modifiers, params with defaults and optionally, a trailing function that might not have a default param.&#xA;Current params are: `[modifier: Modifier = Modifier, text: String, textColor: Color, backgroundGradient: Gradient, @DrawableRes iconStart: Int? = null, hasNext: Boolean = false, enabled: Boolean = true, onClick: () -> Unit]` but should be `[text: String, textColor: Color, backgroundGradient: Gradient, modifier: Modifier = Modifier, @DrawableRes iconStart: Int? = null, hasNext: Boolean = false, enabled: Boolean = true, onClick: () -> Unit]`.&#xA;See https://slackhq.github.io/compose-lints/rules/#ordering-composable-parameters-properly for more information."
-        errorLine1="fun OnboardingButton("
-        errorLine2="                    ^">
-        <location
-            file="src/main/java/com/ivy/legacy/legacy/ui/theme/components/OnboardingComponents.kt"
-            line="33"
-            column="21"/>
-    </issue>
 
     <issue
         id="ComposeParameterOrder"

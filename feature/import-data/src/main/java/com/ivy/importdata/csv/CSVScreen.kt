@@ -2,26 +2,40 @@ package com.ivy.importdata.csv
 
 import android.net.Uri
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,26 +43,28 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ivy.base.legacy.Theme
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.colorAs
-import com.ivy.design.l0_system.style
-import com.ivy.ui.util.thenIf
 import com.ivy.importdata.csvimport.flow.ImportProcessing
 import com.ivy.importdata.csvimport.flow.ImportResultUI
-import com.ivy.legacy.IvyWalletPreview
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.navigation.CSVScreen
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
+import com.ivy.navigation.navigation
+import com.ivy.onboarding.components.OnboardingToolbar
 import com.ivy.onboarding.viewmodel.OnboardingViewModel
 import com.ivy.ui.R
+import com.ivy.ui.util.thenIf
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlin.math.abs
 
@@ -90,96 +106,103 @@ private fun ImportUI(
     state: CSVState,
     launchedFromOnboarding: Boolean,
     onEvent: (CSVEvent) -> Unit,
+    listState: LazyListState = rememberLazyListState(),
 ) {
-    LazyColumn(
+    val nav = navigation()
+
+    Scaffold(
         modifier = Modifier
             .fillMaxSize()
-            .systemBarsPadding(),
-        contentPadding = PaddingValues(
-            horizontal = 8.dp,
-            vertical = 16.dp,
-        )
-    ) {
-        item(key = "import_btn") {
-            Spacer8()
-            Spacer8()
-            ImportButton(
-                onFilePick = {
-                    onEvent(CSVEvent.FilePicked(it))
-                }
+            .imePadding(),
+        topBar = {
+            OnboardingToolbar(
+                hasSkip = false,
+                onBack = { nav.onBackPressed() },
+                onSkip = {},
+                title = stringResource(R.string.manual_csv_import),
             )
-            if (!launchedFromOnboarding) {
-                Spacer8()
-                Text(
-                    text = stringResource(R.string.warning_import_csv_file).trimIndent(),
-                    style = UI.typo.c.colorAs(UI.colors.red),
-                    fontWeight = FontWeight.Bold,
-                )
-            } else {
-                Spacer8()
-                Spacer8()
-                Text(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    text = stringResource(R.string.import_a_csv_file_to_continue),
-                    style = UI.typo.b2,
-                    fontWeight = FontWeight.SemiBold,
-                )
+        },
+        bottomBar = {
+            Surface {
+                Button(
+                    onClick = { onEvent(CSVEvent.Continue) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(16.dp),
+                    enabled = state.continueEnabled,
+                ) {
+                    Text(text = stringResource(R.string.import_csv_continue))
+                }
             }
         }
-        if (state.csv != null) {
-            spacer8()
-            csvTable(state.csv)
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            state = listState,
+            contentPadding = innerPadding,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            item(key = "import_btn") {
+                ImportButton(
+                    onFilePick = {
+                        onEvent(CSVEvent.FilePicked(it))
+                    }
+                )
+            }
+            item(key = "import_hint") {
+                if (!launchedFromOnboarding) {
+                    Text(
+                        text = stringResource(R.string.warning_import_csv_file).trimIndent(),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.import_a_csv_file_to_continue),
+                        style = MaterialTheme.typography.bodyLarge,
+                    )
+                }
+            }
+            if (state.csv != null) {
+                csvTable(state.csv)
+            }
+            if (state.columns != null && state.important != null) {
+                importantFields(state.columns, importantFields = state.important, onEvent = onEvent)
+            }
+            if (state.columns != null && state.transfer != null) {
+                transferFields(state.columns, state.transfer, onEvent = onEvent)
+            }
+            if (state.columns != null && state.optional != null) {
+                optionalFields(state.columns, state.optional, onEvent = onEvent)
+            }
         }
-        if (state.columns != null && state.important != null) {
-            importantFields(state.columns, importantFields = state.important, onEvent = onEvent)
-        }
-        if (state.columns != null && state.transfer != null) {
-            transferFields(state.columns, state.transfer, onEvent = onEvent)
-        }
-        if (state.columns != null && state.optional != null) {
-            optionalFields(state.columns, state.optional, onEvent = onEvent)
-        }
-        continueButton(state.continueEnabled, onEvent)
     }
 }
 
 @Composable
 private fun ImportButton(
     onFilePick: (Uri) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val ivyContext = com.ivy.legacy.ivyWalletCtx()
-    Button(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(48.dp),
+    FilledTonalButton(
+        modifier = modifier.fillMaxWidth(),
         onClick = {
             ivyContext.openFile {
                 onFilePick(it)
             }
         }
     ) {
-        Text(
-            text = stringResource(R.string.import_csv_file),
-            style = UI.typo.b2.style(
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            ),
+        Icon(
+            imageVector = Icons.Filled.FileUpload,
+            contentDescription = null,
+            modifier = Modifier.size(ButtonDefaults.IconSize),
         )
-    }
-}
-
-fun LazyListScope.spacer8() {
-    item {
-        Spacer8()
-    }
-}
-
-@Composable
-fun Spacer8(horizontal: Boolean = false) {
-    if (horizontal) {
-        Spacer(modifier = Modifier.width(8.dp))
-    } else {
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+        Text(text = stringResource(R.string.import_csv_file))
     }
 }
 
@@ -187,14 +210,12 @@ private fun LazyListScope.csvTable(
     csv: List<CSVRow>,
 ) {
     item {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-        ) {
-            val visibleRows = remember(csv) { csv.take(10) }
-            visibleRows.forEachIndexed { index, row ->
-                CSVRow(row = row, header = index == 0, even = index % 2 == 0)
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.horizontalScroll(rememberScrollState())) {
+                val visibleRows = remember(csv) { csv.take(10) }
+                visibleRows.forEachIndexed { index, row ->
+                    CSVRow(row = row, header = index == 0, even = index % 2 == 0)
+                }
             }
         }
     }
@@ -207,10 +228,7 @@ private fun CSVRow(
     even: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-    ) {
+    Row(modifier = modifier) {
         row.values.forEach { value ->
             CSVCell(text = value, header = header, even = even)
         }
@@ -222,80 +240,72 @@ private fun CSVCell(
     text: String,
     header: Boolean,
     even: Boolean,
+    modifier: Modifier = Modifier,
 ) {
-    val medium = UI.colors.medium
+    val zebra = MaterialTheme.colorScheme.surfaceContainerHigh
     Text(
-        modifier = Modifier
+        modifier = modifier
             .width(140.dp)
-            .border(1.dp, UI.colors.pureInverse)
             .thenIf(even) {
-                this.background(medium)
+                this.background(zebra)
             }
-            .padding(all = 4.dp),
+            .padding(8.dp),
         text = text.ifEmpty { " " },
-        style = UI.typo.nB1,
-        fontWeight = if (header) FontWeight.Bold else FontWeight.Normal,
+        style = if (header) MaterialTheme.typography.labelLarge else MaterialTheme.typography.bodyMedium,
         overflow = TextOverflow.Ellipsis,
         maxLines = 1,
     )
 }
 
-private fun <M> LazyListScope.mappingRow(
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun <M> MappingCard(
     columns: CSVRow,
     mapping: ColumnMapping<M>,
     status: MappingStatus,
     onMapTo: (Int, String) -> Unit,
+    modifier: Modifier = Modifier,
     metadataContent: (@Composable (M) -> Unit)? = null,
 ) {
-    item {
-        Spacer8()
+    Card(modifier = modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    width = 2.dp,
-                    color = when {
-                        mapping.required && !status.success -> UI.colors.red
-                        status.success -> UI.colors.green
-                        else -> UI.colors.medium
-                    },
-                    shape = RoundedCornerShape(4.dp),
-                )
-                .padding(vertical = 8.dp, horizontal = 8.dp)
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
                 text = mapping.ivyColumn,
-                style = UI.typo.b1.colorAs(UI.colors.primary),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(text = mapping.helpInfo, style = UI.typo.c.colorAs(UI.colors.gray))
-            Spacer8()
-            Text(text = "Choose a matching CSV column:", style = UI.typo.b2)
-            Spacer(modifier = Modifier.height(4.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                verticalAlignment = Alignment.CenterVertically
+            Text(
+                text = mapping.helpInfo,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = "Choose a matching CSV column:",
+                style = MaterialTheme.typography.labelLarge,
+            )
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 columns.values.forEachIndexed { index, column ->
-                    EnabledButton(
-                        text = column,
-                        enabled = column == mapping.name
-                    ) {
-                        onMapTo(index, column)
-                    }
-                    Spacer(Modifier.width(8.dp))
+                    FilterChip(
+                        selected = column == mapping.name,
+                        onClick = { onMapTo(index, column) },
+                        label = { Text(text = column) },
+                    )
                 }
             }
 
             if (metadataContent != null) {
-                Spacer8()
                 metadataContent(mapping.metadata)
             }
 
+            MappingStatusLine(mapping = mapping, status = status)
+
             if (status.sampleValues.isNotEmpty()) {
-                Spacer8()
                 CSVRow(
                     modifier = Modifier.horizontalScroll(rememberScrollState()),
                     row = CSVRow(status.sampleValues),
@@ -307,19 +317,72 @@ private fun <M> LazyListScope.mappingRow(
     }
 }
 
+@Composable
+private fun MappingStatusLine(
+    mapping: ColumnMapping<*>,
+    status: MappingStatus,
+    modifier: Modifier = Modifier,
+) {
+    val (icon, text, color) = when {
+        status.success -> Triple(
+            Icons.Filled.CheckCircle,
+            "Parsed successfully",
+            MaterialTheme.colorScheme.tertiary
+        )
+
+        mapping.required -> Triple(
+            Icons.Filled.Error,
+            "Required: choose a column that can be parsed",
+            MaterialTheme.colorScheme.error
+        )
+
+        else -> return
+    }
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(imageVector = icon, contentDescription = null, tint = color)
+        Text(text = text, style = MaterialTheme.typography.bodySmall, color = color)
+    }
+}
+
+private fun <M> LazyListScope.mappingRow(
+    columns: CSVRow,
+    mapping: ColumnMapping<M>,
+    status: MappingStatus,
+    onMapTo: (Int, String) -> Unit,
+    metadataContent: (@Composable (M) -> Unit)? = null,
+) {
+    item {
+        MappingCard(
+            columns = columns,
+            mapping = mapping,
+            status = status,
+            onMapTo = onMapTo,
+            metadataContent = metadataContent,
+        )
+    }
+}
+
 fun LazyListScope.sectionDivider(text: String) {
     item {
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(text = text, style = UI.typo.b1)
-        Text(
-            text = """
-                Match the CSV column with the appropriate Ivy type.
-                If the parsing is successful the border will turn green.
-            """.trimIndent(),
-            style = UI.typo.nB2,
-            color = UI.colors.gray
-        )
-        Spacer8()
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                text = text,
+                modifier = Modifier.semantics { heading() },
+                style = MaterialTheme.typography.titleLarge,
+            )
+            Text(
+                text = """
+                    Match the CSV column with the appropriate Ivy type.
+                    If the parsing is successful the field is marked as parsed.
+                """.trimIndent(),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
@@ -398,42 +461,46 @@ fun LazyListScope.importantFields(
 private fun AmountMetadata(
     multiplier: Int,
     onMetaChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Text(text = "Multiplier", style = UI.typo.nB2)
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Button(onClick = {
-            onMetaChange(
-                when {
-                    multiplier < 0 -> multiplier * 10
-                    multiplier == 1 -> -10
-                    else -> multiplier / 10
-                }
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(text = "Multiplier", style = MaterialTheme.typography.labelLarge)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FilledTonalButton(onClick = {
+                onMetaChange(
+                    when {
+                        multiplier < 0 -> multiplier * 10
+                        multiplier == 1 -> -10
+                        else -> multiplier / 10
+                    }
+                )
+            }) {
+                Text(text = "/10")
+            }
+            Text(
+                text = when {
+                    multiplier < 0 -> "/${abs(multiplier)}"
+                    multiplier > 1 -> "*${abs(multiplier)}"
+                    else -> "None"
+                },
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
             )
-        }) {
-            Text(text = "/10")
-        }
-        Spacer8(horizontal = true)
-        Text(
-            text = when {
-                multiplier < 0 -> "/${abs(multiplier)}"
-                multiplier > 1 -> "*${abs(multiplier)}"
-                else -> "None"
-            },
-            style = UI.typo.nB2,
-            color = UI.colors.primary,
-        )
-        Spacer8(horizontal = true)
-        Button(onClick = {
-            onMetaChange(
-                when {
-                    multiplier == -10 -> 1
-                    multiplier == -1 -> 10
-                    multiplier > 0 -> multiplier * 10
-                    else -> multiplier / 10
-                }
-            )
-        }) {
-            Text(text = "*10")
+            FilledTonalButton(onClick = {
+                onMetaChange(
+                    when {
+                        multiplier == -10 -> 1
+                        multiplier == -1 -> 10
+                        multiplier > 0 -> multiplier * 10
+                        else -> multiplier / 10
+                    }
+                )
+            }) {
+                Text(text = "*10")
+            }
         }
     }
 }
@@ -455,7 +522,6 @@ private fun TypeMetadata(
             onTypeMetaEvent(metadata.copy(income = it))
         }
     )
-    Spacer8()
     LabelContainsField(
         label = "Expense",
         value = metadata.expense,
@@ -463,11 +529,10 @@ private fun TypeMetadata(
             onTypeMetaEvent(metadata.copy(expense = it))
         }
     )
-    Spacer8()
-    Text(text = "(optional)", style = UI.typo.c)
     LabelContainsField(
         label = "Transfer",
         value = metadata.transfer ?: "",
+        supportingText = "(optional)",
         onValueChange = {
             onTypeMetaEvent(metadata.copy(transfer = it))
         }
@@ -479,70 +544,54 @@ fun LabelContainsField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    supportingText: String? = null,
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text = label, color = UI.colors.primary, style = UI.typo.nB1)
-        Text(text = " contains ", style = UI.typo.c)
-        Spacer8(horizontal = true)
-        var textField by remember {
-            // move the cursor at the end of the text
-            mutableStateOf(TextFieldValue(value, TextRange(value.length)))
-        }
-        TextField(
-            value = textField,
-            onValueChange = {
-                textField = it
-                onValueChange(it.text)
-            },
-            singleLine = true
-        )
+    var textField by remember {
+        // move the cursor at the end of the text
+        mutableStateOf(TextFieldValue(value, TextRange(value.length)))
     }
+    OutlinedTextField(
+        value = textField,
+        onValueChange = {
+            textField = it
+            onValueChange(it.text)
+        },
+        modifier = modifier.fillMaxWidth(),
+        label = { Text(text = "$label contains") },
+        supportingText = supportingText?.let { { Text(text = it) } },
+        singleLine = true
+    )
 }
 // endregion
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun DateMetadataUI(
     metadata: DateMetadata,
     onEvent: (CSVEvent) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    Text(text = "Which is first in the format?")
-    Row {
-        EnabledButton(
-            enabled = metadata == DateMetadata.DateFirst,
-            text = "Date/Day (1,2,3...31)",
-            onClick = {
-                onEvent(CSVEvent.DataMetaChange(DateMetadata.DateFirst))
-            }
-        )
-        Spacer8(horizontal = true)
-        EnabledButton(
-            enabled = metadata == DateMetadata.MonthFirst,
-            text = "Month (1,2..12 / Jan, Feb..Dec)",
-            onClick = {
-                onEvent(CSVEvent.DataMetaChange(DateMetadata.MonthFirst))
-            }
-        )
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(text = "Which is first in the format?", style = MaterialTheme.typography.labelLarge)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            FilterChip(
+                selected = metadata == DateMetadata.DateFirst,
+                onClick = {
+                    onEvent(CSVEvent.DataMetaChange(DateMetadata.DateFirst))
+                },
+                label = { Text(text = "Date/Day (1,2,3...31)") },
+            )
+            FilterChip(
+                selected = metadata == DateMetadata.MonthFirst,
+                onClick = {
+                    onEvent(CSVEvent.DataMetaChange(DateMetadata.MonthFirst))
+                },
+                label = { Text(text = "Month (1,2..12 / Jan, Feb..Dec)") },
+            )
+        }
     }
 }
-
-@Composable
-private fun EnabledButton(
-    text: String,
-    enabled: Boolean,
-    onClick: () -> Unit,
-) {
-    Button(
-        colors = if (enabled) {
-            ButtonDefaults.buttonColors()
-        } else {
-            ButtonDefaults.outlinedButtonColors()
-        },
-        onClick = onClick
-    ) {
-        Text(text = text)
-    }
-}
-// endregion
 
 fun LazyListScope.transferFields(
     columns: CSVRow,
@@ -639,65 +688,125 @@ fun LazyListScope.optionalFields(
     )
 }
 
-private fun LazyListScope.continueButton(
-    enabled: Boolean,
-    onEvent: (CSVEvent) -> Unit,
-) {
-    item {
-        Spacer8()
-        Spacer8()
-        Button(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp),
-            enabled = enabled,
-            onClick = {
-                onEvent(CSVEvent.Continue)
-            }
-        ) {
-            Text(
-                text = stringResource(R.string.import_csv_continue),
-                style = UI.typo.b2.style(
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                ),
-            )
-        }
-        Spacer8()
-        Spacer8()
-    }
-}
+private fun previewColumns(): CSVRow = CSVRow(listOf("Date", "Account", "Amount", "Category"))
+
+private fun previewCsv(): ImmutableList<CSVRow> = persistentListOf(
+    previewColumns(),
+    CSVRow(listOf("2023-04-27", "Cash", "-12.50", "Food")),
+    CSVRow(listOf("2023-04-28", "Bank", "1500.00", "Salary")),
+)
+
+private fun previewColumn(name: String): Int = previewColumns().values.indexOf(name)
+
+private fun previewState(mapped: Boolean): CSVState = CSVState(
+    uiState = UIState.Idle,
+    columns = if (mapped) previewColumns() else null,
+    csv = previewCsv(),
+    important = if (mapped) {
+        ImportantFields(
+            amount = ColumnMapping("Amount", "The transaction amount", "Amount", 2, 1, true),
+            amountStatus = MappingStatus(listOf("-12.5", "1500.0"), true),
+            type = ColumnMapping(
+                "Type",
+                "Income or expense",
+                "Amount",
+                2,
+                TrnTypeMetadata(income = "Income", expense = "Expense", transfer = null),
+                true,
+            ),
+            typeStatus = MappingStatus(listOf("EXPENSE", "INCOME"), true),
+            date = ColumnMapping("Date", "When it happened", "Date", 0, DateMetadata.DateFirst, true),
+            dateStatus = MappingStatus(listOf("2023-04-27T00:00", "2023-04-28T00:00"), true),
+            account = ColumnMapping(
+                ivyColumn = "Account",
+                helpInfo = "The account name",
+                name = "Category",
+                index = previewColumn("Category"),
+                metadata = Unit,
+                required = true,
+            ),
+            accountStatus = MappingStatus(emptyList(), false),
+            accountCurrency = ColumnMapping("Account currency", "Optional currency", "", -1, Unit, false),
+            accountCurrencyStatus = MappingStatus(emptyList(), false),
+        )
+    } else {
+        null
+    },
+    transfer = if (mapped) {
+        TransferFields(
+            toAccount = ColumnMapping("To account", "The receiving account", "Account", 1, Unit, true),
+            toAccountStatus = MappingStatus(listOf("Cash", "Bank"), true),
+            toAccountCurrency = ColumnMapping("To account currency", "Optional currency", "", -1, Unit, false),
+            toAccountCurrencyStatus = MappingStatus(emptyList(), false),
+            toAmount = ColumnMapping("To amount", "The received amount", "Amount", 2, 10, true),
+            toAmountStatus = MappingStatus(listOf("-125.0", "15000.0"), true),
+        )
+    } else {
+        null
+    },
+    optional = if (mapped) {
+        OptionalFields(
+            category = ColumnMapping(
+                ivyColumn = "Category",
+                helpInfo = "The category name",
+                name = "Category",
+                index = previewColumn("Category"),
+                metadata = Unit,
+                required = false,
+            ),
+            categoryStatus = MappingStatus(listOf("Food", "Salary"), true),
+            title = ColumnMapping("Title", "A short title", "", -1, Unit, false),
+            titleStatus = MappingStatus(emptyList(), false),
+            description = ColumnMapping("Description", "A longer note", "", -1, Unit, false),
+            descriptionStatus = MappingStatus(emptyList(), false),
+        )
+    } else {
+        null
+    },
+    continueEnabled = false,
+)
 
 @Preview
 @Composable
-private fun Preview(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
-        ImportUI(
-            state = CSVState(
-                uiState = UIState.Idle,
-                columns = null,
-                csv = persistentListOf(
-                    CSVRow(listOf("Date", "Account", "Amount", "Category")),
-                    CSVRow(listOf("2023-04-27", "Cash", "-12.50", "Food")),
-                    CSVRow(listOf("2023-04-28", "Bank", "1500.00", "Salary")),
-                ),
-                important = null,
-                transfer = null,
-                optional = null,
-                continueEnabled = false,
-            ),
-            launchedFromOnboarding = false,
-            onEvent = {}
-        )
+private fun Preview(theme: Theme = Theme.LIGHT, mapped: Boolean = false, firstVisibleItem: Int = 0) {
+    WalletPreview(theme) {
+        NavigationRoot(navigation = Navigation()) {
+            ImportUI(
+                state = previewState(mapped),
+                launchedFromOnboarding = false,
+                onEvent = {},
+                listState = rememberLazyListState(initialFirstVisibleItemIndex = firstVisibleItem),
+            )
+        }
     }
 }
 
 /** For screenshot testing */
 @Composable
 fun CSVScreenUiTest(isDark: Boolean) {
-    val theme = when (isDark) {
-        true -> Theme.DARK
-        false -> Theme.LIGHT
-    }
-    Preview(theme)
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing */
+@Composable
+fun CSVScreenMappedUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT, mapped = true)
+}
+
+/** For screenshot testing */
+@Composable
+fun CSVScreenTypeFieldsUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT, mapped = true, firstVisibleItem = 5)
+}
+
+/** For screenshot testing */
+@Composable
+fun CSVScreenInvalidMappingUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT, mapped = true, firstVisibleItem = 6)
+}
+
+/** For screenshot testing */
+@Composable
+fun CSVScreenTransferFieldsUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT, mapped = true, firstVisibleItem = 9)
 }

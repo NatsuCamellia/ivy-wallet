@@ -1437,6 +1437,38 @@ flow_settings() {
   return 0
 }
 
+# Settings -> Import data: the source list with the manual CSV button, an app source opens its instructions (steps and
+# the pinned upload button, nothing is picked), back returns to the list, the manual CSV screen opens with its upload
+# button and a disabled continue button, back twice returns to Settings.
+flow_import_data() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Settings" || return 1
+  wait_for text exact "Set currency" || { log "settings did not open"; return 1; }
+  scroll_to text exact "Import data" || return 1
+  tap_node text exact "Import data" || return 1
+  wait_for text exact "Manual CSV import" || { log "import data did not open"; return 1; }
+  has desc exact "Back" && has text exact "Import from" && has text exact "Money Manager" || { log "import sources missing"; return 1; }
+  shot import-1-sources
+  tap_node text exact "Money Manager" || return 1
+  wait_for text exact "How to import" || { log "instructions did not open"; return 1; }
+  has text exact "Steps" && has text exact "Upload a CSV file" && has text exact "Export Excel file" || { log "instruction steps missing"; return 1; }
+  shot import-2-instructions
+  tap_node desc exact "Back" || return 1
+  wait_for text exact "Import from" || { log "back from the instructions should return to the sources"; return 1; }
+  tap_node text exact "Manual CSV import" || return 1
+  wait_for text exact "Import CSV file" || { log "manual csv screen did not open"; return 1; }
+  has text exact "Continue" || { log "continue button missing"; return 1; }
+  shot import-3-manual-csv
+  tap_node desc exact "Back" || return 1
+  wait_for text exact "Import from" || { log "back from the manual csv screen should return to the sources"; return 1; }
+  tap_node desc exact "Back" || return 1
+  wait_for any sub "Import & Export" || { log "back from the sources should return to Settings"; return 1; }
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -1469,7 +1501,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data}; do
   run_flow "$flow"
 done
 

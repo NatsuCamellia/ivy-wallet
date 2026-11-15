@@ -84,4 +84,12 @@ class OnboardingPaparazziTest(
             OnboardingLoginUiTest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotOnboardingLoginOverflow() {
+        paparazzi.unsafeUpdateConfig(DeviceConfig.NEXUS_5.copy(fontScale = 2f))
+        snapshot(theme) {
+            OnboardingLoginUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

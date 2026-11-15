@@ -96,29 +96,28 @@ private fun Login(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Brand()
+            Spacer(Modifier.weight(1f))
 
-                TextButton(
-                    onClick = {
-                        openUrl(
-                            uriHandler = uriHandler,
-                            url = Constants.URL_IVY_WALLET_REPO
-                        )
-                    }
-                ) {
-                    Text(stringResource(R.string.opensource))
+            Brand()
+
+            TextButton(
+                onClick = {
+                    openUrl(
+                        uriHandler = uriHandler,
+                        url = Constants.URL_IVY_WALLET_REPO
+                    )
                 }
+            ) {
+                Text(stringResource(R.string.opensource))
             }
+
+            Spacer(Modifier.weight(1f))
 
             Text(
                 text = stringResource(R.string.enter_with_offline_account),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
             )
 
             Text(
@@ -157,11 +156,13 @@ private fun Brand(modifier: Modifier = Modifier) {
         Text(
             text = "Ivy Wallet",
             style = MaterialTheme.typography.headlineLarge,
+            textAlign = TextAlign.Center,
         )
 
         Text(
             text = stringResource(R.string.your_personal_money_manager),
             style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
         )
     }
 }

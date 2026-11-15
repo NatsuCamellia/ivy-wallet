@@ -10840,17 +10840,6 @@
 
     <issue
         id="ComposeParameterOrder"
-        message="Parameters in a composable function should be ordered following this pattern: params without defaults, modifiers, params with defaults and optionally, a trailing function that might not have a default param.&#xA;Current params are: `[modifier: Modifier = Modifier, iconName: String?, tint: Color = UI.colors.pureInverse, @DrawableRes defaultIcon: Int]` but should be `[iconName: String?, @DrawableRes defaultIcon: Int, modifier: Modifier = Modifier, tint: Color = UI.colors.pureInverse]`.&#xA;See https://slackhq.github.io/compose-lints/rules/#ordering-composable-parameters-properly for more information."
-        errorLine1="fun ItemIconMDefaultIcon("
-        errorLine2="                        ^">
-        <location
-            file="src/main/java/com/ivy/legacy/legacy/ui/theme/components/ItemIcon.kt"
-            line="45"
-            column="25"/>
-    </issue>
-
-    <issue
-        id="ComposeParameterOrder"
         message="Parameters in a composable function should be ordered following this pattern: params without defaults, modifiers, params with defaults and optionally, a trailing function that might not have a default param.&#xA;Current params are: `[modifier: Modifier = Modifier, iconName: String?, tint: Color = UI.colors.pureInverse, iconContentScale: ContentScale? = null, Default: (@Composable () -> Unit)? = null]` but should be `[iconName: String?, modifier: Modifier = Modifier, tint: Color = UI.colors.pureInverse, iconContentScale: ContentScale? = null, Default: (@Composable () -> Unit)? = null]`.&#xA;See https://slackhq.github.io/compose-lints/rules/#ordering-composable-parameters-properly for more information."
         errorLine1="fun ItemIconM("
         errorLine2="             ^">

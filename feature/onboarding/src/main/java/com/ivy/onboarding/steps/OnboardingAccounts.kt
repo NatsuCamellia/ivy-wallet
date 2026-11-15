@@ -91,7 +91,7 @@ fun OnboardingAccounts(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
             contentPadding = innerPadding,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
                 Text(

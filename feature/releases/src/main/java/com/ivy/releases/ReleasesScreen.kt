@@ -33,9 +33,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.ivy.navigation.IvyPreview
+import com.ivy.base.legacy.Theme
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
+import com.ivy.ui.theme.WalletTheme
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -256,37 +259,39 @@ private fun GitHubButton(
 @Preview
 @Composable
 private fun PreviewReleasesUi(isDark: Boolean = false) {
-    IvyPreview(isDark) {
-        ReleasesUi(
-            uiState = ReleasesState.Success(
-                releasesInfo = persistentListOf(
-                    ReleaseInfo(
-                        releaseName = "v2026.10.22",
-                        releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.22",
-                        releaseDate = "2026-10-22",
-                        releaseCommits = persistentListOf(
-                            "Target Android 16 (API 36) for Google Play",
-                            "Bump reactivecircus/android-emulator-runner",
+    WalletTheme(if (isDark) Theme.DARK else Theme.LIGHT) {
+        NavigationRoot(navigation = Navigation()) {
+            ReleasesUi(
+                uiState = ReleasesState.Success(
+                    releasesInfo = persistentListOf(
+                        ReleaseInfo(
+                            releaseName = "v2026.10.22",
+                            releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.22",
+                            releaseDate = "2026-10-22",
+                            releaseCommits = persistentListOf(
+                                "Target Android 16 (API 36) for Google Play",
+                                "Bump reactivecircus/android-emulator-runner",
+                            ),
                         ),
-                    ),
-                    ReleaseInfo(
-                        releaseName = "v2026.10.15",
-                        releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.15",
-                        releaseDate = "2026-10-15",
-                        releaseCommits = persistentListOf(
-                            "Fix crash when opening the budgets screen",
+                        ReleaseInfo(
+                            releaseName = "v2026.10.15",
+                            releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.15",
+                            releaseDate = "2026-10-15",
+                            releaseCommits = persistentListOf(
+                                "Fix crash when opening the budgets screen",
+                            ),
                         ),
-                    ),
-                    ReleaseInfo(
-                        releaseName = "v2026.10.08",
-                        releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.08",
-                        releaseDate = "2026-10-08",
-                        releaseCommits = persistentListOf(),
-                    ),
-                )
-            ),
-            onEvent = {}
-        )
+                        ReleaseInfo(
+                            releaseName = "v2026.10.08",
+                            releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.08",
+                            releaseDate = "2026-10-08",
+                            releaseCommits = persistentListOf(),
+                        ),
+                    )
+                ),
+                onEvent = {}
+            )
+        }
     }
 }
 

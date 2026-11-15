@@ -42,11 +42,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.ivy.navigation.IvyPreview
+import com.ivy.base.legacy.Theme
 import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
+import com.ivy.ui.theme.WalletTheme
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -361,57 +363,63 @@ private fun GitHubButton(
 @Preview
 @Composable
 private fun PreviewSuccess(isDark: Boolean = false) {
-    IvyPreview(isDark) {
-        ContributorsUi(
-            uiState = ContributorsState(
-                projectResponse = ProjectResponse.Success(
-                    projectInfo = ProjectRepositoryInfo(
-                        forks = "259",
-                        stars = "1524",
-                        url = ""
-                    )
-                ),
-                contributorsResponse = ContributorsResponse.Success(
-                    contributors = persistentListOf(
-                        Contributor(
-                            name = "Iliyan",
-                            photoUrl = "",
-                            contributionsCount = "567",
-                            githubProfileUrl = ""
+    WalletTheme(if (isDark) Theme.DARK else Theme.LIGHT) {
+        NavigationRoot(navigation = Navigation()) {
+            ContributorsUi(
+                uiState = ContributorsState(
+                    projectResponse = ProjectResponse.Success(
+                        projectInfo = ProjectRepositoryInfo(
+                            forks = "259",
+                            stars = "1524",
+                            url = ""
+                        )
+                    ),
+                    contributorsResponse = ContributorsResponse.Success(
+                        contributors = persistentListOf(
+                            Contributor(
+                                name = "Iliyan",
+                                photoUrl = "",
+                                contributionsCount = "567",
+                                githubProfileUrl = ""
+                            )
                         )
                     )
-                )
-            ),
-            onEvent = {}
-        )
+                ),
+                onEvent = {}
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 private fun PreviewError() {
-    IvyPreview {
-        ContributorsUi(
-            uiState = ContributorsState(
-                projectResponse = ProjectResponse.Error,
-                contributorsResponse = ContributorsResponse.Error(stringResource(R.string.error))
-            ),
-            onEvent = {}
-        )
+    WalletTheme(Theme.LIGHT) {
+        NavigationRoot(navigation = Navigation()) {
+            ContributorsUi(
+                uiState = ContributorsState(
+                    projectResponse = ProjectResponse.Error,
+                    contributorsResponse = ContributorsResponse.Error(stringResource(R.string.error))
+                ),
+                onEvent = {}
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 private fun PreviewLoading() {
-    IvyPreview {
-        ContributorsUi(
-            uiState = ContributorsState(
-                projectResponse = ProjectResponse.Loading,
-                contributorsResponse = ContributorsResponse.Loading
-            ),
-            onEvent = {}
-        )
+    WalletTheme(Theme.LIGHT) {
+        NavigationRoot(navigation = Navigation()) {
+            ContributorsUi(
+                uiState = ContributorsState(
+                    projectResponse = ProjectResponse.Loading,
+                    contributorsResponse = ContributorsResponse.Loading
+                ),
+                onEvent = {}
+            )
+        }
     }
 }
 

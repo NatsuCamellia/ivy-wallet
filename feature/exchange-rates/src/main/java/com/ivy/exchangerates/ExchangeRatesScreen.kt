@@ -126,7 +126,7 @@ private fun UI(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
-            // the rates and the base currency load together; nothing to say before that
+            // the rates are filtered by the base currency, so they are empty until it has loaded
             if (state.baseCurrency.isNotEmpty() && state.manual.isEmpty() && state.automatic.isEmpty()) {
                 item(key = "empty") {
                     EmptyState(

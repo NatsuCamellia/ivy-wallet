@@ -65,7 +65,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -271,6 +273,7 @@ private fun AccountGroup(
             SettingsItem(
                 icon = Icons.Default.Person,
                 title = name.ifBlank { stringResource(R.string.anonymous) },
+                supporting = stringResource(R.string.account),
                 onClick = onNameClick,
                 modifier = Modifier.testTag("settings_profile_card"),
                 titleModifier = Modifier.testTag("local_account_name"),
@@ -411,6 +414,7 @@ private fun OtherGroup(modifier: Modifier = Modifier) {
             SettingsItem(
                 icon = Icons.Default.Code,
                 title = stringResource(R.string.ivy_wallet_is_opensource),
+                supporting = stringResource(R.string.github),
                 onClick = { rootScreen.openUrlInBrowser(url = Constants.URL_IVY_WALLET_REPO) },
             ),
         )
@@ -564,7 +568,7 @@ private fun SettingsRow(
             onCheckedChange = { item.onClick() },
             shapes = shapes,
             colors = colors,
-            modifier = modifier.then(item.modifier),
+            modifier = modifier.semantics { role = Role.Switch }.then(item.modifier),
             leadingContent = leading,
             trailingContent = { Switch(checked = item.checked, onCheckedChange = null) },
             supportingContent = supporting,

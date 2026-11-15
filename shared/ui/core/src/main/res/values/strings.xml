@@ -78,6 +78,7 @@
     <string name="pay_with">Pay with</string>
     <string name="from">From</string>
     <string name="account">Account</string>
+    <string name="github">GitHub</string>
     <string name="to">To</string>
     <string name="add_account">Add account</string>
     <string name="no_accounts">No accounts</string>

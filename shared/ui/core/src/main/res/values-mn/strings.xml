@@ -5,8 +5,6 @@
     <string name="month_income">ЭНЭ САРЫН ОРЛОГО</string>
     <string name="month_expenses">ЭНЭ САРЫН ЗАРЛАГА</string>
     <string name="excluded">(үлдэгдэл тооцохгүй)</string>
-    <string name="income_uppercase">ОРЛОГО</string>
-    <string name="expenses_uppercase">ЗАРЛАГА</string>
     <string name="app_locked">АПП ТҮГЖИГДСЭН</string>
     <string name="authenticate_text">Түгжээ тайлж нэвтрэнэ үү</string>
     <string name="unlock">Онгойлгох</string>
@@ -103,7 +101,6 @@
     <string name="light_mode">Гэгээлэг горим</string>
     <string name="dark_mode">Харанхуй горим</string>
     <string name="auto_mode">Систем (auto)</string>
-    <string name="planned_payments">Төлөвлөгөөт\nтөлбөрүүд</string>
     <string name="share_ivy">Ivy-г түгээх</string>
     <string name="reports">Тайлангууд</string>
     <string name="loans">Зээл</string>
@@ -115,8 +112,6 @@
     <string name="no_loans_description">Танд өглөг, авлага байхгүй байна. \"+ Зээл нэмэх\" товч дээр дарж шинийг нэмэх боломжтой.</string>
     <string name="loan_confirm_deletion_description">Санамж: Энэ зээлийг устгавал холбогдох бүх тооцоо хамт үүрд устах болно.</string>
     <string name="confirm_account_loan_change">Түр хүлээнэ үү, зээлийн түүхийг дахин тооцоолж байна</string>
-    <string name="paid">Төлсөн</string>
-    <string name="left_to_pay">%1$s %2$s үлдсэн</string>
     <string name="loan_interest">Зээлийн хүү</string>
     <string name="interest_paid">%1$s %2$s төлсөн</string>
     <string name="add_record">Тооцоо нэмэх</string>
@@ -135,23 +130,12 @@
     <string name="transactions">гүйлгээнүүд</string>
     <string name="home">Нүүр</string>
     <string name="add_planned_payment">Төлөвлөгөөт гүйлгээ нэмэх</string>
-    <string name="add_income_uppercase">ОРЛОГО НЭМЭХ</string>
-    <string name="add_expense_uppercase">ЗАРЛАГА НЭМЭХ</string>
-    <string name="account_transfer">ДАНС ХООРОНД</string>
     <string name="skip">Алгасах</string>
     <string name="add_new">Нэмэх</string>
     <string name="from_date">%1$s-с</string>
     <string name="to_date">%1$s хүртэл</string>
     <string name="range">Хугацаа</string>
-    <string name="privacy_and_data_collection">Нууцлал ба\nмэдээлэл цуглуулалт</string>
-    <string name="swipe_to_agree_terms_conditions">Шударч үйлчилгээний нөхцөлийг зөвшөөрнө үү</string>
-    <string name="agreed_terms_conditions">Үйлчилгээний нөхцөлийг зөвшөөрсөн</string>
-    <string name="swipe_to_agree_privacy_policy">Шударч нууцлалын бодлогыг зөвшөөрнө үү</string>
-    <string name="agreed_privacy_policy">Нууцлалын бодлогыг зөвшөөрсөн</string>
-    <string name="terms_and_conditions">Үйлчилгээний нөхцөл</string>
     <string name="privacy_policy">Нууцлалын бодлого</string>
-    <string name="wallet_description">Ivy-г ашиглаж орлого, зарлага, төсвөө хянаарай.\n\nХялбар интерфэйс, давтамжит ба төлөвлөгөөт гүйлгээ, олон данс, гүйлгээ ангилах, чухал статистик, CSV хэлбэрээр авах болон өшөө илүү зүйлс.</string>
-    <string name="enter_your_name">Нэрээ оруулж\nсанхүүчтэйгээ\nтанилцаарай</string>
     <string name="what_is_your_name">Таны нэр?</string>
     <string name="enter">Оруулах</string>
     <string name="add_accounts">Данс нэмэх</string>
@@ -181,12 +165,8 @@
     <string name="planned_payment_confirm_deletion_description">Энэ төлөвлөгөөт гүйлгээг устгаснаар төлөгдөөгүй (мөн хугацаа хэтэрсэн) бүх тооцоо хамт устах болно.</string>
     <string name="set_payment_type">Гүйлгээний төрөл сонгох</string>
     <string name="planned_start_at">Эхлэх тов</string>
-    <string name="repeats_every">%1$d %2$s бүр давтана</string>
     <string name="deleted">устсан</string>
-    <string name="planned_for_uppercase">"ТОВ: "</string>
     <string name="null_text">null</string>
-    <string name="starts_date">"ЭХЛЭХ: %1$s "</string>
-    <string name="add_payment">Төлбөр нэмэх</string>
     <string name="one_time_payments">Нэг удаагийн гүйлгээнүүд</string>
     <string name="recurring_payments">Давтамжит гүйлгээнүүд</string>
     <string name="no_planned_payments">Төлөвлөгөөт гүйлгээ байхгүй</string>
@@ -198,8 +178,6 @@
     <string name="due_on">Төлөх: %1$s</string>
     <string name="upcoming">Удахгүй</string>
     <string name="overdue">Хугацаа хэтэрсэн</string>
-    <string name="expenses_lowercase">зарлага</string>
-    <string name="income_lowercase">орлого</string>
     <string name="edit_account">Данс өөрчлөх</string>
     <string name="new_account">Шинэ данс</string>
     <string name="account_name">Дансны нэр</string>
@@ -226,9 +204,7 @@
     <string name="select_all">Бүгдийг сонгох</string>
     <string name="amount_optional">Дүн (шаардлагагүй)</string>
     <string name="keywords_optional">Түлхүүр үгс (шаардлагагүй)</string>
-    <string name="includes_uppercase">АГУУЛСАН</string>
     <string name="add_keyword">Түлхүүр үг нэмэх</string>
-    <string name="excludes_uppercase">АГУУЛААГҮЙ</string>
     <string name="no_transactions_for_your_filter">Танд шүүлтүүрт тохирох гүйлгээ алга байна.</string>
     <string name="no_filter">Шүүлтүүр байхгүй</string>
     <string name="invalid_filter_warning">Тайлан гаргахын тулд шүүлтүүх тохируулах шаардлагатай.</string>
@@ -264,7 +240,6 @@
     <string name="request_a_feature">Санал хүсэлт илгээх</string>
     <string name="contact_support">Зөвлөхтэй холбогдох</string>
     <string name="project_contributors">Төсөлд оролцсон хүмүүс</string>
-    <string name="account_uppercase">ДАНС</string>
     <string name="logout">Гарах</string>
     <string name="login">Нэвтрэх</string>
     <string name="syncing">Нөөцөлж байна…</string>
@@ -301,7 +276,6 @@
     <string name="unselect_all_time">Бүх цаг үеийг цуцлах</string>
     <string name="select_all_time">Бүх цаг үеийг сонгох</string>
     <string name="choose_start_date_of_month">Сар эхлэх өдрийг сонгоно уу</string>
-    <string name="supports_crypto">крипто дэмждэг</string>
     <string name="delete">Устгах</string>
     <string name="save">Хадгалах</string>
     <string name="add">Нэмэх</string>
@@ -433,8 +407,6 @@
     <string name="confirm_skip_all">Тийм, бүгдийг алгасъя</string>
     <string name="confirm_skip_all_description">Бүх хугацаа хэтэрсэн төлөвлөгөөт гүйлгээг алгасах уу?</string>
     <string name="switch_to_offline_mode">Оффлайн горимд шилжих</string>
-    <string name="delete_all_user_cloud_data_warning">АНХААР! Энэ үйлдэл %1$s-н үүлэнд нөөцөлсөн бүх мэдээллийг ҮҮРД устгах болно. Одоо гар утсан дээр хадгалагдсан мэдээлэл үлдэнэ.</string>
-    <string name="delete_all_cloud_data_question">Үүлэнд нөөцөлсөн бүх мэдээллээ устгах уу?</string>
     <string name="experimental">Туршилт</string>
     <string name="experimental_settings">Туршилтын тохиргоо</string>
     <string name="wallet_balance">Хэтэвчний үлдэгдэл</string>

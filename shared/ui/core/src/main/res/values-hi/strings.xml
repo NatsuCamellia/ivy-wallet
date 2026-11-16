@@ -4,8 +4,6 @@
     <string name="month_income">इस महीने की आय</string>
     <string name="month_expenses">इस महीने के खर्च</string>
     <string name="excluded">(छोड़ा गया)</string>
-    <string name="income_uppercase">आय</string>
-    <string name="expenses_uppercase">खर्च</string>
     <string name="app_locked">ऐप लॉक</string>
     <string name="total">कुल: %1$s %2$s</string>
     <string name="authenticate_text">ऐप में प्रवेश करने के लिए प्रमाणित करें</string>
@@ -102,7 +100,6 @@
     <string name="light_mode">लाइट मोड</string>
     <string name="dark_mode">डार्क मोड</string>
     <string name="auto_mode">आटोमेटिक मोड</string>
-    <string name="planned_payments">आयोजित भुगतान</string>
     <string name="share_ivy">शेयर Ivy</string>
     <string name="reports">रिपोर्ट्स</string>
     <string name="loans">लोन्स</string>
@@ -114,8 +111,6 @@
     <string name="no_loans_description">आपके पास कोई लोन नहीं है। जोड़ने के लिए \"+\" बटन पर टैप करे।</string>
     <string name="loan_confirm_deletion_description">नोट: इस लोन को हटाने से यह स्थायी रूप से हट जाएगा और इससे जुड़े सभी लोन रिकॉर्ड हटा दिए जाएंगे।</string>
     <string name="confirm_account_loan_change">कृपया प्रतीक्षा करें, सभी लोन रिकॉर्ड की पुन: गणना की जा रही है</string>
-    <string name="paid">भुगतान किया गया</string>
-    <string name="left_to_pay">%1$s %2$s शेष</string>
     <string name="loan_interest">क़र्ज़ का ब्याज</string>
     <string name="interest_paid">%1$s %2$s भुगतान किया गया</string>
     <string name="add_record">रिकॉर्ड जोड़ें</string>
@@ -134,19 +129,11 @@
     <string name="transactions">लेनदेन</string>
     <string name="home">होम</string>
     <string name="add_planned_payment">नियोजित भुगतान जोड़ें</string>
-    <string name="add_income_uppercase">आय जोड़ें</string>
-    <string name="add_expense_uppercase">व्यय जोड़ें</string>
-    <string name="account_transfer">खाता स्थानांतरण</string>
     <string name="skip">स्किप</string>
     <string name="add_new">नया जोड़ें</string>
     <string name="from_date">%1$s से</string>
     <string name="to_date">%1$s तक</string>
     <string name="range">सीमा</string>
-    <string name="privacy_and_data_collection">प्राइवेसी और डाटा कलेक्शन</string>
-    <string name="swipe_to_agree_terms_conditions">हमारे नियम और शर्तों से सहमत होने के लिए स्वाइप करें</string>
-    <string name="agreed_terms_conditions">हमारे नियमों और शर्तों से सहमत</string>
-    <string name="swipe_to_agree_privacy_policy">हमारी गोपनीयता नीति से सहमत होने के लिए स्वाइप करें</string>
-    <string name="terms_and_conditions">नियम और शर्तें</string>
     <string name="privacy_policy">प्राइवेसी पालिसी</string>
     <string name="what_is_your_name">आपका क्या नाम है?</string>
     <string name="enter">दाखिल करना</string>
@@ -173,7 +160,6 @@
     <string name="import_backup_file">बैकअप फ़ाइल इम्पोर्ट करें</string>
     <string name="start_fresh">नए से शुरू करें</string>
     <string name="set_payment_type">भुगतान प्रकार सेट करें</string>
-    <string name="repeats_every">हर %1$d %2$s को दोहराता है</string>
     <string name="deleted">हटाए गए</string>
     <string name="confirm_skip_all_description">क्या आप सुनिश्चित हैं कि आप सभी अतिदेय नियोजित लेनदेन को छोड़ना चाहते हैं?</string>
     <string name="confirm_skip_all">सभी को छोड़ने की पुष्टि करें</string>
@@ -297,7 +283,6 @@
     <string name="add">जोड़ें</string>
     <string name="save">सेव करें</string>
     <string name="delete">मिटाये</string>
-    <string name="supports_crypto">क्रिप्टो सपोर्ट करता है</string>
     <string name="choose_start_date_of_month">महीने की आरंभ तिथि चुनें</string>
     <string name="select_all_time">आल टाइम का चयन करें</string>
     <string name="unselect_all_time">आल टाइम का चयन रद्द करें</string>
@@ -334,7 +319,6 @@
     <string name="syncing">सिंक किया जा रहा है…</string>
     <string name="login">लॉग इन करें</string>
     <string name="logout">लॉग आउट</string>
-    <string name="account_uppercase">खाता</string>
     <string name="project_contributors">प्रोजेक्ट योगदानकर्ता</string>
     <string name="contact_support">सहयोग टीम से संपर्क करें</string>
     <string name="request_a_feature">सुविधा के लिए अनुरोध करें</string>
@@ -368,17 +352,11 @@
     <string name="export">एक्सपोर्ट करें</string>
     <string name="set_filter">फ़िल्टर सेट करें</string>
     <string name="export_to_file_description">कैरेक्टर सेट: UTF-८ दशमलव विभाजक: दशमलव बिंदु \'.\' सीमांकक वर्ण: अल्पविराम \',\'</string>
-    <string name="agreed_privacy_policy">आप सहमत हैं हमारी प्राइवेसी पॉलिसी से</string>
-    <string name="wallet_description">Ivy के साथ अपनी आय, खर्च और बजट को ट्रैक करें।\nसहज ज्ञान युक्त यूआई, आवर्ती और नियोजित भुगतान, कई खातों का प्रबंधन, श्रेणियों में लेनदेन का आयोजन, सार्थक आँकड़े, CSV को export करें और बहुत कुछ।</string>
-    <string name="enter_your_name">वॉलेट पर्सनॅलिजे करने के लिए अपना नाम दर्ज करें</string>
     <string name="offline_warning">आपका डेटा स्थानीय रूप से सहेजा जाएगा (केवल आपके फ़ोन पर) और क्लाउड के साथ समन्वयित नहीं किया जाएगा। यदि आप ऐप को अनइंस्टॉल करते हैं या अपना डिवाइस बदलते हैं तो आप इसे खोने का जोखिम उठाते हैं। यदि आप निर्णय लेते हैं तो आप बाद में कभी भी सिंक शुरू कर सकते हैं।</string>
     <string name="importing_another_time_warning">दूसरे से बैकअप फ़ाइल इम्पोर्ट करने में 5 मिनट तक का समय लग सकता है। आप चाहें तो बाद में कभी भी अपना डेटा इम्पोर्ट कर सकते हैं।</string>
     <string name="planned_payment_confirm_deletion_description">इस नियोजित भुगतान को हटाने से इससे जुड़े सभी गैर-भुगतान आगामी या अतिदेय लेनदेन हट जाएंगे।</string>
     <string name="planned_start_at">नियोजित शुरुआत</string>
-    <string name="planned_for_uppercase">के लिए योजना बनाई</string>
     <string name="null_text">null</string>
-    <string name="starts_date">स्टार्ट %1$s</string>
-    <string name="add_payment">भुगतान जोड़ें</string>
     <string name="one_time_payments">एकमुश्त भुगतान</string>
     <string name="recurring_payments">आवर्ती भुगतान</string>
     <string name="no_planned_payments">कोई नियोजित भुगतान नहीं</string>
@@ -390,8 +368,6 @@
     <string name="due_on">%1$s को देय</string>
     <string name="upcoming">आगामी</string>
     <string name="overdue">अतिदेय</string>
-    <string name="expenses_lowercase">खर्च</string>
-    <string name="income_lowercase">आय</string>
     <string name="edit_account">खाता संपादित करें</string>
     <string name="new_account">नया खाता</string>
     <string name="account_name">खाते का नाम</string>
@@ -418,9 +394,7 @@
     <string name="clear_all">सभी क्लियर करें</string>
     <string name="amount_optional">राशि (वैकल्पिक)</string>
     <string name="keywords_optional">कीवर्ड (वैकल्पिक)</string>
-    <string name="includes_uppercase">शामिल</string>
     <string name="add_keyword">कीवर्ड जोड़ें</string>
-    <string name="excludes_uppercase">शामिल नहीं</string>
     <string name="no_transactions_for_your_filter">आपके पास इस फ़िल्टर के लिए कोई लेन-देन नहीं है।</string>
     <string name="no_filter">कोई फिल्टर नहीं</string>
     <string name="invalid_filter_warning">रिपोर्ट जनरेट करने के लिए आपको पहले एक मान्य फ़िल्टर सेट करना होगा।</string>
@@ -433,8 +407,6 @@
     <string name="make_ivy_wallet_better_description">आइवी वॉलेट को बेहतर बनाना चाहते हैं? हमें एक समीक्षा लिखें। आप जो चाहते हैं उसे विकसित करने का यही एकमात्र तरीका है। साथ ही हमें PlayStore में उच्च रैंक देने में मदद करें ताकि हम मार्केटिंग के बजाय उत्पाद पर पैसा खर्च कर सकें।\\nहम अपनी तरफ से हमेशाअच्छा करते रहेंगे।\\n Ivy टीम</string>
     <string name="transfers_as_income_expense_description">खाता स्थानान्तरण को खाता स्क्रीन में आय या व्यय के रूप में मानता है</string>
     <string name="switch_to_offline_mode">ऑफ़लाइन मोड में स्विच करें</string>
-    <string name="delete_all_user_cloud_data_warning">चेतावनी! यह क्रिया %1$s के लिए आपके सभी क्लाउड-संग्रहीत डेटा को स्थायी रूप से हटा देगी, आपके स्थानीय ऐप में संग्रहीत ऑफ़लाइन डेटा बना रहेगा।</string>
-    <string name="delete_all_cloud_data_question">सभी क्लाउड-संग्रहीत डेटा हटाएं?</string>
     <string name="experimental">Experimental</string>
     <string name="experimental_settings">प्रायोगिक सेटिंग्स</string>
     <string name="wallet_balance">वॉलेट बैलेंस</string>

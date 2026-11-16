@@ -5,8 +5,6 @@
     <string name="month_income">الدخل هذا الشهر</string>
     <string name="month_expenses">الإنفاق هذا الشهر</string>
     <string name="excluded">(مستبعد)</string>
-    <string name="income_uppercase">دخل</string>
-    <string name="expenses_uppercase">إنفاق</string>
     <string name="app_locked">التطبيق مغلق</string>
     <string name="authenticate_text">الغِ القفل لدخول التطبيق</string>
     <string name="unlock">إلغاء القفل</string>
@@ -103,7 +101,6 @@
     <string name="light_mode">وضع النهار</string>
     <string name="dark_mode">الوضغ الليلي</string>
     <string name="auto_mode">الوضع التلقائي</string>
-    <string name="planned_payments">المدفوعات\n المخططة</string>
     <string name="share_ivy">شارك التطبيق</string>
     <string name="reports">التقارير</string>
     <string name="loans">القروض</string>
@@ -115,8 +112,6 @@
     <string name="no_loans_description">لا يوجد لديك اي قروض.\n اضغط على "اضافة قرض +" للإضافة</string>
     <string name="loan_confirm_deletion_description">ملاحظة: حذف هذا القرض سيزيله نهائيا و يحذف جميع القروض التابعة له</string>
     <string name="confirm_account_loan_change">الرجاء الانتظار, يتم اعادة حساب كل سجلات القروض</string>
-    <string name="paid">مدفوع</string>
-    <string name="left_to_pay">%1$s %2$s متبقي</string>
     <string name="loan_interest">فائدة القرض</string>
     <string name="interest_paid">%1$s %2$s مدفوعة</string>
     <string name="add_record">إضافة سجل</string>
@@ -135,23 +130,12 @@
     <string name="transactions">المعاملات</string>
     <string name="home">الرئيسية</string>
     <string name="add_planned_payment">إضافة مدفوعات مخططة</string>
-    <string name="add_income_uppercase">إضافة دخل</string>
-    <string name="add_expense_uppercase">إضافة إنفاق</string>
-    <string name="account_transfer">تحويل لحساب</string>
     <string name="skip">تخطي</string>
     <string name="add_new">إضافة جديد</string>
     <string name="from_date">من %1$s</string>
     <string name="to_date">إلى %1$s</string>
     <string name="range">المجال</string>
-    <string name="privacy_and_data_collection">الخصوصية و\n تجميع البيانات</string>
-    <string name="swipe_to_agree_terms_conditions">اسحب للموافقة على الشروط و الأحكام</string>
-    <string name="agreed_terms_conditions">تمت الموافقة على الشروط و الأحكام</string>
-    <string name="swipe_to_agree_privacy_policy">اسحب للموافقة على سياسة الخصوصية</string>
-    <string name="agreed_privacy_policy">تمت الموافقة على سياسة الخصوصية</string>
-    <string name="terms_and_conditions">الشروط و الأحكام</string>
     <string name="privacy_policy">سياسة الخصوصية</string>
-    <string name="wallet_description">تتبع دخلك, إنفاقك و ميزانيتك مع Ivy.\n\n تصميم أنيق, دفعات مخططة و متكررة, أدِر حسابات متعددة, نظم المعاملات في فئات, إحصائيات معبرة, صدّر المعاملات الى ملف csv و أكثر.</string>
-    <string name="enter_your_name">أدخل اسمك\n لتخصيص محفظتك</string>
     <string name="what_is_your_name">ما اسمك؟</string>
     <string name="enter">إدخال</string>
     <string name="add_accounts">إضافة حسابات</string>
@@ -181,12 +165,8 @@
     <string name="planned_payment_confirm_deletion_description">حذف هذه الدفعه المخططة سيزيل كل المدفوعات الغير مدفوغة او المدفوعات المتأخرة القادمة المتعلقة بها.</string>
     <string name="set_payment_type">تحديد نوع العملية</string>
     <string name="planned_start_at">مخطط البدء في</string>
-    <string name="repeats_every">تكرر كل %1$d %2$s</string>
     <string name="deleted">محذوف</string>
-    <string name="planned_for_uppercase">مخطط في</string>
     <string name="null_text">null</string>
-    <string name="starts_date">"تبدأ %1$s "</string>
-    <string name="add_payment">إضافة دفعة</string>
     <string name="one_time_payments">المدفوعات لمرة واحدة</string>
     <string name="recurring_payments">الدفعات متكررة</string>
     <string name="no_planned_payments">لا توجد مدفوعات مخططة</string>
@@ -198,8 +178,6 @@
     <string name="due_on">محدد الدفع في %1$s</string>
     <string name="upcoming">قادم</string>
     <string name="overdue">متأخر</string>
-    <string name="expenses_lowercase">الانفاق</string>
-    <string name="income_lowercase">الدخل</string>
     <string name="edit_account">تعديل الحساب</string>
     <string name="new_account">حساب جديد</string>
     <string name="account_name">اسم الحساب</string>
@@ -226,9 +204,7 @@
     <string name="select_all">تحديد الكل</string>
     <string name="amount_optional">القيمة (اختياري)</string>
     <string name="keywords_optional">الكلمات المفتاحية (اختياري)</string>
-    <string name="includes_uppercase">تحتوي</string>
     <string name="add_keyword">اضف كلمة مفتاحية</string>
-    <string name="excludes_uppercase">استبعد</string>
     <string name="no_transactions_for_your_filter">لا يوجد معاملات لتصفياتك</string>
     <string name="no_filter">بدون تصفيات</string>
     <string name="invalid_filter_warning">لإنشاء تقرير يجب عليك تحديد تصفيات صالحة اولا.</string>
@@ -264,7 +240,6 @@
     <string name="request_a_feature">طلب ميزة</string>
     <string name="contact_support">اتصل بالدعم</string>
     <string name="project_contributors">المساهمون في التطبيق</string>
-    <string name="account_uppercase">الحساب</string>
     <string name="logout">تسجيل الخروج</string>
     <string name="login">تسجيل الدخول</string>
     <string name="syncing">يتم المزامنة…</string>
@@ -301,7 +276,6 @@
     <string name="unselect_all_time">إلغاء تحديد كل الأوقات</string>
     <string name="select_all_time">تحديد كل الأوقات</string>
     <string name="choose_start_date_of_month">أختر تاريخ بداية الشهر</string>
-    <string name="supports_crypto">تدعم العملات الرقمية</string>
     <string name="delete">حذف</string>
     <string name="save">حفظ</string>
     <string name="add">أضافة</string>
@@ -433,8 +407,6 @@
     <string name="confirm_skip_all">تأكيد تخطي الكل</string>
     <string name="confirm_skip_all_description">هل أنت متأكد من أنك تريد تخطي جميع المعاملات المخطط لها المتأخرة؟</string>
     <string name="switch_to_offline_mode">التبديل إلى وضع بدون انترنت</string>
-    <string name="delete_all_user_cloud_data_warning">تحذير! سوف يؤدي هذا الى حذف كل بياناتك المخزنة في السحابة ل%1$s نهائيا, لن يتم حذف البيانات المخزنة على جهازك.</string>
-    <string name="delete_all_cloud_data_question">حذف كل اليانات على السحابة؟</string>
     <string name="experimental">تجريبي</string>
     <string name="experimental_settings">الإعدادات التجريبية</string>
     <string name="wallet_balance">رصيد المحفظة</string>

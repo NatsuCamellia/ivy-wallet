@@ -5,8 +5,6 @@
     <string name="month_income">INCOME THIS MONTH</string>
     <string name="month_expenses">EXPENSES THIS MONTH</string>
     <string name="excluded">(excluded)</string>
-    <string name="income_uppercase">INCOME</string>
-    <string name="expenses_uppercase">EXPENSES</string>
     <string name="app_locked">APP LOCKED</string>
     <string name="authenticate_text">Authenticate to enter the app</string>
     <string name="unlock">Unlock</string>
@@ -112,7 +110,6 @@
     <string name="dark_mode">Dark mode</string>
     <string name="amoled_mode">AMOLED Dark mode</string>
     <string name="auto_mode">Auto mode</string>
-    <string name="planned_payments">Planned\nPayments</string>
     <string name="share_ivy">Share Ivy</string>
     <string name="reports">Reports</string>
     <string name="loans">Loans</string>
@@ -130,8 +127,6 @@
     <string name="no_loans_description">You don\'t have any loans.\nTap the \"+ Add loan\" to add one.</string>
     <string name="loan_confirm_deletion_description">Note: Deleting this loan will permanently remove all related transactions.</string>
     <string name="confirm_account_loan_change">Please wait, recalculating all loan records</string>
-    <string name="paid">Paid</string>
-    <string name="left_to_pay">%1$s %2$s left</string>
     <string name="loan_interest">Loan Interest</string>
     <string name="interest_paid">%1$s %2$s paid</string>
     <string name="add_record">Add record</string>
@@ -151,23 +146,12 @@
     <string name="transactions">transactions</string>
     <string name="home">Home</string>
     <string name="add_planned_payment">Add planned payment</string>
-    <string name="add_income_uppercase">ADD INCOME</string>
-    <string name="add_expense_uppercase">ADD EXPENSE</string>
-    <string name="account_transfer">ACCOUNT TRANSFER</string>
     <string name="skip">Skip</string>
     <string name="add_new">Add new</string>
     <string name="from_date">From %1$s</string>
     <string name="to_date">To %1$s</string>
     <string name="range">Range</string>
-    <string name="privacy_and_data_collection">Privacy and\ndata collection</string>
-    <string name="swipe_to_agree_terms_conditions">Swipe to accept our Terms and Conditions</string>
-    <string name="agreed_terms_conditions">Agreed to our Terms and Conditions</string>
-    <string name="swipe_to_agree_privacy_policy">Swipe to agree with our Privacy Policy</string>
-    <string name="agreed_privacy_policy">Agreed to our Privacy Policy</string>
-    <string name="terms_and_conditions">Terms and Conditions</string>
     <string name="privacy_policy">Privacy Policy</string>
-    <string name="wallet_description">Track your income, expenses, and budget with Ivy!\n\nEnjoy an intuitive interface, manage recurring and planned payments, oversee multiple accounts, categorize transactions, access powerful statistics, export to CSV, and much more.</string>
-    <string name="enter_your_name">Enter your name\nto personalize your\nwallet</string>
     <string name="what_is_your_name">What\'s your name?</string>
     <string name="enter">Enter</string>
     <string name="add_accounts">Add accounts</string>
@@ -198,12 +182,8 @@
     <string name="planned_payment_confirm_deletion_description">Deleting this planned payment will remove all related unpaid transactions, whether upcoming or overdue.</string>
     <string name="set_payment_type">Choose payment type</string>
     <string name="planned_start_at">Planned start at</string>
-    <string name="repeats_every">REPEATS EVERY %1$d %2$s</string>
     <string name="deleted">deleted</string>
-    <string name="planned_for_uppercase">"PLANNED FOR "</string>
     <string name="null_text">null</string>
-    <string name="starts_date">"STARTS %1$s "</string>
-    <string name="add_payment">Add payment</string>
     <string name="one_time_payments">One-time payments</string>
     <string name="recurring_payments">Recurring payments</string>
     <string name="no_planned_payments">No planned payments</string>
@@ -215,8 +195,6 @@
     <string name="due_on">Due on %1$s</string>
     <string name="upcoming">Upcoming</string>
     <string name="overdue">Overdue</string>
-    <string name="expenses_lowercase">expenses</string>
-    <string name="income_lowercase">income</string>
     <string name="edit_account">Edit account</string>
     <string name="new_account">New account</string>
     <string name="account_name">Account name</string>
@@ -243,9 +221,7 @@
     <string name="select_all">Select all</string>
     <string name="amount_optional">Amount (optional)</string>
     <string name="keywords_optional">Keywords (optional)</string>
-    <string name="includes_uppercase">INCLUDES</string>
     <string name="add_keyword">Add a keyword</string>
-    <string name="excludes_uppercase">EXCLUDES</string>
     <string name="filter_includes">Includes</string>
     <string name="filter_excludes">Excludes</string>
     <string name="filter_amount_from">From %1$s</string>
@@ -294,7 +270,6 @@
     <string name="request_a_feature">Request a feature</string>
     <string name="contact_support">Community support</string>
     <string name="project_contributors">Contributors</string>
-    <string name="account_uppercase">ACCOUNT</string>
     <string name="logout">Logout</string>
     <string name="login">Login</string>
     <string name="syncing">Syncing…</string>
@@ -341,7 +316,6 @@
     <string name="unselect_all_time">Unselect All Time</string>
     <string name="select_all_time">Select All Time</string>
     <string name="choose_start_date_of_month">Select start date of month</string>
-    <string name="supports_crypto">supports crypto</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
     <string name="add">Add</string>
@@ -473,8 +447,6 @@
     <string name="confirm_skip_all">Confirm skipping all</string>
     <string name="confirm_skip_all_description">Are you sure you want to skip all overdue planned payments?</string>
     <string name="switch_to_offline_mode">Switch to offline mode</string>
-    <string name="delete_all_user_cloud_data_warning">WARNING! This action will delete all your cloud-stored data for %1$s PERMANENTLY, the offline data stored in your local app will remain.</string>
-    <string name="delete_all_cloud_data_question">Delete all cloud-stored data?</string>
     <string name="experimental">Experimental</string>
     <string name="experimental_settings">Experimental Settings</string>
     <string name="wallet_balance">Wallet balance</string>

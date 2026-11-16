@@ -294,10 +294,22 @@ private fun <M> MappingCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 itemsIndexed(columns.values) { index, column ->
-                    CheckedFilterChip(
-                        selected = column == mapping.name,
+                    val selected = column == mapping.name
+                    FilterChip(
+                        selected = selected,
                         onClick = { onMapTo(index, column) },
-                        label = column,
+                        label = { Text(text = column) },
+                        leadingIcon = if (selected) {
+                            {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(FilterChipDefaults.IconSize),
+                                )
+                            }
+                        } else {
+                            null
+                        },
                     )
                 }
             }
@@ -318,32 +330,6 @@ private fun <M> MappingCard(
             }
         }
     }
-}
-
-@Composable
-private fun CheckedFilterChip(
-    selected: Boolean,
-    onClick: () -> Unit,
-    label: String,
-    modifier: Modifier = Modifier,
-) {
-    FilterChip(
-        selected = selected,
-        onClick = onClick,
-        label = { Text(text = label) },
-        modifier = modifier,
-        leadingIcon = if (selected) {
-            {
-                Icon(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = null,
-                    modifier = Modifier.size(FilterChipDefaults.IconSize),
-                )
-            }
-        } else {
-            null
-        },
-    )
 }
 
 @Composable
@@ -604,19 +590,41 @@ private fun DateMetadataUI(
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(text = "Which is first in the format?", style = MaterialTheme.typography.labelLarge)
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            CheckedFilterChip(
+            FilterChip(
                 selected = metadata == DateMetadata.DateFirst,
                 onClick = {
                     onEvent(CSVEvent.DataMetaChange(DateMetadata.DateFirst))
                 },
-                label = "Date/Day (1,2,3...31)",
+                label = { Text(text = "Date/Day (1,2,3...31)") },
+                leadingIcon = if (metadata == DateMetadata.DateFirst) {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(FilterChipDefaults.IconSize),
+                        )
+                    }
+                } else {
+                    null
+                },
             )
-            CheckedFilterChip(
+            FilterChip(
                 selected = metadata == DateMetadata.MonthFirst,
                 onClick = {
                     onEvent(CSVEvent.DataMetaChange(DateMetadata.MonthFirst))
                 },
-                label = "Month (1,2..12 / Jan, Feb..Dec)",
+                label = { Text(text = "Month (1,2..12 / Jan, Feb..Dec)") },
+                leadingIcon = if (metadata == DateMetadata.MonthFirst) {
+                    {
+                        Icon(
+                            imageVector = Icons.Filled.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(FilterChipDefaults.IconSize),
+                        )
+                    }
+                } else {
+                    null
+                },
             )
         }
     }

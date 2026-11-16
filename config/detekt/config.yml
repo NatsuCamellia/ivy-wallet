@@ -581,8 +581,12 @@ style:
         value: 'TODO:'
     allowedPatterns: ''
   ForbiddenImport:
-    active: false
-    imports: []
+    active: true
+    imports:
+      - value: 'com.ivy.design.*'
+        reason: 'The Ivy design system is deleted, use Material 3.'
+      - value: 'com.ivy.wallet.ui.theme.*'
+        reason: 'The legacy theme package is deleted, use Material 3.'
     forbiddenPatterns: ''
   ForbiddenMethodCall:
     active: false

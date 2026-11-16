@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,7 +28,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -85,6 +83,7 @@ import com.ivy.ui.color.IvyDark
 import com.ivy.ui.color.Orange
 import com.ivy.ui.component.BackButton
 import com.ivy.ui.rememberScrollPositionListState
+import com.ivy.ui.withFabClearance
 import com.ivy.wallet.domain.data.SortOrder
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -168,11 +167,7 @@ private fun UI(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
             state = listState,
-            contentPadding = PaddingValues(
-                top = innerPadding.calculateTopPadding(),
-                // clears the add button that the Scaffold draws over the list
-                bottom = innerPadding.calculateBottomPadding() + LocalMinimumInteractiveComponentSize.current * 2
-            ),
+            contentPadding = innerPadding.withFabClearance(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             if (state.showCategorySearchBar) {

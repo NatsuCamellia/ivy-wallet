@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -22,7 +24,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedButton
@@ -34,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -65,6 +67,7 @@ import com.ivy.ui.color.Blue
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.Orange
 import com.ivy.ui.component.BackButton
+import com.ivy.ui.fabClearance
 import com.ivy.ui.rememberScrollPositionListState
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -118,10 +121,15 @@ private fun UI(
             )
         }
     ) { innerPadding ->
+        val layoutDirection = LocalLayoutDirection.current
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding())
+                .padding(
+                    start = innerPadding.calculateStartPadding(layoutDirection),
+                    top = innerPadding.calculateTopPadding(),
+                    end = innerPadding.calculateEndPadding(layoutDirection)
+                )
                 .padding(horizontal = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -142,8 +150,7 @@ private fun UI(
                 state = scrollState,
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    // clears the add button that the Scaffold draws over the list
-                    bottom = innerPadding.calculateBottomPadding() + LocalMinimumInteractiveComponentSize.current * 2
+                    bottom = innerPadding.calculateBottomPadding() + fabClearance()
                 ),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {

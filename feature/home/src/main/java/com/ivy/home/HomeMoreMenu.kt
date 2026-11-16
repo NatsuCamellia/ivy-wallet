@@ -6,13 +6,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Assessment
-import androidx.compose.material.icons.filled.BrightnessAuto
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Contrast
-import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.EventRepeat
-import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -37,6 +33,8 @@ import com.ivy.legacy.Constants
 import com.ivy.legacy.rootScreen
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.AmountText
+import com.ivy.legacy.ui.component.icon
+import com.ivy.legacy.ui.component.label
 import com.ivy.legacy.ui.sheet.ActionSheet
 import com.ivy.legacy.ui.sheet.BufferStatus
 import com.ivy.legacy.utils.openUrl
@@ -193,23 +191,6 @@ private fun MenuItem(
         Text(label)
     }
 }
-
-private fun Theme.icon(): ImageVector = when (this) {
-    Theme.LIGHT -> Icons.Default.LightMode
-    Theme.DARK -> Icons.Default.DarkMode
-    Theme.AMOLED_DARK -> Icons.Default.Contrast
-    Theme.AUTO -> Icons.Default.BrightnessAuto
-}
-
-@Composable
-private fun Theme.label(): String = stringResource(
-    when (this) {
-        Theme.LIGHT -> R.string.light_mode
-        Theme.DARK -> R.string.dark_mode
-        Theme.AMOLED_DARK -> R.string.amoled_mode
-        Theme.AUTO -> R.string.auto_mode
-    }
-)
 
 @Preview
 @Composable

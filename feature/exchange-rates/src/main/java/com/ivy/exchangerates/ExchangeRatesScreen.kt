@@ -1,7 +1,6 @@
 package com.ivy.exchangerates
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,7 +16,6 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -51,6 +49,7 @@ import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
 import com.ivy.ui.component.BackButton
+import com.ivy.ui.withFabClearance
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.util.UUID
@@ -109,11 +108,7 @@ private fun UI(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(
-                top = innerPadding.calculateTopPadding(),
-                // clears the add button that the Scaffold draws over the list
-                bottom = innerPadding.calculateBottomPadding() + LocalMinimumInteractiveComponentSize.current * 2
-            ),
+            contentPadding = innerPadding.withFabClearance(),
             verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
         ) {
             item(key = "search") {

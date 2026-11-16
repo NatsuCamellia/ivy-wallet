@@ -39,6 +39,7 @@ import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
 import com.ivy.ui.theme.WalletTheme
+import com.ivy.ui.withFabClearance
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -81,7 +82,7 @@ private fun ReleasesUi(
         LazyColumn(
             modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = innerPadding,
+            contentPadding = innerPadding.withFabClearance(),
         ) {
             content(
                 releasesState = uiState,

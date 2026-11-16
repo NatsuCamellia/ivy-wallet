@@ -1308,7 +1308,7 @@ flow_balance() {
   has text exact "Cashflow" || has any sub "Cashflow" || { log "home balance missing"; return 1; }
   tap_node text sub " USD" 0 || return 1
   wait_for text exact "Balance" 10 || { log "balance screen did not open: run flow_add_expense first, the balance opens only with transactions"; return 1; }
-  has desc exact "Back" && has text exact "CURRENT BALANCE" && has text exact "Planned payments" && has text exact "BALANCE AFTER PLANNED PAYMENTS" || { log "balance rows or back button missing"; return 1; }
+  has desc exact "Back" && has text exact "Current balance" && has text exact "Planned payments" && has text exact "Balance after planned payments" || { log "balance rows or back button missing"; return 1; }
   shot balance-1
   local before after
   before=$(period_label_anywhere) || { log "period label not found"; return 1; }

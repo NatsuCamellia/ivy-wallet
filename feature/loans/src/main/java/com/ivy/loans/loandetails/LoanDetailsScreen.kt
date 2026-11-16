@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +27,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.LinearWavyProgressIndicator
 import androidx.compose.material3.ListItemDefaults
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SegmentedListItem
@@ -87,6 +85,7 @@ import com.ivy.ui.color.Green
 import com.ivy.ui.component.BackButton
 import com.ivy.ui.time.LocalTimeFormatter
 import com.ivy.ui.time.TimeFormatter
+import com.ivy.ui.withFabClearance
 import com.ivy.wallet.domain.data.IvyCurrency
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -151,11 +150,7 @@ private fun UI(
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
                 .testTag("loan_details_lazy_column"),
-            contentPadding = PaddingValues(
-                top = innerPadding.calculateTopPadding(),
-                // clears the add button that the Scaffold draws over the list
-                bottom = innerPadding.calculateBottomPadding() + LocalMinimumInteractiveComponentSize.current * 2
-            ),
+            contentPadding = innerPadding.withFabClearance(),
             verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
         ) {
             if (loan != null) {

@@ -24,7 +24,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LargeFlexibleTopAppBar
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -65,6 +64,7 @@ import com.ivy.ui.R
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.GreenLight
 import com.ivy.ui.rememberScrollPositionListState
+import com.ivy.ui.withFabClearance
 import kotlinx.collections.immutable.persistentListOf
 import java.util.UUID
 import kotlin.math.absoluteValue
@@ -120,11 +120,7 @@ private fun AccountsUi(
         AccountsList(
             state = state,
             listState = listState,
-            contentPadding = PaddingValues(
-                top = innerPadding.calculateTopPadding(),
-                // clears the add-account FAB that the main screen draws over the list
-                bottom = innerPadding.calculateBottomPadding() + LocalMinimumInteractiveComponentSize.current * 2
-            ),
+            contentPadding = innerPadding.withFabClearance(),
             modifier = Modifier.padding(horizontal = 16.dp)
         )
     }

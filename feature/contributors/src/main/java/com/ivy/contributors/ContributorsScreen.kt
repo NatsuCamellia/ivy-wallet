@@ -49,6 +49,7 @@ import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
+import com.ivy.ui.fabClearance
 import com.ivy.ui.theme.WalletTheme
 import kotlinx.collections.immutable.persistentListOf
 
@@ -146,7 +147,7 @@ private fun ScreenContent(
         contentPadding = PaddingValues(
             start = 16.dp,
             end = 16.dp,
-            bottom = 8.dp
+            bottom = fabClearance()
         ),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {

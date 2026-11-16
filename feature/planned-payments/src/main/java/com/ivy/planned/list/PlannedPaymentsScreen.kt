@@ -1,13 +1,11 @@
 package com.ivy.planned.list
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -42,6 +40,7 @@ import com.ivy.ui.component.BackButton
 import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.Orange
+import com.ivy.ui.withFabClearance
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import java.time.LocalDateTime
@@ -114,11 +113,7 @@ private fun UI(
                 onEvent(PlannedPaymentsScreenEvent.OnRecurringPaymentsExpanded(it))
             },
             modifier = Modifier.padding(horizontal = 16.dp),
-            contentPadding = PaddingValues(
-                top = innerPadding.calculateTopPadding(),
-                // clears the add button that the Scaffold draws over the list
-                bottom = innerPadding.calculateBottomPadding() + LocalMinimumInteractiveComponentSize.current * 2
-            ),
+            contentPadding = innerPadding.withFabClearance(),
             listState = rememberScrollPositionListState(key = "plannedPayments")
         )
     }

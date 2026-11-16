@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -59,6 +58,7 @@ import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
 import com.ivy.ui.time.LocalTimeProvider
+import com.ivy.ui.withFabClearance
 import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
 import com.ivy.wallet.domain.pure.data.IncomeExpensePair
 import kotlinx.collections.immutable.ImmutableList
@@ -139,11 +139,7 @@ fun HomeUi(
 
             period = uiState.period,
             listState = listState,
-            contentPadding = PaddingValues(
-                top = innerPadding.calculateTopPadding(),
-                // clears the FAB that the main screen draws over the list
-                bottom = innerPadding.calculateBottomPadding() + LocalMinimumInteractiveComponentSize.current * 2
-            ),
+            contentPadding = innerPadding.withFabClearance(),
 
             baseData = uiState.baseData,
 

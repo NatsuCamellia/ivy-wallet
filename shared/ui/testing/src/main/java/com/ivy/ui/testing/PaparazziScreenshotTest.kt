@@ -7,12 +7,22 @@ import app.cash.paparazzi.DeviceConfig
 import app.cash.paparazzi.Paparazzi
 import com.ivy.base.legacy.Theme
 import com.ivy.ui.theme.WalletTheme
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import java.util.Locale
 import java.util.TimeZone
 
 open class PaparazziScreenshotTest {
+
+    private val defaultLocale = Locale.getDefault()
+    private val defaultTimeZone = TimeZone.getDefault()
+
+    @After
+    fun restoreLocaleAndTimeZone() {
+        Locale.setDefault(defaultLocale)
+        TimeZone.setDefault(defaultTimeZone)
+    }
 
     @Before
     fun setup() {

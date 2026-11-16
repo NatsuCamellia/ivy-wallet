@@ -2,7 +2,6 @@ package com.ivy.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,20 +14,16 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Attribution
 import androidx.compose.material.icons.filled.Backup
-import androidx.compose.material.icons.filled.BrightnessAuto
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.CurrencyExchange
-import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.NewReleases
 import androidx.compose.material.icons.filled.Notifications
@@ -76,6 +71,8 @@ import com.ivy.base.legacy.Theme
 import com.ivy.legacy.Constants
 import com.ivy.legacy.rootScreen
 import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.icon
+import com.ivy.legacy.ui.component.label
 import com.ivy.legacy.ui.sheet.ChooseStartDateOfMonthModal
 import com.ivy.legacy.ui.sheet.CurrencyModal
 import com.ivy.legacy.ui.sheet.DeleteModal
@@ -145,10 +142,7 @@ private fun UI(
                 .padding(horizontal = 16.dp)
                 .testTag("settings_lazy_column"),
             state = listState,
-            contentPadding = PaddingValues(
-                top = innerPadding.calculateTopPadding(),
-                bottom = innerPadding.calculateBottomPadding()
-            ),
+            contentPadding = innerPadding,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item(key = "account") {
@@ -591,23 +585,6 @@ private fun SettingsRow(
         )
     }
 }
-
-private fun Theme.icon(): ImageVector = when (this) {
-    Theme.LIGHT -> Icons.Default.LightMode
-    Theme.DARK -> Icons.Default.DarkMode
-    Theme.AMOLED_DARK -> Icons.Default.Contrast
-    Theme.AUTO -> Icons.Default.BrightnessAuto
-}
-
-@Composable
-private fun Theme.label(): String = stringResource(
-    when (this) {
-        Theme.LIGHT -> R.string.light_mode
-        Theme.DARK -> R.string.dark_mode
-        Theme.AMOLED_DARK -> R.string.amoled_mode
-        Theme.AUTO -> R.string.auto_mode
-    }
-)
 
 @Preview
 @Composable

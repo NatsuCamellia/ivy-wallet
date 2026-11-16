@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ForkRight
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedButton
@@ -208,7 +209,7 @@ private fun ProjectInfoRow(
             icon = {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    painter = painterResource(id = R.drawable.ic_vue_dev_hierarchy),
+                    imageVector = Icons.Filled.ForkRight,
                     contentDescription = "Forks"
                 )
             },

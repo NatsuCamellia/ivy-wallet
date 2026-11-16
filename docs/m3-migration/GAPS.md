@@ -6,7 +6,7 @@ Known gaps are listed here.
 
 ## Remaining drawable references
 
-Spec grep 4 (`git grep -nE 'R\.drawable\.ic_' -- 'feature/*.kt' 'temp/*.kt'`) still prints 27 hits at the end of Task 6.1. None is a hand-drawn interface icon of the old design system.
+Spec grep 4 (`git grep -nE 'R\.drawable\.ic_' -- 'feature/*.kt' 'temp/*.kt'`) prints 26 hits after Task 6.2 (25 `ic_custom_*` defaults plus `ic_notification`). None is a hand-drawn interface icon of the old design system.
 
 - `R.drawable.ic_custom_account_m`, `ic_custom_category_m`, `ic_custom_loan_m` and `ic_custom_category_s` (25 hits). These are the default glyphs of user-picked account, category and loan icons: `IconBadge` and `customIconResource` take the user's saved icon name and fall back to this drawable, and the icon picker offers the whole `ic_custom_*` set. They are content chosen by the user, loaded with `getIdentifier`, so they stay (spec: keep `ic_custom_*`). Hits:
   - `feature/accounts/src/main/java/com/ivy/accounts/AccountsTab.kt:327`

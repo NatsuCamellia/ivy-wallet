@@ -5,12 +5,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 
 @SuppressLint("ComposeCompositionLocalUsage")
 private val LocalNavigation = compositionLocalOf<Navigation> { error("No LocalNavigation") }
+
+private class ShownScreen(var screen: Screen?)
 
 @Composable
 fun NavigationRoot(
@@ -20,16 +23,24 @@ fun NavigationRoot(
     CompositionLocalProvider(
         LocalNavigation provides navigation,
     ) {
-        val viewModelStore = LocalViewModelStoreOwner.current
-        DisposableEffect(navigation.currentScreen) {
+        val viewModelStore = LocalViewModelStoreOwner.current?.viewModelStore
+        val screen = navigation.currentScreen
+        val shown = remember { ShownScreen(screen) }
+        if (shown.screen != screen) {
+            // Destroy viewModels only for non-legacy screens, before the new screen creates its own
+            shown.screen = screen
+            if (navigation.lastScreen?.isLegacy == false) {
+                viewModelStore?.clear()
+            }
+        }
+        DisposableEffect(Unit) {
             onDispose {
-                // Destroy viewModels only for non-legacy screens
                 if (navigation.lastScreen?.isLegacy == false) {
-                    viewModelStore?.viewModelStore?.clear()
+                    viewModelStore?.clear()
                 }
             }
         }
-        navGraph(navigation.currentScreen)
+        navGraph(screen)
     }
 }
 

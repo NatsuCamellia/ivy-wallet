@@ -10,9 +10,6 @@ import android.view.WindowInsetsController
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.FloatRange
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalView

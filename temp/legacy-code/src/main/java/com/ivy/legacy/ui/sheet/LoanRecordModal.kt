@@ -38,10 +38,10 @@ import com.ivy.base.model.LoanRecordType
 import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.datamodel.LoanRecord
-import com.ivy.legacy.legacy.ui.theme.components.DateTimeRow
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.AccountsRow
 import com.ivy.legacy.ui.component.AmountItem
+import com.ivy.legacy.ui.component.DateTimeRow
 import com.ivy.legacy.utils.capitalizeLocal
 import com.ivy.legacy.utils.getDefaultFIATCurrency
 import com.ivy.legacy.utils.selectEndTextFieldValue

@@ -320,8 +320,8 @@
     <ID>CyclomaticComplexMethod:EditTransactionScreen.kt$@ExperimentalFoundationApi @Composable private fun BoxWithConstraintsScope.UI( screen: EditTransactionScreen, transactionType: TransactionType, baseCurrency: String, initialTitle: String?, titleSuggestions: ImmutableSet&lt;String&gt;, description: String?, category: Category?, dateTime: LocalDateTime?, account: Account?, toAccount: Account?, dueDate: LocalDateTime?, amount: Double, customExchangeRateState: CustomExchangeRateState, categories: ImmutableList&lt;Category&gt;, accounts: ImmutableList&lt;Account&gt;, onTitleChanged: (String?) -&gt; Unit, onDescriptionChanged: (String?) -&gt; Unit, onAmountChanged: (Double) -&gt; Unit, onCategoryChanged: (Category?) -&gt; Unit, onAccountChanged: (Account) -&gt; Unit, onToAccountChanged: (Account) -&gt; Unit, onDueDateChanged: (LocalDateTime?) -&gt; Unit, onSetDate: (LocalDate) -&gt; Unit, onSetTime: (LocalTime) -&gt; Unit, onSetTransactionType: (TransactionType) -&gt; Unit, onCreateCategory: (CreateCategoryData) -&gt; Unit, onEditCategory: (Category) -&gt; Unit, onPayPlannedPayment: () -&gt; Unit, onSave: (closeScreen: Boolean) -&gt; Unit, onSetHasChanges: (hasChanges: Boolean) -&gt; Unit, onDelete: () -&gt; Unit, onCreateAccount: (CreateAccountData) -&gt; Unit, onExchangeRateChanged: (Double?) -&gt; Unit = { }, loanData: EditTransactionDisplayLoan = EditTransactionDisplayLoan(), backgroundProcessing: Boolean = false, hasChanges: Boolean = false, )</ID>
     <ID>CyclomaticComplexMethod:EditTransactionViewModel.kt$EditTransactionViewModel$override fun onEvent(event: EditTransactionEvent)</ID>
     <ID>CyclomaticComplexMethod:IvyNavGraph.kt$@ExperimentalFoundationApi @ExperimentalAnimationApi @Composable fun BoxWithConstraintsScope.IvyNavGraph(screen: Screen?)</ID>
-    <ID>CyclomaticComplexMethod:LoanModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun BoxWithConstraintsScope.LoanModal( accounts: List&lt;Account&gt; = emptyList(), onCreateAccount: (CreateAccountData) -&gt; Unit = {}, modal: LoanModalData?, onCreateLoan: (CreateLoanData) -&gt; Unit, onEditLoan: (Loan, Boolean) -&gt; Unit, onPerformCalculations: () -&gt; Unit = {}, dismiss: () -&gt; Unit, )</ID>
-    <ID>CyclomaticComplexMethod:LoanRecordModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun BoxWithConstraintsScope.LoanRecordModal( modal: LoanRecordModalData?, accounts: List&lt;Account&gt; = emptyList(), onCreateAccount: (CreateAccountData) -&gt; Unit = {}, onCreate: (CreateLoanRecordData) -&gt; Unit, onEdit: (EditLoanRecordData) -&gt; Unit, onDelete: (LoanRecord) -&gt; Unit, dismiss: () -&gt; Unit )</ID>
+    <ID>CyclomaticComplexMethod:LoanModal.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun BoxWithConstraintsScope.LoanModal( accounts: List&lt;Account&gt; = emptyList(), onCreateAccount: (CreateAccountData) -&gt; Unit = {}, modal: LoanModalData?, onCreateLoan: (CreateLoanData) -&gt; Unit, onEditLoan: (Loan, Boolean) -&gt; Unit, onPerformCalculations: () -&gt; Unit = {}, dismiss: () -&gt; Unit, )</ID>
+    <ID>CyclomaticComplexMethod:LoanRecordModal.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun BoxWithConstraintsScope.LoanRecordModal( modal: LoanRecordModalData?, accounts: List&lt;Account&gt; = emptyList(), onCreateAccount: (CreateAccountData) -&gt; Unit = {}, onCreate: (CreateLoanRecordData) -&gt; Unit, onEdit: (EditLoanRecordData) -&gt; Unit, onDelete: (LoanRecord) -&gt; Unit, dismiss: () -&gt; Unit )</ID>
     <ID>CyclomaticComplexMethod:ReportViewModel.kt$ReportViewModel$private suspend fun filterTransactions( baseCurrency: String, accounts: List&lt;Account&gt;, filter: ReportFilter, ): ImmutableList&lt;Transaction&gt;</ID>
     <ID>DataClassDefaultValues:Account.kt$Account$val currency: String? = null</ID>
     <ID>DataClassDefaultValues:Account.kt$Account$val icon: String? = null</ID>
@@ -593,7 +593,7 @@
     <ID>DataClassFunctions:Category.kt$Category$fun toEntity(): CategoryEntity</ID>
     <ID>DataClassFunctions:ChoosePeriodModal.kt$MonthYear$fun forDisplay( currentYear: Int ): String</ID>
     <ID>DataClassFunctions:ClosedTimeRange.kt$ClosedTimeRange$fun toFromToRange(): com.ivy.legacy.data.model.FromToTimeRange</ID>
-    <ID>DataClassFunctions:Colors.kt$Gradient$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun asHorizontalBrush()</ID>
+    <ID>DataClassFunctions:Colors.kt$Gradient$@Deprecated("Legacy code. Don't use it, please.") fun asHorizontalBrush()</ID>
     <ID>DataClassFunctions:ExchangeRate.kt$ExchangeRate$fun toEntity(): ExchangeRateEntity</ID>
     <ID>DataClassFunctions:FromToTimeRange.kt$FromToTimeRange$fun from(): LocalDateTime</ID>
     <ID>DataClassFunctions:FromToTimeRange.kt$FromToTimeRange$fun includes(dateTime: LocalDateTime): Boolean</ID>
@@ -601,8 +601,8 @@
     <ID>DataClassFunctions:FromToTimeRange.kt$FromToTimeRange$fun to(): LocalDateTime</ID>
     <ID>DataClassFunctions:FromToTimeRange.kt$FromToTimeRange$fun toDisplay(): String</ID>
     <ID>DataClassFunctions:FromToTimeRange.kt$FromToTimeRange$fun upcomingFrom(): LocalDateTime</ID>
-    <ID>DataClassFunctions:IvyColors.kt$Gradient$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun asHorizontalBrush()</ID>
-    <ID>DataClassFunctions:IvyColors.kt$Gradient$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun asVerticalBrush()</ID>
+    <ID>DataClassFunctions:IvyColors.kt$Gradient$@Deprecated("Legacy code. Don't use it, please.") fun asHorizontalBrush()</ID>
+    <ID>DataClassFunctions:IvyColors.kt$Gradient$@Deprecated("Legacy code. Don't use it, please.") fun asVerticalBrush()</ID>
     <ID>DataClassFunctions:IvyLineChart.kt$Function$fun determineLineColor(valueStart: Double, valueEnd: Double): Color</ID>
     <ID>DataClassFunctions:LastNTimeRange.kt$LastNTimeRange$fun forDisplay(): String</ID>
     <ID>DataClassFunctions:LastNTimeRange.kt$LastNTimeRange$fun fromDate(): LocalDateTime</ID>
@@ -2534,9 +2534,9 @@
     <ID>LongMethod:EditTransactionScreen.kt$@ExperimentalFoundationApi @Composable private fun BoxWithConstraintsScope.UI( screen: EditTransactionScreen, transactionType: TransactionType, baseCurrency: String, initialTitle: String?, titleSuggestions: ImmutableSet&lt;String&gt;, description: String?, category: Category?, dateTime: LocalDateTime?, account: Account?, toAccount: Account?, dueDate: LocalDateTime?, amount: Double, customExchangeRateState: CustomExchangeRateState, categories: ImmutableList&lt;Category&gt;, accounts: ImmutableList&lt;Account&gt;, onTitleChanged: (String?) -&gt; Unit, onDescriptionChanged: (String?) -&gt; Unit, onAmountChanged: (Double) -&gt; Unit, onCategoryChanged: (Category?) -&gt; Unit, onAccountChanged: (Account) -&gt; Unit, onToAccountChanged: (Account) -&gt; Unit, onDueDateChanged: (LocalDateTime?) -&gt; Unit, onSetDate: (LocalDate) -&gt; Unit, onSetTime: (LocalTime) -&gt; Unit, onSetTransactionType: (TransactionType) -&gt; Unit, onCreateCategory: (CreateCategoryData) -&gt; Unit, onEditCategory: (Category) -&gt; Unit, onPayPlannedPayment: () -&gt; Unit, onSave: (closeScreen: Boolean) -&gt; Unit, onSetHasChanges: (hasChanges: Boolean) -&gt; Unit, onDelete: () -&gt; Unit, onCreateAccount: (CreateAccountData) -&gt; Unit, onExchangeRateChanged: (Double?) -&gt; Unit = { }, loanData: EditTransactionDisplayLoan = EditTransactionDisplayLoan(), backgroundProcessing: Boolean = false, hasChanges: Boolean = false, )</ID>
     <ID>LongMethod:FilterOverlay.kt$@Composable fun BoxWithConstraintsScope.FilterOverlay( visible: Boolean, baseCurrency: String, accounts: List&lt;Account&gt;, categories: List&lt;Category&gt;, filter: ReportFilter?, onClose: () -&gt; Unit, onSetFilter: (ReportFilter?) -&gt; Unit )</ID>
     <ID>LongMethod:ImportResultUI.kt$@Composable fun ImportResultUI( result: ImportResult, launchedFromOnboarding: Boolean, isManualCsvImport: Boolean = false, onTryAgain: (() -&gt; Unit)? = null, onFinish: () -&gt; Unit )</ID>
-    <ID>LongMethod:LoanModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun BoxWithConstraintsScope.LoanModal( accounts: List&lt;Account&gt; = emptyList(), onCreateAccount: (CreateAccountData) -&gt; Unit = {}, modal: LoanModalData?, onCreateLoan: (CreateLoanData) -&gt; Unit, onEditLoan: (Loan, Boolean) -&gt; Unit, onPerformCalculations: () -&gt; Unit = {}, dismiss: () -&gt; Unit, )</ID>
-    <ID>LongMethod:LoanRecordModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun BoxWithConstraintsScope.LoanRecordModal( modal: LoanRecordModalData?, accounts: List&lt;Account&gt; = emptyList(), onCreateAccount: (CreateAccountData) -&gt; Unit = {}, onCreate: (CreateLoanRecordData) -&gt; Unit, onEdit: (EditLoanRecordData) -&gt; Unit, onDelete: (LoanRecord) -&gt; Unit, dismiss: () -&gt; Unit )</ID>
-    <ID>LongMethod:MainBottomBar.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun BoxWithConstraintsScope.BottomBar( tab: MainTab, selectTab: (MainTab) -&gt; Unit, onAddIncome: () -&gt; Unit, onAddExpense: () -&gt; Unit, onAddTransfer: () -&gt; Unit, onAddPlannedPayment: () -&gt; Unit, showAddAccountModal: () -&gt; Unit, )</ID>
+    <ID>LongMethod:LoanModal.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun BoxWithConstraintsScope.LoanModal( accounts: List&lt;Account&gt; = emptyList(), onCreateAccount: (CreateAccountData) -&gt; Unit = {}, modal: LoanModalData?, onCreateLoan: (CreateLoanData) -&gt; Unit, onEditLoan: (Loan, Boolean) -&gt; Unit, onPerformCalculations: () -&gt; Unit = {}, dismiss: () -&gt; Unit, )</ID>
+    <ID>LongMethod:LoanRecordModal.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun BoxWithConstraintsScope.LoanRecordModal( modal: LoanRecordModalData?, accounts: List&lt;Account&gt; = emptyList(), onCreateAccount: (CreateAccountData) -&gt; Unit = {}, onCreate: (CreateLoanRecordData) -&gt; Unit, onEdit: (EditLoanRecordData) -&gt; Unit, onDelete: (LoanRecord) -&gt; Unit, dismiss: () -&gt; Unit )</ID>
+    <ID>LongMethod:MainBottomBar.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun BoxWithConstraintsScope.BottomBar( tab: MainTab, selectTab: (MainTab) -&gt; Unit, onAddIncome: () -&gt; Unit, onAddExpense: () -&gt; Unit, onAddTransfer: () -&gt; Unit, onAddPlannedPayment: () -&gt; Unit, showAddAccountModal: () -&gt; Unit, )</ID>
     <ID>LongMethod:ReportScreen.kt$@ExperimentalFoundationApi @Composable private fun BoxWithConstraintsScope.UI( state: ReportScreenState = ReportScreenState(), onEventHandler: (ReportScreenEvent) -&gt; Unit = {} )</ID>
     <ID>LongMethod:SettingsScreen.kt$@ExperimentalFoundationApi @Composable private fun BoxWithConstraintsScope.UI( currencyCode: String, theme: Theme, onSwitchTheme: () -&gt; Unit, lockApp: Boolean, nameLocalAccount: String?, onSetCurrency: (String) -&gt; Unit, startDateOfMonth: Int = 1, showNotifications: Boolean = true, hideCurrentBalance: Boolean = false, hideIncome: Boolean = false, progressState: Boolean = false, treatTransfersAsIncomeExpense: Boolean = false, onSetName: (String) -&gt; Unit = {}, onBackupData: () -&gt; Unit = {}, onExportToCSV: () -&gt; Unit = {}, onSetLockApp: (Boolean) -&gt; Unit = {}, onSetShowNotifications: (Boolean) -&gt; Unit = {}, onSetTreatTransfersAsIncExp: (Boolean) -&gt; Unit = {}, onSetHideCurrentBalance: (Boolean) -&gt; Unit = {}, onSetHideIncome: (Boolean) -&gt; Unit = {}, onSetStartDateOfMonth: (Int) -&gt; Unit = {}, onDeleteAllUserData: () -&gt; Unit = {}, onDeleteCloudUserData: () -&gt; Unit = {}, )</ID>
     <ID>LongMethod:TransactionsScreen.kt$@Composable private fun BoxWithConstraintsScope.UI( period: TimePeriod, baseCurrency: String, currency: String, skipAllModalVisible: Boolean, onSkipAllModalVisible: (Boolean) -&gt; Unit, account: Account?, category: Category?, accountNameConfirmation: TextFieldValue, updateAccountNameConfirmation: (String) -&gt; Unit, enableDeletionButton: Boolean, categories: ImmutableList&lt;Category&gt;, accounts: ImmutableList&lt;Account&gt;, balance: Double, balanceBaseCurrency: Double?, income: Double, expenses: Double, choosePeriodModal: ChoosePeriodModalData?, history: ImmutableList&lt;TransactionHistoryItem&gt;, onPreviousMonth: () -&gt; Unit, onNextMonth: () -&gt; Unit, onSetPeriod: (TimePeriod) -&gt; Unit, onEditAccount: (Account, Double) -&gt; Unit, onEditCategory: (Category) -&gt; Unit, onDelete: () -&gt; Unit, deleteModal1Visible: Boolean, onDeleteModal1Visible: (Boolean) -&gt; Unit, initWithTransactions: Boolean = false, treatTransfersAsIncomeExpense: Boolean = false, upcomingExpanded: Boolean = true, setUpcomingExpanded: (Boolean) -&gt; Unit = {}, upcomingIncome: Double = 0.0, upcomingExpenses: Double = 0.0, upcoming: ImmutableList&lt;Transaction&gt; = persistentListOf(), overdueExpanded: Boolean = true, setOverdueExpanded: (Boolean) -&gt; Unit = {}, overdueIncome: Double = 0.0, overdueExpenses: Double = 0.0, overdue: ImmutableList&lt;Transaction&gt; = persistentListOf(), onPayOrGet: (Transaction) -&gt; Unit = {}, onSkipTransaction: (Transaction) -&gt; Unit = {}, onSkipAllTransactions: (List&lt;Transaction&gt;) -&gt; Unit = {}, onChoosePeriodModal: (ChoosePeriodModalData?) -&gt; Unit )</ID>
@@ -4871,7 +4871,7 @@
     <ID>NoImplicitFunctionReturnType:AccountData.kt$AccountData$override fun withNewOrderNum(newOrderNum: Double)</ID>
     <ID>NoImplicitFunctionReturnType:AmountFormatting.kt$fun Double.format(digits: Int)</ID>
     <ID>NoImplicitFunctionReturnType:AmountFormatting.kt$fun Long.length()</ID>
-    <ID>NoImplicitFunctionReturnType:Animation.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun &lt;T&gt; springBounce( stiffness: Float = 500f, )</ID>
+    <ID>NoImplicitFunctionReturnType:Animation.kt$@Deprecated("Legacy code. Don't use it, please.") fun &lt;T&gt; springBounce( stiffness: Float = 500f, )</ID>
     <ID>NoImplicitFunctionReturnType:BackupDataUseCaseAndroidTest.kt$BackupDataUseCaseAndroidTest$@Test fun backup450_150()</ID>
     <ID>NoImplicitFunctionReturnType:CSVMapper.kt$CSVMapper$@ExperimentalStdlibApi fun mapping(type: ImportType, headerRow: String?)</ID>
     <ID>NoImplicitFunctionReturnType:CSVMapper.kt$CSVMapper$@ExperimentalStdlibApi private fun financisto()</ID>
@@ -4888,18 +4888,18 @@
     <ID>NoImplicitFunctionReturnType:CategoryData.kt$CategoryData$override fun getItemOrderNum()</ID>
     <ID>NoImplicitFunctionReturnType:CategoryData.kt$CategoryData$override fun withNewOrderNum(newOrderNum: Double)</ID>
     <ID>NoImplicitFunctionReturnType:CategoryTrnsBetweenAct.kt$fun actInput( categoryId: UUID, between: ClosedTimeRange )</ID>
-    <ID>NoImplicitFunctionReturnType:Colors.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun Int.toComposeColor()</ID>
-    <ID>NoImplicitFunctionReturnType:Colors.kt$Gradient$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun asHorizontalBrush()</ID>
-    <ID>NoImplicitFunctionReturnType:Colors.kt$Gradient.Companion$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun black()</ID>
-    <ID>NoImplicitFunctionReturnType:Colors.kt$Gradient.Companion$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun from(startColor: Int, endColor: Int?)</ID>
-    <ID>NoImplicitFunctionReturnType:Colors.kt$Gradient.Companion$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun solid(color: Color)</ID>
-    <ID>NoImplicitFunctionReturnType:Compose.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun Int.toDensityDp()</ID>
-    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun Dp.toDensityPx()</ID>
-    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun Float.toDensityDp()</ID>
-    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun Int.toDensityDp()</ID>
-    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun Modifier.consumeClicks(interactionSource: MutableInteractionSource)</ID>
-    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun Modifier.drawColoredShadow( color: Color, alpha: Float = 0.15f, borderRadius: Dp = 0.dp, shadowRadius: Dp = 16.dp, offsetX: Dp = 0.dp, offsetY: Dp = 8.dp )</ID>
-    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun selectEndTextFieldValue(text: String?)</ID>
+    <ID>NoImplicitFunctionReturnType:Colors.kt$@Deprecated("Legacy code. Don't use it, please.") fun Int.toComposeColor()</ID>
+    <ID>NoImplicitFunctionReturnType:Colors.kt$Gradient$@Deprecated("Legacy code. Don't use it, please.") fun asHorizontalBrush()</ID>
+    <ID>NoImplicitFunctionReturnType:Colors.kt$Gradient.Companion$@Deprecated("Legacy code. Don't use it, please.") @Composable fun black()</ID>
+    <ID>NoImplicitFunctionReturnType:Colors.kt$Gradient.Companion$@Deprecated("Legacy code. Don't use it, please.") fun from(startColor: Int, endColor: Int?)</ID>
+    <ID>NoImplicitFunctionReturnType:Colors.kt$Gradient.Companion$@Deprecated("Legacy code. Don't use it, please.") fun solid(color: Color)</ID>
+    <ID>NoImplicitFunctionReturnType:Compose.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun Int.toDensityDp()</ID>
+    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun Dp.toDensityPx()</ID>
+    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun Float.toDensityDp()</ID>
+    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun Int.toDensityDp()</ID>
+    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Legacy code. Don't use it, please.") fun Modifier.consumeClicks(interactionSource: MutableInteractionSource)</ID>
+    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Legacy code. Don't use it, please.") fun Modifier.drawColoredShadow( color: Color, alpha: Float = 0.15f, borderRadius: Dp = 0.dp, shadowRadius: Dp = 16.dp, offsetX: Dp = 0.dp, offsetY: Dp = 8.dp )</ID>
+    <ID>NoImplicitFunctionReturnType:ComposeExt.kt$@Deprecated("Legacy code. Don't use it, please.") fun selectEndTextFieldValue(text: String?)</ID>
     <ID>NoImplicitFunctionReturnType:CustomerJourneyCardsProvider.kt$CustomerJourneyCardsProvider.Companion$fun addPlannedPaymentCard()</ID>
     <ID>NoImplicitFunctionReturnType:CustomerJourneyCardsProvider.kt$CustomerJourneyCardsProvider.Companion$fun adjustBalanceCard()</ID>
     <ID>NoImplicitFunctionReturnType:CustomerJourneyCardsProvider.kt$CustomerJourneyCardsProvider.Companion$fun didYouKnow_expensesPieChart()</ID>
@@ -4929,16 +4929,16 @@
     <ID>NoImplicitFunctionReturnType:IvyAnimation.kt$fun &lt;T&gt; springBounceMedium()</ID>
     <ID>NoImplicitFunctionReturnType:IvyAnimation.kt$fun &lt;T&gt; springBounceSlow()</ID>
     <ID>NoImplicitFunctionReturnType:IvyAnimation.kt$fun &lt;T&gt; springBounceVerySlow()</ID>
-    <ID>NoImplicitFunctionReturnType:IvyColors.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun gradientExpenses()</ID>
-    <ID>NoImplicitFunctionReturnType:IvyColors.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun mediumBlur()</ID>
-    <ID>NoImplicitFunctionReturnType:IvyColors.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun pureBlur()</ID>
-    <ID>NoImplicitFunctionReturnType:IvyColors.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun Int.toComposeColor()</ID>
-    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun asHorizontalBrush()</ID>
-    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun asVerticalBrush()</ID>
-    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient.Companion$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun black()</ID>
-    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient.Companion$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun from(gradient: com.ivy.design.l0_system.Gradient)</ID>
-    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient.Companion$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun from(startColor: Int, endColor: Int?)</ID>
-    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient.Companion$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun solid(color: Color)</ID>
+    <ID>NoImplicitFunctionReturnType:IvyColors.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun gradientExpenses()</ID>
+    <ID>NoImplicitFunctionReturnType:IvyColors.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun mediumBlur()</ID>
+    <ID>NoImplicitFunctionReturnType:IvyColors.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun pureBlur()</ID>
+    <ID>NoImplicitFunctionReturnType:IvyColors.kt$@Deprecated("Legacy code. Don't use it, please.") fun Int.toComposeColor()</ID>
+    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient$@Deprecated("Legacy code. Don't use it, please.") fun asHorizontalBrush()</ID>
+    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient$@Deprecated("Legacy code. Don't use it, please.") fun asVerticalBrush()</ID>
+    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient.Companion$@Deprecated("Legacy code. Don't use it, please.") @Composable fun black()</ID>
+    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient.Companion$@Deprecated("Legacy code. Don't use it, please.") fun from(gradient: com.ivy.design.l0_system.Gradient)</ID>
+    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient.Companion$@Deprecated("Legacy code. Don't use it, please.") fun from(startColor: Int, endColor: Int?)</ID>
+    <ID>NoImplicitFunctionReturnType:IvyColors.kt$Gradient.Companion$@Deprecated("Legacy code. Don't use it, please.") fun solid(color: Color)</ID>
     <ID>NoImplicitFunctionReturnType:IvyRoomDatabase.kt$IvyRoomDatabase.Companion$fun migrations()</ID>
     <ID>NoImplicitFunctionReturnType:LoanTransactionsCore.kt$LoanTransactionsCore$suspend fun fetchAccounts()</ID>
     <ID>NoImplicitFunctionReturnType:LoanTransactionsCore.kt$LoanTransactionsCore$suspend fun fetchAllLoanRecords(loanId: UUID)</ID>
@@ -4972,8 +4972,8 @@
     <ID>NoImplicitFunctionReturnType:RoomTypeConverters.kt$RoomTypeConverters$@TypeConverter fun saveTransactionType(value: TransactionType?)</ID>
     <ID>NoImplicitFunctionReturnType:RoomTypeConverters.kt$RoomTypeConverters$@TypeConverter fun saveUUID(id: UUID?)</ID>
     <ID>NoImplicitFunctionReturnType:TransactionReminderWorker.kt$TransactionReminderWorker$override suspend fun doWork()</ID>
-    <ID>NoImplicitFunctionReturnType:TypographyExt.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") @Composable fun TextStyle.style( color: Color = UI.colors.pureInverse, fontWeight: FontWeight = FontWeight.Bold, textAlign: TextAlign = TextAlign.Start )</ID>
-    <ID>NoImplicitFunctionReturnType:TypographyExt.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") fun TextStyle.colorAs(color: Color)</ID>
+    <ID>NoImplicitFunctionReturnType:TypographyExt.kt$@Deprecated("Legacy code. Don't use it, please.") @Composable fun TextStyle.style( color: Color = UI.colors.pureInverse, fontWeight: FontWeight = FontWeight.Bold, textAlign: TextAlign = TextAlign.Start )</ID>
+    <ID>NoImplicitFunctionReturnType:TypographyExt.kt$@Deprecated("Legacy code. Don't use it, please.") fun TextStyle.colorAs(color: Color)</ID>
     <ID>NoImplicitFunctionReturnType:UtilExt.kt$fun String.toLowerCaseLocal()</ID>
     <ID>NoImplicitFunctionReturnType:UtilExt.kt$fun String.toUpperCaseLocal()</ID>
     <ID>NoMultipleSpaces:AndroidApisConfigurationAccessors.kt$ </ID>
@@ -10300,8 +10300,8 @@
     <ID>TopLevelPropertyNaming:Accessorsv8sku3n0evm97p61uoj1tesf.kt$/** * Provides the existing [debugCompileOnly][org.gradle.api.artifacts.Configuration] element. */ internal val org.gradle.api.NamedDomainObjectContainer&lt;org.gradle.api.artifacts.Configuration&gt;.`debugCompileOnly`: NamedDomainObjectProvider&lt;org.gradle.api.artifacts.Configuration&gt; get() = named&lt;org.gradle.api.artifacts.Configuration&gt;("debugCompileOnly")</ID>
     <ID>TopLevelPropertyNaming:Accessorsw34mwj3hroscfmyxar5atwjz.kt$/** * Provides the existing [jar][org.gradle.api.tasks.bundling.Jar] task. */ internal val TaskContainer.`jar`: TaskProvider&lt;org.gradle.api.tasks.bundling.Jar&gt; get() = named&lt;org.gradle.api.tasks.bundling.Jar&gt;("jar")</ID>
     <ID>TopLevelPropertyNaming:AmountFormatting.kt$const val N_100K = 100000</ID>
-    <ID>TopLevelPropertyNaming:ChooseIconModal.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") private const val ICON_PICKER_ICONS_PER_ROW = 5</ID>
-    <ID>TopLevelPropertyNaming:EditBottomSheet.kt$@Deprecated("Old design system. Use `:ivy-design` and Material3") const val SWIPE_UP_EXPANDED_THRESHOLD = 200</ID>
+    <ID>TopLevelPropertyNaming:ChooseIconModal.kt$@Deprecated("Legacy code. Don't use it, please.") private const val ICON_PICKER_ICONS_PER_ROW = 5</ID>
+    <ID>TopLevelPropertyNaming:EditBottomSheet.kt$@Deprecated("Legacy code. Don't use it, please.") const val SWIPE_UP_EXPANDED_THRESHOLD = 200</ID>
     <ID>TopLevelPropertyNaming:ParseStatus.kt$const val SAMPLE_SIZE = 20</ID>
     <ID>TopLevelPropertyNaming:PieChart.kt$const val PIE_CHART_RADIUS_DP = 128</ID>
     <ID>TopLevelPropertyNaming:PieChart.kt$const val RADIUS_DP = 112f</ID>

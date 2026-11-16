@@ -35,7 +35,6 @@ import com.ivy.domain.RootScreen
 import com.ivy.home.customerjourney.CustomerJourneyCardsProvider
 import com.ivy.legacy.Constants
 import com.ivy.legacy.IvyWalletCtx
-import com.ivy.legacy.IvyWalletUI
 import com.ivy.legacy.ui.WalletRoot
 import com.ivy.legacy.utils.activityForResultLauncher
 import com.ivy.legacy.utils.sendToCrashlytics
@@ -122,9 +121,7 @@ class RootActivity : AppCompatActivity(), RootScreen {
 
                     false -> {
                         NavigationRoot(navigation = navigation) { screen ->
-                            IvyWalletUI(includeSurface = screen?.isLegacy ?: true) {
-                                IvyNavGraph(screen)
-                            }
+                            IvyNavGraph(screen)
                         }
                     }
                 }

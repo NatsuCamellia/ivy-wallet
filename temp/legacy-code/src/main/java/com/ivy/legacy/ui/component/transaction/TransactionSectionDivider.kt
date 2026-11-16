@@ -24,7 +24,7 @@ import com.ivy.legacy.ui.component.AmountText
 import com.ivy.legacy.ui.component.color
 import com.ivy.ui.R
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 @Composable
 fun SectionDivider(
     expanded: Boolean,

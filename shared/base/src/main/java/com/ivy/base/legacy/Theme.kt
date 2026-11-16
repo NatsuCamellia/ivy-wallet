@@ -2,7 +2,7 @@ package com.ivy.base.legacy
 
 import androidx.compose.runtime.Immutable
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 @Immutable
 enum class Theme {
     LIGHT, DARK, AUTO, AMOLED_DARK

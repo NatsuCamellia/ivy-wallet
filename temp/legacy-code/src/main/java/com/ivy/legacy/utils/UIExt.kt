@@ -20,25 +20,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import kotlin.math.roundToInt
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
-fun keyboardVisibleState(): State<Boolean> {
-    val rootView = LocalView.current
-
-    val keyboardVisible = remember {
-        mutableStateOf(false)
-    }
-
-    com.ivy.legacy.utils.onScreenStart {
-        rootView.addKeyboardListener {
-            keyboardVisible.value = it
-        }
-    }
-
-    return keyboardVisible
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun View.addKeyboardListener(keyboardCallback: (visible: Boolean) -> Unit) {
     doOnLayout {
         // get init state of keyboard
@@ -59,7 +41,7 @@ fun View.addKeyboardListener(keyboardCallback: (visible: Boolean) -> Unit) {
     }
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun isKeyboardOpen(rootView: View): Boolean {
     return try {
         WindowInsetsCompat.toWindowInsetsCompat(rootView.rootWindowInsets, rootView)
@@ -70,17 +52,17 @@ fun isKeyboardOpen(rootView: View): Boolean {
     }
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun convertDpToPixel(context: Context, dp: Float): Float {
     return dp * (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun convertDpToPixel(context: Context, dp: Int): Int {
     return convertDpToPixel(context, dp.toFloat()).roundToInt()
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 @SuppressLint("ComposableNaming")
 @Composable
 fun setStatusBarDarkTextCompat(darkText: Boolean) {
@@ -90,12 +72,12 @@ fun setStatusBarDarkTextCompat(darkText: Boolean) {
     )
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun setStatusBarDarkTextCompat(view: View, darkText: Boolean) {
     view.windowInsetsController?.setStatusBarDarkText(darkText)
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun WindowInsetsController.setStatusBarDarkText(darkText: Boolean) {
     setSystemBarsAppearance(
         if (darkText) WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS else 0,
@@ -103,27 +85,27 @@ fun WindowInsetsController.setStatusBarDarkText(darkText: Boolean) {
     )
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun lerp(start: Int, end: Int, @FloatRange(from = 0.0, to = 1.0) fraction: Float): Int {
     return ((start + fraction * (end - start)).roundToInt())
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun lerp(start: Float, end: Float, @FloatRange(from = 0.0, to = 1.0) fraction: Float): Float {
     return (start + fraction * (end - start))
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun lerp(start: Double, end: Double, @FloatRange(from = 0.0, to = 1.0) fraction: Double): Double {
     return (start + fraction * (end - start))
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun colorLerp(start: Color, end: Color, fraction: Float): Color {
     return Color(ArgbEvaluator().evaluate(fraction, start.toArgb(), end.toArgb()) as Int)
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun hideKeyboard(view: View) {
     try {
         val imm: InputMethodManager =

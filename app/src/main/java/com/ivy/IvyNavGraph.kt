@@ -2,7 +2,6 @@ package com.ivy
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
 import com.ivy.attributions.AttributionsScreenImpl
 import com.ivy.balance.BalanceScreen
@@ -58,7 +57,7 @@ import com.ivy.transactions.TransactionsScreen
 @ExperimentalAnimationApi
 @Composable
 @Suppress("CyclomaticComplexMethod", "FunctionNaming")
-fun BoxWithConstraintsScope.IvyNavGraph(screen: Screen?) {
+fun IvyNavGraph(screen: Screen?) {
     when (screen) {
         null -> {
             // show nothing

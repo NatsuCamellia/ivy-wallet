@@ -19,23 +19,11 @@ import javax.inject.Singleton
 @Deprecated("Legacy code. Don't use it, please.")
 @Singleton
 class IvyWalletCtx @Inject constructor() {
-    @Deprecated("Old design system. Use `:ivy-design` and Material3")
+    @Deprecated("Legacy code. Don't use it, please.")
     var theme: Theme by mutableStateOf(Theme.LIGHT)
         private set
 
-    @Deprecated("Old design system. Use `:ivy-design` and Material3")
-    var screenWidth: Int = -1
-        get() {
-            return if (field > 0) field else throw IllegalStateException("screenWidth not initialized")
-        }
-
-    @Deprecated("Old design system. Use `:ivy-design` and Material3")
-    var screenHeight: Int = -1
-        get() {
-            return if (field > 0) field else throw IllegalStateException("screenHeight not initialized")
-        }
-
-    @Deprecated("Old design system. Use `:ivy-design` and Material3")
+    @Deprecated("Legacy code. Don't use it, please.")
     fun switchTheme(theme: Theme) {
         this.theme = theme
     }

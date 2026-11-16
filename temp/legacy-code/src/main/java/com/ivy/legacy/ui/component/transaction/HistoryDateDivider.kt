@@ -14,7 +14,7 @@ import com.ivy.legacy.utils.formatLocal
 import com.ivy.ui.R
 import java.time.LocalDate
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 @Composable
 fun HistoryDateDivider(
     date: LocalDate,

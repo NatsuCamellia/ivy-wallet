@@ -38,7 +38,7 @@ import com.ivy.ui.R
 import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
 import java.util.UUID
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun LazyListScope.transactions(
     baseData: AppBaseData,
 

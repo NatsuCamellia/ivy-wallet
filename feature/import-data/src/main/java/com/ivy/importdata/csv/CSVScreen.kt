@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -273,31 +272,25 @@ private fun <M> MappingCard(
 ) {
     Card(modifier = modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier.padding(vertical = 16.dp),
+            modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Text(
-                    text = mapping.ivyColumn,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = mapping.helpInfo,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                Text(
-                    text = "Choose a matching CSV column:",
-                    style = MaterialTheme.typography.labelLarge,
-                )
-            }
+            Text(
+                text = mapping.ivyColumn,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                text = mapping.helpInfo,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Text(
+                text = "Choose a matching CSV column:",
+                style = MaterialTheme.typography.labelLarge,
+            )
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = 16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 itemsIndexed(columns.values) { index, column ->
@@ -321,24 +314,19 @@ private fun <M> MappingCard(
                 }
             }
 
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (metadataContent != null) {
-                    metadataContent(mapping.metadata)
-                }
+            if (metadataContent != null) {
+                metadataContent(mapping.metadata)
+            }
 
-                MappingStatusLine(mapping = mapping, status = status)
+            MappingStatusLine(mapping = mapping, status = status)
 
-                if (status.sampleValues.isNotEmpty()) {
-                    CSVRow(
-                        modifier = Modifier.horizontalScroll(rememberScrollState()),
-                        row = CSVRow(status.sampleValues),
-                        header = false,
-                        even = true
-                    )
-                }
+            if (status.sampleValues.isNotEmpty()) {
+                CSVRow(
+                    modifier = Modifier.horizontalScroll(rememberScrollState()),
+                    row = CSVRow(status.sampleValues),
+                    header = false,
+                    even = true
+                )
             }
         }
     }

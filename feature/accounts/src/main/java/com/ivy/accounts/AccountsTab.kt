@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -37,7 +36,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
@@ -54,6 +52,7 @@ import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.AmountText
 import com.ivy.legacy.ui.component.IconBadge
 import com.ivy.legacy.ui.component.color
+import com.ivy.legacy.ui.component.transaction.EmptyState
 import com.ivy.legacy.ui.sheet.ReorderModalSingleType
 import com.ivy.navigation.Navigation
 import com.ivy.navigation.NavigationRoot
@@ -161,7 +160,11 @@ private fun AccountsList(
     ) {
         if (state.accountsData.isEmpty()) {
             item {
-                EmptyState()
+                EmptyState(
+                    emptyStateTitle = stringResource(R.string.no_accounts),
+                    emptyStateText = stringResource(R.string.no_accounts_description),
+                    icon = Icons.Outlined.AccountBalanceWallet,
+                )
             }
         } else if (!state.hideTotalBalance) {
             item {
@@ -322,34 +325,6 @@ private fun AccountBadge(account: Account) {
         iconName = account.icon?.id,
         defaultIcon = R.drawable.ic_custom_account_m,
     )
-}
-
-@Composable
-private fun EmptyState(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Outlined.AccountBalanceWallet,
-            contentDescription = null,
-            modifier = Modifier.size(48.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = stringResource(R.string.no_accounts),
-            style = MaterialTheme.typography.titleMedium
-        )
-        Text(
-            text = stringResource(R.string.no_accounts_description),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-    }
 }
 
 @Preview

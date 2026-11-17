@@ -796,11 +796,6 @@
     <ID>NoImplicitFunctionReturnType:HomeViewModel.kt$HomeViewModel$private suspend fun dismissCustomerJourneyCard(card: CustomerJourneyCardModel)</ID>
     <ID>NoImplicitFunctionReturnType:HomeViewModel.kt$HomeViewModel$private suspend fun reload( timePeriod: TimePeriod = ivyContext.selectedPeriod )</ID>
     <ID>NoImplicitFunctionReturnType:HomeViewModel.kt$HomeViewModel$private suspend fun setCurrency(newCurrency: String)</ID>
-    <ID>NoImplicitFunctionReturnType:IvyAnimation.kt$fun &lt;T&gt; springBounce( stiffness: Float = 500f, )</ID>
-    <ID>NoImplicitFunctionReturnType:IvyAnimation.kt$fun &lt;T&gt; springBounceFast()</ID>
-    <ID>NoImplicitFunctionReturnType:IvyAnimation.kt$fun &lt;T&gt; springBounceMedium()</ID>
-    <ID>NoImplicitFunctionReturnType:IvyAnimation.kt$fun &lt;T&gt; springBounceSlow()</ID>
-    <ID>NoImplicitFunctionReturnType:IvyAnimation.kt$fun &lt;T&gt; springBounceVerySlow()</ID>
     <ID>NoImplicitFunctionReturnType:IvyRoomDatabase.kt$IvyRoomDatabase.Companion$fun migrations()</ID>
     <ID>NoImplicitFunctionReturnType:LoanTransactionsCore.kt$LoanTransactionsCore$suspend fun fetchAccounts()</ID>
     <ID>NoImplicitFunctionReturnType:LoanTransactionsCore.kt$LoanTransactionsCore$suspend fun fetchAllLoanRecords(loanId: UUID)</ID>

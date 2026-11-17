@@ -2,9 +2,7 @@ package com.ivy.legacy.ui.component.transaction
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
@@ -50,7 +48,6 @@ fun LazyListScope.transactions(
     emptyStateText: String,
 
     dateDividerMarginTop: Dp? = null,
-    lastItemSpacer: Dp? = null,
     shouldShowAccountSpecificColorInTransactions: Boolean,
     onPayOrGet: (Transaction) -> Unit,
     setUpcomingExpanded: (Boolean) -> Unit,
@@ -99,13 +96,6 @@ fun LazyListScope.transactions(
             )
         }
     }
-
-    scrollHackSpacer(
-        history = history,
-        upcoming = upcoming,
-        overdue = overdue,
-        lastItemSpacer = lastItemSpacer
-    )
 }
 
 private fun LazyListScope.upcomingSection(
@@ -334,31 +324,5 @@ fun EmptyState(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
-    }
-}
-
-private fun LazyListScope.scrollHackSpacer(
-    history: List<TransactionHistoryItem>,
-    upcoming: LegacyDueSection?,
-    overdue: LegacyDueSection?,
-
-    lastItemSpacer: Dp?,
-) {
-    item {
-        if (lastItemSpacer != null) {
-            Spacer(Modifier.height(lastItemSpacer))
-        } else {
-            // last spacer - scroll hack
-            val trnCount = history.size.plus(
-                if (upcoming != null && upcoming.expanded) upcoming.trns.size else 0
-            ).plus(
-                if (overdue != null && overdue.expanded) overdue.trns.size else 0
-            )
-            if (trnCount <= 5) {
-                Spacer(Modifier.height(300.dp))
-            } else {
-                Spacer(Modifier.height(150.dp))
-            }
-        }
     }
 }

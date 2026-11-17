@@ -24,7 +24,6 @@ import com.ivy.ui.testing.PaparazziScreenshotTest
 import com.ivy.ui.testing.PaparazziTheme
 import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
 import com.ivy.wallet.domain.pure.data.IncomeExpensePair
-import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -129,7 +128,6 @@ private fun List(
                     overdue = overdue,
                     history = history,
                     emptyStateText = "You don't have any transactions for March.",
-                    lastItemSpacer = 0.dp,
                     shouldShowAccountSpecificColorInTransactions = false,
                     onPayOrGet = {},
                     setUpcomingExpanded = {},

@@ -30,7 +30,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
 import com.ivy.base.legacy.Transaction
 import com.ivy.base.legacy.TransactionHistoryItem
@@ -158,7 +157,6 @@ private fun SearchUi(
                 onPayOrGet = { },
                 emptyStateTitle = emptyStateTitle,
                 emptyStateText = emptyStateText,
-                lastItemSpacer = 0.dp,
                 shouldShowAccountSpecificColorInTransactions = uiState.shouldShowAccountSpecificColorInTransactions
             )
         }

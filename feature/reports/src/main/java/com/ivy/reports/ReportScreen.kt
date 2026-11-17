@@ -207,7 +207,6 @@ private fun UI(
                             onEventHandler(ReportScreenEvent.OnOverdueExpanded(overdueExpanded = it))
                         },
                         history = state.history,
-                        lastItemSpacer = 0.dp,
                         onPayOrGet = {
                             onEventHandler(ReportScreenEvent.OnPayOrGetLegacy(transaction = it))
                         },

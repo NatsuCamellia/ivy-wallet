@@ -2,15 +2,11 @@ package com.ivy.main
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -69,8 +65,6 @@ import com.ivy.wallet.domain.deprecated.logic.model.CreateAccountData
 private const val ScrimAlpha = 0.32f
 private const val ToggleIconSwapProgress = 0.5f
 
-@ExperimentalAnimationApi
-@ExperimentalFoundationApi
 @Composable
 fun MainScreen(screen: MainScreen) {
     val viewModel: MainViewModel = viewModel()
@@ -90,8 +84,6 @@ fun MainScreen(screen: MainScreen) {
     )
 }
 
-@ExperimentalAnimationApi
-@ExperimentalFoundationApi
 @Composable
 private fun UI(
     tab: MainTab,
@@ -173,7 +165,7 @@ private fun MainShell(
     onAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
     initiallyExpanded: Boolean = false,
-    content: @Composable BoxWithConstraintsScope.() -> Unit,
+    content: @Composable () -> Unit,
 ) {
     var expanded by rememberSaveable(tab) { mutableStateOf(initiallyExpanded && tab == MainTab.HOME) }
 
@@ -268,7 +260,7 @@ private fun MainShell(
             }
         }
     ) { innerPadding ->
-        BoxWithConstraints(
+        Box(
             modifier = Modifier
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)

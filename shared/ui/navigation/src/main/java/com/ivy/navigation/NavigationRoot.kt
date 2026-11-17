@@ -3,7 +3,6 @@ package com.ivy.navigation
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
@@ -31,13 +30,6 @@ fun NavigationRoot(
             shown.screen = screen
             if (navigation.lastScreen?.isLegacy == false) {
                 viewModelStore?.clear()
-            }
-        }
-        DisposableEffect(Unit) {
-            onDispose {
-                if (navigation.lastScreen?.isLegacy == false) {
-                    viewModelStore?.clear()
-                }
             }
         }
         navGraph(screen)

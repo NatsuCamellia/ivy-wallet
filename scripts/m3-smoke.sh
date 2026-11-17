@@ -259,11 +259,11 @@ go_home() {
 }
 
 nav_bar_top() {
-  adb shell dumpsys window | grep -m1 'type=navigationBars' | grep -oE 'frame=\[0,[0-9]+\]' | grep -oE '[0-9]+' | tail -1
+  adb shell dumpsys window | grep -m1 -E 'type=(navigationBars|ITYPE_NAVIGATION_BAR) ' | grep -oE 'frame=\[0,[0-9]+\]' | grep -oE '[0-9]+' | tail -1
 }
 
 ime_top() {
-  adb shell dumpsys window | grep -m1 'type=ime frame=.*visible=true' | grep -oE 'frame=\[0,[0-9]+\]' | grep -oE '[0-9]+' | tail -1
+  adb shell dumpsys window | grep -m1 -E 'type=(ime|ITYPE_IME) frame=.*visible=true' | grep -oE 'frame=\[0,[0-9]+\]' | grep -oE '[0-9]+' | tail -1
 }
 
 crashed() { adb logcat -d | grep -q "FATAL EXCEPTION"; }

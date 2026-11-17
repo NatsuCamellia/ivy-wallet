@@ -502,6 +502,11 @@
     <string name="language">Language</string>
     <string name="advanced_features">Advanced features</string>
     <string name="close">Close</string>
+    <string name="open_balance">Open balance</string>
+    <string name="show_balance">Show balance</string>
+    <string name="back">Back</string>
+    <string name="forks">Forks</string>
+    <string name="stars">Stars</string>
     <string name="expand_section">Expand %1$s</string>
     <string name="collapse_section">Collapse %1$s</string>
     <string name="section_expanded">Expanded</string>

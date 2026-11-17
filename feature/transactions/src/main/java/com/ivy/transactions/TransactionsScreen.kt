@@ -398,7 +398,6 @@ private fun TransactionsUi(
                 setOverdueExpanded = setOverdueExpanded,
 
                 history = history,
-                lastItemSpacer = 0.dp,
 
                 onPayOrGet = onPayOrGet,
                 onSkipTransaction = onSkipTransaction,
@@ -489,11 +488,15 @@ private fun TransactionsTopBar(
     LargeFlexibleTopAppBar(
         title = {
             Row(
-                modifier = Modifier.clickable(
-                    onClickLabel = stringResource(R.string.edit),
-                    role = Role.Button,
-                    onClick = onEdit
-                ),
+                modifier = if (account != null || category != null) {
+                    Modifier.clickable(
+                        onClickLabel = stringResource(R.string.edit),
+                        role = Role.Button,
+                        onClick = onEdit
+                    )
+                } else {
+                    Modifier
+                },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {

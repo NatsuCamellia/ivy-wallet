@@ -233,6 +233,7 @@ private fun TagList(
                     null
                 },
                 onLongClick = { onTagLongClick(tag) },
+                onLongClickLabel = stringResource(R.string.edit),
             ) {
                 Text(
                     text = "#${tag.name.value}",

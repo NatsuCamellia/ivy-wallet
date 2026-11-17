@@ -4,20 +4,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -25,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +26,7 @@ import com.ivy.navigation.Navigation
 import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
+import com.ivy.ui.component.BackButton
 import com.ivy.ui.theme.WalletTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -54,6 +47,7 @@ private fun FeaturesUi(
     uiState: FeaturesUiState,
     onEvent: (FeaturesUiEvent) -> Unit,
 ) {
+    val nav = navigation()
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -61,7 +55,7 @@ private fun FeaturesUi(
                     Title()
                 },
                 navigationIcon = {
-                    BackButton()
+                    BackButton(onClick = nav::back)
                 },
             )
         },
@@ -75,24 +69,6 @@ private fun FeaturesUi(
             )
         }
     )
-}
-
-@Composable
-private fun BackButton(
-    modifier: Modifier = Modifier,
-) {
-    val nav = navigation()
-    IconButton(
-        modifier = modifier,
-        onClick = {
-            nav.back()
-        }
-    ) {
-        Icon(
-            imageVector = Icons.Filled.ArrowBack,
-            contentDescription = "Back"
-        )
-    }
 }
 
 @Composable
@@ -151,22 +127,20 @@ private fun FeatureRow(
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Column(Modifier.weight(1f)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
                     text = feature.name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.W700
+                    style = MaterialTheme.typography.bodyLargeEmphasized,
                 )
                 if (feature.description != null) {
-                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = feature.description,
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
             }
-            Spacer(modifier = Modifier.width(8.dp))
             Switch(checked = feature.enabled, onCheckedChange = { onToggleClick() })
         }
     }
@@ -177,18 +151,12 @@ private fun FeatureSectionDivider(
     text: String,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier) {
-        Spacer(Modifier.height(16.dp))
-
-        Text(
-            modifier = Modifier.padding(start = 16.dp),
-            text = text,
-            style = MaterialTheme.typography.titleMedium.copy(
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontWeight = FontWeight.Bold
-            )
-        )
-    }
+    Text(
+        modifier = modifier.padding(start = 16.dp, top = 16.dp),
+        text = text,
+        style = MaterialTheme.typography.titleMediumEmphasized,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }
 
 @Preview

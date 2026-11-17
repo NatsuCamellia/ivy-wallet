@@ -5,18 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
@@ -28,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,6 +33,7 @@ import com.ivy.navigation.Navigation
 import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
+import com.ivy.ui.component.BackButton
 import com.ivy.ui.theme.WalletTheme
 import com.ivy.ui.withFabClearance
 import kotlinx.collections.immutable.persistentListOf
@@ -62,6 +58,7 @@ private fun ReleasesUi(
     onEvent: (ReleasesEvent) -> Unit
 ) {
     val browser = LocalUriHandler.current
+    val nav = navigation()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -69,7 +66,7 @@ private fun ReleasesUi(
                     TopAppBarTitle(title = stringResource(R.string.releases))
                 },
                 navigationIcon = {
-                    BackButton()
+                    BackButton(onClick = nav::back)
                 }
             )
         },
@@ -99,20 +96,6 @@ private fun TopAppBarTitle(title: String) {
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
-}
-
-@Composable
-private fun BackButton() {
-    val nav = navigation()
-
-    IconButton(onClick = {
-        nav.back()
-    }) {
-        Icon(
-            imageVector = Icons.Filled.ArrowBack,
-            contentDescription = "Back"
-        )
-    }
 }
 
 private fun LazyListScope.content(
@@ -159,14 +142,17 @@ private fun ReleaseInfoCard(
             browser.openUri(releaseInfo.releaseUrl)
         }
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             ReleaseInfoRow(releaseInfo = releaseInfo)
 
             if (releaseInfo.releaseCommits.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
-
-                for (commit in releaseInfo.releaseCommits) {
-                    Text(text = "• $commit")
+                Column {
+                    for (commit in releaseInfo.releaseCommits) {
+                        Text(text = "• $commit")
+                    }
                 }
             }
         }
@@ -196,8 +182,7 @@ private fun ReleaseName(
     Text(
         modifier = modifier,
         text = info,
-        style = MaterialTheme.typography.bodyLarge,
-        fontWeight = FontWeight.Bold,
+        style = MaterialTheme.typography.bodyLargeEmphasized,
         color = MaterialTheme.colorScheme.primary
     )
 }
@@ -210,8 +195,7 @@ private fun ReleaseDate(
     Text(
         modifier = modifier,
         text = info,
-        style = MaterialTheme.typography.labelMedium,
-        fontWeight = FontWeight.Bold
+        style = MaterialTheme.typography.labelMediumEmphasized
     )
 }
 
@@ -252,7 +236,7 @@ private fun GitHubButton(
     ) {
         Icon(
             painter = painterResource(id = R.drawable.github_logo),
-            contentDescription = "GitHub"
+            contentDescription = stringResource(R.string.github)
         )
     }
 }

@@ -1,9 +1,8 @@
 package com.ivy.disclaimer.composables
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,10 +19,10 @@ fun AgreementCheckBox(
 ) {
     Row(
         modifier = modifier.clickable(onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Checkbox(checked = viewState.checked, onCheckedChange = { onClick() })
-        Spacer(modifier = Modifier.width(8.dp))
         Text(text = viewState.text)
     }
 }

@@ -3,6 +3,7 @@
 Known gaps are listed here.
 
 - Reorder with a list taller than the sheet (3.4a): `flow_reorder` runs on the two default accounts only, so scrolling and dragging inside a sheet whose rows overflow it is not covered by `m3-smoke.sh`. Onboarding offers no way to seed more than two accounts, and adding ten or more accounts through the UI would make the flow several minutes long. Needs a seeded database or a debug intent before it can be automated.
+- Spacing budget exception (7.0): `scripts/m3-check.sh dbdd33d3a --no-total` reports feature/disclaimer (4 numeric dp lines in 9 added lines) and feature/poll/impl (6 in 8) over the per-module budget. The lines replace `Spacer` chains with `Arrangement.spacedBy`, so each module ends with fewer numeric dp lines than before (disclaimer 6 to 3, poll 9 to 5, all on the 4/8/16/24 grid); the checker counts every touched line as added. Accepted by the controller; the check exits 1 against the S6 and S7 bases until those modules change again.
 
 ## Remaining drawable references
 

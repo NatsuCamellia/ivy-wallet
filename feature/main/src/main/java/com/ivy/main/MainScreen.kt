@@ -22,18 +22,19 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.ShortNavigationBar
 import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
+import androidx.compose.material3.ToggleFloatingActionButtonDefaults.animateIcon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -42,6 +43,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -69,7 +71,6 @@ import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
 import com.ivy.wallet.domain.deprecated.logic.model.CreateAccountData
 
-private const val ScrimAlpha = 0.32f
 private const val ToggleIconSwapProgress = 0.5f
 
 @Composable
@@ -197,18 +198,21 @@ private fun MainShell(
                 ShortNavigationBarItem(
                     selected = tab == MainTab.HOME,
                     onClick = { selectTab(MainTab.HOME) },
+                    modifier = Modifier.testTag("home"),
                     icon = { Icon(Icons.Default.Home, contentDescription = null) },
                     label = { Text(stringResource(R.string.home)) }
                 )
                 ShortNavigationBarItem(
                     selected = tab == MainTab.ACCOUNTS,
                     onClick = { selectTab(MainTab.ACCOUNTS) },
+                    modifier = Modifier.testTag("accounts"),
                     icon = { Icon(Icons.Default.AccountBalanceWallet, contentDescription = null) },
                     label = { Text(stringResource(R.string.accounts)) }
                 )
                 ShortNavigationBarItem(
                     selected = tab == MainTab.CATEGORIES,
                     onClick = { selectTab(MainTab.CATEGORIES) },
+                    modifier = Modifier.testTag("categories"),
                     icon = { Icon(Icons.Default.Category, contentDescription = null) },
                     label = { Text(stringResource(R.string.categories)) }
                 )
@@ -216,10 +220,54 @@ private fun MainShell(
         },
         floatingActionButton = {
             when (tab) {
-                MainTab.HOME -> FloatingActionButtonMenu(
+                MainTab.HOME -> Unit
+
+                MainTab.ACCOUNTS -> FloatingActionButton(onClick = onAddAccount) {
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_account))
+                }
+
+                MainTab.CATEGORIES -> FloatingActionButton(
+                    onClick = onAddCategory,
+                    modifier = Modifier.testTag("categories_add")
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_category))
+                }
+            }
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding)
+        ) {
+            content()
+
+            if (tab == MainTab.HOME) {
+                AnimatedVisibility(
+                    visible = expanded,
+                    enter = fadeIn(),
+                    exit = fadeOut()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(BottomSheetDefaults.ScrimColor)
+                            .clickable(
+                                interactionSource = null,
+                                indication = null,
+                                onClickLabel = stringResource(R.string.close)
+                            ) { expanded = false }
+                            .testTag("fab_menu_scrim")
+                    )
+                }
+
+                FloatingActionButtonMenu(
                     expanded = expanded,
+                    modifier = Modifier.align(Alignment.BottomEnd),
                     button = {
                         ToggleFloatingActionButton(
+                            modifier = Modifier.testTag("fab_add"),
                             checked = expanded,
                             onCheckedChange = { expanded = it }
                         ) {
@@ -236,7 +284,8 @@ private fun MainShell(
                                 imageVector = icon,
                                 contentDescription = stringResource(
                                     if (expanded) R.string.close else R.string.add
-                                )
+                                ),
+                                modifier = Modifier.animateIcon({ checkedProgress })
                             )
                         }
                     }
@@ -274,42 +323,6 @@ private fun MainShell(
                         icon = { Icon(Icons.Default.ArrowDownward, contentDescription = null) }
                     )
                 }
-
-                MainTab.ACCOUNTS -> FloatingActionButton(onClick = onAddAccount) {
-                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_account))
-                }
-
-                MainTab.CATEGORIES -> FloatingActionButton(
-                    onClick = onAddCategory,
-                    modifier = Modifier.testTag("categories_add")
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_category))
-                }
-            }
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding)
-        ) {
-            content()
-
-            AnimatedVisibility(
-                visible = expanded,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.scrim.copy(alpha = ScrimAlpha))
-                        .clickable(
-                            interactionSource = null,
-                            indication = null,
-                            onClickLabel = stringResource(R.string.close)
-                        ) { expanded = false }
-                )
             }
         }
     }
@@ -319,11 +332,12 @@ private fun MainShell(
 @Composable
 private fun PreviewMainScreen(
     theme: Theme = Theme.LIGHT,
+    tab: MainTab = MainTab.HOME,
     expanded: Boolean = false
 ) {
     WalletPreview(theme) {
         MainShell(
-            tab = MainTab.HOME,
+            tab = tab,
             selectTab = {},
             onAddIncome = {},
             onAddExpense = {},
@@ -338,10 +352,10 @@ private fun PreviewMainScreen(
 
 /** For screenshot testing */
 @Composable
-fun MainUiTest(isDark: Boolean, expanded: Boolean = false) {
+fun MainUiTest(isDark: Boolean, tab: MainTab = MainTab.HOME, expanded: Boolean = false) {
     val theme = when (isDark) {
         true -> Theme.DARK
         false -> Theme.LIGHT
     }
-    PreviewMainScreen(theme, expanded)
+    PreviewMainScreen(theme, tab, expanded)
 }

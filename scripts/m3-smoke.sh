@@ -736,7 +736,8 @@ flow_period_date_picker() {
   return 0
 }
 
-# Home FAB: tap opens the menu, back collapses it (still on Home), reopen, Add expense opens the edit screen.
+# Home FAB: tap opens the menu, back or a scrim tap collapses it (still on Home), reopen, Add expense opens the edit screen;
+# the Categories tab shows its own add button.
 flow_fab_menu() {
   go_home || return 1
   has desc exact "Add" || { log "FAB missing on Home"; return 1; }
@@ -749,6 +750,11 @@ flow_fab_menu() {
   wait_gone text exact "Add expense" || { log "back did not collapse the menu"; return 1; }
   has text exact "Home" && has desc exact "Add" || { log "back left the main screen"; return 1; }
   shot fab-3-collapsed-by-back
+  open_fab_menu || return 1
+  # a tap on the scrim, above the menu items, collapses the menu and stays on Home
+  tap_xy $(($(screen_width) / 2)) $(($(screen_height) / 4))
+  wait_gone text exact "Add expense" || { log "tap on the scrim did not collapse the menu"; return 1; }
+  has text exact "Home" && has desc exact "Add" || { log "scrim tap left the main screen"; return 1; }
   open_fab_menu || return 1
   tap_node text exact "Add expense" || return 1
   wait_for text exact "Enter" || return 1
@@ -769,6 +775,10 @@ flow_fab_menu() {
   has text exact "Total Balance" && { log "Back was swallowed on Accounts (stale menu state)"; return 1; }
   has desc exact "Add" && ! has text exact "Add expense" || { log "Home should show the collapsed menu"; return 1; }
   shot fab-5-home-after-accounts
+  tap_tab Categories || return 1
+  wait_for desc exact "Add category" || { log "Categories tab did not show"; return 1; }
+  has desc exact "Add" && { log "Home FAB shown on Categories"; return 1; }
+  shot fab-6-categories-tab
   crashed && return 1
   return 0
 }

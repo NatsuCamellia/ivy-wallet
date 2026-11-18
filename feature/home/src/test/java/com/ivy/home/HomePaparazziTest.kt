@@ -38,6 +38,13 @@ class HomePaparazziTest(
     }
 
     @Test
+    fun snapshotHomePlannedPayments() {
+        snapshot(theme) {
+            HomeUiTest(theme == PaparazziTheme.Dark, planned = true)
+        }
+    }
+
+    @Test
     fun snapshotCustomerJourneyCards() {
         snapshot(theme) {
             CustomerJourneyUiTest(theme == PaparazziTheme.Dark)

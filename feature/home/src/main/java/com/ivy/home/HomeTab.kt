@@ -7,7 +7,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,14 +48,16 @@ import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
-import com.ivy.legacy.ui.component.transaction.transactions
+import com.ivy.home.transactionlist.homeTransactionsList
+import com.ivy.home.transactionlist.rememberHomeTransactionMapper
 import com.ivy.legacy.ui.sheet.BufferModal
 import com.ivy.legacy.ui.sheet.BufferModalData
 import com.ivy.legacy.ui.sheet.ChoosePeriodModal
 import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
-import com.ivy.legacy.ui.sheet.DeleteModal
+import com.ivy.navigation.EditTransactionScreen
 import com.ivy.navigation.Navigation
 import com.ivy.navigation.NavigationRoot
+import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
 import com.ivy.ui.color.Green
@@ -65,6 +72,8 @@ import com.ivy.wallet.domain.pure.data.IncomeExpensePair
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import java.math.BigDecimal
+import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -217,16 +226,27 @@ fun HomeUi(
         } then2 onEvent
     )
 
-    DeleteModal(
-        visible = skipAllModalVisible,
-        title = stringResource(R.string.confirm_skip_all),
-        description = stringResource(R.string.confirm_skip_all_description),
-        dismiss = {
-            skipAllModalVisible = false
-        }
-    ) {
-        onEvent(HomeEvent.SkipAllPlanned(uiState.overdue.trns))
-        skipAllModalVisible = false
+    if (skipAllModalVisible) {
+        AlertDialog(
+            onDismissRequest = { skipAllModalVisible = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onEvent(HomeEvent.SkipAllPlanned(uiState.overdue.trns))
+                        skipAllModalVisible = false
+                    }
+                ) {
+                    Text(text = stringResource(R.string.confirm), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { skipAllModalVisible = false }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            },
+            title = { Text(text = stringResource(R.string.confirm_skip_all)) },
+            text = { Text(text = stringResource(R.string.confirm_skip_all_description)) },
+        )
     }
 }
 
@@ -267,18 +287,30 @@ fun HomeLazyColumn(
     val timeProvider = LocalTimeProvider.current
     val timeConverter = LocalTimeConverter.current
     val timeFormatter = LocalTimeFormatter.current
+
+    val mapper = rememberHomeTransactionMapper(baseData)
+    val historyItems = remember(mapper, history) { mapper.mapHistory(history) }
+    val upcomingRows = remember(mapper, upcoming) { mapper.mapDueSection(upcoming.trns, overdue = false) }
+    val overdueRows = remember(mapper, overdue) { mapper.mapDueSection(overdue.trns, overdue = true) }
+    val upcomingSubtitle = remember(mapper, upcoming) {
+        mapper.sectionSubtitle(upcoming.stats, baseData.baseCurrency)
+    }
+    val overdueSubtitle = remember(mapper, overdue) {
+        mapper.sectionSubtitle(overdue.stats, baseData.baseCurrency)
+    }
+    val nav = navigation()
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
+            .padding(horizontal = 16.dp)
             .testTag("home_lazy_column"),
         state = listState,
-        contentPadding = contentPadding
+        contentPadding = contentPadding,
+        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
     ) {
         item {
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 CashFlowInfo(
                     currency = baseData.baseCurrency,
                     balance = balance.toDouble(),
@@ -303,14 +335,14 @@ fun HomeLazyColumn(
             }
         }
 
-        transactions(
-            baseData = baseData,
+        homeTransactionsList(
+            historyItems = historyItems,
             upcoming = upcoming,
-            setUpcomingExpanded = setUpcomingExpanded,
+            upcomingRows = upcomingRows,
+            upcomingSubtitle = upcomingSubtitle,
             overdue = overdue,
-            setOverdueExpanded = setOverdueExpanded,
-            history = history,
-            onPayOrGet = onPayOrGet,
+            overdueRows = overdueRows,
+            overdueSubtitle = overdueSubtitle,
             emptyStateTitle = stringRes(R.string.no_transactions),
             emptyStateText = stringRes(
                 R.string.no_transactions_description,
@@ -321,9 +353,14 @@ fun HomeLazyColumn(
                     timeFormatter = timeFormatter,
                 )
             ),
-            shouldShowAccountSpecificColorInTransactions = false,
+            onTransactionClick = { trn ->
+                nav.navigateTo(EditTransactionScreen(initialTransactionId = trn.id, type = trn.type))
+            },
+            onPayOrGet = onPayOrGet,
             onSkipTransaction = onSkipTransaction,
-            onSkipAllTransactions = onSkipAllTransactions
+            onSkipAllTransactions = onSkipAllTransactions,
+            setUpcomingExpanded = setUpcomingExpanded,
+            setOverdueExpanded = setOverdueExpanded,
         )
     }
 }
@@ -334,12 +371,17 @@ private fun PreviewHomeTab(
     theme: Theme = Theme.LIGHT,
     moreMenuExpanded: Boolean = false,
     empty: Boolean = false,
+    planned: Boolean = false,
 ) {
     WalletPreview(theme) {
         NavigationRoot(navigation = Navigation()) {
             ivyWalletCtx().setMoreMenuExpanded(moreMenuExpanded)
             HomeUi(
-                uiState = if (empty) emptyHomeState() else populatedHomeState(),
+                uiState = when {
+                    empty -> emptyHomeState()
+                    planned -> plannedHomeState()
+                    else -> populatedHomeState()
+                },
                 onEvent = {}
             )
         }
@@ -424,12 +466,47 @@ private fun populatedHomeState(): HomeState {
     )
 }
 
+@Suppress("MagicNumber")
+private fun plannedHomeState(): HomeState {
+    val state = populatedHomeState()
+    val account = state.baseData.accounts.first()
+    val due = Instant.parse("2023-01-20T12:00:00Z")
+    fun planned(type: TransactionType, title: String, amount: Long, dueDate: Instant) = Transaction(
+        accountId = account.id,
+        type = type,
+        amount = BigDecimal.valueOf(amount),
+        title = title,
+        dueDate = dueDate,
+    )
+
+    val rent = planned(TransactionType.EXPENSE, "Rent", 500, due)
+    val freelance = planned(TransactionType.INCOME, "Freelance", 120, due)
+    val phone = planned(TransactionType.EXPENSE, "Phone", 40, due.minus(Duration.ofDays(30)))
+    return state.copy(
+        upcoming = LegacyDueSection(
+            trns = persistentListOf(rent, freelance),
+            stats = IncomeExpensePair(BigDecimal.valueOf(120), BigDecimal.valueOf(500)),
+            expanded = true,
+        ),
+        overdue = LegacyDueSection(
+            trns = persistentListOf(phone),
+            stats = IncomeExpensePair(BigDecimal.ZERO, BigDecimal.valueOf(40)),
+            expanded = true,
+        ),
+    )
+}
+
 /** For screenshot testing */
 @Composable
-fun HomeUiTest(isDark: Boolean, moreMenuExpanded: Boolean = false, empty: Boolean = false) {
+fun HomeUiTest(
+    isDark: Boolean,
+    moreMenuExpanded: Boolean = false,
+    empty: Boolean = false,
+    planned: Boolean = false,
+) {
     val theme = when (isDark) {
         true -> Theme.DARK
         false -> Theme.LIGHT
     }
-    PreviewHomeTab(theme, moreMenuExpanded, empty)
+    PreviewHomeTab(theme, moreMenuExpanded, empty, planned)
 }

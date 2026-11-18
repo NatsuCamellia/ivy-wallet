@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -29,8 +30,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
+import com.ivy.domain.RootScreen
 import com.ivy.legacy.Constants
-import com.ivy.legacy.rootScreen
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.AmountText
 import com.ivy.legacy.ui.component.icon
@@ -43,6 +44,8 @@ import com.ivy.navigation.LoansScreen
 import com.ivy.navigation.PlannedPaymentsScreen
 import com.ivy.navigation.ReportScreen
 import com.ivy.navigation.SearchScreen
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.SettingsScreen
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
@@ -59,89 +62,114 @@ fun MoreMenu(
     onCategoriesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val nav = navigation()
-    val rootScreen = rootScreen()
-    val uriHandler = LocalUriHandler.current
-
     ActionSheet(
         onDismiss = onDismiss,
         modifier = modifier,
         title = stringResource(R.string.more),
     ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            MenuGroup {
-                MenuItem(
-                    icon = Icons.Default.Search,
-                    label = stringResource(R.string.search_transactions),
-                    onClick = { nav.navigateTo(SearchScreen) }
-                )
-            }
+        MoreMenuContent(
+            balance = balance,
+            buffer = buffer,
+            currency = currency,
+            theme = theme,
+            onSwitchTheme = onSwitchTheme,
+            onBufferClick = onBufferClick,
+            onCategoriesClick = onCategoriesClick,
+        )
+    }
+}
 
-            val quickAccess = listOf(
-                MenuEntry(Icons.Default.Settings, stringResource(R.string.settings)) {
-                    nav.navigateTo(SettingsScreen)
-                },
-                MenuEntry(Icons.Default.Category, stringResource(R.string.categories), onCategoriesClick),
-                MenuEntry(theme.icon(), theme.label(), onSwitchTheme),
-                MenuEntry(Icons.Default.EventRepeat, stringResource(R.string.planned_payments_inline)) {
-                    nav.navigateTo(PlannedPaymentsScreen)
-                },
-                MenuEntry(Icons.Default.Share, stringResource(R.string.share_ivy)) {
-                    rootScreen.shareIvyWallet()
-                },
-                MenuEntry(Icons.Default.Assessment, stringResource(R.string.reports)) {
-                    nav.navigateTo(ReportScreen)
-                },
-                MenuEntry(Icons.Default.PieChart, stringResource(R.string.budgets)) {
-                    nav.navigateTo(BudgetScreen)
-                },
-                MenuEntry(Icons.Default.AccountBalance, stringResource(R.string.loans)) {
-                    nav.navigateTo(LoansScreen)
-                },
+@Composable
+private fun MoreMenuContent(
+    balance: Double,
+    buffer: Double,
+    currency: String,
+    theme: Theme,
+    onSwitchTheme: () -> Unit,
+    onBufferClick: () -> Unit,
+    onCategoriesClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val nav = navigation()
+    // The context is only cast when Share is tapped, so the content also renders without a RootScreen host
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
+
+    Column(
+        modifier = modifier
+            .padding(horizontal = 16.dp)
+            .testTag("home_more_menu_content"),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        MenuGroup {
+            MenuItem(
+                icon = Icons.Default.Search,
+                label = stringResource(R.string.search_transactions),
+                onClick = { nav.navigateTo(SearchScreen) }
             )
-            MenuGroup(title = stringResource(R.string.quick_access)) {
-                quickAccess.forEachIndexed { index, entry ->
-                    MenuItem(
-                        icon = entry.icon,
-                        label = entry.label,
-                        index = index,
-                        count = quickAccess.size,
-                        onClick = entry.onClick
-                    )
-                }
-            }
+        }
 
-            MenuGroup {
-                SegmentedListItem(
-                    onClick = onBufferClick,
-                    shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
-                    modifier = Modifier.testTag("savings_goal_row"),
-                    trailingContent = {
-                        AmountText(
-                            amount = buffer,
-                            currency = currency,
-                            style = MaterialTheme.typography.titleMediumEmphasized,
-                        )
-                    },
-                    supportingContent = {
-                        BufferStatus(buffer = buffer, balance = balance, currency = currency)
-                    },
-                ) {
-                    Text(stringResource(R.string.savings_goal))
-                }
-            }
-
-            MenuGroup {
+        val quickAccess = listOf(
+            MenuEntry(Icons.Default.Settings, stringResource(R.string.settings)) {
+                nav.navigateTo(SettingsScreen)
+            },
+            MenuEntry(Icons.Default.Category, stringResource(R.string.categories), onCategoriesClick),
+            MenuEntry(theme.icon(), theme.label(), onSwitchTheme),
+            MenuEntry(Icons.Default.EventRepeat, stringResource(R.string.planned_payments_inline)) {
+                nav.navigateTo(PlannedPaymentsScreen)
+            },
+            MenuEntry(Icons.Default.Share, stringResource(R.string.share_ivy)) {
+                (context as? RootScreen)?.shareIvyWallet()
+            },
+            MenuEntry(Icons.Default.Assessment, stringResource(R.string.reports)) {
+                nav.navigateTo(ReportScreen)
+            },
+            MenuEntry(Icons.Default.PieChart, stringResource(R.string.budgets)) {
+                nav.navigateTo(BudgetScreen)
+            },
+            MenuEntry(Icons.Default.AccountBalance, stringResource(R.string.loans)) {
+                nav.navigateTo(LoansScreen)
+            },
+        )
+        MenuGroup(title = stringResource(R.string.quick_access)) {
+            quickAccess.forEachIndexed { index, entry ->
                 MenuItem(
-                    icon = Icons.Default.Code,
-                    label = stringResource(R.string.ivy_wallet_open_source),
-                    supporting = Constants.URL_IVY_WALLET_REPO,
-                    onClick = { openUrl(uriHandler = uriHandler, url = Constants.URL_IVY_WALLET_REPO) }
+                    icon = entry.icon,
+                    label = entry.label,
+                    index = index,
+                    count = quickAccess.size,
+                    onClick = entry.onClick
                 )
             }
+        }
+
+        MenuGroup {
+            SegmentedListItem(
+                onClick = onBufferClick,
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+                modifier = Modifier.testTag("savings_goal_row"),
+                trailingContent = {
+                    AmountText(
+                        amount = buffer,
+                        currency = currency,
+                        style = MaterialTheme.typography.titleMediumEmphasized,
+                    )
+                },
+                supportingContent = {
+                    BufferStatus(buffer = buffer, balance = balance, currency = currency)
+                },
+            ) {
+                Text(stringResource(R.string.savings_goal))
+            }
+        }
+
+        MenuGroup {
+            MenuItem(
+                icon = Icons.Default.Code,
+                label = stringResource(R.string.ivy_wallet_open_source),
+                supporting = Constants.URL_IVY_WALLET_REPO,
+                onClick = { openUrl(uriHandler = uriHandler, url = Constants.URL_IVY_WALLET_REPO) }
+            )
         }
     }
 }
@@ -204,5 +232,23 @@ private fun PreviewMoreMenu() {
             onBufferClick = {},
             onCategoriesClick = {}
         )
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun MoreMenuContentUiTest(isDark: Boolean) {
+    WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
+        NavigationRoot(navigation = Navigation()) {
+            MoreMenuContent(
+                balance = 7523.43,
+                buffer = 5000.0,
+                currency = "BGN",
+                theme = Theme.LIGHT,
+                onSwitchTheme = {},
+                onBufferClick = {},
+                onCategoriesClick = {},
+            )
+        }
     }
 }

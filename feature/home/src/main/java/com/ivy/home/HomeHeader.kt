@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
@@ -32,7 +33,6 @@ import com.ivy.base.model.TransactionType
 import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.component.AmountText
-import com.ivy.legacy.ui.component.color
 import com.ivy.legacy.utils.format
 import com.ivy.legacy.utils.isNotNullOrBlank
 import com.ivy.navigation.PieChartStatisticScreen
@@ -116,7 +116,6 @@ fun CashFlowInfo(
         Balance(
             currency = currency,
             balance = balance,
-            cashflow = monthlyIncome - monthlyExpenses,
             hideBalance = hideBalance,
             onClick = if (hideBalance) onHiddenBalanceClick else onBalanceClick,
         )
@@ -128,6 +127,11 @@ fun CashFlowInfo(
             hideIncome = hideIncome,
             onHiddenIncomeClick = onHiddenIncomeClick,
         )
+
+        val cashflow = monthlyIncome - monthlyExpenses
+        if (cashflow != 0.0 && !hideBalance) {
+            Cashflow(currency = currency, cashflow = cashflow)
+        }
     }
 }
 
@@ -135,11 +139,11 @@ fun CashFlowInfo(
 private fun Balance(
     currency: String,
     balance: Double,
-    cashflow: Double,
     hideBalance: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val style = MaterialTheme.typography.displaySmallEmphasized
     Column(
         modifier = modifier
             .clickable(
@@ -151,30 +155,31 @@ private fun Balance(
             )
             .testTag("home_balance")
     ) {
-        val style = MaterialTheme.typography.displaySmallEmphasized
         if (hideBalance) {
             Text(text = HiddenBalance, style = style)
         } else {
             AmountText(amount = balance, currency = currency, style = style)
         }
-
-        if (cashflow != 0.0 && !hideBalance) {
-            Text(
-                text = stringResource(
-                    R.string.cashflow,
-                    (if (cashflow > 0) "+" else ""),
-                    cashflow.format(currency),
-                    currency,
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (cashflow > 0) {
-                    TransactionType.INCOME.color()
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-            )
-        }
     }
+}
+
+@Composable
+private fun Cashflow(currency: String, cashflow: Double, modifier: Modifier = Modifier) {
+    Text(
+        text = stringResource(
+            R.string.cashflow,
+            (if (cashflow > 0) "+" else ""),
+            cashflow.format(currency),
+            currency,
+        ),
+        modifier = modifier,
+        style = MaterialTheme.typography.labelLarge,
+        color = if (cashflow > 0) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
+    )
 }
 
 @Composable
@@ -226,7 +231,17 @@ private fun SummaryCard(
     testTag: String,
     modifier: Modifier = Modifier,
 ) {
-    Card(onClick = onClick, modifier = modifier.testTag(testTag)) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.testTag(testTag),
+        colors = CardDefaults.cardColors(
+            containerColor = if (type == TransactionType.INCOME) {
+                MaterialTheme.colorScheme.tertiaryContainer
+            } else {
+                MaterialTheme.colorScheme.secondaryContainer
+            }
+        ),
+    ) {
         Column(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -243,7 +258,6 @@ private fun SummaryCard(
                     },
                     contentDescription = null,
                     modifier = Modifier.size(ButtonDefaults.IconSize),
-                    tint = type.color(),
                 )
                 Text(text = label, style = MaterialTheme.typography.labelLarge)
             }
@@ -251,7 +265,7 @@ private fun SummaryCard(
             AmountText(
                 amount = amount,
                 currency = currency,
-                style = MaterialTheme.typography.titleMediumEmphasized.copy(color = type.color()),
+                style = MaterialTheme.typography.titleMediumEmphasized,
                 showPlusSign = type == TransactionType.INCOME,
             )
         }

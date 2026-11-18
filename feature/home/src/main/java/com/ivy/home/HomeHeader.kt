@@ -12,8 +12,6 @@ import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
@@ -22,7 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -33,6 +30,7 @@ import com.ivy.base.model.TransactionType
 import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.component.AmountText
+import com.ivy.legacy.ui.component.TonalSummaryCard
 import com.ivy.legacy.utils.format
 import com.ivy.legacy.utils.isNotNullOrBlank
 import com.ivy.navigation.PieChartStatisticScreen
@@ -193,11 +191,13 @@ private fun IncomeExpenses(
 ) {
     val nav = navigation()
     Row(modifier = modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        SummaryCard(
-            type = TransactionType.INCOME,
+        TonalSummaryCard(
             label = stringResource(R.string.income),
-            currency = currency,
             amount = monthlyIncome,
+            currency = currency,
+            icon = Icons.Default.ArrowDownward,
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            showPlusSign = true,
             onClick = {
                 if (hideIncome) {
                     onHiddenIncomeClick()
@@ -205,70 +205,18 @@ private fun IncomeExpenses(
                     nav.navigateTo(PieChartStatisticScreen(type = TransactionType.INCOME))
                 }
             },
-            modifier = Modifier.weight(1f),
-            testTag = "home_card_income",
+            modifier = Modifier.weight(1f).testTag("home_card_income"),
         )
 
-        SummaryCard(
-            type = TransactionType.EXPENSE,
+        TonalSummaryCard(
             label = stringResource(R.string.expenses),
-            currency = currency,
             amount = 0.0 - monthlyExpenses.absoluteValue,
+            currency = currency,
+            icon = Icons.Default.ArrowUpward,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
             onClick = { nav.navigateTo(PieChartStatisticScreen(type = TransactionType.EXPENSE)) },
-            modifier = Modifier.weight(1f),
-            testTag = "home_card_expense",
+            modifier = Modifier.weight(1f).testTag("home_card_expense"),
         )
-    }
-}
-
-@Composable
-private fun SummaryCard(
-    type: TransactionType,
-    label: String,
-    currency: String,
-    amount: Double,
-    onClick: () -> Unit,
-    testTag: String,
-    modifier: Modifier = Modifier,
-) {
-    Card(
-        onClick = onClick,
-        modifier = modifier.testTag(testTag),
-        colors = CardDefaults.cardColors(
-            containerColor = if (type == TransactionType.INCOME) {
-                MaterialTheme.colorScheme.tertiaryContainer
-            } else {
-                MaterialTheme.colorScheme.secondaryContainer
-            }
-        ),
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Icon(
-                    imageVector = if (type == TransactionType.INCOME) {
-                        Icons.Default.ArrowDownward
-                    } else {
-                        Icons.Default.ArrowUpward
-                    },
-                    contentDescription = null,
-                    modifier = Modifier.size(ButtonDefaults.IconSize),
-                )
-                Text(text = label, style = MaterialTheme.typography.labelLarge)
-            }
-
-            AmountText(
-                amount = amount,
-                currency = currency,
-                style = MaterialTheme.typography.titleMediumEmphasized,
-                showPlusSign = type == TransactionType.INCOME,
-            )
-        }
     }
 }
 

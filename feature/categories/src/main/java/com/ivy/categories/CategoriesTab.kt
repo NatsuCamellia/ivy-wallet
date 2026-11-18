@@ -2,16 +2,17 @@ package com.ivy.categories
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Paid
@@ -19,11 +20,9 @@ import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.outlined.Category
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeFlexibleTopAppBar
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -52,8 +51,10 @@ import com.ivy.data.model.primitive.IconAsset
 import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
-import com.ivy.legacy.ui.component.AmountText
 import com.ivy.legacy.ui.component.IconBadge
+import com.ivy.legacy.ui.component.OverviewAmount
+import com.ivy.legacy.ui.component.OverviewCard
+import com.ivy.legacy.ui.component.TonalSummaryCard
 import com.ivy.legacy.ui.component.color
 import com.ivy.legacy.ui.component.signedAmount
 import com.ivy.legacy.ui.component.transaction.EmptyState
@@ -152,6 +153,10 @@ private fun CategoriesUi(
                         icon = Icons.Outlined.Category,
                     )
                 }
+            } else {
+                item(key = "totals") {
+                    CategoryTotalCards(state)
+                }
             }
             items(state.categories, key = { it.category.id.value }) { categoryData ->
                 CategoryCard(
@@ -215,6 +220,32 @@ private fun CategoriesUi(
 }
 
 @Composable
+private fun CategoryTotalCards(state: CategoriesScreenState, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        TonalSummaryCard(
+            label = stringResource(R.string.month_expenses),
+            amount = signedAmount(TransactionType.EXPENSE, state.totalMonthlyExpenses),
+            currency = state.baseCurrency,
+            icon = Icons.Default.ArrowUpward,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+        )
+        TonalSummaryCard(
+            label = stringResource(R.string.month_income),
+            amount = state.totalMonthlyIncome,
+            currency = state.baseCurrency,
+            icon = Icons.Default.ArrowDownward,
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            showPlusSign = true,
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+        )
+    }
+}
+
+@Composable
 private fun CategoryCard(
     currency: String,
     categoryData: CategoryData,
@@ -222,77 +253,32 @@ private fun CategoryCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
-        ListItem(
-            leadingContent = { CategoryBadge(categoryData.category) },
-            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-        ) {
-            NameAndBalance(categoryData, currency)
-        }
-
-        if (!compactModeEnabled) {
-            Row {
-                LabelledAmount(
-                    label = stringResource(R.string.month_income),
-                    amount = categoryData.monthlyIncome,
-                    currency = currency,
-                    amountColor = TransactionType.INCOME.color(),
-                    showPlusSign = true,
-                    modifier = Modifier.weight(1f)
-                )
-                LabelledAmount(
+    OverviewCard(
+        name = categoryData.category.name.value,
+        badge = { CategoryBadge(categoryData.category) },
+        balance = categoryData.monthlyBalance,
+        currency = currency,
+        onClick = onClick,
+        modifier = modifier,
+        showPlusSign = true,
+        footer = if (compactModeEnabled) {
+            persistentListOf()
+        } else {
+            persistentListOf(
+                OverviewAmount(
                     label = stringResource(R.string.month_expenses),
                     amount = signedAmount(TransactionType.EXPENSE, categoryData.monthlyExpenses),
-                    currency = currency,
-                    amountColor = TransactionType.EXPENSE.color(),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
-    }
-}
-
-/** The name and the balance share a line; when the balance is too wide for that it moves to its own line. */
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun NameAndBalance(categoryData: CategoryData, currency: String) {
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Text(
-            text = categoryData.category.name.value,
-            modifier = Modifier.weight(1f)
-        )
-        AmountText(
-            amount = categoryData.monthlyBalance,
-            currency = currency,
-            style = MaterialTheme.typography.titleMediumEmphasized,
-            showPlusSign = true,
-        )
-    }
-}
-
-@Composable
-private fun LabelledAmount(
-    label: String,
-    amount: Double,
-    currency: String,
-    amountColor: Color,
-    modifier: Modifier = Modifier,
-    showPlusSign: Boolean = false,
-) {
-    ListItem(
-        modifier = modifier,
-        overlineContent = { Text(label) },
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-    ) {
-        AmountText(
-            amount = amount,
-            currency = currency,
-            style = MaterialTheme.typography.titleSmall.copy(color = amountColor),
-            showPlusSign = showPlusSign,
-        )
-    }
+                    color = TransactionType.EXPENSE.color(),
+                ),
+                OverviewAmount(
+                    label = stringResource(R.string.month_income),
+                    amount = categoryData.monthlyIncome,
+                    color = TransactionType.INCOME.color(),
+                    showPlusSign = true,
+                ),
+            )
+        },
+    )
 }
 
 @Composable
@@ -380,8 +366,8 @@ private fun PreviewCategories(
                 state = CategoriesScreenState(
                     baseCurrency = "BGN",
                     compactCategoriesModeEnabled = compactModeEnabled,
-                    totalMonthlyExpenses = 0.0,
-                    totalMonthlyIncome = 0.0,
+                    totalMonthlyExpenses = if (empty) 0.0 else 3360.5,
+                    totalMonthlyIncome = if (empty) 0.0 else 16445.48,
                     categories = previewCategories(empty = empty, hugeAmountOnly = hugeAmountOnly),
                 )
             )

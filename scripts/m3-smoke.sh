@@ -1106,6 +1106,15 @@ flow_categories() {
   wait_for desc exact "Add category" || return 1
   has desc exact "Sort by" && has desc exact "Reorder" || { log "categories top bar buttons missing"; return 1; }
   has desc exact "Back" && { log "Categories is a tab and must not show a back button"; return 1; }
+  # the cards are tall: scroll until the seeded category is on screen
+  local w h i
+  w=$(screen_width); h=$(screen_height)
+  for i in 1 2 3 4 5 6; do
+    has text exact "Groceries" && break
+    adb shell input swipe $((w / 2)) $((h * 70 / 100)) $((w / 2)) $((h * 30 / 100)) 300 </dev/null
+    sleep 1
+    dump || return 1
+  done
   has text exact "Groceries" || { log "seeded category missing"; return 1; }
   shot categories-1-list
   tap_node desc exact "Add category" || return 1
@@ -1117,9 +1126,7 @@ flow_categories() {
   tap_node text exact "Add" || return 1
   wait_gone text exact "Create category" || { log "Add did not close the category sheet"; return 1; }
   # the new category is last in the list: scroll until it is on screen
-  local w h i
-  w=$(screen_width); h=$(screen_height)
-  for i in 1 2 3 4 5 6; do
+  for i in 1 2 3 4 5 6 7 8; do
     sleep 1
     dump || return 1
     has text exact "smokecat" && break

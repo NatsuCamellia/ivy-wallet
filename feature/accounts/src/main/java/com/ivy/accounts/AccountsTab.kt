@@ -2,26 +2,25 @@ package com.ivy.accounts
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LargeFlexibleTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,7 +34,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
@@ -51,7 +50,11 @@ import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.AmountText
 import com.ivy.legacy.ui.component.IconBadge
+import com.ivy.legacy.ui.component.OverviewAmount
+import com.ivy.legacy.ui.component.OverviewCard
+import com.ivy.legacy.ui.component.TonalSummaryCard
 import com.ivy.legacy.ui.component.color
+import com.ivy.legacy.ui.component.signedAmount
 import com.ivy.legacy.ui.component.transaction.EmptyState
 import com.ivy.legacy.ui.sheet.ReorderModalSingleType
 import com.ivy.navigation.Navigation
@@ -66,7 +69,6 @@ import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.ui.withFabClearance
 import kotlinx.collections.immutable.persistentListOf
 import java.util.UUID
-import kotlin.math.absoluteValue
 
 @Composable
 fun AccountsTab() {
@@ -168,7 +170,7 @@ private fun AccountsList(
             }
         } else if (!state.hideTotalBalance) {
             item {
-                TotalBalanceCard(state)
+                TotalBalanceCards(state)
             }
         }
         items(state.accountsData, key = { it.account.id.value }) {
@@ -190,19 +192,26 @@ private fun AccountsList(
 }
 
 @Composable
-private fun TotalBalanceCard(state: AccountsState, modifier: Modifier = Modifier) {
-    Card(modifier = modifier.fillMaxWidth()) {
-        LabelledAmount(
+private fun TotalBalanceCards(state: AccountsState, modifier: Modifier = Modifier) {
+    Row(
+        modifier = modifier.height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        TonalSummaryCard(
             label = stringResource(R.string.total_balance),
             amount = state.totalBalanceWithoutExcluded.toDoubleOrNull() ?: 0.0,
             currency = state.baseCurrency,
-            amountStyle = MaterialTheme.typography.headlineSmallEmphasized,
+            icon = Icons.Default.AccountBalanceWallet,
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+            modifier = Modifier.weight(1f).fillMaxHeight(),
         )
-        LabelledAmount(
+        TonalSummaryCard(
             label = stringResource(R.string.total_balance_excluded),
             amount = state.totalBalanceWithExcluded.toDoubleOrNull() ?: 0.0,
             currency = state.baseCurrency,
-            amountStyle = MaterialTheme.typography.titleMediumEmphasized,
+            icon = Icons.Default.AccountBalance,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            modifier = Modifier.weight(1f).fillMaxHeight(),
         )
     }
 }
@@ -217,105 +226,51 @@ private fun AccountCard(
 ) {
     val account = accountData.account
     val currency = account.asset.code
+    val baseBalance = accountData.balanceBaseCurrency
 
-    Card(onClick = onClick, modifier = modifier.fillMaxWidth()) {
-        ListItem(
-            leadingContent = { AccountBadge(account) },
-            supportingContent = if (!account.includeInBalance) {
-                {
-                    Text(
-                        text = stringResource(R.string.excluded),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            } else {
-                null
-            },
-            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-        ) {
-            NameAndBalance(accountData, currency, baseCurrency)
-        }
-
-        if (!compactModeEnabled) {
-            Row {
-                LabelledAmount(
-                    label = stringResource(R.string.month_income),
-                    amount = accountData.monthlyIncome,
-                    currency = currency,
-                    amountStyle = MaterialTheme.typography.titleSmall,
-                    amountColor = TransactionType.INCOME.color(),
-                    showPlusSign = true,
-                    modifier = Modifier.weight(1f)
-                )
-                LabelledAmount(
-                    label = stringResource(R.string.month_expenses),
-                    amount = 0.0 - accountData.monthlyExpenses.absoluteValue,
-                    currency = currency,
-                    amountStyle = MaterialTheme.typography.titleSmall,
-                    amountColor = TransactionType.EXPENSE.color(),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-        }
-    }
-}
-
-/** The name and the balance share a line; when the balance is too wide for that it moves to its own line. */
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun NameAndBalance(accountData: AccountData, currency: String, baseCurrency: String) {
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Text(
-            text = accountData.account.name.value,
-            modifier = Modifier.weight(1f)
-        )
-        Column(horizontalAlignment = Alignment.End) {
-            AmountText(
-                amount = accountData.balance,
-                currency = currency,
-                style = MaterialTheme.typography.titleMediumEmphasized,
-            )
-            val baseBalance = accountData.balanceBaseCurrency
-            if (currency != baseCurrency && baseBalance != null) {
-                Box(modifier = Modifier.testTag("baseCurrencyEquivalent")) {
+    OverviewCard(
+        name = account.name.value,
+        badge = { AccountBadge(account) },
+        balance = accountData.balance,
+        currency = currency,
+        onClick = onClick,
+        modifier = modifier,
+        supportingText = if (account.includeInBalance) null else stringResource(R.string.excluded),
+        balanceSupporting = if (currency != baseCurrency && baseBalance != null) {
+            {
+                Box(modifier = Modifier.fillMaxWidth().testTag("baseCurrencyEquivalent")) {
                     AmountText(
                         amount = baseBalance,
                         currency = baseCurrency,
+                        modifier = Modifier.fillMaxWidth(),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         ),
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun LabelledAmount(
-    label: String,
-    amount: Double,
-    currency: String,
-    amountStyle: TextStyle,
-    modifier: Modifier = Modifier,
-    amountColor: Color = Color.Unspecified,
-    showPlusSign: Boolean = false,
-) {
-    ListItem(
-        modifier = modifier,
-        overlineContent = { Text(label) },
-        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-    ) {
-        AmountText(
-            amount = amount,
-            currency = currency,
-            style = amountStyle.copy(color = amountColor),
-            showPlusSign = showPlusSign,
-        )
-    }
+        } else {
+            null
+        },
+        footer = if (compactModeEnabled) {
+            persistentListOf()
+        } else {
+            persistentListOf(
+                OverviewAmount(
+                    label = stringResource(R.string.month_income),
+                    amount = accountData.monthlyIncome,
+                    color = TransactionType.INCOME.color(),
+                    showPlusSign = true,
+                ),
+                OverviewAmount(
+                    label = stringResource(R.string.month_expenses),
+                    amount = signedAmount(TransactionType.EXPENSE, accountData.monthlyExpenses),
+                    color = TransactionType.EXPENSE.color(),
+                ),
+            )
+        },
+    )
 }
 
 @Composable

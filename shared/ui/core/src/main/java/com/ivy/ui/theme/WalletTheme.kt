@@ -44,6 +44,7 @@ fun WalletTheme(
     MaterialExpressiveTheme(
         colorScheme = scheme,
         motionScheme = MotionScheme.expressive(),
+        typography = WalletTypography,
         content = content,
     )
 }
@@ -58,5 +59,10 @@ fun ColorScheme.trueBlack(): ColorScheme = copy(
     background = Color.Black,
     surface = Color.Black,
     surfaceDim = Color.Black,
+    surfaceBright = Color.Black,
     surfaceContainerLowest = Color.Black,
+    surfaceContainerLow = Color.Black,
+    surfaceContainer = Color.Black,
+    surfaceContainerHigh = Color.Black,
+    surfaceContainerHighest = Color.Black,
 )

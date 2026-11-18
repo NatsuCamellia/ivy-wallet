@@ -4,10 +4,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -98,10 +99,10 @@ fun EditBottomBar(
                 )
             }
 
-            Row(
+            FlowRow(
                 modifier = Modifier.padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
+                itemVerticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(
                     modifier = Modifier
@@ -125,7 +126,7 @@ fun EditBottomBar(
                         )
                     }
                 }
-                actions()
+                Row { actions() }
             }
         }
     }

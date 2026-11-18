@@ -3,7 +3,6 @@ package com.ivy.ui.theme
 import androidx.compose.ui.graphics.Color
 import com.ivy.base.legacy.Theme
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import org.junit.Test
 
 class WalletThemeTest {
@@ -24,14 +23,18 @@ class WalletThemeTest {
     }
 
     @Test
-    fun `trueBlack blacks out the base surfaces only`() {
+    fun `trueBlack blacks out every surface role`() {
         val scheme = SeedDarkColorScheme.trueBlack()
 
         scheme.background shouldBe Color.Black
         scheme.surface shouldBe Color.Black
         scheme.surfaceDim shouldBe Color.Black
         scheme.surfaceContainerLowest shouldBe Color.Black
-        scheme.surfaceContainerHigh shouldNotBe Color.Black
+        scheme.surfaceBright shouldBe Color.Black
+        scheme.surfaceContainerLow shouldBe Color.Black
+        scheme.surfaceContainer shouldBe Color.Black
+        scheme.surfaceContainerHigh shouldBe Color.Black
+        scheme.surfaceContainerHighest shouldBe Color.Black
         scheme.primary shouldBe SeedDarkColorScheme.primary
     }
 }

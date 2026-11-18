@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material.icons.filled.Home
@@ -42,23 +43,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ivy.accounts.AccountsTab
 import com.ivy.base.legacy.Theme
 import com.ivy.base.model.TransactionType
+import com.ivy.categories.CategoriesScreenEvent
+import com.ivy.categories.CategoriesTab
+import com.ivy.categories.CategoriesViewModel
 import com.ivy.home.HomeTab
 import com.ivy.legacy.data.model.MainTab
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.sheet.AccountModal
 import com.ivy.legacy.ui.sheet.AccountModalData
+import com.ivy.legacy.ui.sheet.CategoryModalData
 import com.ivy.legacy.utils.onScreenStart
 import com.ivy.navigation.EditPlannedScreen
 import com.ivy.navigation.EditTransactionScreen
 import com.ivy.navigation.MainScreen
 import com.ivy.navigation.navigation
+import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
 import com.ivy.wallet.domain.deprecated.logic.model.CreateAccountData
 
@@ -92,6 +99,7 @@ private fun UI(
     onCreateAccount: (CreateAccountData) -> Unit,
 ) {
     var accountModalData: AccountModalData? by remember { mutableStateOf(null) }
+    val categoriesViewModel: CategoriesViewModel = screenScopedViewModel()
 
     val nav = navigation()
     MainShell(
@@ -135,11 +143,17 @@ private fun UI(
                 balance = 0.0,
                 baseCurrency = baseCurrency
             )
+        },
+        onAddCategory = {
+            categoriesViewModel.onEvent(
+                CategoriesScreenEvent.OnCategoryModalVisible(CategoryModalData(category = null))
+            )
         }
     ) {
         when (tab) {
             MainTab.HOME -> HomeTab()
             MainTab.ACCOUNTS -> AccountsTab()
+            MainTab.CATEGORIES -> CategoriesTab()
         }
     }
 
@@ -163,6 +177,7 @@ private fun MainShell(
     onAddTransfer: () -> Unit,
     onAddPlannedPayment: () -> Unit,
     onAddAccount: () -> Unit,
+    onAddCategory: () -> Unit,
     modifier: Modifier = Modifier,
     initiallyExpanded: Boolean = false,
     content: @Composable () -> Unit,
@@ -190,6 +205,12 @@ private fun MainShell(
                     onClick = { selectTab(MainTab.ACCOUNTS) },
                     icon = { Icon(Icons.Default.AccountBalanceWallet, contentDescription = null) },
                     label = { Text(stringResource(R.string.accounts)) }
+                )
+                ShortNavigationBarItem(
+                    selected = tab == MainTab.CATEGORIES,
+                    onClick = { selectTab(MainTab.CATEGORIES) },
+                    icon = { Icon(Icons.Default.Category, contentDescription = null) },
+                    label = { Text(stringResource(R.string.categories)) }
                 )
             }
         },
@@ -257,6 +278,13 @@ private fun MainShell(
                 MainTab.ACCOUNTS -> FloatingActionButton(onClick = onAddAccount) {
                     Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_account))
                 }
+
+                MainTab.CATEGORIES -> FloatingActionButton(
+                    onClick = onAddCategory,
+                    modifier = Modifier.testTag("categories_add")
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_category))
+                }
             }
         }
     ) { innerPadding ->
@@ -302,6 +330,7 @@ private fun PreviewMainScreen(
             onAddTransfer = {},
             onAddPlannedPayment = {},
             onAddAccount = {},
+            onAddCategory = {},
             initiallyExpanded = expanded
         ) {}
     }

@@ -307,6 +307,13 @@ private fun ImportExportGroup(
     )
 }
 
+private fun Theme.next(): Theme = when (this) {
+    Theme.LIGHT -> Theme.DARK
+    Theme.DARK -> Theme.AMOLED_DARK
+    Theme.AMOLED_DARK -> Theme.AUTO
+    Theme.AUTO -> Theme.LIGHT
+}
+
 @Composable
 private fun AppSettingsGroup(
     state: SettingsState,
@@ -323,7 +330,7 @@ private fun AppSettingsGroup(
                 icon = state.currentTheme.icon(),
                 title = state.currentTheme.label(),
                 supporting = stringResource(R.string.tap_to_switch_theme),
-                onClick = { onEvent(SettingsEvent.SwitchTheme) },
+                onClick = { onEvent(SettingsEvent.SetTheme(state.currentTheme.next())) },
             ),
             SettingsItem(
                 icon = Icons.Default.Language,

@@ -6,9 +6,8 @@ package com.ivy.navigation
  */
 sealed interface Screen {
     /**
-     * Marks whether a given screen keeps the activity's ViewModel store when it is shown.
-     * When the shown screen changes to a screen whose `isLegacy` is false, `NavigationRoot`
-     * clears the store before that screen composes.
+     * Marks whether a given screen is a legacy screen. `NavigationRoot` does not act on it:
+     * it never clears the activity's ViewModel store, which also holds `RootViewModel`.
      */
     val isLegacy: Boolean
         get() = false

@@ -38,14 +38,6 @@ class IvyFeatures @Inject constructor() : Features {
         defaultValue = true
     )
 
-    override val showCategorySearchBar = BoolFeature(
-        key = "search_categories",
-        group = FeatureGroup.Category,
-        name = "Search within categories",
-        description = "Display a search bar on the Categories screen",
-        defaultValue = true
-    )
-
     override val hideTotalBalance = BoolFeature(
         key = "hide_total_balance",
         group = FeatureGroup.Account,
@@ -84,7 +76,6 @@ class IvyFeatures @Inject constructor() : Features {
             compactAccountsMode,
             compactCategoriesMode,
             showTitleSuggestions,
-            showCategorySearchBar,
             hideTotalBalance,
             standardKeypadLayout,
             showAccountColorsInTransactions

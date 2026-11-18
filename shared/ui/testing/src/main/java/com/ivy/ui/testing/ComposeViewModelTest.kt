@@ -7,6 +7,7 @@ import app.cash.turbine.test
 import com.ivy.ui.ComposeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.Rule
@@ -30,13 +31,19 @@ fun <UiState, UiEvent> ComposeViewModel<UiState, UiEvent>.runTest(
     try {
         Dispatchers.setMain(Dispatchers.Unconfined)
         val viewModel = this
-        kotlinx.coroutines.test.runTest {
+        kotlinx.coroutines.test.runTest(UnconfinedTestDispatcher()) {
             moleculeFlow(mode = RecompositionMode.Immediate) {
                 viewModel.uiState()
             }.test {
                 events.onEach(viewModel::onEvent)
                 verify(expectMostRecentItem())
-                cancel()
+                // Use cancelAndIgnoreRemainingEvents() instead of cancel(): ViewModels can keep
+                // recomposing after we've sampled the state we care about (e.g. onStart() work
+                // that hops onto the real Dispatchers.IO and lands after expectMostRecentItem()
+                // returns). Plain cancel() still runs Turbine's ensureAllEventsConsumed() check,
+                // so any such late, uninteresting recomposition fails the test with a
+                // TurbineAssertionError even though verify() already got the state it wanted.
+                cancelAndIgnoreRemainingEvents()
             }
         }
     } finally {

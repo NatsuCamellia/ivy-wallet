@@ -37,6 +37,7 @@ import com.ivy.home.customerjourney.CustomerJourneyCardModel
 import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.data.BufferInfo
 import com.ivy.legacy.data.LegacyDueSection
+import com.ivy.legacy.data.model.MainTab
 import com.ivy.legacy.data.model.Month
 import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.datamodel.Account
@@ -150,7 +151,6 @@ fun HomeUi(
             history = uiState.history,
 
             customerJourneyCards = uiState.customerJourneyCards,
-            shouldShowAccountSpecificColorInTransactions = uiState.shouldShowAccountSpecificColorInTransactions,
 
             onPayOrGet = forward<Transaction>() then2 {
                 HomeEvent.PayOrGetPlanned(it)
@@ -189,6 +189,10 @@ fun HomeUi(
                     currency = baseCurrency,
                     buffer = uiState.buffer.amount.toDouble()
                 )
+            },
+            onCategoriesClick = {
+                setMoreMenuExpanded(false)
+                ivyContext.selectMainTab(MainTab.CATEGORIES)
             },
         )
     }
@@ -235,7 +239,6 @@ fun HomeLazyColumn(
     period: TimePeriod,
 
     baseData: AppBaseData,
-    shouldShowAccountSpecificColorInTransactions: Boolean,
 
     upcoming: LegacyDueSection,
     overdue: LegacyDueSection,
@@ -318,7 +321,7 @@ fun HomeLazyColumn(
                     timeFormatter = timeFormatter,
                 )
             ),
-            shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions,
+            shouldShowAccountSpecificColorInTransactions = false,
             onSkipTransaction = onSkipTransaction,
             onSkipAllTransactions = onSkipAllTransactions
         )
@@ -373,7 +376,6 @@ private fun emptyHomeState(): HomeState = HomeState(
     hideBalance = false,
     hideIncome = false,
     expanded = false,
-    shouldShowAccountSpecificColorInTransactions = false
 )
 
 @Suppress("MagicNumber")

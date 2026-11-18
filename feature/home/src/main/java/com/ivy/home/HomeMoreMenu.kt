@@ -39,7 +39,6 @@ import com.ivy.legacy.ui.sheet.ActionSheet
 import com.ivy.legacy.ui.sheet.BufferStatus
 import com.ivy.legacy.utils.openUrl
 import com.ivy.navigation.BudgetScreen
-import com.ivy.navigation.CategoriesScreen
 import com.ivy.navigation.LoansScreen
 import com.ivy.navigation.PlannedPaymentsScreen
 import com.ivy.navigation.ReportScreen
@@ -57,6 +56,7 @@ fun MoreMenu(
     onDismiss: () -> Unit,
     onSwitchTheme: () -> Unit,
     onBufferClick: () -> Unit,
+    onCategoriesClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val nav = navigation()
@@ -84,9 +84,7 @@ fun MoreMenu(
                 MenuEntry(Icons.Default.Settings, stringResource(R.string.settings)) {
                     nav.navigateTo(SettingsScreen)
                 },
-                MenuEntry(Icons.Default.Category, stringResource(R.string.categories)) {
-                    nav.navigateTo(CategoriesScreen)
-                },
+                MenuEntry(Icons.Default.Category, stringResource(R.string.categories), onCategoriesClick),
                 MenuEntry(theme.icon(), theme.label(), onSwitchTheme),
                 MenuEntry(Icons.Default.EventRepeat, stringResource(R.string.planned_payments_inline)) {
                     nav.navigateTo(PlannedPaymentsScreen)
@@ -203,7 +201,8 @@ private fun PreviewMoreMenu() {
             theme = Theme.LIGHT,
             onDismiss = {},
             onSwitchTheme = {},
-            onBufferClick = {}
+            onBufferClick = {},
+            onCategoriesClick = {}
         )
     }
 }

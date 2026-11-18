@@ -8,7 +8,7 @@
 set -u
 
 OUT="${1:-.superpowers/sdd/2026-11-07-m3-expressive/smoke}"
-PKG=com.ivy.wallet.debug
+PKG=net.natsucamellia.ivywallet.debug
 ACTIVITY=$PKG/com.ivy.wallet.RootActivity
 export ANDROID_AVD_HOME="${ANDROID_AVD_HOME:-$HOME/.config/.android/avd}"
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}}"
@@ -1084,16 +1084,18 @@ flow_reports() {
   return 0
 }
 
-# Home More -> Categories: the top bar has back, sort and reorder, the add button is a FAB; add a category through the
-# Create category sheet, it is listed and opens its transactions, back returns to the list; Sort by opens and closes;
-# the reorder sheet opens and Done closes it; back returns to the open More sheet. Needs the Groceries category.
+# Home More -> Categories selects the Categories tab: the top bar has sort and reorder (no back), the add button is a
+# FAB; add a category through the Create category sheet, it is listed and opens its transactions, back returns to the
+# list; Sort by opens and closes; the reorder sheet opens and Done closes it; back from the tab returns to Home.
+# Needs the Groceries category.
 flow_categories() {
   go_home || return 1
   tap_node desc exact "More" || return 1
   wait_for text exact "Quick access" || return 1
   tap_node text exact "Categories" || return 1
   wait_for desc exact "Add category" || return 1
-  has desc exact "Back" && has desc exact "Sort by" && has desc exact "Reorder" || { log "categories top bar buttons missing"; return 1; }
+  has desc exact "Sort by" && has desc exact "Reorder" || { log "categories top bar buttons missing"; return 1; }
+  has desc exact "Back" && { log "Categories is a tab and must not show a back button"; return 1; }
   has text exact "Groceries" || { log "seeded category missing"; return 1; }
   shot categories-1-list
   tap_node desc exact "Add category" || return 1
@@ -1131,7 +1133,7 @@ flow_categories() {
   tap_node text exact "Done" || return 1
   wait_gone text exact "Done" || { log "Done did not close the reorder sheet"; return 1; }
   back
-  wait_for text exact "Quick access" || { log "back from Categories should return to the open More sheet"; return 1; }
+  wait_for desc exact "More" || { log "back from the Categories tab should return to Home"; return 1; }
   crashed && return 1
   return 0
 }

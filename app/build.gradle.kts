@@ -14,7 +14,7 @@ android {
     compileSdk = libs.versions.compile.sdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.ivy.wallet"
+        applicationId = "net.natsucamellia.ivywallet"
         minSdk = libs.versions.min.sdk.get().toInt()
         targetSdk = libs.versions.target.sdk.get().toInt()
         versionName = libs.versions.version.name.get()
@@ -82,8 +82,6 @@ android {
             isDefault = false
 
             signingConfig = signingConfigs.getByName("debug")
-
-            applicationIdSuffix = ".debug"
         }
     }
 

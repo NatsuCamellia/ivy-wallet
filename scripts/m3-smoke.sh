@@ -3,12 +3,13 @@
 # Emulator smoke test for the M3 migration: boots the `m3` AVD if no device is attached, installs the
 # debug build, drives flows with `adb shell input` + `uiautomator dump` (nodes found by text or
 # content-desc), screenshots into the given directory, fails on FATAL EXCEPTION in logcat.
-# Env: SKIP_INSTALL=1 skips :app:installDebug, KEEP_EMULATOR=1 never kills the emulator.
+# Env: SKIP_INSTALL=1 skips :app:installDebug, KEEP_EMULATOR=1 never kills the emulator, PKG=net.natsucamellia.ivywallet
+# targets the demo build (installed by hand with SKIP_INSTALL=1).
 # To add a flow: write `flow_xxx()` (return non-zero on failure) and register it at the bottom.
 set -u
 
 OUT="${1:-.superpowers/sdd/2026-11-07-m3-expressive/smoke}"
-PKG=net.natsucamellia.ivywallet.debug
+PKG="${PKG:-net.natsucamellia.ivywallet.debug}"
 ACTIVITY=$PKG/com.ivy.wallet.RootActivity
 export ANDROID_AVD_HOME="${ANDROID_AVD_HOME:-$HOME/.config/.android/avd}"
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}}"

@@ -486,7 +486,7 @@
     <string name="privacy">隱私</string>
     <string name="about_and_support">關於與支援</string>
     <string name="profile_settings_desc">名稱、貨幣</string>
-    <string name="appearance_settings_desc">主題、顏色、語言</string>
+    <string name="appearance_settings_desc">主題、語言</string>
     <string name="search">搜尋</string>
     <string name="fiat_currencies">法定貨幣</string>
 </resources>

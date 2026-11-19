@@ -123,7 +123,7 @@
     <string name="privacy">Privacy</string>
     <string name="about_and_support">About &amp; Support</string>
     <string name="profile_settings_desc">Name, currency</string>
-    <string name="appearance_settings_desc">Theme, colors, language</string>
+    <string name="appearance_settings_desc">Theme, language</string>
     <string name="behavior_settings_desc">Start date, exchange rates</string>
     <string name="privacy_settings_desc">Lock app, notifications</string>
     <string name="import_export_settings_desc">Backup, import, export</string>

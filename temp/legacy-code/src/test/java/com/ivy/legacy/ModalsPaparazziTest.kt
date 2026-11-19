@@ -14,14 +14,12 @@ import com.ivy.legacy.ui.sheet.BufferModalUiTest
 import com.ivy.legacy.ui.sheet.ChoosePeriodModalFromToUiTest
 import com.ivy.legacy.ui.sheet.ChoosePeriodModalLastNUiTest
 import com.ivy.legacy.ui.sheet.ChoosePeriodModalMonthUiTest
-import com.ivy.legacy.ui.sheet.ChooseStartDateOfMonthModalUiTest
 import com.ivy.legacy.ui.sheet.DeleteConfirmationModalUiTest
 import com.ivy.legacy.ui.sheet.DeleteModalUiTest
 import com.ivy.legacy.ui.sheet.EditLoanModalUiTest
 import com.ivy.legacy.ui.sheet.EditLoanRecordModalUiTest
 import com.ivy.legacy.ui.sheet.LoanModalUiTest
 import com.ivy.legacy.ui.sheet.LoanRecordModalUiTest
-import com.ivy.legacy.ui.sheet.NameModalUiTest
 import com.ivy.legacy.ui.sheet.ProgressModalUiTest
 import com.ivy.legacy.ui.sheet.RecurringRuleModalMultipleTimesUiTest
 import com.ivy.legacy.ui.sheet.RecurringRuleModalOneTimeUiTest
@@ -46,13 +44,11 @@ enum class ModalUnderTest(val content: @Composable (isDark: Boolean) -> Unit) {
     ChoosePeriodMonth({ ChoosePeriodModalMonthUiTest(it) }),
     ChoosePeriodFromTo({ ChoosePeriodModalFromToUiTest(it) }),
     ChoosePeriodLastN({ ChoosePeriodModalLastNUiTest(it) }),
-    ChooseStartDateOfMonth({ ChooseStartDateOfMonthModalUiTest(it) }),
     Currency({ CurrencyModalUiTest(it) }),
     Delete({ DeleteModalUiTest(it) }),
     DeleteConfirmation({ DeleteConfirmationModalUiTest(it) }),
     Loan({ LoanModalUiTest(it) }),
     LoanRecord({ LoanRecordModalUiTest(it) }),
-    Name({ NameModalUiTest(it) }),
     Progress({ ProgressModalUiTest(it) }),
     RecurringRuleOneTime({ RecurringRuleModalOneTimeUiTest(it) }),
     RecurringRuleMultipleTimes({ RecurringRuleModalMultipleTimesUiTest(it) }),

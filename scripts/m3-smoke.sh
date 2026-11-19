@@ -885,7 +885,7 @@ flow_more_menu() {
   has text exact "Search transactions..." && has text exact "Settings" && has text exact "Loans" || { log "menu items missing"; return 1; }
   shot more-2-sheet
   tap_node text exact "Settings" || return 1
-  wait_for text exact "Set currency" || return 1
+  wait_for text exact "About & Support" || return 1
   back
   wait_for text exact "Quick access" || { log "back from Settings should return to the open More sheet"; return 1; }
   tap_node desc exact "Close" || return 1
@@ -1259,7 +1259,7 @@ flow_loans() {
   return 0
 }
 
-# Home More -> Settings -> Exchange rates: top bar with back, the search field and the Add rate FAB; add a manual SMK rate
+# Home More -> Settings -> Behavior -> Exchange rates: top bar with back, the search field and the Add rate FAB; add a manual SMK rate
 # through the Add rate sheet and the amount sheet, it is listed under Manual, searching for another code hides it and the
 # empty state shows, clearing the search brings it back, its delete button removes it, back returns to Settings.
 flow_exchange_rates() {
@@ -1267,15 +1267,9 @@ flow_exchange_rates() {
   tap_node desc exact "More" || return 1
   wait_for text exact "Quick access" || return 1
   tap_node text exact "Settings" || return 1
-  wait_for text exact "Set currency" || return 1
-  local w h i
-  w=$(screen_width); h=$(screen_height)
-  for i in 1 2 3 4 5 6; do
-    dump || return 1
-    has text exact "Exchange rates" && break
-    adb shell input swipe $((w / 2)) $((h * 70 / 100)) $((w / 2)) $((h * 30 / 100)) 300 </dev/null
-    sleep 1
-  done
+  wait_for text exact "About & Support" || return 1
+  tap_node text exact "Behavior" || return 1
+  wait_for text exact "Exchange rates" || { log "behavior page did not open"; return 1; }
   tap_node text exact "Exchange rates" || return 1
   wait_for desc exact "Add rate" || { log "exchange rates screen did not open"; return 1; }
   has desc exact "Back" && has text exact "Exchange rates" && has any sub "Search" || { log "exchange rates top bar or search missing"; return 1; }
@@ -1313,7 +1307,7 @@ flow_exchange_rates() {
   # the first back only hides the keyboard of the focused search field
   ! has desc exact "Add rate" || back
   wait_gone desc exact "Add rate" 5 || { log "back from Exchange rates should return to Settings"; return 1; }
-  wait_for text exact "Set currency" || { log "Settings missing after back"; return 1; }
+  wait_for text exact "About & Support" || { log "Settings missing after back"; return 1; }
   crashed && return 1
   return 0
 }
@@ -1391,18 +1385,20 @@ sys.exit(1)
 PY
 }
 
-# Home More -> Settings: the large top bar with back, the grouped rows; the Hide balance switch flips and Home shows
-# the hidden balance, the theme row cycles through its four values and back, Exchange rates opens and returns, the
-# currency sheet opens and closes, the last groups are reachable and Delete all user data asks before deleting.
+# Home More -> Settings: the category list (large top bar with back, one row per category), Privacy opens with its
+# switches, Hide balance flips and Home shows the hidden balance, the theme radio dialog cycles the theme through its
+# four values and back, Exchange rates opens from Behavior and returns, the currency dialog opens and closes, Danger zone
+# asks before deleting, back from a page returns to the list and back from the list to the More sheet.
 flow_settings() {
   go_home || return 1
   tap_node desc exact "More" || return 1
   wait_for text exact "Quick access" || return 1
   tap_node text exact "Settings" || return 1
-  wait_for text exact "Set currency" || { log "settings did not open"; return 1; }
-  has desc exact "Back" && has text exact "Settings" && has text exact "Import & Export" && has text exact "App Settings" || { log "settings top bar or groups missing"; return 1; }
-  shot settings-1-top
-  scroll_to text exact "Hide balance" || return 1
+  wait_for text exact "About & Support" || { log "settings did not open"; return 1; }
+  has desc exact "Back" && has text exact "Settings" && has text exact "Profile" && has text exact "Import & Export" && has text exact "Danger zone" || { log "settings top bar or categories missing"; return 1; }
+  shot settings-1-categories
+  tap_node text exact "Privacy" || return 1
+  wait_for text exact "Hide balance" || { log "privacy page did not open"; return 1; }
   [ "$(row_checked "Hide balance")" = false ] || { log "Hide balance should start off (seeded state)"; return 1; }
   tap_node text exact "Hide balance" || return 1
   sleep 1
@@ -1410,60 +1406,77 @@ flow_settings() {
   [ "$(row_checked "Hide balance")" = true ] || { log "the Hide balance row did not turn on"; return 1; }
   shot settings-2-switch-on
   back
-  wait_for text exact "Quick access" || { log "back from Settings should return to the open More sheet"; return 1; }
+  wait_for text exact "About & Support" || { log "back from a page should return to the category list"; return 1; }
+  back
+  wait_for text exact "Quick access" || { log "back from the list should return to the open More sheet"; return 1; }
   tap_node desc exact "Close" || return 1
   wait_for any sub "****" 10 || { log "Home does not show the hidden balance"; return 1; }
   tap_node desc exact "More" || return 1
   wait_for text exact "Quick access" || return 1
   tap_node text exact "Settings" || return 1
-  wait_for text exact "Set currency" || return 1
-  scroll_to text exact "Hide balance" || return 1
+  wait_for text exact "About & Support" || return 1
+  tap_node text exact "Privacy" || return 1
+  wait_for text exact "Hide balance" || return 1
   [ "$(row_checked "Hide balance")" = true ] || { log "Hide balance did not stay on"; return 1; }
   tap_node text exact "Hide balance" || return 1
   sleep 1
   dump || return 1
   [ "$(row_checked "Hide balance")" = false ] || { log "the Hide balance row did not turn off"; return 1; }
-  scroll_to text exact "Tap to toggle theme" || return 1
-  local mode first i
+  back
+  wait_for text exact "About & Support" || return 1
+  tap_node text exact "Appearance" || return 1
+  wait_for text exact "Theme" || { log "appearance page did not open"; return 1; }
+  local mode first opt
   first=$(theme_label) || { log "theme label not found"; return 1; }
-  mode=$first
-  for i in 1 2 3 4; do
-    tap_node text exact "Tap to toggle theme" || return 1
+  for opt in "Dark mode" "Light mode" "AMOLED Dark mode" "$first"; do
+    tap_node text exact "Theme" || return 1
+    wait_for text exact "Cancel" || { log "the theme dialog did not open"; return 1; }
+    [ "$opt" != "$first" ] || shot settings-3-theme-dialog
+    tap_node text exact "$opt" || return 1
+    wait_gone text exact "Cancel" 5 || { log "the theme dialog did not close after choosing $opt"; return 1; }
     sleep 1
     dump || return 1
-    mode=$(theme_label) || { log "theme label missing after tap $i"; return 1; }
-    [ "$i" = 4 ] || [ "$mode" != "$first" ] || { log "theme did not change on tap $i"; return 1; }
-    shot settings-3-theme-$i
+    mode=$(theme_label) || { log "theme label missing after choosing $opt"; return 1; }
+    [ "$mode" = "$opt" ] || { log "chose '$opt' but the theme row shows '$mode'"; return 1; }
   done
-  [ "$mode" = "$first" ] || { log "four taps should return to '$first', got '$mode'"; return 1; }
-  has text exact "Tap to toggle theme" || { log "settings lost after the theme cycle"; return 1; }
+  shot settings-3-theme-restored
+  back
+  wait_for text exact "About & Support" || return 1
+  tap_node text exact "Behavior" || return 1
+  wait_for text exact "Exchange rates" || { log "behavior page did not open"; return 1; }
   tap_node text exact "Exchange rates" || return 1
   wait_for desc exact "Add rate" || { log "exchange rates did not open from settings"; return 1; }
   back
   wait_gone desc exact "Add rate" 5 || { log "back from Exchange rates should return to Settings"; return 1; }
-  wait_for text exact "Exchange rates" || { log "Settings missing after back"; return 1; }
-  local w h
-  w=$(screen_width); h=$(screen_height)
-  for i in 1 2 3 4 5 6 7 8; do
-    dump || return 1
-    has text exact "Set currency" && break
-    adb shell input swipe $((w / 2)) $((h * 30 / 100)) $((w / 2)) $((h * 70 / 100)) 300 </dev/null
-    sleep 1
-  done
-  tap_node text exact "Set currency" || return 1
-  wait_for desc exact "Close" || { log "currency sheet did not open"; return 1; }
+  wait_for text exact "About & Support" || { log "Settings missing after back"; return 1; }
+  tap_node text exact "Profile" || return 1
+  wait_for text exact "Currency" || { log "profile page did not open"; return 1; }
+  has text exact "Anonymous" || has text exact "Name" || { log "profile rows missing"; return 1; }
+  tap_node text exact "Currency" || return 1
+  wait_for text exact "Cancel" || { log "currency dialog did not open"; return 1; }
+  has any sub "Search" || { log "currency dialog search field missing"; return 1; }
   shot settings-4-currency
   back
-  wait_gone desc exact "Close" 5 || { log "back did not close the currency sheet"; return 1; }
-  has text exact "Import & Export" || { log "settings missing after the currency sheet"; return 1; }
-  scroll_to text exact "Delete all user data" || return 1
-  has text exact "Danger zone" && has text exact "Product" || { log "last groups missing"; return 1; }
-  shot settings-5-end
+  wait_gone text exact "Cancel" 5 || { log "back did not close the currency dialog"; return 1; }
+  has text exact "Currency" || { log "profile page missing after the currency dialog"; return 1; }
+  back
+  wait_for text exact "About & Support" || return 1
+  tap_node text exact "About & Support" || return 1
+  wait_for text exact "Attributions" || { log "about page did not open"; return 1; }
+  has text exact "Version" && has text exact "GitHub" && has text exact "Terms & Conditions" && has text exact "Privacy Policy" || { log "about rows missing"; return 1; }
+  shot settings-5-about
+  back
+  wait_for text exact "About & Support" || return 1
+  tap_node text exact "Danger zone" || return 1
+  wait_for text exact "Delete all user data" || { log "danger zone page did not open"; return 1; }
   tap_node text exact "Delete all user data" || return 1
   wait_for text exact "Delete all user data?" || { log "the delete confirmation did not open"; return 1; }
+  shot settings-6-delete
   back
   wait_gone text exact "Delete all user data?" 5 || { log "back did not close the delete confirmation"; return 1; }
-  has text exact "Danger zone" || { log "settings missing after the confirmation"; return 1; }
+  has text exact "Delete all user data" || { log "danger zone missing after the confirmation"; return 1; }
+  back
+  wait_for text exact "About & Support" || return 1
   back
   wait_for text exact "Quick access" || { log "back from Settings should return to the open More sheet"; return 1; }
   crashed && return 1
@@ -1478,8 +1491,9 @@ flow_import_data() {
   tap_node desc exact "More" || return 1
   wait_for text exact "Quick access" || return 1
   tap_node text exact "Settings" || return 1
-  wait_for text exact "Set currency" || { log "settings did not open"; return 1; }
-  scroll_to text exact "Import data" || return 1
+  wait_for text exact "About & Support" || { log "settings did not open"; return 1; }
+  tap_node text exact "Import & Export" || return 1
+  wait_for text exact "Import data" || { log "import & export page did not open"; return 1; }
   tap_node text exact "Import data" || return 1
   wait_for text exact "Manual CSV import" || { log "import data did not open"; return 1; }
   has desc exact "Back" && has text exact "Import from" && has text exact "Money Manager" || { log "import sources missing"; return 1; }

@@ -161,18 +161,19 @@ private fun TrnRow(
     }
 }
 
-/** The category (or account) colour with its icon; without a colour a transfer or a neutral default badge. */
+/** The category (or account) colour with its icon, a transfer without one shows the transfer glyph. */
 @Composable
 private fun TrnBadge(item: HomeTrnListItem.Trn) {
     val color = item.ui.categoryColor
+    val isTransfer = item.trn.type == TransactionType.TRANSFER
     when {
         color != null -> IconBadge(
             color = color,
             iconName = item.iconAsset,
-            defaultIcon = R.drawable.ic_custom_category_m,
+            defaultIcon = if (isTransfer) R.drawable.ic_transfer else R.drawable.ic_custom_category_m,
         )
 
-        item.trn.type == TransactionType.TRANSFER -> IconBadge(
+        isTransfer -> IconBadge(
             color = MaterialTheme.colorScheme.primaryContainer,
             icon = Icons.Default.SwapHoriz,
         )

@@ -9,6 +9,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -20,7 +21,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import com.ivy.ui.R
 
-/** A collapsible section (upcoming, overdue) with the totals of its transactions under the title. */
+/**
+ * A collapsible section (upcoming, overdue) with the totals of its transactions under the title.
+ * Only the title and chevron toggle it, so a [trailing] action stays its own control.
+ */
 @Composable
 fun TransactionSectionHeader(
     title: String,
@@ -35,21 +39,23 @@ fun TransactionSectionHeader(
     val stateDescription = stringResource(if (expanded) R.string.section_expanded else R.string.section_collapsed)
     ListItem(
         headlineContent = {
-            Text(text = title, style = MaterialTheme.typography.titleMedium, color = titleColor)
-        },
-        modifier = modifier
-            .clickable(onClickLabel = clickLabel, role = Role.Button) { onExpandedChange(!expanded) }
-            .semantics { this.stateDescription = stateDescription },
-        supportingContent = subtitle?.let { { Text(it) } },
-        trailingContent = {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                trailing?.invoke()
+            Row(
+                modifier = Modifier
+                    .clickable(onClickLabel = clickLabel, role = Role.Button) { onExpandedChange(!expanded) }
+                    .semantics { this.stateDescription = stateDescription }
+                    .minimumInteractiveComponentSize(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(text = title, style = MaterialTheme.typography.titleMedium, color = titleColor)
                 Icon(
                     imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
                     contentDescription = null,
                 )
             }
         },
+        modifier = modifier,
+        supportingContent = subtitle?.let { { Text(it) } },
+        trailingContent = trailing,
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     )
 }

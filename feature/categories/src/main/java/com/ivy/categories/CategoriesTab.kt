@@ -253,6 +253,30 @@ private fun CategoryCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val incomeLabel = stringResource(R.string.month_income)
+    val expenseLabel = stringResource(R.string.month_expenses)
+    val incomeColor = TransactionType.INCOME.color()
+    val expenseColor = TransactionType.EXPENSE.color()
+    val footer = remember(categoryData, compactModeEnabled, incomeLabel, expenseLabel, incomeColor, expenseColor) {
+        if (compactModeEnabled) {
+            persistentListOf()
+        } else {
+            persistentListOf(
+                OverviewAmount(
+                    label = expenseLabel,
+                    amount = signedAmount(TransactionType.EXPENSE, categoryData.monthlyExpenses),
+                    color = expenseColor,
+                ),
+                OverviewAmount(
+                    label = incomeLabel,
+                    amount = categoryData.monthlyIncome,
+                    color = incomeColor,
+                    showPlusSign = true,
+                ),
+            )
+        }
+    }
+
     OverviewCard(
         name = categoryData.category.name.value,
         badge = { CategoryBadge(categoryData.category) },
@@ -261,23 +285,7 @@ private fun CategoryCard(
         onClick = onClick,
         modifier = modifier,
         showPlusSign = true,
-        footer = if (compactModeEnabled) {
-            persistentListOf()
-        } else {
-            persistentListOf(
-                OverviewAmount(
-                    label = stringResource(R.string.month_expenses),
-                    amount = signedAmount(TransactionType.EXPENSE, categoryData.monthlyExpenses),
-                    color = TransactionType.EXPENSE.color(),
-                ),
-                OverviewAmount(
-                    label = stringResource(R.string.month_income),
-                    amount = categoryData.monthlyIncome,
-                    color = TransactionType.INCOME.color(),
-                    showPlusSign = true,
-                ),
-            )
-        },
+        footer = footer,
     )
 }
 

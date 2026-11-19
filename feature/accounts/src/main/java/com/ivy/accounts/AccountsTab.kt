@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -228,6 +229,30 @@ private fun AccountCard(
     val currency = account.asset.code
     val baseBalance = accountData.balanceBaseCurrency
 
+    val incomeLabel = stringResource(R.string.month_income)
+    val expenseLabel = stringResource(R.string.month_expenses)
+    val incomeColor = TransactionType.INCOME.color()
+    val expenseColor = TransactionType.EXPENSE.color()
+    val footer = remember(accountData, compactModeEnabled, incomeLabel, expenseLabel, incomeColor, expenseColor) {
+        if (compactModeEnabled) {
+            persistentListOf()
+        } else {
+            persistentListOf(
+                OverviewAmount(
+                    label = incomeLabel,
+                    amount = accountData.monthlyIncome,
+                    color = incomeColor,
+                    showPlusSign = true,
+                ),
+                OverviewAmount(
+                    label = expenseLabel,
+                    amount = signedAmount(TransactionType.EXPENSE, accountData.monthlyExpenses),
+                    color = expenseColor,
+                ),
+            )
+        }
+    }
+
     OverviewCard(
         name = account.name.value,
         badge = { AccountBadge(account) },
@@ -253,23 +278,7 @@ private fun AccountCard(
         } else {
             null
         },
-        footer = if (compactModeEnabled) {
-            persistentListOf()
-        } else {
-            persistentListOf(
-                OverviewAmount(
-                    label = stringResource(R.string.month_income),
-                    amount = accountData.monthlyIncome,
-                    color = TransactionType.INCOME.color(),
-                    showPlusSign = true,
-                ),
-                OverviewAmount(
-                    label = stringResource(R.string.month_expenses),
-                    amount = signedAmount(TransactionType.EXPENSE, accountData.monthlyExpenses),
-                    color = TransactionType.EXPENSE.color(),
-                ),
-            )
-        },
+        footer = footer,
     )
 }
 

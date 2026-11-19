@@ -470,9 +470,13 @@ PY
 # screenshot taken between the tap and the drag is lower than in the pre-tap one; a dump is too slow
 # to observe this, the sheet is already gone by then) and (2) afterwards the sheet is back at
 # the exact settled pre-tap position (Close button top unchanged).
+# The hide lasts about 60 ms * ANIM_SCALE (measured: scale 20 -> 1.2 s, 100 -> 6 s). The swipe starts about
+# 0.6 s after the tap (the screencap alone takes 0.3-0.5 s on a loaded host) and must touch the sheet, which
+# sinks below the swipe's start (90% of the screen) near the end of the hide, so scale 20 was a coin flip on a
+# slow host; 50 leaves a 3 s hide.
 flow_cancelled_hide() {
   open_account_edit_sheet || return 1
-  adb shell settings put global animator_duration_scale "${ANIM_SCALE:-20}"
+  adb shell settings put global animator_duration_scale "${ANIM_SCALE:-50}"
   local w h attempt cancelled="" by1 pos after top0 top1 pulled
   w=$(screen_width); h=$(screen_height)
   for attempt in 1 2 3 4 5 6; do

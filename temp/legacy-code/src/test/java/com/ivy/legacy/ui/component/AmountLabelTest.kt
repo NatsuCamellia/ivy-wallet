@@ -53,4 +53,13 @@ class AmountLabelTest {
         assertEquals("${UnicodeMinus}12,50 NOK", amountLabel(-12.5, "NOK"))
         assertEquals("+12,50 NOK", amountLabel(12.5, "NOK", showPlusSign = true))
     }
+
+    @Test
+    fun shortenBigNumbersShortensFromOneHundredThousand() {
+        assertEquals("120k USD", amountLabel(120_000.0, "USD", shortenBigNumbers = true))
+        assertEquals("+1.50m USD", amountLabel(1_500_000.0, "USD", showPlusSign = true, shortenBigNumbers = true))
+        assertEquals("-2m USD", amountLabel(-2_000_000.0, "USD", shortenBigNumbers = true))
+        assertEquals("99,999.00 USD", amountLabel(99_999.0, "USD", shortenBigNumbers = true))
+        assertEquals("120,000.00 USD", amountLabel(120_000.0, "USD"))
+    }
 }

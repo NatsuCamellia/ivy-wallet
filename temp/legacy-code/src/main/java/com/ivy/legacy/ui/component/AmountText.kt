@@ -17,11 +17,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.ivy.base.model.TransactionType
 import com.ivy.legacy.utils.format
+import com.ivy.legacy.utils.shortenAmount
+import com.ivy.legacy.utils.shouldShortAmount
 import kotlin.math.abs
 
-/** The amount and its currency code. A zero amount is never signed, even as -0.0 or a rounded-down negative. */
-fun amountLabel(amount: Double, currency: String, showPlusSign: Boolean = false): String {
-    val formatted = amount.format(currency)
+/**
+ * The amount and its currency code. A zero amount is never signed, even as -0.0 or a rounded-down negative.
+ * With [shortenBigNumbers] an amount from 100k up reads as 1.5m or 120k.
+ */
+fun amountLabel(
+    amount: Double,
+    currency: String,
+    showPlusSign: Boolean = false,
+    shortenBigNumbers: Boolean = false,
+): String {
+    val formatted = when {
+        shortenBigNumbers && shouldShortAmount(amount) -> shortenAmount(amount)
+        else -> amount.format(currency)
+    }
     val isZero = formatted.none { (it.digitToIntOrNull() ?: 0) > 0 }
     val sign = if (showPlusSign && amount > 0 && !isZero) "+" else ""
     val digits = if (isZero) formatted.dropWhile { it.digitToIntOrNull() == null } else formatted
@@ -37,9 +50,10 @@ fun AmountText(
     style: TextStyle = LocalTextStyle.current,
     showPlusSign: Boolean = false,
     textAlign: TextAlign = TextAlign.End,
+    shortenBigNumbers: Boolean = false,
 ) {
     Text(
-        text = amountLabel(amount, currency, showPlusSign),
+        text = amountLabel(amount, currency, showPlusSign, shortenBigNumbers),
         modifier = modifier.testTag("amount_text"),
         style = style,
         textAlign = textAlign,

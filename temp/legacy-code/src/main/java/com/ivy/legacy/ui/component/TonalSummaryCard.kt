@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /** A total on a tonal container: a labelled icon above the amount. Clickable only when [onClick] is given. */
@@ -54,6 +55,8 @@ fun TonalSummaryCard(
                 currency = currency,
                 style = MaterialTheme.typography.titleMediumEmphasized,
                 showPlusSign = showPlusSign,
+                textAlign = TextAlign.Start,
+                shortenBigNumbers = true,
             )
         }
     }

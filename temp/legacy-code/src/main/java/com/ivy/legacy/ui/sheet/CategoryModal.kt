@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -205,6 +206,7 @@ fun IconNameRow(
             iconName = icon,
             defaultIcon = defaultIcon,
             modifier = Modifier
+                .minimumInteractiveComponentSize()
                 .clip(CircleShape)
                 .clickable(role = Role.Button) { showChooseIconModal() }
                 .semantics { contentDescription = chooseIconLabel }

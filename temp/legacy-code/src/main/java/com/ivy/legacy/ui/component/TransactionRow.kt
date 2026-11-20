@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.LegacyTag
@@ -92,13 +93,13 @@ fun TransactionRow(
                 if (title != null && description != null) {
                     Text(text = description, maxLines = 3, overflow = TextOverflow.Ellipsis)
                 }
-                if (time != null) Text(time)
                 NavigationChips(
                     category = category,
                     account = account,
                     toAccount = toAccount,
                     isTransfer = transaction.type == TransactionType.TRANSFER,
                     showAccountColor = shouldShowAccountSpecificColorInTransactions,
+                    time = time,
                 )
                 Tags(transaction.tags)
                 if (transaction.dueDate != null && transaction.dateTime == null) {
@@ -185,7 +186,10 @@ private fun DueOverline(dueDate: Instant, due: DueState?) {
     }
 }
 
-/** Chips that open the category's and the account's transactions; a transfer shows both accounts. */
+/**
+ * Chips that open the category's and the account's transactions; a transfer shows both accounts.
+ * The optional [time] ends the last line, after the chips, so it never sits alone above them.
+ */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NavigationChips(
@@ -195,6 +199,7 @@ fun NavigationChips(
     isTransfer: Boolean,
     showAccountColor: Boolean,
     modifier: Modifier = Modifier,
+    time: String? = null,
 ) {
     val nav = navigation()
     FlowRow(
@@ -223,6 +228,15 @@ fun NavigationChips(
                 )
                 AccountChip(toAccount, showAccountColor, nav)
             }
+        }
+        if (time != null) {
+            Text(
+                text = time,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.End,
+                maxLines = 1,
+                softWrap = false,
+            )
         }
     }
 }

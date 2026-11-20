@@ -21,6 +21,14 @@ import com.ivy.ui.color.findContrastTextColor
 
 private const val IconInsetDivisor = 12
 
+/**
+ * The `ic_vue_*` drawables fill 90% of their viewport (line art, stroke included); the `ic_custom_*` and
+ * Ivy drawables fill about 50%, with their padding built in. Insetting a vue icon by this share of the
+ * badge on every side draws its art as large as the others.
+ */
+private const val VueIconInsetRatio = 0.27f
+private const val VueIconPrefix = "ic_vue_"
+
 @DrawableRes
 @Composable
 fun customIconResource(iconName: String?, @DrawableRes defaultIcon: Int, size: String): Int {
@@ -34,7 +42,7 @@ private fun customIconId(context: Context, iconName: String?, size: String): Int
     val name = iconName?.replace(" ", "")?.trim()?.toLowerCaseLocal() ?: return null
     fun drawable(resName: String) =
         context.resources.getIdentifier(resName, "drawable", context.packageName).takeIf { it != 0 }
-    return drawable("ic_custom_${name}_$size") ?: drawable(name)
+    return if (name.startsWith(VueIconPrefix)) drawable(name) else drawable("ic_custom_${name}_$size") ?: drawable(name)
 }
 
 /** The only place a user-picked colour and `ic_custom_*` icon are shown: a coloured circle with the icon on it. */
@@ -44,10 +52,11 @@ fun IconBadge(
     iconName: String?,
     @DrawableRes defaultIcon: Int,
     modifier: Modifier = Modifier,
-    size: Dp = 48.dp,
+    size: Dp = 40.dp,
 ) {
     val iconRes = customIconResource(iconName, defaultIcon, "m")
-    BadgeSurface(color, size, modifier) {
+    val isVue = iconName?.startsWith(VueIconPrefix) == true
+    BadgeSurface(color, size, if (isVue) size * VueIconInsetRatio else size / IconInsetDivisor, modifier) {
         Icon(painter = painterResource(iconRes), contentDescription = null, modifier = it)
     }
 }
@@ -58,9 +67,9 @@ fun IconBadge(
     color: Color,
     icon: ImageVector,
     modifier: Modifier = Modifier,
-    size: Dp = 48.dp,
+    size: Dp = 40.dp,
 ) {
-    BadgeSurface(color, size, modifier) {
+    BadgeSurface(color, size, size / IconInsetDivisor, modifier) {
         Icon(imageVector = icon, contentDescription = null, modifier = it)
     }
 }
@@ -69,6 +78,7 @@ fun IconBadge(
 private fun BadgeSurface(
     color: Color,
     size: Dp,
+    inset: Dp,
     modifier: Modifier = Modifier,
     icon: @Composable (Modifier) -> Unit,
 ) {
@@ -78,6 +88,6 @@ private fun BadgeSurface(
         color = color,
         contentColor = findContrastTextColor(color),
     ) {
-        icon(Modifier.padding(size / IconInsetDivisor))
+        icon(Modifier.padding(inset))
     }
 }

@@ -2,6 +2,8 @@ package com.ivy.legacy.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -48,6 +50,23 @@ class TransactionRowPaparazziTest(
     @Test
     fun snapshotBadgeDarkUserColor() {
         snapshot(theme) { Badges(theme, Color(0xFF000000)) }
+    }
+
+    @Test
+    fun snapshotBadgeIconFamilies() {
+        snapshot(theme) { IconFamilies(theme) }
+    }
+
+    @Test
+    fun snapshotRowChipsWrap() {
+        snapshot(theme) {
+            Rows(
+                theme,
+                expense(categoryId = LongCategory.id.value, tags = true),
+                income(title = "Salary March"),
+                baseData = LongBaseData,
+            )
+        }
     }
 
     @Test
@@ -140,14 +159,42 @@ private fun Badges(theme: PaparazziTheme, color: Color) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun Rows(theme: PaparazziTheme, vararg transactions: Transaction, showAccountColors: Boolean = false) {
+private fun IconFamilies(theme: PaparazziTheme) {
+    WalletPreview(theme.toTheme()) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            listOf(IvyIcons, VueBuildingIcons, VueOtherIcons).forEach { icons ->
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    icons.forEach {
+                        IconBadge(
+                            color = Color(0xFF6B4DFF),
+                            iconName = it,
+                            defaultIcon = R.drawable.ic_custom_category_m,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Rows(
+    theme: PaparazziTheme,
+    vararg transactions: Transaction,
+    showAccountColors: Boolean = false,
+    baseData: AppBaseData = BaseData,
+) {
     WalletPreview(theme.toTheme()) {
         NavigationRoot(navigation = Navigation()) {
             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                 transactions.forEachIndexed { index, transaction ->
                     TransactionRow(
-                        baseData = BaseData,
+                        baseData = baseData,
                         transaction = transaction,
                         shouldShowAccountSpecificColorInTransactions = showAccountColors,
                         onPayOrGet = {},
@@ -206,6 +253,37 @@ private val BaseData = AppBaseData(
     baseCurrency = "USD",
     categories = persistentListOf(Food, Work),
     accounts = persistentListOf(Cash, Bank, Euro),
+)
+
+private val LongCategory = Category(
+    name = NotBlankTrimmedString.unsafe("Home improvement and gardening"),
+    color = ColorInt(0xFF4CAF50.toInt()),
+    icon = IconAsset.unsafe("house"),
+    id = CategoryId(UUID.fromString("00000000-0000-0000-0000-0000000000c3")),
+    orderNum = 2.0,
+)
+private val LongBaseData = AppBaseData(
+    baseCurrency = "USD",
+    categories = persistentListOf(Food, Work, LongCategory),
+    accounts = persistentListOf(Cash.copy(name = "Savings at the credit union"), Bank, Euro),
+)
+
+private val IvyIcons = listOf("bank", "house", "education", "doctor", "farmacy", "cash")
+private val VueBuildingIcons = listOf(
+    "ic_vue_building_bank",
+    "ic_vue_building_house",
+    "ic_vue_building_building",
+    "ic_vue_building_buildings",
+    "ic_vue_building_courthouse",
+    "ic_vue_building_hospital",
+)
+private val VueOtherIcons = listOf(
+    "ic_vue_main_cake",
+    "ic_vue_main_coffee",
+    "ic_vue_main_clock",
+    "ic_vue_main_crown",
+    "ic_vue_main_cup",
+    "ic_vue_main_calendar",
 )
 
 private var nextId = 0L

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Button
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.ListItemShapes
@@ -49,11 +50,11 @@ fun TransactionItem(
                 Text(text = dueText, color = ui.amountKind.amountColor())
             }
         },
-        supportingContent = if (ui.supportingText != null || hasButtons) {
+        supportingContent = if (ui.supportingText != null || ui.time != null || hasButtons) {
             {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (ui.supportingText != null) {
-                        Text(text = ui.supportingText, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    if (ui.supportingText != null || ui.time != null) {
+                        SupportingLine(supportingText = ui.supportingText, time = ui.time)
                     }
                     if (hasButtons) {
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -72,6 +73,24 @@ fun TransactionItem(
         },
     ) {
         Headline(ui)
+    }
+}
+
+/** One line: the text takes the width left over and ellipsizes, the time keeps its own width. */
+@Composable
+private fun SupportingLine(supportingText: String?, time: String?) {
+    Row {
+        if (supportingText != null) {
+            Text(
+                text = supportingText,
+                modifier = Modifier.weight(1f, fill = false),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        if (time != null) {
+            Text(text = if (supportingText != null) " · $time" else time, maxLines = 1, softWrap = false)
+        }
     }
 }
 

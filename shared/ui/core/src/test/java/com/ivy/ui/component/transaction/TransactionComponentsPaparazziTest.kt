@@ -47,7 +47,8 @@ class TransactionComponentsPaparazziTest(
                         ui = expense.copy(
                             id = "2",
                             title = "Salary — July",
-                            supportingText = "Salary · DSK Bank · 09:30",
+                            supportingText = "Salary · DSK Bank",
+                            time = "09:30",
                             categoryColor = Color(0xFF14CC9E),
                             amountText = "+8,049.70 USD",
                             amountKind = TransactionAmountKind.Income,
@@ -60,7 +61,8 @@ class TransactionComponentsPaparazziTest(
                         ui = expense.copy(
                             id = "3",
                             title = "Top-up Revolut",
-                            supportingText = "Cash → Revolut · 18:20",
+                            supportingText = "Cash → Revolut",
+                            time = "18:20",
                             categoryColor = null,
                             amountText = "40.00 USD",
                             amountKind = TransactionAmountKind.Transfer,
@@ -75,6 +77,7 @@ class TransactionComponentsPaparazziTest(
                             id = "4",
                             title = "Rent",
                             supportingText = null,
+                            time = null,
                             amountText = "-500.00 USD",
                             amountKind = TransactionAmountKind.Upcoming,
                             secondaryText = null,
@@ -92,6 +95,7 @@ class TransactionComponentsPaparazziTest(
                             id = "5",
                             title = "Spotify",
                             supportingText = null,
+                            time = null,
                             amountText = "-5.99 USD",
                             amountKind = TransactionAmountKind.Overdue,
                             secondaryText = null,
@@ -103,6 +107,40 @@ class TransactionComponentsPaparazziTest(
                         onPayOrGet = {},
                         payOrGetText = "Pay",
                         icon = { CategoryIcon() },
+                    )
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `snapshot transaction items with long text`() {
+        snapshot(theme) {
+            Surface(color = MaterialTheme.colorScheme.surface) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
+                ) {
+                    TransactionItem(
+                        ui = expense.copy(
+                            supportingText = "Groceries and household supplies · Joint savings account at the bank",
+                        ),
+                        position = TransactionItemPosition.First,
+                        onClick = {},
+                        icon = { CategoryIcon() },
+                    )
+                    TransactionItem(
+                        ui = expense.copy(
+                            id = "2",
+                            supportingText = "Checking account of the long named company · Savings account at the bank",
+                            categoryColor = null,
+                            amountText = "40,000.00 USD",
+                            amountKind = TransactionAmountKind.Transfer,
+                            secondaryText = "36,500.00 EUR",
+                        ),
+                        position = TransactionItemPosition.Last,
+                        onClick = {},
+                        icon = { TransferIcon() },
                     )
                 }
             }
@@ -157,7 +195,8 @@ class TransactionComponentsPaparazziTest(
         private val expense = TransactionItemUi(
             id = "1",
             title = "Expense",
-            supportingText = "Groceries · Cash · 14:05",
+            supportingText = "Groceries · Cash",
+            time = "14:05",
             categoryColor = Color(0xFFFF9235),
             amountText = "-32.51 USD",
             amountKind = TransactionAmountKind.Expense,

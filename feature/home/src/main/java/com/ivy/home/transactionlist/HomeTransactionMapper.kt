@@ -118,12 +118,15 @@ class HomeTransactionMapper(
                 TransactionType.TRANSFER -> transferFallback
             }
         }
-        val time = if (dueKind == null) trn.dateTime?.let(::formatTransactionTime) else null
         val supporting = if (isTransfer) {
-            listOfNotNull("$accountName → ${toAccount?.name ?: deletedText}", time)
+            "$accountName → ${toAccount?.name ?: deletedText}"
         } else {
-            listOfNotNull(category?.name?.value?.takeIf { !titledByCategory }, accountName, time)
-        }.joinToString(" · ").ifBlank { null }
+            listOfNotNull(
+                category?.name?.value?.takeIf { !titledByCategory },
+                accountName,
+            ).joinToString(" · ").ifBlank { null }
+        }
+        val time = if (dueKind == null) trn.dateTime?.let(::formatTransactionTime) else null
 
         val amountKind = dueKind ?: when (trn.type) {
             TransactionType.INCOME -> TransactionAmountKind.Income
@@ -154,6 +157,7 @@ class HomeTransactionMapper(
                 id = trn.id.toString(),
                 title = title,
                 supportingText = supporting,
+                time = time,
                 categoryColor = categoryColor(category?.color?.value, account, isTransfer),
                 amountText = amountText,
                 amountKind = amountKind,

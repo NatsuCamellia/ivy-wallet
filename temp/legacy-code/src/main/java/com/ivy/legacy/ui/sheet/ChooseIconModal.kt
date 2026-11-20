@@ -4,13 +4,13 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledIconToggleButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,16 +25,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
 import com.ivy.legacy.ui.WalletPreview
-import com.ivy.legacy.ui.component.customIconResource
+import com.ivy.legacy.ui.component.CustomIcon
 import com.ivy.ui.R
 import com.ivy.ui.color.Ivy
 import com.ivy.ui.color.findContrastTextColor
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.toImmutableList
 import java.util.UUID
 
 private const val IconsPerRow = 5
@@ -86,14 +87,15 @@ fun ChooseIconModal(
 }
 
 @Composable
-private fun IconGrid(
+internal fun IconGrid(
     selectedIcon: String?,
     color: Color,
     onIconSelect: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    icons: ImmutableList<Any> = remember { ivyIcons().toImmutableList() },
 ) {
-    val icons = remember { ivyIcons() }
-
     LazyVerticalGrid(
+        modifier = modifier,
         columns = GridCells.Fixed(IconsPerRow),
         contentPadding = PaddingValues(horizontal = 16.dp),
     ) {
@@ -121,10 +123,11 @@ private fun IconGrid(
                             checkedContentColor = findContrastTextColor(color),
                         ),
                     ) {
-                        Icon(
-                            painter = painterResource(
-                                customIconResource(entry, R.drawable.ic_custom_category_s, "s")
-                            ),
+                        CustomIcon(
+                            iconName = entry,
+                            defaultIcon = R.drawable.ic_custom_category_s,
+                            size = "s",
+                            modifier = Modifier.size(IconButtonDefaults.extraLargeIconSize),
                             contentDescription = entry.removePrefix("ic_vue_").replace('_', ' '),
                         )
                     }

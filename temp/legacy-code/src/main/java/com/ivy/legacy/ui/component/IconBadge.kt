@@ -2,6 +2,8 @@ package com.ivy.legacy.ui.component
 
 import android.content.Context
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -9,6 +11,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -23,10 +26,10 @@ private const val IconInsetDivisor = 12
 
 /**
  * The `ic_vue_*` drawables fill 90% of their viewport (line art, stroke included); the `ic_custom_*` and
- * Ivy drawables fill about 50%, with their padding built in. Insetting a vue icon by this share of the
- * badge on every side draws its art as large as the others.
+ * Ivy drawables fill about 50%, with their padding built in. Drawing a vue icon at this share of the
+ * box an Ivy icon fills makes its art as large as the others.
  */
-private const val VueIconInsetRatio = 0.27f
+private const val VueIconScale = 0.55f
 private const val VueIconPrefix = "ic_vue_"
 
 @DrawableRes
@@ -45,6 +48,25 @@ private fun customIconId(context: Context, iconName: String?, size: String): Int
     return if (name.startsWith(VueIconPrefix)) drawable(name) else drawable("ic_custom_${name}_$size") ?: drawable(name)
 }
 
+/** An `ic_custom_*` or `ic_vue_*` icon that fills its box evenly whichever family it is from. */
+@Composable
+fun CustomIcon(
+    iconName: String?,
+    @DrawableRes defaultIcon: Int,
+    size: String,
+    modifier: Modifier = Modifier,
+    contentDescription: String? = null,
+) {
+    val scale = if (iconName?.startsWith(VueIconPrefix) == true) VueIconScale else 1f
+    Box(modifier, contentAlignment = Alignment.Center) {
+        Icon(
+            painter = painterResource(customIconResource(iconName, defaultIcon, size)),
+            contentDescription = contentDescription,
+            modifier = Modifier.fillMaxSize(scale),
+        )
+    }
+}
+
 /** The only place a user-picked colour and `ic_custom_*` icon are shown: a coloured circle with the icon on it. */
 @Composable
 fun IconBadge(
@@ -54,10 +76,8 @@ fun IconBadge(
     modifier: Modifier = Modifier,
     size: Dp = 40.dp,
 ) {
-    val iconRes = customIconResource(iconName, defaultIcon, "m")
-    val isVue = iconName?.startsWith(VueIconPrefix) == true
-    BadgeSurface(color, size, if (isVue) size * VueIconInsetRatio else size / IconInsetDivisor, modifier) {
-        Icon(painter = painterResource(iconRes), contentDescription = null, modifier = it)
+    BadgeSurface(color, size, modifier) {
+        CustomIcon(iconName, defaultIcon, "m", it)
     }
 }
 
@@ -69,7 +89,7 @@ fun IconBadge(
     modifier: Modifier = Modifier,
     size: Dp = 40.dp,
 ) {
-    BadgeSurface(color, size, size / IconInsetDivisor, modifier) {
+    BadgeSurface(color, size, modifier) {
         Icon(imageVector = icon, contentDescription = null, modifier = it)
     }
 }
@@ -78,7 +98,6 @@ fun IconBadge(
 private fun BadgeSurface(
     color: Color,
     size: Dp,
-    inset: Dp,
     modifier: Modifier = Modifier,
     icon: @Composable (Modifier) -> Unit,
 ) {
@@ -88,6 +107,6 @@ private fun BadgeSurface(
         color = color,
         contentColor = findContrastTextColor(color),
     ) {
-        icon(Modifier.padding(inset))
+        icon(Modifier.padding(size / IconInsetDivisor))
     }
 }

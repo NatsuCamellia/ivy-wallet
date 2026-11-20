@@ -47,7 +47,7 @@ class TransactionComponentsPaparazziTest(
                         ui = expense.copy(
                             id = "2",
                             title = "Salary — July",
-                            supportingText = "Salary · DSK Bank",
+                            supportingText = "Salary · DSK Bank · 09:30",
                             categoryColor = Color(0xFF14CC9E),
                             amountText = "+8,049.70 USD",
                             amountKind = TransactionAmountKind.Income,
@@ -60,7 +60,7 @@ class TransactionComponentsPaparazziTest(
                         ui = expense.copy(
                             id = "3",
                             title = "Top-up Revolut",
-                            supportingText = "Cash → Revolut",
+                            supportingText = "Cash → Revolut · 18:20",
                             categoryColor = null,
                             amountText = "40.00 USD",
                             amountKind = TransactionAmountKind.Transfer,
@@ -157,11 +157,11 @@ class TransactionComponentsPaparazziTest(
         private val expense = TransactionItemUi(
             id = "1",
             title = "Expense",
-            supportingText = "Groceries · Cash",
+            supportingText = "Groceries · Cash · 14:05",
             categoryColor = Color(0xFFFF9235),
             amountText = "-32.51 USD",
             amountKind = TransactionAmountKind.Expense,
-            secondaryText = "14:05",
+            secondaryText = null,
             dueText = null,
         )
     }

@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,6 +47,7 @@ internal fun HomeTopBar(
     name: String,
     period: TimePeriod,
     onShowPeriodModal: () -> Unit,
+    onSearch: () -> Unit,
     onOpenMoreMenu: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior,
     modifier: Modifier = Modifier,
@@ -65,6 +67,9 @@ internal fun HomeTopBar(
         },
         modifier = modifier,
         actions = {
+            IconButton(onClick = onSearch, modifier = Modifier.testTag("home_search_button")) {
+                Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_transactions))
+            }
             PeriodButton(period = period, onClick = onShowPeriodModal)
             IconButton(
                 onClick = onOpenMoreMenu,

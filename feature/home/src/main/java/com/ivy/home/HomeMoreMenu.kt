@@ -10,7 +10,6 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.EventRepeat
 import androidx.compose.material.icons.filled.PieChart
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
@@ -43,7 +42,6 @@ import com.ivy.navigation.BudgetScreen
 import com.ivy.navigation.LoansScreen
 import com.ivy.navigation.PlannedPaymentsScreen
 import com.ivy.navigation.ReportScreen
-import com.ivy.navigation.SearchScreen
 import com.ivy.navigation.Navigation
 import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.SettingsScreen
@@ -101,14 +99,6 @@ private fun MoreMenuContent(
             .testTag("home_more_menu_content"),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        MenuGroup {
-            MenuItem(
-                icon = Icons.Default.Search,
-                label = stringResource(R.string.search_transactions),
-                onClick = { nav.navigateTo(SearchScreen) }
-            )
-        }
-
         val quickAccess = listOf(
             MenuEntry(Icons.Default.Settings, stringResource(R.string.settings)) {
                 nav.navigateTo(SettingsScreen)

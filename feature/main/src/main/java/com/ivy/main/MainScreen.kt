@@ -293,14 +293,6 @@ private fun MainShell(
                     FloatingActionButtonMenuItem(
                         onClick = {
                             expanded = false
-                            onAddPlannedPayment()
-                        },
-                        text = { Text(stringResource(R.string.add_planned_payment)) },
-                        icon = { Icon(Icons.Default.EventRepeat, contentDescription = null) }
-                    )
-                    FloatingActionButtonMenuItem(
-                        onClick = {
-                            expanded = false
                             onAddTransfer()
                         },
                         text = { Text(stringResource(R.string.transfer)) },
@@ -321,6 +313,14 @@ private fun MainShell(
                         },
                         text = { Text(stringResource(R.string.add_income)) },
                         icon = { Icon(Icons.Default.ArrowDownward, contentDescription = null) }
+                    )
+                    FloatingActionButtonMenuItem(
+                        onClick = {
+                            expanded = false
+                            onAddPlannedPayment()
+                        },
+                        text = { Text(stringResource(R.string.add_planned_payment)) },
+                        icon = { Icon(Icons.Default.EventRepeat, contentDescription = null) }
                     )
                 }
             }

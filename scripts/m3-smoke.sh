@@ -750,6 +750,9 @@ flow_fab_menu() {
   open_fab_menu || return 1
   has text exact "Add income" && has text exact "Transfer" && has text exact "Add planned payment" || { log "menu items missing"; return 1; }
   has desc exact "Close" || { log "FAB should read Close while expanded"; return 1; }
+  local ys
+  ys=$(for t in "Transfer" "Add expense" "Add income" "Add planned payment"; do find_node text exact "$t" | cut -d' ' -f2; done | tr '\n' ' ')
+  [ "$(echo $ys | tr ' ' '\n' | sort -n | tr '\n' ' ')" = "$ys" ] || { log "menu order wrong (y: $ys), expected Transfer, Add expense, Add income, Add planned payment top to bottom"; return 1; }
   shot fab-2-expanded
   back
   wait_gone text exact "Add expense" || { log "back did not collapse the menu"; return 1; }
@@ -883,11 +886,12 @@ flow_amount_sheet_close() {
 # the Savings goal row opens the Buffer sheet on top and back closes only that one.
 flow_more_menu() {
   go_home || return 1
-  has desc exact "More" || { log "more button missing on Home"; return 1; }
+  has desc exact "More" && has desc exact "Search transactions..." || { log "more or search button missing on Home"; return 1; }
   shot more-1-home
   tap_node desc exact "More" || return 1
   wait_for text exact "Quick access" || return 1
-  has text exact "Search transactions..." && has text exact "Settings" && has text exact "Loans" || { log "menu items missing"; return 1; }
+  has text exact "Settings" && has text exact "Loans" || { log "menu items missing"; return 1; }
+  has text exact "Search transactions..." && { log "Search moved to the Home top bar, the More sheet must not list it"; return 1; }
   shot more-2-sheet
   tap_node text exact "Settings" || return 1
   wait_for text exact "About & Support" || return 1
@@ -964,13 +968,11 @@ flow_account_detail() {
   return 0
 }
 
-# Home More -> Search transactions: type the title of the seeded expense (flow_add_expense), its row is listed under the
+# Home top bar -> Search transactions: type the title of the seeded expense (flow_add_expense), its row is listed under the
 # search field, Clear search empties the field, back leaves the screen. Needs flow_add_expense to have run.
 flow_search() {
   go_home || return 1
-  tap_node desc exact "More" || return 1
-  wait_for text exact "Quick access" || return 1
-  tap_node text exact "Search transactions..." || return 1
+  tap_node desc exact "Search transactions..." || return 1
   wait_for class exact android.widget.EditText || return 1
   adb shell input text smokecoffee
   wait_for desc exact "Clear search" || { log "clear button missing after typing"; return 1; }

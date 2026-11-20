@@ -57,6 +57,7 @@ import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
 import com.ivy.navigation.EditTransactionScreen
 import com.ivy.navigation.Navigation
 import com.ivy.navigation.NavigationRoot
+import com.ivy.navigation.SearchScreen
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
@@ -107,6 +108,7 @@ fun HomeUi(
         ivyContext.setMoreMenuExpanded(expanded)
     }
 
+    val nav = navigation()
     val baseCurrency = uiState.baseData.baseCurrency
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val listState = rememberScrollPositionListState(
@@ -128,6 +130,7 @@ fun HomeUi(
                 onShowPeriodModal = {
                     choosePeriodModal = ChoosePeriodModalData(period = uiState.period)
                 },
+                onSearch = { nav.navigateTo(SearchScreen) },
                 onOpenMoreMenu = { setMoreMenuExpanded(true) },
                 scrollBehavior = scrollBehavior,
             )

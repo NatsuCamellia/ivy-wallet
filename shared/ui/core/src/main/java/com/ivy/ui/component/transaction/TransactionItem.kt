@@ -53,7 +53,7 @@ fun TransactionItem(
             {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (ui.supportingText != null) {
-                        Text(text = ui.supportingText, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                        Text(text = ui.supportingText, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                     if (hasButtons) {
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

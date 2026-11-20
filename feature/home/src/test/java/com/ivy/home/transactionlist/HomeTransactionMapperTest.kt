@@ -138,7 +138,7 @@ class HomeTransactionMapperTest {
         val item = mapper().mapHistory(listOf(divider(0.0, 10.0), trn))[1] as HomeTrnListItem.Trn
 
         item.ui.title shouldBe "Food"
-        item.ui.supportingText shouldBe "Cash"
+        item.ui.supportingText shouldBe "Cash · 14:05"
     }
 
     @Test
@@ -146,10 +146,10 @@ class HomeTransactionMapperTest {
         val item = mapper()
             .mapHistory(listOf(divider(0.0, 10.0), expenseTrn("a")))[1] as HomeTrnListItem.Trn
 
-        item.ui.supportingText shouldBe "Food · Cash"
+        item.ui.supportingText shouldBe "Food · Cash · 14:05"
         item.ui.amountKind shouldBe TransactionAmountKind.Expense
         item.ui.amountText shouldBe "-32.51 USD"
-        item.ui.secondaryText shouldBe "14:05"
+        item.ui.secondaryText shouldBe null
         item.ui.categoryColor shouldBe Color(food.color.value)
         item.iconAsset shouldBe null
     }
@@ -169,7 +169,7 @@ class HomeTransactionMapperTest {
         val item = mapper(accounts = listOf(cash, revolut))
             .mapHistory(listOf(divider(0.0, 0.0), trn))[1] as HomeTrnListItem.Trn
 
-        item.ui.supportingText shouldBe "Cash → Revolut"
+        item.ui.supportingText shouldBe "Cash → Revolut · 14:05"
         item.ui.amountKind shouldBe TransactionAmountKind.Transfer
         item.ui.amountText shouldBe "40.0 USD"
         item.ui.secondaryText shouldBe "36.5 EUR"
@@ -208,7 +208,7 @@ class HomeTransactionMapperTest {
 
         val item = mapper().mapHistory(listOf(divider(0.0, 10.0), trn))[1] as HomeTrnListItem.Trn
 
-        item.ui.supportingText shouldBe "Food · deleted"
+        item.ui.supportingText shouldBe "Food · deleted · 14:05"
     }
 
     @Test

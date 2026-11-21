@@ -18,6 +18,7 @@ class Navigation @Inject constructor() {
   val onBackPressed: MutableMap<Screen, () -> Boolean> = mutableMapOf()
 
   private val backStack: Stack<Screen> = Stack()
+  internal var onScreenDiscarded: ((Screen) -> Unit)? = null
   var lastScreen: Screen? = null
     private set
 
@@ -31,7 +32,7 @@ class Navigation @Inject constructor() {
   fun backStackEmpty() = backStack.empty()
 
   private fun popBackStack() {
-    backStack.pop()
+    discard(backStack.pop())
   }
 
   @Deprecated("Legacy code. Don't use it, please.")
@@ -49,8 +50,18 @@ class Navigation @Inject constructor() {
   }
 
   private fun switchScreen(screen: Screen) {
+    val previous = currentScreen
     this.currentScreen = screen
     lastScreen = screen
+    if (previous != null) {
+      discard(previous)
+    }
+  }
+
+  private fun discard(screen: Screen) {
+    if (screen != currentScreen && screen !in backStack) {
+      onScreenDiscarded?.invoke(screen)
+    }
   }
 
   fun resetBackStack() {

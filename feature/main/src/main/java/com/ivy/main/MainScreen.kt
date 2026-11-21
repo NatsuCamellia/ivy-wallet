@@ -42,6 +42,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -184,6 +185,7 @@ private fun MainShell(
     content: @Composable () -> Unit,
 ) {
     var expanded by rememberSaveable(tab) { mutableStateOf(initiallyExpanded && tab == MainTab.HOME) }
+    val tabStateHolder = rememberSaveableStateHolder()
 
     BackHandler(enabled = expanded) {
         expanded = false
@@ -241,7 +243,7 @@ private fun MainShell(
                 .padding(innerPadding)
                 .consumeWindowInsets(innerPadding)
         ) {
-            content()
+            tabStateHolder.SaveableStateProvider(tab.name, content)
 
             if (tab == MainTab.HOME) {
                 AnimatedVisibility(

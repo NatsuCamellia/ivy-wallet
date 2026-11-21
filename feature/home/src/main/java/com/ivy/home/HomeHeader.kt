@@ -68,7 +68,7 @@ internal fun HomeTopBar(
         modifier = modifier,
         actions = {
             IconButton(onClick = onSearch, modifier = Modifier.testTag("home_search_button")) {
-                Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_transactions))
+                Icon(Icons.Default.Search, contentDescription = stringResource(R.string.search_transactions_action))
             }
             PeriodButton(period = period, onClick = onShowPeriodModal)
             IconButton(

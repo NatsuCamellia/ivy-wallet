@@ -47,4 +47,25 @@ class NavigationTest {
         discarded.shouldContainExactly()
         navigation.currentScreen shouldBe SettingsScreen
     }
+
+    @Test
+    fun navigatingToTheCurrentScreenDiscardsNothing() {
+        navigation.navigateTo(MainScreen)
+        navigation.navigateTo(MainScreen)
+        navigation.back()
+
+        discarded.shouldContainExactly()
+        navigation.currentScreen shouldBe MainScreen
+        navigation.backStackEmpty() shouldBe true
+    }
+
+    @Test
+    fun backOnAnEmptyStackDoesNothing() {
+        navigation.navigateTo(MainScreen)
+
+        navigation.back() shouldBe false
+
+        discarded.shouldContainExactly()
+        navigation.currentScreen shouldBe MainScreen
+    }
 }

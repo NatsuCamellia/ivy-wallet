@@ -269,6 +269,45 @@ ime_top() {
 
 crashed() { adb logcat -d | grep -q "FATAL EXCEPTION"; }
 
+# bar_state <title text> <action content-desc>: "collapsed" when the large app bar title shares the row of its
+# action button, "expanded" when it sits below it (the title is looked up in the top 40% of the screen, which
+# excludes a tab label with the same text)
+bar_state() {
+  python3 -I - "$XML" "$1" "$2" "$(screen_height)" <<'PY'
+import re, sys, xml.etree.ElementTree as ET
+path, title, action, height = sys.argv[1], sys.argv[2], sys.argv[3], int(sys.argv[4])
+def centre(n):
+    x1, y1, x2, y2 = map(int, re.findall(r'\d+', n.get('bounds')))
+    return (y1 + y2) // 2
+titles = [centre(n) for n in ET.parse(path).iter('node') if n.get('text') == title and centre(n) < height * 0.4]
+actions = [centre(n) for n in ET.parse(path).iter('node') if n.get('content-desc') == action]
+if not titles or not actions:
+    sys.exit(1)
+print('collapsed' if abs(titles[0] - actions[0]) < 40 else 'expanded')
+PY
+}
+
+# collapse_bar: drags the list up twice so the large app bar collapses
+collapse_bar() {
+  local w h
+  w=$(screen_width); h=$(screen_height)
+  adb shell input swipe $((w / 2)) $((h * 75 / 100)) $((w / 2)) $((h * 35 / 100)) 250 </dev/null
+  sleep 0.5
+  adb shell input swipe $((w / 2)) $((h * 75 / 100)) $((w / 2)) $((h * 35 / 100)) 250 </dev/null
+  sleep 1
+}
+
+# check_bar <expected> <title> <action> <label>: dumps and fails the flow unless the bar is in the expected state
+check_bar() {
+  local got
+  dump || return 1
+  got=$(bar_state "$2" "$3") || { log "$4: title '$2' or action '$3' not found"; return 1; }
+  [ "$got" = "$1" ] || { log "$4: app bar is $got, expected $1"; return 1; }
+}
+
+# node_cy <text> -> y of the node's centre
+node_cy() { find_node text exact "$1" | cut -d' ' -f2; }
+
 # ---------- flows ----------
 
 # Cold start through onboarding (offline account, skip accounts and categories) to Home.
@@ -1105,6 +1144,51 @@ flow_reports() {
 # FAB; add a category through the Create category sheet, it is listed and opens its transactions, back returns to the
 # list; Sort by opens and closes; the reorder sheet opens and Done closes it; back from the tab returns to Home.
 # Needs the Groceries category.
+# The large app bar keeps its collapsed state (and the list its position) across tabs and back navigation, and a
+# screen opened again starts expanded. Needs flow_add_expense (the seeded smokecoffee row) and the Cash account.
+flow_appbar_state() {
+  go_home || return 1
+  wait_for text exact "smokecoffee" || { log "run flow_add_expense first"; return 1; }
+  check_bar expanded "Hi" "More" "Home at start" || return 1
+  collapse_bar
+  check_bar collapsed "Hi" "More" "Home scrolled" || return 1
+  local y_home
+  y_home=$(node_cy smokecoffee) || { log "row missing after collapse"; return 1; }
+  shot appbar-1-home-collapsed
+  tap_tab Accounts || return 1
+  wait_for text exact "Total Balance" || return 1
+  check_bar expanded "Accounts" "Reorder" "Accounts at start" || return 1
+  collapse_bar
+  check_bar collapsed "Accounts" "Reorder" "Accounts scrolled" || return 1
+  shot appbar-2-accounts-collapsed
+  tap_tab Home || return 1
+  wait_for text exact "smokecoffee" || return 1
+  check_bar collapsed "Hi" "More" "Home after tab switch" || return 1
+  [ "$(node_cy smokecoffee)" = "$y_home" ] || { log "Home list moved: $(node_cy smokecoffee) vs $y_home"; return 1; }
+  shot appbar-3-home-back
+  tap_tab Accounts || return 1
+  wait_for text exact "Total Balance" || return 1
+  check_bar collapsed "Accounts" "Reorder" "Accounts after tab switch" || return 1
+  tap_node text exact "Cash" || return 1
+  wait_for desc exact "Edit" || return 1
+  check_bar expanded "Cash" "Edit" "account at start" || return 1
+  collapse_bar
+  check_bar collapsed "Cash" "Edit" "account scrolled" || return 1
+  shot appbar-4-account-collapsed
+  back
+  wait_for text exact "Total Balance" || { log "back did not return to Accounts"; return 1; }
+  check_bar collapsed "Accounts" "Reorder" "Accounts after back" || return 1
+  shot appbar-5-accounts-back
+  tap_node text exact "Cash" || return 1
+  wait_for desc exact "Edit" || return 1
+  check_bar expanded "Cash" "Edit" "account reopened" || return 1
+  shot appbar-6-account-reopened
+  back
+  wait_for text exact "Total Balance" || return 1
+  crashed && return 1
+  return 0
+}
+
 flow_categories() {
   go_home || return 1
   tap_node desc exact "More" || return 1
@@ -1314,7 +1398,7 @@ flow_exchange_rates() {
   # the first back only hides the keyboard of the focused search field
   ! has desc exact "Add rate" || back
   wait_gone desc exact "Add rate" 5 || { log "back from Exchange rates should return to Settings"; return 1; }
-  wait_for text exact "About & Support" || { log "Settings missing after back"; return 1; }
+  wait_for text exact "Exchange rates" || { log "Settings did not return to the Behavior page after back"; return 1; }
   crashed && return 1
   return 0
 }
@@ -1455,7 +1539,10 @@ flow_settings() {
   wait_for desc exact "Add rate" || { log "exchange rates did not open from settings"; return 1; }
   back
   wait_gone desc exact "Add rate" 5 || { log "back from Exchange rates should return to Settings"; return 1; }
-  wait_for text exact "About & Support" || { log "Settings missing after back"; return 1; }
+  # Settings keeps its page while another screen is open: back from Exchange rates shows the Behavior page again
+  wait_for text exact "Exchange rates" || { log "Settings did not return to the Behavior page after back"; return 1; }
+  back
+  wait_for text exact "About & Support" || { log "back from the Behavior page should return to the category list"; return 1; }
   tap_node text exact "Profile" || return 1
   wait_for text exact "Currency" || { log "profile page did not open"; return 1; }
   has text exact "Anonymous" || has text exact "Name" || { log "profile rows missing"; return 1; }
@@ -1557,7 +1644,7 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data}; do
+for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data}; do
   run_flow "$flow"
 done
 

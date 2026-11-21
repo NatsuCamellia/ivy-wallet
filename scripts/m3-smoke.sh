@@ -787,7 +787,7 @@ flow_fab_menu() {
   has desc exact "Add" || { log "FAB missing on Home"; return 1; }
   shot fab-1-collapsed
   open_fab_menu || return 1
-  has text exact "Add income" && has text exact "Transfer" && has text exact "Add planned payment" || { log "menu items missing"; return 1; }
+  has text exact "Add expense" && has text exact "Add income" && has text exact "Transfer" && has text exact "Add planned payment" || { log "menu items missing"; return 1; }
   has desc exact "Close" || { log "FAB should read Close while expanded"; return 1; }
   local ys
   ys=$(for t in "Transfer" "Add expense" "Add income" "Add planned payment"; do find_node text exact "$t" | cut -d' ' -f2; done | tr '\n' ' ')
@@ -925,7 +925,7 @@ flow_amount_sheet_close() {
 # the Savings goal row opens the Buffer sheet on top and back closes only that one.
 flow_more_menu() {
   go_home || return 1
-  has desc exact "More" && has desc exact "Search transactions..." || { log "more or search button missing on Home"; return 1; }
+  has desc exact "More" && has desc exact "Search transactions" || { log "more or search button missing on Home"; return 1; }
   shot more-1-home
   tap_node desc exact "More" || return 1
   wait_for text exact "Quick access" || return 1
@@ -1011,7 +1011,7 @@ flow_account_detail() {
 # search field, Clear search empties the field, back leaves the screen. Needs flow_add_expense to have run.
 flow_search() {
   go_home || return 1
-  tap_node desc exact "Search transactions..." || return 1
+  tap_node desc exact "Search transactions" || return 1
   wait_for class exact android.widget.EditText || return 1
   adb shell input text smokecoffee
   wait_for desc exact "Clear search" || { log "clear button missing after typing"; return 1; }
@@ -1140,10 +1140,6 @@ flow_reports() {
   return 0
 }
 
-# Home More -> Categories selects the Categories tab: the top bar has sort and reorder (no back), the add button is a
-# FAB; add a category through the Create category sheet, it is listed and opens its transactions, back returns to the
-# list; Sort by opens and closes; the reorder sheet opens and Done closes it; back from the tab returns to Home.
-# Needs the Groceries category.
 # The large app bar keeps its collapsed state (and the list its position) across tabs and back navigation, and a
 # screen opened again starts expanded. Needs flow_add_expense (the seeded smokecoffee row) and the Cash account.
 flow_appbar_state() {
@@ -1189,6 +1185,10 @@ flow_appbar_state() {
   return 0
 }
 
+# Home More -> Categories selects the Categories tab: the top bar has sort and reorder (no back), the add button is a
+# FAB; add a category through the Create category sheet, it is listed and opens its transactions, back returns to the
+# list; Sort by opens and closes; the reorder sheet opens and Done closes it; back from the tab returns to Home.
+# Needs the Groceries category.
 flow_categories() {
   go_home || return 1
   tap_node desc exact "More" || return 1

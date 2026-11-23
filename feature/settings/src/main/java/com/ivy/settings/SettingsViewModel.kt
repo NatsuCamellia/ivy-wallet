@@ -9,8 +9,6 @@ import android.provider.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
@@ -18,7 +16,6 @@ import com.ivy.base.legacy.SharedPrefs
 import com.ivy.base.legacy.Theme
 import com.ivy.base.legacy.refreshWidget
 import com.ivy.data.backup.BackupDataUseCase
-import com.ivy.data.datasource.LocalAppearanceDataSource
 import com.ivy.data.db.dao.read.SettingsDao
 import com.ivy.data.db.dao.write.WriteSettingsDao
 import com.ivy.data.model.primitive.AssetCode
@@ -60,7 +57,6 @@ class SettingsViewModel @Inject constructor(
     private val updateSettingsAct: UpdateSettingsAct,
     private val settingsWriter: WriteSettingsDao,
     private val exportCsvUseCase: ExportCsvUseCase,
-    private val appearanceDataSource: LocalAppearanceDataSource,
     @ApplicationContext private val context: Context
 ) : ComposeViewModel<SettingsState, SettingsEvent>() {
 
@@ -92,9 +88,7 @@ class SettingsViewModel @Inject constructor(
             startDateOfMonth = getStartDateOfMonth(),
             progressState = getProgressState(),
             hideIncome = getHideIncome(),
-            languageOptionVisible = isLanguageOptionVisible(),
-            dynamicColorEnabled = getDynamicColorEnabled(),
-            dynamicColorAvailable = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S,
+            languageOptionVisible = isLanguageOptionVisible()
         )
     }
 
@@ -213,12 +207,6 @@ class SettingsViewModel @Inject constructor(
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
     }
 
-    @Composable
-    private fun getDynamicColorEnabled(): Boolean {
-        val enabled by appearanceDataSource.dynamicColor.collectAsState(initial = true)
-        return enabled
-    }
-
     override fun onEvent(event: SettingsEvent) {
         when (event) {
             is SettingsEvent.SetCurrency -> setCurrency(event.newCurrency)
@@ -226,7 +214,6 @@ class SettingsViewModel @Inject constructor(
             is SettingsEvent.ExportToCsv -> exportToCSV(event.rootScreen)
             is SettingsEvent.BackupData -> exportToZip(event.rootScreen)
             is SettingsEvent.SetTheme -> setTheme(event.theme)
-            is SettingsEvent.SetDynamicColor -> setDynamicColor(event.enabled)
             is SettingsEvent.SetLockApp -> setLockApp(event.lockApp)
             is SettingsEvent.SetShowNotifications -> setShowNotifications(event.showNotifications)
             is SettingsEvent.SetHideCurrentBalance -> setHideCurrentBalance(
@@ -327,12 +314,6 @@ class SettingsViewModel @Inject constructor(
             updateSettingsAct(updated)
             ivyContext.switchTheme(theme)
             currentTheme.value = theme
-        }
-    }
-
-    private fun setDynamicColor(enabled: Boolean) {
-        viewModelScope.launch {
-            appearanceDataSource.setDynamicColor(enabled)
         }
     }
 

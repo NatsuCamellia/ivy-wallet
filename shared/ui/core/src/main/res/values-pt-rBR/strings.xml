@@ -5,8 +5,6 @@
     <string name="month_income">RENDA ESTE MÊS</string>
     <string name="month_expenses">DESPESAS ESTE MÊS</string>
     <string name="excluded">(excluído)</string>
-    <string name="income_uppercase">RENDA</string>
-    <string name="expenses_uppercase">DESPESAS</string>
     <string name="app_locked">APP BLOQUEADO</string>
     <string name="authenticate_text">Autenticar para entrar no aplicativo</string>
     <string name="unlock">Desbloquear</string>
@@ -103,7 +101,6 @@
     <string name="light_mode">Modo claro</string>
     <string name="dark_mode">Modo escuro</string>
     <string name="auto_mode">Modo automático</string>
-    <string name="planned_payments">Pagamentos\nPlanejados</string>
     <string name="share_ivy">Compartilhar o Ivy</string>
     <string name="reports">Relatórios</string>
     <string name="loans">Empréstimos</string>
@@ -115,8 +112,6 @@
     <string name="no_loans_description">Você não tem empréstimos.\nToque em \"+ Adicionar empréstimo\" para adicionar um.</string>
     <string name="loan_confirm_deletion_description">Nota: a exclusão deste empréstimo removerá permanentemente todas as transações associadas.</string>
     <string name="confirm_account_loan_change">Aguarde, recalculando todos os registros de empréstimo</string>
-    <string name="paid">Pago</string>
-    <string name="left_to_pay">%1$s %2$s restantes</string>
     <string name="loan_interest">Juros do empréstimo</string>
     <string name="interest_paid">%1$s %2$s pagos</string>
     <string name="add_record">Adicionar registro</string>
@@ -136,23 +131,12 @@
     <string name="transactions">transações</string>
     <string name="home">Início</string>
     <string name="add_planned_payment">Adicionar pagamento planejado</string>
-    <string name="add_income_uppercase">ADICIONAR RECEITA</string>
-    <string name="add_expense_uppercase">ADICIONAR DESPESA</string>
-    <string name="account_transfer">TRANSFERÊNCIA DE CONTA</string>
     <string name="skip">Pular</string>
     <string name="add_new">Adicionar novo</string>
     <string name="from_date">De %1$s</string>
     <string name="to_date">Para %1$s</string>
     <string name="range">Faixa</string>
-    <string name="privacy_and_data_collection">Privacidade e coleta de dados</string>
-    <string name="swipe_to_agree_terms_conditions">Deslize para concordar com nossos Termos e Condições</string>
-    <string name="agreed_terms_conditions">Concordou com nossos Termos e Condições</string>
-    <string name="swipe_to_agree_privacy_policy">Deslize para concordar com nossa Política de Privacidade</string>
-    <string name="agreed_privacy_policy">Concordou com nossa Política de Privacidade</string>
-    <string name="terms_and_conditions">Termos e Condições</string>
     <string name="privacy_policy">Política de Privacidade</string>
-    <string name="wallet_description">Acompanhe suas receitas, despesas e orçamento com Ivy.\n\nInterface intuitiva, pagamentos recorrentes e planejados, gerenciamento de múltiplas contas, organização de transações em categorias, estatísticas poderosas, exportação para CSV e muito mais.</string>
-    <string name="enter_your_name">Digite seu nome\para personalizar sua\carteira</string>
     <string name="what_is_your_name">Qual o seu nome?</string>
     <string name="enter">Confirmar</string>
     <string name="add_accounts">Adicionar contas</string>
@@ -181,12 +165,8 @@
     <string name="planned_payment_confirm_deletion_description">A exclusão deste pagamento planejado removerá todas as transações não pagas associadas (próximas ou vencidas).</string>
     <string name="set_payment_type">Definir tipo de pagamento</string>
     <string name="planned_start_at">Início planejado em</string>
-    <string name="repeats_every">REPETE CADA %1$d %2$s</string>
     <string name="deleted">excluído</string>
-    <string name="planned_for_uppercase">"PLANEJADO PARA "</string>
     <string name="null_text">nulo</string>
-    <string name="starts_date">"INÍCIO %1$s "</string>
-    <string name="add_payment">Adicionar pagamento</string>
     <string name="one_time_payments">Pagamentos únicos</string>
     <string name="recurring_payments">Pagamentos recorrentes</string>
     <string name="no_planned_payments">Nenhum pagamento planejado</string>
@@ -198,8 +178,6 @@
     <string name="due_on">Vencimento em %1$s</string>
     <string name="upcoming">Próximos</string>
     <string name="overdue">Atrasado</string>
-    <string name="expenses_lowercase">despesas</string>
-    <string name="income_lowercase">renda</string>
     <string name="edit_account">Editar conta</string>
     <string name="new_account">Nova conta</string>
     <string name="account_name">Nome da conta</string>
@@ -226,9 +204,7 @@
     <string name="select_all">Selecionar tudo</string>
     <string name="amount_optional">Valor (opcional)</string>
     <string name="keywords_optional">Palavras-chave (opcional)</string>
-    <string name="includes_uppercase">INCLUI</string>
     <string name="add_keyword">Adicionar uma palavra-chave</string>
-    <string name="excludes_uppercase">EXCLUI</string>
     <string name="no_transactions_for_your_filter">Você não tem nenhuma transação para seu filtro.</string>
     <string name="no_filter">Sem filtro</string>
     <string name="invalid_filter_warning">Para gerar um relatório você deve primeiro definir um filtro válido.</string>
@@ -267,7 +243,6 @@
     <string name="request_a_feature">Solicitar um recurso</string>
     <string name="contact_support">Suporte da comunidade</string>
     <string name="project_contributors">Contribuidores</string>
-    <string name="account_uppercase">CONTA</string>
     <string name="logout">Sair</string>
     <string name="login">Entrar</string>
     <string name="syncing">Sincronizando…</string>
@@ -304,7 +279,6 @@
     <string name="unselect_all_time">Desmarcar todo o tempo</string>
     <string name="select_all_time">Selecionar todo o tempo</string>
     <string name="choose_start_date_of_month">Selecione a data de início do mês</string>
-    <string name="supports_crypto">suporta criptografia</string>
     <string name="delete">Excluir</string>
     <string name="save">Salvar</string>
     <string name="add">Adicionar</string>
@@ -436,8 +410,6 @@
     <string name="confirm_skip_all">Confirme ignorar tudo</string>
     <string name="confirm_skip_all_description">Tem certeza de que deseja ignorar todos os pagamentos planejados em atraso?</string>
     <string name="switch_to_offline_mode">Mudar para o modo off-line</string>
-    <string name="delete_all_user_cloud_data_warning">AVISO! Esta ação excluirá todos os seus dados armazenados na nuvem por %1$s PERMANENTEMENTE. Os dados off-line armazenados no seu aplicativo local permanecerão.</string>
-    <string name="delete_all_cloud_data_question">Excluir todos os dados armazenados na nuvem?</string>
     <string name="experimental">Experimental</string>
     <string name="experimental_settings">Configurações experimentais</string>
     <string name="wallet_balance">Saldo da carteira</string>

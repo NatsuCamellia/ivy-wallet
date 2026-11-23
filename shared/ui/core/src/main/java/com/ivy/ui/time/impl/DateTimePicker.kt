@@ -16,6 +16,12 @@ interface DateTimePicker {
         onDatePick: (LocalDate) -> Unit
     )
 
+    /** The date picker's UTC calendar day is the picked [LocalDate]; no time zone shift is applied. */
+    fun pickCalendarDate(
+        initialDate: LocalDate?,
+        onDatePick: (LocalDate) -> Unit
+    )
+
     fun pickTime(
         initialTime: LocalTime?,
         onTimePick: (LocalTime) -> Unit

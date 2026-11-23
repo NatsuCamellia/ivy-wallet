@@ -5,8 +5,6 @@
     <string name="month_income">本月收入</string>
     <string name="month_expenses">本月支出</string>
     <string name="excluded">（已排除）</string>
-    <string name="income_uppercase">收入</string>
-    <string name="expenses_uppercase">支出</string>
     <string name="app_locked">应用已锁定</string>
     <string name="authenticate_text">验证以进入应用</string>
     <string name="unlock">解锁</string>
@@ -103,7 +101,6 @@
     <string name="light_mode">亮色模式</string>
     <string name="dark_mode">暗色模式</string>
     <string name="auto_mode">自动模式</string>
-    <string name="planned_payments">计划支付</string>
     <string name="share_ivy">分享 Ivy</string>
     <string name="reports">报告</string>
     <string name="loans">贷款</string>
@@ -115,8 +112,6 @@
     <string name="no_loans_description">您没有任何贷款。\n点击“+ 添加贷款”添加一笔。</string>
     <string name="loan_confirm_deletion_description">注意：删除此贷款将永久删除所有关联的交易。</string>
     <string name="confirm_account_loan_change">请稍候，正在重新计算所有贷款记录</string>
-    <string name="paid">已支付</string>
-    <string name="left_to_pay">剩余 %1$s %2$s</string>
     <string name="loan_interest">贷款利息</string>
     <string name="interest_paid">已支付 %1$s %2$s</string>
     <string name="add_record">添加记录</string>
@@ -136,23 +131,12 @@
     <string name="transactions">交易</string>
     <string name="home">主页</string>
     <string name="add_planned_payment">添加计划支付</string>
-    <string name="add_income_uppercase">添加收入</string>
-    <string name="add_expense_uppercase">添加支出</string>
-    <string name="account_transfer">账户转账</string>
     <string name="skip">跳过</string>
     <string name="add_new">添加</string>
     <string name="from_date">从 %1$s</string>
     <string name="to_date">至 %1$s</string>
     <string name="range">范围</string>
-    <string name="privacy_and_data_collection">隐私和数据收集</string>
-    <string name="swipe_to_agree_terms_conditions">滑动以同意我们的条款和条件</string>
-    <string name="agreed_terms_conditions">已同意我们的条款和条件</string>
-    <string name="swipe_to_agree_privacy_policy">滑动以同意我们的隐私政策</string>
-    <string name="agreed_privacy_policy">已同意我们的隐私政策</string>
-    <string name="terms_and_conditions">条款和条件</string>
     <string name="privacy_policy">隐私政策</string>
-    <string name="wallet_description">使用 Ivy 记录您的收入、支出和预算。\n\n直观的界面，循环和计划支付，管理多个账户，按类别组织交易，强大的统计数据，导出为 CSV 等等。</string>
-    <string name="enter_your_name">输入您的姓名\n以个性化您的\n钱包</string>
     <string name="what_is_your_name">您叫什么名字？</string>
     <string name="enter">输入</string>
     <string name="add_accounts">添加账户</string>
@@ -181,12 +165,8 @@
     <string name="planned_payment_confirm_deletion_description">删除此计划支付将删除所有相关的（即将到期或逾期的）未付款交易。</string>
     <string name="set_payment_type">设置付款类型</string>
     <string name="planned_start_at">计划开始于</string>
-    <string name="repeats_every">每 %1$d %2$s 重复</string>
     <string name="deleted">已删除</string>
-    <string name="planned_for_uppercase">计划于</string>
     <string name="null_text">无</string>
-    <string name="starts_date">开始于 %1$s</string>
-    <string name="add_payment">添加付款</string>
     <string name="one_time_payments">一次性付款</string>
     <string name="recurring_payments">定期付款</string>
     <string name="no_planned_payments">无计划支付</string>
@@ -198,8 +178,6 @@
     <string name="due_on">%1$s 截止</string>
     <string name="upcoming">即将到期</string>
     <string name="overdue">逾期</string>
-    <string name="expenses_lowercase">支出</string>
-    <string name="income_lowercase">收入</string>
     <string name="edit_account">编辑账户</string>
     <string name="new_account">新建账户</string>
     <string name="account_name">账户名称</string>
@@ -226,9 +204,7 @@
     <string name="select_all">全选</string>
     <string name="amount_optional">金额（可选）</string>
     <string name="keywords_optional">关键词（可选）</string>
-    <string name="includes_uppercase">包含</string>
     <string name="add_keyword">添加关键词</string>
-    <string name="excludes_uppercase">不包含</string>
     <string name="no_transactions_for_your_filter">您没有符合筛选条件的交易记录。</string>
     <string name="no_filter">无筛选器</string>
     <string name="invalid_filter_warning">要生成报告，您必须先设置有效的筛选器。</string>
@@ -267,7 +243,6 @@
     <string name="request_a_feature">请求功能</string>
     <string name="contact_support">社区支持</string>
     <string name="project_contributors">贡献者</string>
-    <string name="account_uppercase">账户</string>
     <string name="logout">注销</string>
     <string name="login">登录</string>
     <string name="syncing">同步中……</string>
@@ -304,7 +279,6 @@
     <string name="unselect_all_time">取消选择全部时间</string>
     <string name="select_all_time">选择全部时间</string>
     <string name="choose_start_date_of_month">选择开始日期</string>
-    <string name="supports_crypto">支持加密货币</string>
     <string name="delete">删除</string>
     <string name="save">保存</string>
     <string name="add">添加</string>
@@ -436,8 +410,6 @@
     <string name="confirm_skip_all">确认全部跳过</string>
     <string name="confirm_skip_all_description">您确定要跳过所有逾期的计划支付吗？</string>
     <string name="switch_to_offline_mode">切换到离线模式</string>
-    <string name="delete_all_user_cloud_data_warning">警告！此操作将永久删除 %1$s 的所有云存储数据，本地应用程序中存储的离线数据将保留。</string>
-    <string name="delete_all_cloud_data_question">删除所有云存储数据？</string>
     <string name="experimental">实验性功能</string>
     <string name="experimental_settings">实验性功能设置</string>
     <string name="wallet_balance">钱包余额</string>

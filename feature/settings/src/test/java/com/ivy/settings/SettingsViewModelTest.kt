@@ -4,7 +4,6 @@ import android.content.Context
 import com.ivy.base.legacy.SharedPrefs
 import com.ivy.base.legacy.Theme
 import com.ivy.data.backup.BackupDataUseCase
-import com.ivy.data.datasource.LocalAppearanceDataSource
 import com.ivy.data.db.dao.read.SettingsDao
 import com.ivy.data.db.dao.write.WriteSettingsDao
 import com.ivy.data.db.entity.SettingsEntity
@@ -19,16 +18,12 @@ import com.ivy.ui.testing.runTest
 import com.ivy.wallet.domain.action.global.StartDayOfMonthAct
 import com.ivy.wallet.domain.action.global.UpdateStartDayOfMonthAct
 import com.ivy.wallet.domain.action.settings.SettingsAct
-import io.kotest.matchers.shouldBe
-import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import java.math.BigDecimal
-import kotlinx.coroutines.flow.flowOf
 import org.junit.Before
 import org.junit.Test
 
@@ -46,7 +41,6 @@ class SettingsViewModelTest : ComposeViewModelTest() {
     private val updateSettingsAct = mockk<UpdateSettingsAct>(relaxed = true)
     private val settingsWriter = mockk<WriteSettingsDao>(relaxed = true)
     private val exportCsvUseCase = mockk<ExportCsvUseCase>(relaxed = true)
-    private val appearanceDataSource = mockk<LocalAppearanceDataSource>()
     private val context = mockk<Context>(relaxed = true)
 
     private lateinit var viewModel: SettingsViewModel
@@ -62,8 +56,6 @@ class SettingsViewModelTest : ComposeViewModelTest() {
         coEvery { settingsAct(Unit) } returns InitialSettings
         coEvery { startDayOfMonthAct(Unit) } returns 1
         every { sharedPrefs.getBoolean(any(), any()) } answers { secondArg() }
-        every { appearanceDataSource.dynamicColor } returns flowOf(true)
-        coEvery { appearanceDataSource.setDynamicColor(any()) } just Runs
 
         viewModel = SettingsViewModel(
             settingsDao = settingsDao,
@@ -78,7 +70,6 @@ class SettingsViewModelTest : ComposeViewModelTest() {
             updateSettingsAct = updateSettingsAct,
             settingsWriter = settingsWriter,
             exportCsvUseCase = exportCsvUseCase,
-            appearanceDataSource = appearanceDataSource,
             context = context,
         )
     }
@@ -101,23 +92,6 @@ class SettingsViewModelTest : ComposeViewModelTest() {
         }
         coVerify { updateSettingsAct(match { it.theme == Theme.DARK }) }
         verify { ivyContext.switchTheme(Theme.DARK) }
-    }
-
-    @Test
-    fun `disabling dynamic color persists the preference`() {
-        viewModel.runTest(events = listOf(SettingsEvent.SetDynamicColor(false))) {
-            // state comes from the (static) mocked flow; the write is the contract
-        }
-        coVerify { appearanceDataSource.setDynamicColor(false) }
-    }
-
-    @Test
-    fun `reflects a disabled dynamic color preference in state`() {
-        every { appearanceDataSource.dynamicColor } returns flowOf(false)
-
-        viewModel.runTest {
-            dynamicColorEnabled shouldBe false
-        }
     }
 
     companion object {

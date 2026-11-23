@@ -2,6 +2,8 @@ package com.ivy.report
 
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import com.ivy.reports.ReportFilterInvalidUiTest
+import com.ivy.reports.ReportFilterUiTest
 import com.ivy.reports.ReportNoFilterUiTest
 import com.ivy.reports.ReportUiTest
 import com.ivy.ui.testing.PaparazziScreenshotTest
@@ -25,6 +27,20 @@ class ReportPaparazziTest(
     fun `snapshot Report Screen no filter`() {
         snapshot(theme) {
             ReportNoFilterUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotReportFilterSheet() {
+        snapshot(theme) {
+            ReportFilterUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotReportFilterInvalid() {
+        snapshot(theme) {
+            ReportFilterInvalidUiTest(theme == PaparazziTheme.Dark)
         }
     }
 }

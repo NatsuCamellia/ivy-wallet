@@ -139,6 +139,7 @@ class HomeTransactionMapperTest {
 
         item.ui.title shouldBe "Food"
         item.ui.supportingText shouldBe "Cash"
+        item.ui.time shouldBe "14:05"
     }
 
     @Test
@@ -147,9 +148,10 @@ class HomeTransactionMapperTest {
             .mapHistory(listOf(divider(0.0, 10.0), expenseTrn("a")))[1] as HomeTrnListItem.Trn
 
         item.ui.supportingText shouldBe "Food · Cash"
+        item.ui.time shouldBe "14:05"
         item.ui.amountKind shouldBe TransactionAmountKind.Expense
         item.ui.amountText shouldBe "-32.51 USD"
-        item.ui.secondaryText shouldBe "14:05"
+        item.ui.secondaryText shouldBe null
         item.ui.categoryColor shouldBe Color(food.color.value)
         item.iconAsset shouldBe null
     }
@@ -170,6 +172,7 @@ class HomeTransactionMapperTest {
             .mapHistory(listOf(divider(0.0, 0.0), trn))[1] as HomeTrnListItem.Trn
 
         item.ui.supportingText shouldBe "Cash → Revolut"
+        item.ui.time shouldBe "14:05"
         item.ui.amountKind shouldBe TransactionAmountKind.Transfer
         item.ui.amountText shouldBe "40.0 USD"
         item.ui.secondaryText shouldBe "36.5 EUR"
@@ -185,6 +188,7 @@ class HomeTransactionMapperTest {
         upcoming.ui.dueText shouldBe "Due on Fri, Jul 24"
         upcoming.ui.amountKind shouldBe TransactionAmountKind.Upcoming
         upcoming.ui.secondaryText shouldBe null
+        upcoming.ui.time shouldBe null
         upcoming.position shouldBe TransactionItemPosition.Single
         overdue.ui.amountKind shouldBe TransactionAmountKind.Overdue
     }

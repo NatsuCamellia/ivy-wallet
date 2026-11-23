@@ -5,8 +5,6 @@
     <string name="month_income">THU TRONG THÁNG NÀY</string>
     <string name="month_expenses">CHI TRONG THÁNG NÀY</string>
     <string name="excluded">(loại trừ)</string>
-    <string name="income_uppercase">THU</string>
-    <string name="expenses_uppercase">CHI</string>
     <string name="app_locked">ỨNG DỤNG ĐÃ KHÓA</string>
     <string name="authenticate_text">Xác thực để vào ứng dụng</string>
     <string name="unlock">Mở khóa</string>
@@ -103,7 +101,6 @@
     <string name="light_mode">Chế độ sáng</string>
     <string name="dark_mode">Chế độ tối</string>
     <string name="auto_mode">Chế độ tự động</string>
-    <string name="planned_payments">Thanh toán\ntheo kế hoạch</string>
     <string name="share_ivy">Chia sẻ Ivy</string>
     <string name="reports">Báo cáo</string>
     <string name="loans">Vay nợ</string>
@@ -115,8 +112,6 @@
     <string name="no_loans_description">Bạn không có bất kỳ khoản vay nào.\nNhấn vào \"+ Thêm khoản vay\" để thêm một khoản vay.</string>
     <string name="loan_confirm_deletion_description">Lưu ý: Việc xóa khoản vay này sẽ xóa vĩnh viễn mọi giao dịch liên quan.</string>
     <string name="confirm_account_loan_change">Hãy chờ đợi, đang tính toán lại toàn bộ bản ghi khoản vay</string>
-    <string name="paid">Đã thanh toán</string>
-    <string name="left_to_pay">%1$s %2$s còn lại</string>
     <string name="loan_interest">Lãi suất vay</string>
     <string name="interest_paid">%1$s %2$s đã thanh toán</string>
     <string name="add_record">Thêm bản ghi</string>
@@ -136,23 +131,12 @@
     <string name="transactions">giao dịch</string>
     <string name="home">Trang chủ</string>
     <string name="add_planned_payment">Thêm khoản thanh toán theo kế hoạch</string>
-    <string name="add_income_uppercase">THÊM KHOẢN THU</string>
-    <string name="add_expense_uppercase">THÊM KHOẢN CHI</string>
-    <string name="account_transfer">CHUYỂN TÀI KHOẢN</string>
     <string name="skip">Bỏ qua</string>
     <string name="add_new">Thêm mới</string>
     <string name="from_date">Từ ngày %1$s</string>
     <string name="to_date">đến ngày %1$s</string>
     <string name="range">Phạm vi</string>
-    <string name="privacy_and_data_collection">Quyền riêng tư và\nviệc thu thập dữ liệu</string>
-    <string name="swipe_to_agree_terms_conditions">Vuốt để đồng ý với Điều khoản và Điều kiện của chúng tôi</string>
-    <string name="agreed_terms_conditions">Đồng ý với Điều khoản và Điều kiện của chúng tôi</string>
-    <string name="swipe_to_agree_privacy_policy">Vuốt để đồng ý với Chính sách quyền riêng tư của chúng tôi</string>
-    <string name="agreed_privacy_policy">Đồng ý với Chính sách quyền riêng tư của chúng tôi</string>
-    <string name="terms_and_conditions">Các điều khoản và điều kiện</string>
     <string name="privacy_policy">Chính sách bảo mật</string>
-    <string name="wallet_description">Theo dõi thu nhập, chi phí và ngân sách của bạn với Ivy.\n\nGiao diện trực quan, thanh toán định kỳ và theo kế hoạch, quản lý nhiều tài khoản, sắp xếp giao dịch theo danh mục, số liệu thống kê mạnh mẽ, xuất file sang CSV và hơn thế nữa.</string>
-    <string name="enter_your_name">Nhập tên \để cá nhân hóa\ví của bạn</string>
     <string name="what_is_your_name">Bạn tên là gì?</string>
     <string name="enter">Nhập</string>
     <string name="add_accounts">Thêm tài khoản</string>
@@ -181,12 +165,8 @@
     <string name="planned_payment_confirm_deletion_description">Việc xóa khoản thanh toán theo kế hoạch này sẽ xóa tất cả các giao dịch chưa thanh toán có liên quan (giao dịch sắp tới hoặc quá hạn).</string>
     <string name="set_payment_type">Đặt loại thanh toán</string>
     <string name="planned_start_at">Kế hoạch bắt đầu từ</string>
-    <string name="repeats_every">LẶP LẠI MỖI %1$d %2$s</string>
     <string name="deleted">đã xóa</string>
-    <string name="planned_for_uppercase">"LÊN KẾ HOẠCH CHO "</string>
     <string name="null_text">null</string>
-    <string name="starts_date">"BẮT ĐẦU TỪ %1$s "</string>
-    <string name="add_payment">Thêm khoản thanh toán</string>
     <string name="one_time_payments">Thanh toán một lần</string>
     <string name="recurring_payments">Thanh toán định kỳ</string>
     <string name="no_planned_payments">Không có khoản thanh toán theo kế hoạch</string>
@@ -198,8 +178,6 @@
     <string name="due_on">Đến hạn vào %1$s</string>
     <string name="upcoming">Sắp tới</string>
     <string name="overdue">Quá hạn</string>
-    <string name="expenses_lowercase">khoản chi</string>
-    <string name="income_lowercase">khoản thu</string>
     <string name="edit_account">Chỉnh sửa tài khoản</string>
     <string name="new_account">Tài khoản mới</string>
     <string name="account_name">Tên tài khoản</string>
@@ -226,9 +204,7 @@
     <string name="select_all">Chọn tất cả</string>
     <string name="amount_optional">Số tiền (tùy chọn)</string>
     <string name="keywords_optional">Từ khóa (tùy chọn)</string>
-    <string name="includes_uppercase">BAO GỒM</string>
     <string name="add_keyword">Thêm từ khóa</string>
-    <string name="excludes_uppercase">KHÔNG BAO GỒM</string>
     <string name="no_transactions_for_your_filter">Bạn không có giao dịch nào cho bộ lọc của bạn.</string>
     <string name="no_filter">Không có bộ lọc</string>
     <string name="invalid_filter_warning">Để tạo báo cáo, trước tiên bạn phải đặt bộ lọc hợp lệ.</string>
@@ -266,7 +242,6 @@
     <string name="request_a_feature">Yêu cầu một tính năng</string>
     <string name="contact_support">Liên hệ hỗ trợ</string>
     <string name="project_contributors">Người đóng góp</string>
-    <string name="account_uppercase">TÀI KHOẢN</string>
     <string name="logout">Đăng xuất</string>
     <string name="login">Đăng nhập</string>
     <string name="syncing">Đang đồng bộ…</string>
@@ -303,7 +278,6 @@
     <string name="unselect_all_time">Bỏ chọn tất cả thời gian</string>
     <string name="select_all_time">Chọn tất cả thời gian</string>
     <string name="choose_start_date_of_month">Chọn ngày bắt đầu của tháng</string>
-    <string name="supports_crypto">hỗ trợ tiền mã hóa</string>
     <string name="delete">Xóa</string>
     <string name="save">Lưu</string>
     <string name="add">Thêm</string>
@@ -435,8 +409,6 @@
     <string name="confirm_skip_all">Xác nhận bỏ qua tất cả</string>
     <string name="confirm_skip_all_description">Bạn có chắc chắn muốn bỏ qua tất cả các khoản thanh toán đã quá hạn theo kế hoạch không?</string>
     <string name="switch_to_offline_mode">Chuyển sang chế độ ngoại tuyến</string>
-    <string name="delete_all_user_cloud_data_warning">CẢNH BÁO! Hành động này sẽ xóa tất cả dữ liệu được lưu trữ trên cloud của bạn trong %1$s VĨNH VIỄN, dữ liệu ngoại tuyến được lưu trữ trong ứng dụng của bạn sẽ vẫn còn.</string>
-    <string name="delete_all_cloud_data_question">Xóa tất cả dữ liệu được lưu trữ trên cloud?</string>
     <string name="experimental">Thử nghiệm</string>
     <string name="experimental_settings">Cài đặt thử nghiệm</string>
     <string name="wallet_balance">Số dư trên ví</string>

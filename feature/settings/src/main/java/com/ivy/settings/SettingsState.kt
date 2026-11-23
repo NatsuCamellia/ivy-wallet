@@ -13,7 +13,5 @@ data class SettingsState(
     val treatTransfersAsIncomeExpense: Boolean,
     val startDateOfMonth: String,
     val progressState: Boolean,
-    val languageOptionVisible: Boolean,
-    val dynamicColorEnabled: Boolean,
-    val dynamicColorAvailable: Boolean,
+    val languageOptionVisible: Boolean
 )

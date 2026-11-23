@@ -2,7 +2,6 @@ package com.ivy.onboarding
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,7 +22,7 @@ import kotlinx.collections.immutable.ImmutableList
 
 @ExperimentalFoundationApi
 @Composable
-fun BoxWithConstraintsScope.OnboardingScreen(screen: OnboardingScreen) {
+fun OnboardingScreen(screen: OnboardingScreen) {
     val viewModel: OnboardingViewModel = viewModel()
 
     val state by viewModel.state
@@ -54,7 +53,7 @@ fun BoxWithConstraintsScope.OnboardingScreen(screen: OnboardingScreen) {
 
 @ExperimentalFoundationApi
 @Composable
-private fun BoxWithConstraintsScope.UI(
+private fun UI(
     onboardingState: OnboardingState,
     currency: IvyCurrency,
 

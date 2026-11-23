@@ -1,38 +1,30 @@
 package com.ivy.legacy.ui.component.transaction
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.legacy.IvyWalletComponentPreview
-import com.ivy.legacy.utils.clickableNoIndication
-import com.ivy.legacy.utils.format
-import com.ivy.legacy.utils.rememberInteractionSource
-import com.ivy.legacy.utils.springBounce
+import com.ivy.base.model.TransactionType
+import com.ivy.legacy.ui.component.AmountText
+import com.ivy.legacy.ui.component.color
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Orange
-import com.ivy.wallet.ui.theme.Red
-import com.ivy.wallet.ui.theme.components.IvyDividerDot
-import com.ivy.wallet.ui.theme.components.IvyIcon
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 @Composable
 fun SectionDivider(
     expanded: Boolean,
@@ -41,163 +33,74 @@ fun SectionDivider(
     baseCurrency: String,
     income: Double,
     expenses: Double,
-
+    modifier: Modifier = Modifier,
     showIncomeExpenseRow: Boolean = true,
-
+    actions: @Composable RowScope.() -> Unit = {},
     setExpanded: (Boolean) -> Unit
 ) {
-    Spacer(Modifier.height(24.dp))
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickableNoIndication(rememberInteractionSource()) {
-                setExpanded(!expanded)
-            },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val expandIconRotation by animateFloatAsState(
-            targetValue = if (expanded) -180f else 0f,
-            animationSpec = springBounce()
-        )
-
-        Spacer(Modifier.width(24.dp))
-
-        Column {
+    ListItem(
+        headlineContent = {
             Text(
-                modifier = Modifier.testTag("upcoming_title"),
                 text = title,
-                style = UI.typo.b1.style(
-                    fontWeight = FontWeight.ExtraBold,
-                    color = titleColor
-                )
+                style = MaterialTheme.typography.titleMedium,
+                color = titleColor
             )
+        },
+        modifier = modifier,
+        supportingContent = if (showIncomeExpenseRow) {
+            { TransactionTotals(income = income, expenses = expenses, currency = baseCurrency) }
+        } else {
+            null
+        },
+        trailingContent = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                actions()
 
-            if (showIncomeExpenseRow) {
-                Spacer(Modifier.height(4.dp))
-
-                SectionDividerIncomeExpenseRow(
-                    income = income,
-                    expenses = expenses,
-                    baseCurrency = baseCurrency
+                val stateDescription = stringResource(
+                    if (expanded) R.string.section_expanded else R.string.section_collapsed
                 )
-            } else {
-                Spacer(Modifier.height(8.dp))
+                IconButton(
+                    onClick = { setExpanded(!expanded) },
+                    modifier = Modifier.semantics { this.stateDescription = stateDescription }
+                ) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                        contentDescription = stringResource(
+                            if (expanded) R.string.collapse_section else R.string.expand_section,
+                            title
+                        )
+                    )
+                }
             }
-        }
-
-        Spacer(Modifier.weight(1f))
-
-        IvyIcon(
-            modifier = Modifier.rotate(expandIconRotation),
-            icon = R.drawable.ic_expandarrow
-        )
-
-        Spacer(Modifier.width(32.dp))
-    }
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+    )
 }
 
+/** Expenses as `-amount` and income as `+amount`, each only when it is not zero. */
 @Composable
-private fun SectionDividerIncomeExpenseRow(
+internal fun TransactionTotals(
     income: Double,
     expenses: Double,
-    baseCurrency: String
+    currency: String,
+    modifier: Modifier = Modifier,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    Column(modifier = modifier, horizontalAlignment = horizontalAlignment) {
         if (expenses > 0) {
-            Text(
-                modifier = Modifier.testTag("upcoming_expense"),
-                text = "${expenses.format(baseCurrency)} $baseCurrency",
-                style = UI.typo.nC.style(
-                    fontWeight = FontWeight.ExtraBold,
-                    color = UI.colors.pureInverse
-                )
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = stringResource(R.string.expenses_lowercase),
-                style = UI.typo.c.style(
-                    fontWeight = FontWeight.Normal,
-                    color = UI.colors.pureInverse
-                )
+            AmountText(
+                amount = -expenses,
+                currency = currency,
+                style = MaterialTheme.typography.labelLarge.copy(color = TransactionType.EXPENSE.color())
             )
         }
-
-        if (income > 0 && expenses > 0) {
-            Spacer(Modifier.width(8.dp))
-
-            IvyDividerDot()
-
-            Spacer(Modifier.width(8.dp))
-        }
-
         if (income > 0) {
-            Text(
-                modifier = Modifier.testTag("upcoming_income"),
-                text = "${income.format(baseCurrency)} $baseCurrency",
-                style = UI.typo.nC.style(
-                    fontWeight = FontWeight.ExtraBold,
-                    color = UI.colors.green
-                )
+            AmountText(
+                amount = income,
+                currency = currency,
+                style = MaterialTheme.typography.labelLarge.copy(color = TransactionType.INCOME.color()),
+                showPlusSign = true
             )
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(
-                text = stringResource(R.string.income_lowercase),
-                style = UI.typo.c.style(
-                    fontWeight = FontWeight.Normal,
-                    color = UI.colors.pureInverse
-                )
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun Preview_Income_Expenses() {
-    IvyWalletComponentPreview {
-        SectionDivider(
-            expanded = true,
-            title = "Upcoming",
-            titleColor = Orange,
-            baseCurrency = "BGN",
-            income = 8043.23,
-            expenses = 923.87
-        ) {
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun Preview_Expenses() {
-    IvyWalletComponentPreview {
-        SectionDivider(
-            expanded = true,
-            title = "Overdue",
-            titleColor = Red,
-            baseCurrency = "BGN",
-            income = 0.0,
-            expenses = 923.87
-        ) {
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun Preview_Income() {
-    IvyWalletComponentPreview {
-        SectionDivider(
-            expanded = true,
-            title = "Upcoming",
-            titleColor = Orange,
-            baseCurrency = "BGN",
-            income = 8043.23,
-            expenses = 0.0
-        ) {
         }
     }
 }

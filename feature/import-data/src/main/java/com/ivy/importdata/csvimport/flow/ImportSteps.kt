@@ -1,6 +1,10 @@
 package com.ivy.importdata.csvimport.flow
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.ivy.importdata.csvimport.flow.instructions.DefaultImportSteps
 import com.ivy.importdata.csvimport.flow.instructions.FinancistoSteps
 import com.ivy.importdata.csvimport.flow.instructions.FortuneCitySteps
@@ -14,54 +18,24 @@ import com.ivy.importdata.csvimport.flow.instructions.WalletByBudgetBakersSteps
 import com.ivy.legacy.domain.deprecated.logic.csv.model.ImportType
 
 @Composable
-fun ImportType.ImportSteps(
-    onUploadClick: () -> Unit
-) {
+fun ImportType.ImportSteps(modifier: Modifier = Modifier) {
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        ImportStepsContent()
+    }
+}
+
+@Composable
+private fun ImportType.ImportStepsContent() {
     when (this) {
-        ImportType.IVY -> {
-            IvyWalletSteps(
-                onUploadClick = onUploadClick
-            )
-        }
-
-        ImportType.MONEY_MANAGER -> {
-            MoneyManagerPraseSteps(
-                onUploadClick = onUploadClick
-            )
-        }
-
-        ImportType.WALLET_BY_BUDGET_BAKERS -> {
-            WalletByBudgetBakersSteps(
-                onUploadClick = onUploadClick
-            )
-        }
-
-        ImportType.SPENDEE -> SpendeeSteps(
-            onUploadClick = onUploadClick
-        )
-
-        ImportType.MONEFY -> MonefySteps(
-            onUploadClick = onUploadClick
-        )
-
-        ImportType.ONE_MONEY -> OneMoneySteps(
-            onUploadClick = onUploadClick
-        )
-
-        ImportType.BLUE_COINS -> DefaultImportSteps(
-            onUploadClick = onUploadClick
-        )
-
-        ImportType.KTW_MONEY_MANAGER -> KTWMoneyManagerSteps(
-            onUploadClick = onUploadClick
-        )
-
-        ImportType.FORTUNE_CITY -> FortuneCitySteps(
-            onUploadClick = onUploadClick
-        )
-
-        ImportType.FINANCISTO -> FinancistoSteps(
-            onUploadClick = onUploadClick
-        )
+        ImportType.IVY -> IvyWalletSteps()
+        ImportType.MONEY_MANAGER -> MoneyManagerPraseSteps()
+        ImportType.WALLET_BY_BUDGET_BAKERS -> WalletByBudgetBakersSteps()
+        ImportType.SPENDEE -> SpendeeSteps()
+        ImportType.MONEFY -> MonefySteps()
+        ImportType.ONE_MONEY -> OneMoneySteps()
+        ImportType.BLUE_COINS -> DefaultImportSteps()
+        ImportType.KTW_MONEY_MANAGER -> KTWMoneyManagerSteps()
+        ImportType.FORTUNE_CITY -> FortuneCitySteps()
+        ImportType.FINANCISTO -> FinancistoSteps()
     }
 }

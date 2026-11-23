@@ -5,8 +5,6 @@
     <string name="month_income">INGRESOS ESTE MES</string>
     <string name="month_expenses">GASTOS ESTE MES</string>
     <string name="excluded">(excluído)</string>
-    <string name="income_uppercase">INGRESOS</string>
-    <string name="expenses_uppercase">GASTOS</string>
     <string name="app_locked">APLICACIÓN BLOQUEADA</string>
     <string name="authenticate_text">Autentícate para entrar na aplicación</string>
     <string name="unlock">Desbloquear</string>
@@ -105,7 +103,6 @@
     <string name="dark_mode">Modo escuro</string>
     <string name="amoled_mode">Modo AMOLED escuro</string>
     <string name="auto_mode">Modo automático</string>
-    <string name="planned_payments">Pagos\nplanificados</string>
     <string name="share_ivy">Compartir Ivy</string>
     <string name="reports">Informes</string>
     <string name="loans">Préstamos</string>
@@ -117,8 +114,6 @@
     <string name="no_loans_description">Non tes ningún préstamo.\nToca o \"+ Engadir préstamo\" para engadir un.</string>
     <string name="loan_confirm_deletion_description">Nota: Eliminar este préstamo eliminará de xeito permanente tódalas transaccións asociadas.</string>
     <string name="confirm_account_loan_change">Por favor, agarda, recalculando tódolos rexistros do préstamo</string>
-    <string name="paid">Pagado</string>
-    <string name="left_to_pay">%1$s %2$s restantes</string>
     <string name="loan_interest">Interese do préstamo</string>
     <string name="interest_paid">%1$s %2$s pagado</string>
     <string name="add_record">Engadir rexistro</string>
@@ -138,23 +133,12 @@
     <string name="transactions">transaccións</string>
     <string name="home">Inicio</string>
     <string name="add_planned_payment">Engadir pago previsto</string>
-    <string name="add_income_uppercase">ENGADIR INGRESOS</string>
-    <string name="add_expense_uppercase">ENGADIR GASTO</string>
-    <string name="account_transfer">TRANSFERENCIA DE CONTA</string>
     <string name="skip">Saltar</string>
     <string name="add_new">Engadir novo</string>
     <string name="from_date">Desde %1$s</string>
     <string name="to_date">Ata %1$s</string>
     <string name="range">Rango</string>
-    <string name="privacy_and_data_collection">Privacidade e\nrecompilación de datos</string>
-    <string name="swipe_to_agree_terms_conditions">Desliza para aceptar os nosos Termos e Condicións</string>
-    <string name="agreed_terms_conditions">Aceptaches os nosos Termos e Condicións</string>
-    <string name="swipe_to_agree_privacy_policy">Desliza para aceptar a nosa Política de Privacidade</string>
-    <string name="agreed_privacy_policy">Aceptaches a nosa Política de Privacidade</string>
-    <string name="terms_and_conditions">Termos e Condicións</string>
     <string name="privacy_policy">Política de Privacidade</string>
-    <string name="wallet_description">Controle os seus ingresos, gastos e orzamento con Ivy.\n\nInterfaz intuitiva, pagos periódicos e planificados, xestión de múltiples contas, organización de transaccións en categorías, potentes estatísticas, exportación a CSV e moito máis.</string>
-    <string name="enter_your_name">Introduce o teu nome\npara personalizar a túa\ncarteira</string>
     <string name="what_is_your_name">Como te chamas?</string>
     <string name="enter">Entrar</string>
     <string name="add_accounts">Engadir contas</string>
@@ -184,12 +168,8 @@
     <string name="planned_payment_confirm_deletion_description">Ao eliminar este pago planificado eliminaranse tódalas transaccións impagadas asociadas (próximas ou vencidas).</string>
     <string name="set_payment_type">Establecer tipo de pago</string>
     <string name="planned_start_at">Inicio planificado en</string>
-    <string name="repeats_every">REPÍTENSE CADA %1$d %2$s</string>
     <string name="deleted">eliminado</string>
-    <string name="planned_for_uppercase">"PLANIFICADO PARA "</string>
     <string name="null_text">nulo</string>
-    <string name="starts_date">"COMEZA %1$s "</string>
-    <string name="add_payment">Engadir pago</string>
     <string name="one_time_payments">Pagos únicos</string>
     <string name="recurring_payments">Pagos recorrentes</string>
     <string name="no_planned_payments">Non hai pagos previstos</string>
@@ -201,8 +181,6 @@
     <string name="due_on">Vencemento en %1$s</string>
     <string name="upcoming">Próximos</string>
     <string name="overdue">Atrasado</string>
-    <string name="expenses_lowercase">gastos</string>
-    <string name="income_lowercase">ingresos</string>
     <string name="edit_account">Editar conta</string>
     <string name="new_account">Nova conta</string>
     <string name="account_name">Nome da conta</string>
@@ -229,9 +207,7 @@
     <string name="select_all">Seleccionar todo</string>
     <string name="amount_optional">Importe (opcional)</string>
     <string name="keywords_optional">Palabras chave (opcional)</string>
-    <string name="includes_uppercase">INCLÚE</string>
     <string name="add_keyword">Engadir unha palabra chave</string>
-    <string name="excludes_uppercase">EXCLÚE</string>
     <string name="no_transactions_for_your_filter">Non tes ningunha transacción para o teu filtro.</string>
     <string name="no_filter">Sen filtro</string>
     <string name="invalid_filter_warning">Para xerar un informe primeiro debes establecer un filtro válido.</string>
@@ -270,7 +246,6 @@
     <string name="request_a_feature">Solicitar unha funcionalidade</string>
     <string name="contact_support">Soporte da comunidade</string>
     <string name="project_contributors">Contribuíntes</string>
-    <string name="account_uppercase">CONTA</string>
     <string name="logout">Pechar sesión</string>
     <string name="login">Iniciar sesión</string>
     <string name="syncing">Sincronizando…</string>
@@ -307,7 +282,6 @@
     <string name="unselect_all_time">Anular selección de todo o tempo</string>
     <string name="select_all_time">Seleccionar tódolos tempos</string>
     <string name="choose_start_date_of_month">Seleccionar data de inicio do mes</string>
-    <string name="supports_crypto">admite cripto</string>
     <string name="delete">Eliminar</string>
     <string name="save">Gardar</string>
     <string name="add">Engadir</string>
@@ -439,8 +413,6 @@
     <string name="confirm_skip_all">Confirmar saltar todo</string>
     <string name="confirm_skip_all_description">Está seguro de que quere saltarse tódolos pagos previstos atrasados?</string>
     <string name="switch_to_offline_mode">Cambiar ao modo sen conexión</string>
-    <string name="delete_all_user_cloud_data_warning">ADVERTENCIA! Esta acción eliminará PERMANENTEMENTE tódolos teus datos almacenados na nube para %1$s, os datos almacenados localmente na túa aplicación seguirán existindo.</string>
-    <string name="delete_all_cloud_data_question">Eliminar tódolos datos almacenados na nube?</string>
     <string name="experimental">Experimental</string>
     <string name="experimental_settings">Axustes experimentais</string>
     <string name="wallet_balance">Saldo da carteira</string>

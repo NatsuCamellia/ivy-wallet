@@ -7,14 +7,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import com.ivy.design.system.IvyMaterial3Theme
 import com.ivy.ui.R
 
+/** Edits one line of text; Confirm hands the edited value back, Cancel and outside taps dismiss. */
 @Composable
 fun TextInputDialog(
     title: String,
@@ -23,10 +22,20 @@ fun TextInputDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var value by remember(initialValue) { mutableStateOf(initialValue) }
+    var value by rememberSaveable(initialValue) { mutableStateOf(initialValue) }
     AlertDialog(
-        modifier = modifier,
         onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = { onConfirm(value) }) {
+                Text(text = stringResource(R.string.confirm))
+            }
+        },
+        modifier = modifier,
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.cancel))
+            }
+        },
         title = { Text(text = title) },
         text = {
             OutlinedTextField(
@@ -35,28 +44,5 @@ fun TextInputDialog(
                 singleLine = true,
             )
         },
-        confirmButton = {
-            TextButton(onClick = { onConfirm(value) }) {
-                Text(text = stringResource(R.string.confirm))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel))
-            }
-        },
     )
-}
-
-@Preview
-@Composable
-private fun TextInputDialogPreview() {
-    IvyMaterial3Theme(isTrueBlack = false) {
-        TextInputDialog(
-            title = "Name",
-            initialValue = "Ivy",
-            onConfirm = {},
-            onDismiss = {},
-        )
-    }
 }

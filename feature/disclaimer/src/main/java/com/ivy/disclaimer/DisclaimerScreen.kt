@@ -1,7 +1,7 @@
 package com.ivy.disclaimer
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -51,17 +51,17 @@ private fun Content(
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = modifier.padding(horizontal = 16.dp)
+        modifier = modifier.padding(horizontal = 16.dp),
+        contentPadding = PaddingValues(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
             OpenSourceCard()
         }
         item {
-            Spacer(modifier = Modifier.height(12.dp))
             AcceptTermsText()
         }
         itemsIndexed(items = viewState.checkboxes) { index, item ->
-            Spacer(modifier = Modifier.height(8.dp))
             AgreementCheckBox(
                 viewState = item,
                 onClick = {
@@ -70,14 +70,9 @@ private fun Content(
             )
         }
         item {
-            Spacer(modifier = Modifier.height(12.dp))
             AgreeButton(
                 enabled = viewState.agreeButtonEnabled,
             ) { onEvent(DisclaimerViewEvent.OnAgreeClick) }
-        }
-        item {
-            // To ensure proper scrolling
-            Spacer(modifier = Modifier.height(48.dp))
         }
     }
 }

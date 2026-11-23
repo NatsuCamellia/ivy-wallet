@@ -40,8 +40,8 @@ import com.ivy.wallet.domain.deprecated.logic.loantrasactions.LoanTransactionsLo
 import com.ivy.wallet.domain.deprecated.logic.model.CreateAccountData
 import com.ivy.wallet.domain.deprecated.logic.model.CreateLoanRecordData
 import com.ivy.wallet.domain.deprecated.logic.model.EditLoanRecordData
-import com.ivy.wallet.ui.theme.modal.LoanModalData
-import com.ivy.wallet.ui.theme.modal.LoanRecordModalData
+import com.ivy.legacy.ui.sheet.LoanModalData
+import com.ivy.legacy.ui.sheet.LoanRecordModalData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf

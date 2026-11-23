@@ -1,51 +1,32 @@
 package com.ivy.ui.component.transaction
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.ListItemShapes
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ivy.design.system.LocalIvyExtendedColors
 import com.ivy.ui.R
 
-private val LargeCorner = 24.dp
-private val SmallCorner = 8.dp
-
-fun TransactionItemPosition.toShape(): RoundedCornerShape = when (this) {
-    TransactionItemPosition.Single -> RoundedCornerShape(LargeCorner)
-    TransactionItemPosition.First ->
-        RoundedCornerShape(LargeCorner, LargeCorner, SmallCorner, SmallCorner)
-    TransactionItemPosition.Middle -> RoundedCornerShape(SmallCorner)
-    TransactionItemPosition.Last ->
-        RoundedCornerShape(SmallCorner, SmallCorner, LargeCorner, LargeCorner)
-}
-
+/**
+ * One transaction as a row of a segmented group: [position] gives it rounded outer corners and the gap
+ * between rows is the caller's. A planned payment passes [onSkip] and [onPayOrGet] for its buttons.
+ */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TransactionItem(
     ui: TransactionItemUi,
@@ -57,140 +38,106 @@ fun TransactionItem(
     payOrGetText: String? = null,
     icon: @Composable () -> Unit,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(position.toShape())
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 13.dp)
-            .testTag("transaction_item"),
+    val hasButtons = onSkip != null || onPayOrGet != null
+    SegmentedListItem(
+        onClick = onClick,
+        shapes = position.toShapes(),
+        colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        modifier = modifier.testTag("transaction_item"),
+        leadingContent = icon,
+        overlineContent = ui.dueText?.let { dueText ->
+            {
+                Text(text = dueText, color = ui.amountKind.amountColor())
+            }
+        },
+        supportingContent = if (ui.supportingText != null || ui.time != null || hasButtons) {
+            {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (ui.supportingText != null || ui.time != null) {
+                        SupportingLine(supportingText = ui.supportingText, time = ui.time)
+                    }
+                    if (hasButtons) {
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (onSkip != null) {
+                                OutlinedButton(onClick = onSkip) { Text(stringResource(R.string.skip)) }
+                            }
+                            if (onPayOrGet != null) {
+                                Button(onClick = onPayOrGet) { Text(payOrGetText ?: stringResource(R.string.pay)) }
+                            }
+                        }
+                    }
+                }
+            }
+        } else {
+            null
+        },
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            CategoryIconBubble(categoryColor = ui.categoryColor, icon = icon)
-            Spacer(Modifier.width(14.dp))
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = ui.title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                when {
-                    ui.dueText != null -> DueChip(
-                        text = ui.dueText,
-                        overdue = ui.amountKind == TransactionAmountKind.Overdue,
-                    )
-                    ui.supportingText != null -> Text(
-                        text = ui.supportingText,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
-            Spacer(Modifier.width(12.dp))
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = ui.amountText,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = ui.amountKind.amountColor(),
-                )
-                if (ui.secondaryText != null) {
-                    Text(
-                        text = ui.secondaryText,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-            }
+        Headline(ui)
+    }
+}
+
+/** One line: the text takes the width left over and ellipsizes, the time keeps its own width. */
+@Composable
+private fun SupportingLine(supportingText: String?, time: String?) {
+    Row {
+        if (supportingText != null) {
+            Text(
+                text = supportingText,
+                modifier = Modifier.weight(1f, fill = false),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
-        if (onSkip != null || onPayOrGet != null) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 10.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
-            ) {
-                if (onSkip != null) {
-                    FilledTonalButton(onClick = onSkip) {
-                        Text(text = stringResource(R.string.skip))
-                    }
-                }
-                if (onPayOrGet != null) {
-                    Button(onClick = onPayOrGet) {
-                        Text(text = payOrGetText ?: stringResource(R.string.pay))
-                    }
-                }
+        if (time != null) {
+            Text(text = if (supportingText != null) " · $time" else time, maxLines = 1, softWrap = false)
+        }
+    }
+}
+
+/** The title and the amount share a line; when the amount is too wide for that it moves to its own line. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun Headline(ui: TransactionItemUi) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Text(
+            text = ui.title,
+            modifier = Modifier.weight(1f),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Column(horizontalAlignment = Alignment.End) {
+            Text(
+                text = ui.amountText,
+                style = MaterialTheme.typography.titleMediumEmphasized,
+                color = ui.amountKind.amountColor(),
+            )
+            if (ui.secondaryText != null) {
+                Text(
+                    text = ui.secondaryText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
         }
     }
+}
+
+@Composable
+private fun TransactionItemPosition.toShapes(): ListItemShapes = when (this) {
+    TransactionItemPosition.Single -> ListItemDefaults.segmentedShapes(index = 0, count = 1)
+    TransactionItemPosition.First -> ListItemDefaults.segmentedShapes(index = 0, count = 2)
+    TransactionItemPosition.Middle -> ListItemDefaults.segmentedShapes(index = 1, count = 3)
+    TransactionItemPosition.Last -> ListItemDefaults.segmentedShapes(index = 1, count = 2)
 }
 
 @Composable
 private fun TransactionAmountKind.amountColor(): Color = when (this) {
-    TransactionAmountKind.Expense -> MaterialTheme.colorScheme.onSurface
-    TransactionAmountKind.Income -> LocalIvyExtendedColors.current.income
+    TransactionAmountKind.Expense -> MaterialTheme.colorScheme.error
+    TransactionAmountKind.Income -> MaterialTheme.colorScheme.tertiary
     TransactionAmountKind.Transfer -> MaterialTheme.colorScheme.primary
-    TransactionAmountKind.Upcoming -> LocalIvyExtendedColors.current.warning
+    TransactionAmountKind.Upcoming -> MaterialTheme.colorScheme.secondary
     TransactionAmountKind.Overdue -> MaterialTheme.colorScheme.error
-}
-
-private const val ContainerAlpha = 0.24f
-private const val ContentBlend = 0.45f
-
-@Composable
-private fun CategoryIconBubble(
-    categoryColor: Color?,
-    icon: @Composable () -> Unit,
-) {
-    val container = if (categoryColor != null) {
-        categoryColor.copy(alpha = ContainerAlpha)
-            .compositeOver(MaterialTheme.colorScheme.surfaceContainerHigh)
-    } else {
-        MaterialTheme.colorScheme.surfaceContainerHigh
-    }
-    val content = if (categoryColor != null) {
-        lerp(categoryColor, MaterialTheme.colorScheme.onSurface, ContentBlend)
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
-    Box(
-        modifier = Modifier
-            .size(40.dp)
-            .clip(CircleShape)
-            .background(container),
-        contentAlignment = Alignment.Center,
-    ) {
-        CompositionLocalProvider(LocalContentColor provides content) {
-            icon()
-        }
-    }
-}
-
-@Composable
-private fun DueChip(text: String, overdue: Boolean) {
-    val background = if (overdue) {
-        MaterialTheme.colorScheme.errorContainer
-    } else {
-        LocalIvyExtendedColors.current.warningContainer
-    }
-    val contentColor = if (overdue) {
-        MaterialTheme.colorScheme.onErrorContainer
-    } else {
-        LocalIvyExtendedColors.current.onWarningContainer
-    }
-    Text(
-        text = text,
-        style = MaterialTheme.typography.labelSmall,
-        color = contentColor,
-        modifier = Modifier
-            .padding(top = 4.dp)
-            .clip(CircleShape)
-            .background(background)
-            .padding(horizontal = 10.dp, vertical = 3.dp),
-    )
 }

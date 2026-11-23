@@ -9,7 +9,6 @@ sealed interface SettingsEvent {
     data class ExportToCsv(val rootScreen: RootScreen) : SettingsEvent
     data class BackupData(val rootScreen: RootScreen) : SettingsEvent
     data class SetTheme(val theme: Theme) : SettingsEvent
-    data class SetDynamicColor(val enabled: Boolean) : SettingsEvent
     data class SetLockApp(val lockApp: Boolean) : SettingsEvent
     data class SetShowNotifications(val showNotifications: Boolean) : SettingsEvent
     data class SetHideCurrentBalance(val hideCurrentBalance: Boolean) : SettingsEvent

@@ -5,8 +5,6 @@
     <string name="month_income">WPŁYWY W TYM MIESIĄCU</string>
     <string name="month_expenses">WYDATKI W TYM MIESIĄCU</string>
     <string name="excluded">(wykluczony)</string>
-    <string name="income_uppercase">WPŁYWY</string>
-    <string name="expenses_uppercase">WYDATKI</string>
     <string name="app_locked">APLIKACJA ZABLOKOWANA</string>
     <string name="authenticate_text">Autoryzacja w celu otwarcia aplikacji</string>
     <string name="unlock">Odblokuj</string>
@@ -103,7 +101,6 @@
     <string name="light_mode">Tryb jasny</string>
     <string name="dark_mode">Tryb ciemny</string>
     <string name="auto_mode">Tryb automatyczny</string>
-    <string name="planned_payments">Zaplanowane\nPłatności</string>
     <string name="share_ivy">Udostępnij Ivy</string>
     <string name="reports">Zgłoszenia</string>
     <string name="loans">Pożyczki</string>
@@ -115,8 +112,6 @@
     <string name="no_loans_description">Nie masz żadnych pożyczek.\nDotknij przycisk \"+ Dodaj pożyczkę\" Aby ją dodać.</string>
     <string name="loan_confirm_deletion_description">Uwaga: Usunięcie tej pożyczki spowoduje jej trwałe usunięcie i usunięcie wszystkich powiązanych z nią rekordów pożyczek.</string>
     <string name="confirm_account_loan_change">Proszę czekać, przeliczanie wszystkich rekordów pożyczek</string>
-    <string name="paid">Zapłać</string>
-    <string name="left_to_pay">%1$s %2$s pozostało</string>
     <string name="loan_interest">Oprocentowanie kredytu</string>
     <string name="interest_paid">%1$s %2$s zapłacono</string>
     <string name="add_record">Dodaj rekord</string>
@@ -136,23 +131,12 @@
     <string name="transactions">transakcje</string>
     <string name="home">Pulpit</string>
     <string name="add_planned_payment">Dodaj zaplanowaną płatność</string>
-    <string name="add_income_uppercase">DODAJ WPŁYW</string>
-    <string name="add_expense_uppercase">DODAJ WYDATEK</string>
-    <string name="account_transfer">TRANSFER KONTA</string>
     <string name="skip">Pomiń</string>
     <string name="add_new">Dodaj nowy</string>
     <string name="from_date">Od %1$s</string>
     <string name="to_date">Do %1$s</string>
     <string name="range">Zakres</string>
-    <string name="privacy_and_data_collection">Prytatność i \nzbieranie danych</string>
-    <string name="swipe_to_agree_terms_conditions">Przeciągnij, aby zaakceptować nasze zasady i warunki</string>
-    <string name="agreed_terms_conditions">Zaakceptowano nasze zasady i warunki</string>
-    <string name="swipe_to_agree_privacy_policy">Przeciągnij, aby zaakceptować naszą politykę prywatności</string>
-    <string name="agreed_privacy_policy">Zaakceptowano naszą politykę prywatności</string>
-    <string name="terms_and_conditions">Zasady i warunki</string>
     <string name="privacy_policy">Polityka prywatności</string>
-    <string name="wallet_description">Śledź swoje wpływy, wydatki i budżet z Ivy.\n\nIntuicyjne UI, cykliczne i planowane płatności, zarządzanie wieloma kontami, organizowanie transakcji w kategoriach, czytelne statystyki, eksport do CSV i wiele więcej.</string>
-    <string name="enter_your_name">Podaj swoje imię\naby spersonalizować swój\nportfel</string>
     <string name="what_is_your_name">Jak masz na imię?</string>
     <string name="enter">Enter</string>
     <string name="add_accounts">Dodaj konta</string>
@@ -182,12 +166,8 @@
     <string name="planned_payment_confirm_deletion_description">Usunięcie tej planowanej płatności spowoduje usunięcie wszystkich powiązanych z nią nieopłaconych, nadchodzących lub zaległych transakcji.</string>
     <string name="set_payment_type">Ustaw typ płatności</string>
     <string name="planned_start_at">Zaplanowany start w </string>
-    <string name="repeats_every">POWTARZA SIĘ CO %1$d %2$s</string>
     <string name="deleted">usunięto</string>
-    <string name="planned_for_uppercase">"ZAPLANOWANE NA "</string>
     <string name="null_text">nieważne</string>
-    <string name="starts_date">"STARTUJE %1$s "</string>
-    <string name="add_payment">Dodaj płatność</string>
     <string name="one_time_payments">Jednorazowa płatność</string>
     <string name="recurring_payments">Płatności cykliczne</string>
     <string name="no_planned_payments">Brak zaplanowanych płatności`</string>
@@ -199,8 +179,6 @@
     <string name="due_on">Termin na %1$s</string>
     <string name="upcoming">Nadchodzące</string>
     <string name="overdue">Zaległość</string>
-    <string name="expenses_lowercase">wydatki</string>
-    <string name="income_lowercase">wpływy</string>
     <string name="edit_account">Edytuj konto</string>
     <string name="new_account">Nowe konto</string>
     <string name="account_name">Nazwa konta</string>
@@ -227,9 +205,7 @@
     <string name="select_all">Zaznacz wszystko</string>
     <string name="amount_optional">Ilość (opcjonalnie)</string>
     <string name="keywords_optional">Słowa kluczowe (opcjonalnie)</string>
-    <string name="includes_uppercase">ZAWIERA</string>
     <string name="add_keyword">Dodaj słowo kluczowe</string>
-    <string name="excludes_uppercase">WYKLUCZONE</string>
     <string name="no_transactions_for_your_filter">Nie znaleziono żadnych transakcji dla tego filtra.</string>
     <string name="no_filter">Brak filtra</string>
     <string name="invalid_filter_warning">Aby wygenerować raport, musisz najpierw ustawić prawidłowy filtr.</string>
@@ -267,7 +243,6 @@
     <string name="request_a_feature">Poproś o dodanie nowych funkcji</string>
     <string name="contact_support">Skontaktuj się z supportem</string>
     <string name="project_contributors">Współtwórcy projektu</string>
-    <string name="account_uppercase">KONTO</string>
     <string name="logout">Wyloguj</string>
     <string name="login">Zaloguj</string>
     <string name="syncing">Synchronizuję…</string>
@@ -304,7 +279,6 @@
     <string name="unselect_all_time">Usuń zaznaczenie opcji Cały czas</string>
     <string name="select_all_time">Zaznacz opcję Cały czas</string>
     <string name="choose_start_date_of_month">Wybierz pierwszy dzień miesiąca</string>
-    <string name="supports_crypto">wspiera krypto</string>
     <string name="delete">Usuń</string>
     <string name="save">Zapisz</string>
     <string name="add">Dodaj</string>
@@ -436,8 +410,6 @@
     <string name="confirm_skip_all">Potwierdź pominięcie wszystkich</string>
     <string name="confirm_skip_all_description">Czy na pewno chcesz pominąć wszystkie zaległe zaplanowane płatności?</string>
     <string name="switch_to_offline_mode">Przełącz na konto offline</string>
-    <string name="delete_all_user_cloud_data_warning">UWAGA! Ta czynność spowoduje TRWAŁE usunięcie wszystkich przechowywanych w chmurze danych %1$s, dane offline przechowywane w Twojej aplikacji lokalnej pozostaną nienaruszone.</string>
-    <string name="delete_all_cloud_data_question">Usunąć wszystkie dane z chmury?</string>
     <string name="experimental">Eksperymentalne</string>
     <string name="experimental_settings">Ustawienia eksperymentalne</string>
     <string name="wallet_balance">Saldo portfela</string>

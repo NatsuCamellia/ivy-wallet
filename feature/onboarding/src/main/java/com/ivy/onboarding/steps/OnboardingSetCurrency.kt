@@ -1,126 +1,97 @@
 package com.ivy.onboarding.steps
 
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.legacy.IvyWalletPreview
-import com.ivy.legacy.utils.setStatusBarDarkTextCompat
+import com.ivy.base.legacy.Theme
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.CurrencyPicker
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
+import com.ivy.onboarding.components.OnboardingToolbar
 import com.ivy.ui.R
 import com.ivy.wallet.domain.data.IvyCurrency
-import com.ivy.wallet.ui.theme.GradientIvy
-import com.ivy.wallet.ui.theme.White
-import com.ivy.wallet.ui.theme.components.BackButton
-import com.ivy.wallet.ui.theme.components.CurrencyPicker
-import com.ivy.wallet.ui.theme.components.GradientCutBottom
-import com.ivy.wallet.ui.theme.components.OnboardingButton
 
 @Composable
-fun BoxWithConstraintsScope.OnboardingSetCurrency(
+fun OnboardingSetCurrency(
     preselectedCurrency: IvyCurrency,
-    onSetCurrency: (IvyCurrency) -> Unit
+    onSetCurrency: (IvyCurrency) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    setStatusBarDarkTextCompat(darkText = UI.colors.isLight)
-
     var currency by remember { mutableStateOf(preselectedCurrency) }
+    val nav = navigation()
 
-    Column(
-        modifier = Modifier
+    Scaffold(
+        modifier = modifier
             .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding(),
-    ) {
-        Spacer(Modifier.height(16.dp))
-
-        var keyboardVisible by remember {
-            mutableStateOf(false)
-        }
-
-        val nav = navigation()
-        BackButton(
-            modifier = Modifier.padding(start = 20.dp)
-        ) {
-            nav.onBackPressed()
-        }
-
-        if (!keyboardVisible) {
-            Spacer(Modifier.height(24.dp))
-
-            Text(
-                modifier = Modifier.padding(horizontal = 32.dp),
-                text = stringResource(R.string.set_currency),
-                style = UI.typo.h2.style(
-                    fontWeight = FontWeight.Black
-                )
+            .imePadding(),
+        topBar = {
+            OnboardingToolbar(
+                hasSkip = false,
+                onBack = { nav.onBackPressed() },
+                onSkip = {},
+                title = stringResource(R.string.set_currency)
             )
+        },
+        bottomBar = {
+            Button(
+                onClick = { onSetCurrency(currency) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .padding(16.dp)
+            ) {
+                Text(stringResource(R.string.set))
+            }
         }
-
-        Spacer(Modifier.height(24.dp))
-
+    ) { innerPadding ->
         CurrencyPicker(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .padding(innerPadding),
             initialSelectedCurrency = null,
             preselectedCurrency = preselectedCurrency,
-            includeKeyboardShownInsetSpacer = true,
-            lastItemSpacer = 120.dp,
-            onKeyboardShown = { keyboardShown ->
-                keyboardVisible = keyboardShown
-            }
+            includeKeyboardShownInsetSpacer = false,
         ) {
             currency = it
         }
-    }
-
-    GradientCutBottom(
-        height = 160.dp
-    )
-
-    OnboardingButton(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .align(Alignment.BottomCenter)
-            .navigationBarsPadding()
-            .padding(bottom = 20.dp),
-
-        text = stringResource(R.string.set),
-        textColor = White,
-        backgroundGradient = GradientIvy,
-        hasNext = true,
-        enabled = true
-    ) {
-        onSetCurrency(currency)
     }
 }
 
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletPreview {
-        OnboardingSetCurrency(
-            preselectedCurrency = IvyCurrency.getDefault()
-        ) {
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    WalletPreview(theme) {
+        NavigationRoot(navigation = Navigation()) {
+            OnboardingSetCurrency(
+                preselectedCurrency = IvyCurrency.getDefault(),
+                onSetCurrency = {}
+            )
         }
     }
+}
+
+/** For screenshot testing */
+@Composable
+fun OnboardingSetCurrencyUiTest(isDark: Boolean) {
+    val theme = when (isDark) {
+        true -> Theme.DARK
+        false -> Theme.LIGHT
+    }
+    Preview(theme)
 }

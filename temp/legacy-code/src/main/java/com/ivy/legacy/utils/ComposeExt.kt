@@ -21,49 +21,27 @@ import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsCompat
 import com.ivy.navigation.navigation
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 @Composable
 fun windowInsets(): WindowInsetsCompat {
     val rootView = LocalView.current
     return WindowInsetsCompat.toWindowInsetsCompat(rootView.rootWindowInsets, rootView)
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
-fun statusBarInset(): Int {
-    val windowInsets = windowInsets()
-    return windowInsets.getInsets(WindowInsetsCompat.Type.statusBars()).top
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
-fun navigationBarInset(): Int {
-    return navigationBarInsets().bottom
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 @Composable
 fun navigationBarInsets(): Insets {
     val windowInsets = windowInsets()
     return windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars())
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
-fun keyboardOnlyWindowInsets(): Insets {
-    val windowInsets = windowInsets()
-    return windowInsets.getInsets(
-        WindowInsetsCompat.Type.ime()
-    )
-}
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 @Composable
 fun <T> densityScope(densityScope: @Composable Density.() -> T): T {
     return with(LocalDensity.current) { densityScope() }
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 @SuppressLint("ComposableNaming")
 @Composable
 fun onScreenStart(
@@ -78,16 +56,13 @@ fun onScreenStart(
     }
 }
 
-@Composable
-fun rememberInteractionSource(): MutableInteractionSource = remember { MutableInteractionSource() }
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun Modifier.consumeClicks(interactionSource: MutableInteractionSource) =
     clickableNoIndication(interactionSource) {
         // consume click
     }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun Modifier.clickableNoIndication(
     interactionSource: MutableInteractionSource,
     onClick: () -> Unit
@@ -100,7 +75,7 @@ fun Modifier.clickableNoIndication(
     )
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun Modifier.drawColoredShadow(
     color: Color,
     alpha: Float = 0.15f,
@@ -133,25 +108,21 @@ fun Modifier.drawColoredShadow(
     }
 }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun selectEndTextFieldValue(text: String?) = TextFieldValue(
     text = text ?: "",
     selection = TextRange(text?.length ?: 0)
 )
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Composable
-fun Dp.toDensityPx() = densityScope { toPx() }
-
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 @Composable
 fun Int.toDensityDp() = densityScope { toDp() }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 @Composable
 fun Float.toDensityDp() = densityScope { toDp() }
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
+@Deprecated("Legacy code. Don't use it, please.")
 fun openUrl(uriHandler: UriHandler, url: String) {
     uriHandler.openUri(url)
 }

@@ -2,7 +2,7 @@ package com.ivy.loans.loan
 
 import com.ivy.legacy.datamodel.Account
 import com.ivy.loans.loan.data.DisplayLoan
-import com.ivy.wallet.ui.theme.modal.LoanModalData
+import com.ivy.legacy.ui.sheet.LoanModalData
 import kotlinx.collections.immutable.ImmutableList
 import java.time.Instant
 

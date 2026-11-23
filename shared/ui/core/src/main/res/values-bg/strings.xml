@@ -5,8 +5,6 @@
     <string name="month_income">ПРИХОДИ ТОЗИ МЕСЕЦ</string>
     <string name="month_expenses">РАЗХОДИ ТОЗИ МЕСЕЦ</string>
     <string name="excluded">(изключен)</string>
-    <string name="income_uppercase">ПРИХОДИ</string>
-    <string name="expenses_uppercase">РАЗХОДИ</string>
     <string name="app_locked">ЗАКЛЮЧЕН</string>
     <string name="authenticate_text">Отключете, за влизане</string>
     <string name="unlock">Отключи</string>
@@ -103,7 +101,6 @@
     <string name="light_mode">Бяла тема</string>
     <string name="dark_mode">Черна тема</string>
     <string name="auto_mode">Автоматична</string>
-    <string name="planned_payments">Планирани\nПлащания</string>
     <string name="share_ivy">Сподели Ivy</string>
     <string name="reports">Репорти</string>
     <string name="loans">Заеми</string>
@@ -115,8 +112,6 @@
     <string name="no_loans_description">Нямате заемо.\nЗа да добавите натиснете \"+ Добави заемо\" бутона.</string>
     <string name="loan_confirm_deletion_description">Важно: Ако изтриете заема всички записи свързани с него ще бъдат изтрити.</string>
     <string name="confirm_account_loan_change">Моля изчакайте, пресмятане</string>
-    <string name="paid">Платено</string>
-    <string name="left_to_pay">%1$s %2$s остава</string>
     <string name="loan_interest">Лихва</string>
     <string name="interest_paid">%1$s %2$s платено</string>
     <string name="add_record">Добави запис</string>
@@ -135,23 +130,12 @@
     <string name="transactions">транзацкии</string>
     <string name="home">Начален</string>
     <string name="add_planned_payment">Добави планирано плащане</string>
-    <string name="add_income_uppercase">Добави приход</string>
-    <string name="add_expense_uppercase">Добави разход</string>
-    <string name="account_transfer">Трансфер</string>
     <string name="skip">Пропусни</string>
     <string name="add_new">Добави</string>
     <string name="from_date">От %1$s</string>
     <string name="to_date">До %1$s</string>
     <string name="range">Период</string>
-    <string name="privacy_and_data_collection">Privacy and\ndata collection</string>
-    <string name="swipe_to_agree_terms_conditions">Swipe to agree with our Terms and conditions</string>
-    <string name="agreed_terms_conditions">Agreed with our Terms and conditions</string>
-    <string name="swipe_to_agree_privacy_policy">Swipe to agree with our Privacy policy</string>
-    <string name="agreed_privacy_policy">Agreed with our Privacy policy</string>
-    <string name="terms_and_conditions">Общи условия</string>
     <string name="privacy_policy">Privacy policy</string>
-    <string name="wallet_description">Track your income, expenses and budget with Ivy.\n\nIntuitive UI, recurring and planned payments, manage multiple accounts, organize transactions in categories, meaningful statistics, export to CSV and so much more.</string>
-    <string name="enter_your_name">Enter your name\nto personalize your\nwallet</string>
     <string name="what_is_your_name">What\'s your name?</string>
     <string name="enter">Задай</string>
     <string name="add_accounts">Добави сметка</string>
@@ -181,12 +165,8 @@
     <string name="planned_payment_confirm_deletion_description">Ако изтриете планираното плащане всички неплатени транзакции ще бъдат изтрити заедно с него.</string>
     <string name="set_payment_type">Тип плащане</string>
     <string name="planned_start_at">Планиран старт</string>
-    <string name="repeats_every">ПОВТАРЯ СЕ ВСЕКИ %1$d %2$s</string>
     <string name="deleted">изтрито</string>
-    <string name="planned_for_uppercase">"ПЛАНИРАНО ЗА "</string>
     <string name="null_text">null</string>
-    <string name="starts_date">"СТАРТИРА %1$s "</string>
-    <string name="add_payment">Добави плащане</string>
     <string name="one_time_payments">Еднократно плащане</string>
     <string name="recurring_payments">Повтарящо се плащане</string>
     <string name="no_planned_payments">Няма планирани плащания</string>
@@ -198,8 +178,6 @@
     <string name="due_on">Дължи на %1$s</string>
     <string name="upcoming">Предстоящи</string>
     <string name="overdue">Закъснели</string>
-    <string name="expenses_lowercase">разходи</string>
-    <string name="income_lowercase">приходи</string>
     <string name="edit_account">Редакция</string>
     <string name="new_account">Нова сметка</string>
     <string name="account_name">Сметка</string>
@@ -226,9 +204,7 @@
     <string name="select_all">Избери всички</string>
     <string name="amount_optional">Размер (по избор)</string>
     <string name="keywords_optional">Ключови думи (по избор)</string>
-    <string name="includes_uppercase">ВКЛЮЧВА</string>
     <string name="add_keyword">Добави включова дума</string>
-    <string name="excludes_uppercase">НЕ ВКЛЮЧВА</string>
     <string name="no_transactions_for_your_filter">Не е зададен филтър.</string>
     <string name="no_filter">Няма филтър</string>
     <string name="invalid_filter_warning">За да генерирате отчет първо задайте валиден филтър.</string>
@@ -264,7 +240,6 @@
     <string name="request_a_feature">Поискай функционалност</string>
     <string name="contact_support">Техническа поддръжка</string>
     <string name="project_contributors">Разработчици</string>
-    <string name="account_uppercase">АКАУНТ</string>
     <string name="logout">Изход</string>
     <string name="login">Вход</string>
     <string name="syncing">Синхронизация…</string>
@@ -301,7 +276,6 @@
     <string name="unselect_all_time">От-селектирай Завинаги</string>
     <string name="select_all_time">Избери Завинаги</string>
     <string name="choose_start_date_of_month">Избери начална дата на месец</string>
-    <string name="supports_crypto">поддържа crypto</string>
     <string name="delete">Изтрий</string>
     <string name="save">Запази</string>
     <string name="add">Добави</string>
@@ -433,8 +407,6 @@
     <string name="confirm_skip_all">Потвърдете пропускането на всички</string>
     <string name="confirm_skip_all_description">Сигурни ли сте, че искате да пропуснете всички просрочени планирани операции?</string>
     <string name="switch_to_offline_mode">Switch to offline mode</string>
-    <string name="delete_all_user_cloud_data_warning">WARNING! This action will delete all your cloud-stored data for %1$s PERMANENTLY, the offline data stored in your local app will remain.</string>
-    <string name="delete_all_cloud_data_question">Delete all cloud-stored data?</string>
     <string name="experimental">Experimental</string>
     <string name="experimental_settings">Experimental Settings</string>
     <string name="wallet_balance">Wallet balance</string>

@@ -1,7 +1,7 @@
 package com.ivy.categories
 
 import com.ivy.wallet.domain.data.SortOrder
-import com.ivy.wallet.ui.theme.modal.edit.CategoryModalData
+import com.ivy.legacy.ui.sheet.CategoryModalData
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList

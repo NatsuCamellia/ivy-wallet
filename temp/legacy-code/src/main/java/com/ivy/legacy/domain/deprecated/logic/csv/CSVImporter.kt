@@ -19,9 +19,9 @@ import com.ivy.data.repository.CategoryRepository
 import com.ivy.data.repository.CurrencyRepository
 import com.ivy.data.repository.TransactionRepository
 import com.ivy.data.repository.mapper.TransactionMapper
-import com.ivy.design.IVY_COLOR_PICKER_COLORS_FREE
-import com.ivy.design.l0_system.Green
-import com.ivy.design.l0_system.IvyDark
+import com.ivy.ui.color.IVY_COLOR_PICKER_COLORS_FREE
+import com.ivy.ui.color.Green
+import com.ivy.ui.color.IvyDark
 import com.ivy.legacy.datamodel.temp.toLegacyDomain
 import com.ivy.legacy.datamodel.toEntity
 import com.ivy.legacy.utils.convertLocalToUTC

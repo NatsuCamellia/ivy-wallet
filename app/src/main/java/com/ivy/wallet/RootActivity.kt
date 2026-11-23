@@ -10,7 +10,7 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.activity.addCallback
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.ActivityResultLauncher
@@ -21,33 +21,21 @@ import androidx.biometric.BiometricPrompt
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.TimeFormat
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.ivy.IvyNavGraph
-import com.ivy.base.legacy.Theme
 import com.ivy.base.time.TimeConverter
 import com.ivy.base.time.TimeProvider
-import com.ivy.data.datasource.LocalAppearanceDataSource
-import com.ivy.design.api.IvyDesign
-import com.ivy.design.api.IvyUI
-import com.ivy.design.system.IvyColorSource
-import com.ivy.design.system.IvyMaterial3Theme
-import com.ivy.design.system.LocalIvyColorSource
-import com.ivy.design.system.colors.IvyColors
 import com.ivy.domain.RootScreen
 import com.ivy.home.customerjourney.CustomerJourneyCardsProvider
 import com.ivy.legacy.Constants
 import com.ivy.legacy.IvyWalletCtx
-import com.ivy.legacy.appDesign
+import com.ivy.legacy.ui.WalletRoot
 import com.ivy.legacy.utils.activityForResultLauncher
 import com.ivy.legacy.utils.sendToCrashlytics
 import com.ivy.legacy.utils.simpleActivityForResultLauncher
@@ -61,8 +49,6 @@ import com.ivy.widget.balance.WalletBalanceWidgetReceiver
 import com.ivy.widget.transaction.AddTransactionWidget
 import com.ivy.widget.transaction.AddTransactionWidgetCompact
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.LocalDate
-import java.time.LocalTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -89,9 +75,6 @@ class RootActivity : AppCompatActivity(), RootScreen {
     @Inject
     lateinit var dateTimePicker: DateTimePicker
 
-    @Inject
-    lateinit var appearanceDataSource: LocalAppearanceDataSource
-
     private lateinit var createFileLauncher: ActivityResultLauncher<String>
     private lateinit var onFileCreated: (fileUri: Uri) -> Unit
 
@@ -100,13 +83,11 @@ class RootActivity : AppCompatActivity(), RootScreen {
 
     private val viewModel: RootViewModel by viewModels()
 
-    @Suppress("LongMethod")
     @OptIn(ExperimentalFoundationApi::class, ExperimentalAnimationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         setupApp()
-        setupBackHandling()
         setContent {
             val viewModel: RootViewModel = viewModel()
             val isSystemInDarkTheme = isSystemInDarkTheme()
@@ -115,68 +96,44 @@ class RootActivity : AppCompatActivity(), RootScreen {
                 viewModel.start(isSystemInDarkTheme, intent)
             }
 
-            val dynamicColor by appearanceDataSource.dynamicColor.collectAsState(initial = true)
-            CompositionLocalProvider(
-                LocalIvyColorSource provides if (dynamicColor) {
-                    IvyColorSource.Dynamic
-                } else {
-                    IvyColorSource.BrandSeed(IvyColors.Purple.primary)
-                }
+            WalletRoot(
+                ctx = ivyContext,
+                timeConverter = timeConverter,
+                timeProvider = timeProvider,
+                timeFormatter = timeFormatter,
             ) {
                 val appLocked by viewModel.appLocked.collectAsState()
                 when (appLocked) {
                     null -> { // display nothing
                     }
                     true -> {
-                        IvyUI(
-                            design = appDesign(ivyContext),
-                            timeConverter = timeConverter,
-                            timeProvider = timeProvider,
-                            timeFormatter = timeFormatter,
-                        ) {
-                            AppLockedScreen(
-                                onShowOSBiometricsModal = {
-                                    authenticateWithOSBiometricsModal(
-                                        biometricPromptCallback = viewModel.handleBiometricAuthResult()
-                                    )
-                                },
-                                onContinueWithoutAuthentication = {
-                                    viewModel.unlockApp()
-                                }
-                            )
-                        }
+                        AppLockedScreen(
+                            onShowOSBiometricsModal = {
+                                authenticateWithOSBiometricsModal(
+                                    biometricPromptCallback = viewModel.handleBiometricAuthResult()
+                                )
+                            },
+                            onContinueWithoutAuthentication = {
+                                viewModel.unlockApp()
+                            }
+                        )
                     }
 
                     false -> {
                         NavigationRoot(navigation = navigation) { screen ->
-                            IvyUI(
-                                design = appDesign(ivyContext),
-                                includeSurface = screen?.isLegacy ?: true,
-                                timeConverter = timeConverter,
-                                timeProvider = timeProvider,
-                                timeFormatter = timeFormatter,
-                            ) {
-                                IvyNavGraph(screen)
-                            }
+                            IvyNavGraph(screen)
                         }
                     }
                 }
 
-                IvyMaterial3Theme(
-                    dark = isDarkThemeEnabled(
-                        ivyDesign = appDesign(ivyContext),
-                        systemDarkTheme = isSystemInDarkTheme
-                    ),
-                    isTrueBlack = appDesign(ivyContext).context().theme == Theme.AMOLED_DARK
-                ) {
-                    dateTimePicker.Content()
-                }
+                dateTimePicker.Content()
             }
         }
     }
 
     private fun setupApp() {
         setupActivityForResultLaunchers()
+        setupBackNavigation()
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setupDatePicker()
         setupTimePicker()
@@ -185,89 +142,37 @@ class RootActivity : AppCompatActivity(), RootScreen {
         WalletBalanceWidgetReceiver.updateBroadcast(this)
     }
 
-    private fun setupBackHandling() {
-        onBackPressedDispatcher.addCallback(this) {
-            val handled = !viewModel.isAppLocked() && navigation.onBackPressed()
-            if (!handled) {
-                isEnabled = false
-                onBackPressedDispatcher.onBackPressed()
-                isEnabled = true
-            }
-        }
-    }
+    // Since targetSdk 36 the system no longer calls Activity.onBackPressed(),
+    // so back must go through the OnBackPressedDispatcher.
+    private fun setupBackNavigation() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val handledInApp = !viewModel.isAppLocked() && navigation.onBackPressed()
+                    if (!handledInApp) {
+                        delegateBackToSystem()
+                    }
+                }
 
-    private companion object {
-        private const val MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000
+                private fun delegateBackToSystem() {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                    isEnabled = true
+                }
+            }
+        )
     }
 
     private fun setupDatePicker() {
-        ivyContext.onShowDatePicker = { minDate,
-                                        maxDate,
-                                        initialDate,
-                                        onDatePicked ->
-            val datePicker =
-                MaterialDatePicker.Builder.datePicker()
-                    .setSelection(
-                        if (initialDate != null) {
-                            initialDate.toEpochDay() * MILLISECONDS_IN_DAY
-                        } else {
-                            MaterialDatePicker.todayInUtcMilliseconds()
-                        }
-                    )
-                    .build()
-            datePicker.show(supportFragmentManager, "datePicker")
-            datePicker.addOnPositiveButtonClickListener {
-                onDatePicked(LocalDate.ofEpochDay(it / MILLISECONDS_IN_DAY))
-            }
-
-            if (minDate != null) {
-                datePicker.addOnCancelListener {
-                    onDatePicked(minDate)
-                }
-            }
-
-            if (maxDate != null) {
-                datePicker.addOnCancelListener {
-                    onDatePicked(maxDate)
-                }
-            }
-
-            if (initialDate != null) {
-                datePicker.addOnCancelListener {
-                    onDatePicked(initialDate)
-                }
-            }
+        ivyContext.onShowDatePicker = { _, _, initialDate, onDatePicked ->
+            dateTimePicker.pickCalendarDate(initialDate, onDatePicked)
         }
     }
 
     private fun setupTimePicker() {
-        ivyContext.onShowTimePicker = { initialTime,
-                                        onTimePicked ->
-            val nowLocal = initialTime ?: timeProvider.localTimeNow()
-            val is24Hour = android.text.format.DateFormat.is24HourFormat(this)
-            val timeFormat = if (is24Hour) TimeFormat.CLOCK_24H else TimeFormat.CLOCK_12H
-
-            val picker =
-                MaterialTimePicker.Builder()
-                    .setTimeFormat(timeFormat)
-                    .setHour(nowLocal.hour)
-                    .setMinute(nowLocal.minute)
-                    .build()
-            picker.show(supportFragmentManager, "timePicker")
-            picker.addOnPositiveButtonClickListener {
-                onTimePicked(
-                    LocalTime.of(picker.hour, picker.minute).withSecond(0)
-                )
-            }
-        }
-    }
-
-    private fun isDarkThemeEnabled(ivyDesign: IvyDesign, systemDarkTheme: Boolean): Boolean {
-        return when (ivyDesign.context().theme) {
-            Theme.LIGHT -> false
-            Theme.DARK -> true
-            Theme.AMOLED_DARK -> true
-            else -> systemDarkTheme
+        ivyContext.onShowTimePicker = { initialTime, onTimePicked ->
+            dateTimePicker.pickTime(initialTime, onTimePicked)
         }
     }
 

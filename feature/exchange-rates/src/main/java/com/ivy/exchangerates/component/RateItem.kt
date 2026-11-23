@@ -1,134 +1,67 @@
 package com.ivy.exchangerates.component
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.design.l1_buildingBlocks.SpacerHor
-import com.ivy.design.l1_buildingBlocks.SpacerWeight
+import com.ivy.base.legacy.Theme
 import com.ivy.exchangerates.data.RateUi
-import com.ivy.legacy.IvyWalletComponentPreview
-import com.ivy.legacy.utils.format
-import com.ivy.wallet.ui.theme.components.DeleteButton
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.AmountText
+import com.ivy.ui.R
 
 @Composable
 fun RateItem(
     rate: RateUi,
-    onDelete: (() -> Unit)?,
+    index: Int,
+    count: Int,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDelete: (() -> Unit)? = null,
 ) {
-    Row(
-        modifier = modifier
-            .padding(
-                horizontal = 16.dp
-            )
-            .clickable(onClick = onClick)
-            .border(2.dp, UI.colors.medium, UI.shapes.r4)
-
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-
-        ) {
-            val currencyValue: Double = 1.0
-            RateColumn(
-                label = "Sell",
-                rate = rate.from,
-                value = currencyValue.format(currencyCode = rate.from)
-            )
-
-            SpacerHor(width = 16.dp)
-            Icon(
-                imageVector = Icons.Filled.ArrowForward,
-                contentDescription = "arrow to next"
-            )
-            SpacerHor(width = 16.dp)
-            RateColumn(
-                label = "Buy",
-                rate = rate.to,
-                value = rate.rate.format(currencyCode = rate.to)
-            )
-
-            if (onDelete != null) {
-                SpacerWeight(weight = 1f)
-                DeleteButton(onClick = onDelete)
+    SegmentedListItem(
+        onClick = onClick,
+        shapes = ListItemDefaults.segmentedShapes(index = index, count = count),
+        colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        modifier = modifier.testTag("rate_item"),
+        trailingContent = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AmountText(
+                    amount = rate.rate,
+                    currency = rate.to,
+                    style = MaterialTheme.typography.titleMediumEmphasized,
+                )
+                if (onDelete != null) {
+                    IconButton(onClick = onDelete) {
+                        Icon(
+                            Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.delete_rate_pair, rate.from, rate.to)
+                        )
+                    }
+                }
             }
-        }
+        },
+    ) {
+        Text("${rate.from}–${rate.to}")
     }
 }
 
-@Composable
-private fun RateColumn(label: String, rate: String, value: String) {
-    Column {
-        Text(
-            text = label,
-            style = UI.typo.c.style(
-                fontWeight = FontWeight.Normal
-            )
-        )
-        Text(
-            text = rate,
-            style = UI.typo.nB1.style(
-                fontWeight = FontWeight.ExtraBold
-            )
-        )
-        Text(
-            text = value,
-            style = UI.typo.nB2.style(
-                fontWeight = FontWeight.Normal
-            )
-        )
-    }
-}
-
-// region Preview
+@Suppress("MagicNumber")
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletComponentPreview {
-        RateItem(
-            rate = RateUi(
-            from = "BGN",
-            to = "EUR",
-            rate = 1.95583
-        ),
-            onDelete = null,
-            onClick = {}
-        )
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    WalletPreview(theme) {
+        RateItem(rate = RateUi("BGN", "EUR", 1.95583), index = 0, count = 1, onClick = {}, onDelete = {})
     }
 }
-
-@Preview
-@Composable
-private fun Preview_Delete() {
-    IvyWalletComponentPreview {
-        RateItem(
-            rate = RateUi(
-                from = "BGN",
-                to = "EUR",
-                rate = 1.95583
-        ),
-            onDelete = { },
-            onClick = {}
-        )
-    }
-}
-// endregion

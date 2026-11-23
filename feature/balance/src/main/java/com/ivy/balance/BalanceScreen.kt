@@ -1,59 +1,51 @@
 package com.ivy.balance
 
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ivy.base.legacy.Theme
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.legacy.IvyWalletPreview
 import com.ivy.legacy.data.model.Month
 import com.ivy.legacy.data.model.TimePeriod
-import com.ivy.legacy.utils.format
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.component.AmountText
+import com.ivy.legacy.ui.sheet.ChoosePeriodModal
+import com.ivy.legacy.ui.sheet.ChoosePeriodModalData
 import com.ivy.navigation.BalanceScreen
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Gradient
-import com.ivy.wallet.ui.theme.Gray
-import com.ivy.wallet.ui.theme.Orange
-import com.ivy.wallet.ui.theme.White
-import com.ivy.wallet.ui.theme.components.BalanceRow
-import com.ivy.wallet.ui.theme.components.IvyCircleButton
-import com.ivy.wallet.ui.theme.components.IvyDividerLine
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModal
-import com.ivy.wallet.ui.theme.modal.ChoosePeriodModalData
-import com.ivy.wallet.ui.theme.wallet.PeriodSelector
-
-val FAB_BUTTON_SIZE = 56.dp
+import com.ivy.ui.component.BackButton
+import com.ivy.legacy.ui.component.PeriodSelector
 
 @Composable
-fun BoxWithConstraintsScope.BalanceScreen(screen: BalanceScreen) {
+fun BalanceScreen(screen: BalanceScreen) {
     val viewModel: BalanceViewModel = viewModel()
     val uiState = viewModel.uiState()
 
@@ -64,202 +56,124 @@ fun BoxWithConstraintsScope.BalanceScreen(screen: BalanceScreen) {
 }
 
 @Composable
-private fun BoxWithConstraintsScope.UI(
+private fun UI(
     state: BalanceState,
+    modifier: Modifier = Modifier,
     onEvent: (BalanceEvent) -> Unit = {}
 ) {
+    val nav = navigation()
     var choosePeriodModal: ChoosePeriodModalData? by remember { mutableStateOf(null) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-            .navigationBarsPadding()
-    ) {
-        Spacer(Modifier.height(20.dp))
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.balance_title)) },
+                navigationIcon = { BackButton(onClick = { nav.back() }) },
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            PeriodSelector(
+                period = state.period,
+                onPreviousMonth = { onEvent(BalanceEvent.OnPreviousMonth) },
+                onNextMonth = { onEvent(BalanceEvent.OnNextMonth) },
+                onShowChoosePeriodModal = {
+                    choosePeriodModal = ChoosePeriodModalData(period = state.period)
+                }
+            )
 
-        PeriodSelector(
-            period = state.period,
-            onPreviousMonth = { onEvent(BalanceEvent.OnPreviousMonth) },
-            onNextMonth = { onEvent(BalanceEvent.OnNextMonth) },
-            onShowChoosePeriodModal = {
-                choosePeriodModal = ChoosePeriodModalData(
-                    period = state.period
+            Card(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                BalanceRow(
+                    label = stringResource(R.string.current_balance),
+                    amount = state.currentBalance,
+                    currency = state.baseCurrencyCode,
+                    style = MaterialTheme.typography.titleLargeEmphasized,
+                    modifier = Modifier.testTag("current_balance"),
+                )
+                BalanceRow(
+                    label = stringResource(R.string.planned_payments_inline),
+                    amount = state.plannedPaymentsAmount,
+                    currency = state.baseCurrencyCode,
+                    style = MaterialTheme.typography.titleLargeEmphasized,
+                    showPlusSign = true,
+                    modifier = Modifier.testTag("planned_payments"),
+                )
+                HorizontalDivider()
+                BalanceRow(
+                    label = stringResource(R.string.balance_after_payments),
+                    amount = state.balanceAfterPlannedPayments,
+                    currency = state.baseCurrencyCode,
+                    style = MaterialTheme.typography.displaySmallEmphasized,
+                    modifier = Modifier.testTag("balance_after_payments"),
                 )
             }
-        )
-
-        Spacer(Modifier.height(32.dp))
-
-        CurrentBalance(
-            currency = state.baseCurrencyCode,
-            currentBalance = state.currentBalance
-        )
-
-        Spacer(Modifier.height(32.dp))
-
-        IvyDividerLine(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-        )
-
-        Spacer(Modifier.height(40.dp))
-
-        BalanceAfterPlannedPayments(
-            currency = state.baseCurrencyCode,
-            currentBalance = state.currentBalance,
-            plannedPaymentsAmount = state.plannedPaymentsAmount,
-            balanceAfterPlannedPayments = state.balanceAfterPlannedPayments
-        )
-
-        Spacer(Modifier.weight(1f))
-
-        CloseButton()
-
-        Spacer(Modifier.height(48.dp))
+        }
     }
 
     ChoosePeriodModal(
         modal = choosePeriodModal,
-        dismiss = {
-            choosePeriodModal = null
-        }
+        dismiss = { choosePeriodModal = null }
     ) {
         onEvent(BalanceEvent.OnSetPeriod(it))
     }
 }
 
 @Composable
-private fun ColumnScope.CurrentBalance(
+private fun BalanceRow(
+    label: String,
+    amount: Double,
     currency: String,
-    currentBalance: Double
+    style: TextStyle,
+    modifier: Modifier = Modifier,
+    showPlusSign: Boolean = false,
 ) {
-    Text(
-        modifier = Modifier.align(Alignment.CenterHorizontally),
-        text = stringResource(R.string.current_balance),
-        style = UI.typo.b2.style(
-            color = Gray,
-            fontWeight = FontWeight.ExtraBold
-        )
-    )
-
-    Spacer(Modifier.height(4.dp))
-
-    BalanceRow(
-        modifier = Modifier.align(Alignment.CenterHorizontally),
-        currency = currency,
-        balance = currentBalance
-    )
-}
-
-@Composable
-private fun ColumnScope.BalanceAfterPlannedPayments(
-    currency: String,
-    currentBalance: Double,
-    plannedPaymentsAmount: Double,
-    balanceAfterPlannedPayments: Double
-) {
-    Text(
-        modifier = Modifier
-            .padding(horizontal = 32.dp),
-        text = stringResource(R.string.balance_after_payments),
-        style = UI.typo.b2.style(
-            color = Orange,
-            fontWeight = FontWeight.ExtraBold
-        )
-    )
-
-    Spacer(Modifier.height(8.dp))
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
+    ListItem(
+        modifier = modifier,
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        overlineContent = { Text(label) },
     ) {
-        Spacer(Modifier.width(32.dp))
-
-        BalanceRow(
+        AmountText(
+            amount = amount,
             currency = currency,
-            balance = balanceAfterPlannedPayments,
-
-            balanceFontSize = 30.sp,
-            currencyFontSize = 18.sp,
-
-            currencyUpfront = false
+            style = style,
+            showPlusSign = showPlusSign,
+            textAlign = TextAlign.Start,
         )
-
-        Spacer(Modifier.weight(1f))
-
-        Column(
-            horizontalAlignment = Alignment.End,
-        ) {
-            Spacer(Modifier.height(4.dp))
-
-            Text(
-                text = "${currentBalance.format(2)} $currency",
-                style = UI.typo.nC.style(
-                    color = UI.colors.pureInverse,
-                    fontWeight = FontWeight.Normal
-                )
-            )
-
-            Spacer(Modifier.height(2.dp))
-
-            val plusSign = if (plannedPaymentsAmount >= 0) "+" else ""
-            Text(
-                text = "${plusSign}${plannedPaymentsAmount.format(2)} $currency",
-                style = UI.typo.nC.style(
-                    color = UI.colors.pureInverse,
-                    fontWeight = FontWeight.ExtraBold
-                )
-            )
-        }
-
-        Spacer(Modifier.width(32.dp))
-    }
-}
-
-@Composable
-private fun ColumnScope.CloseButton() {
-    val nav = navigation()
-    IvyCircleButton(
-        modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .size(FAB_BUTTON_SIZE)
-            .rotate(45f)
-            .zIndex(200f),
-        backgroundPadding = 8.dp,
-        icon = R.drawable.ic_add,
-        backgroundGradient = Gradient.solid(Gray),
-        hasShadow = false,
-        tint = White
-    ) {
-        nav.back()
     }
 }
 
 @Preview
 @Composable
-private fun Preview(theme: Theme = Theme.LIGHT) {
-    IvyWalletPreview(theme) {
-        UI(
-            state = BalanceState(
-                period = TimePeriod(month = Month.monthsList().first()),
-                baseCurrencyCode = "BGN",
-                currentBalance = 9326.55,
-                balanceAfterPlannedPayments = 8426.0,
-                plannedPaymentsAmount = -900.55,
-            )
+private fun Preview(theme: Theme = Theme.LIGHT, huge: Boolean = false) {
+    WalletPreview(theme) {
+        val state = BalanceState(
+            period = TimePeriod(month = Month.monthsList().first()),
+            baseCurrencyCode = "BGN",
+            currentBalance = if (huge) 123456789012.34 else 9326.55,
+            balanceAfterPlannedPayments = if (huge) 222222221122.21 else 8426.0,
+            plannedPaymentsAmount = if (huge) 98765432109.87 else -900.55,
         )
+        NavigationRoot(navigation = Navigation()) {
+            UI(state = state)
+        }
     }
 }
 
 /** For screenshot testing */
 @Composable
 fun BalanceScreenUiTest(isDark: Boolean) {
-    val theme = when (isDark) {
-        true -> Theme.DARK
-        false -> Theme.LIGHT
-    }
-    Preview(theme)
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT)
+}
+
+/** For screenshot testing */
+@Composable
+fun BalanceHugeAmountUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT, huge = true)
 }

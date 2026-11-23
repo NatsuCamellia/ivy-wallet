@@ -5,18 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
@@ -28,12 +24,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ivy.base.legacy.Theme
+import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
+import com.ivy.ui.component.BackButton
+import com.ivy.ui.theme.WalletTheme
+import com.ivy.ui.withFabClearance
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun ReleasesScreenImpl() {
@@ -55,6 +58,7 @@ private fun ReleasesUi(
     onEvent: (ReleasesEvent) -> Unit
 ) {
     val browser = LocalUriHandler.current
+    val nav = navigation()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -62,7 +66,7 @@ private fun ReleasesUi(
                     TopAppBarTitle(title = stringResource(R.string.releases))
                 },
                 navigationIcon = {
-                    BackButton()
+                    BackButton(onClick = nav::back)
                 }
             )
         },
@@ -75,7 +79,7 @@ private fun ReleasesUi(
         LazyColumn(
             modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = innerPadding,
+            contentPadding = innerPadding.withFabClearance(),
         ) {
             content(
                 releasesState = uiState,
@@ -92,20 +96,6 @@ private fun TopAppBarTitle(title: String) {
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
-}
-
-@Composable
-private fun BackButton() {
-    val nav = navigation()
-
-    IconButton(onClick = {
-        nav.back()
-    }) {
-        Icon(
-            imageVector = Icons.Filled.ArrowBack,
-            contentDescription = "Back"
-        )
-    }
 }
 
 private fun LazyListScope.content(
@@ -152,14 +142,17 @@ private fun ReleaseInfoCard(
             browser.openUri(releaseInfo.releaseUrl)
         }
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             ReleaseInfoRow(releaseInfo = releaseInfo)
 
             if (releaseInfo.releaseCommits.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
-
-                for (commit in releaseInfo.releaseCommits) {
-                    Text(text = "• $commit")
+                Column {
+                    for (commit in releaseInfo.releaseCommits) {
+                        Text(text = "• $commit")
+                    }
                 }
             }
         }
@@ -189,8 +182,7 @@ private fun ReleaseName(
     Text(
         modifier = modifier,
         text = info,
-        style = MaterialTheme.typography.bodyLarge,
-        fontWeight = FontWeight.Bold,
+        style = MaterialTheme.typography.bodyLargeEmphasized,
         color = MaterialTheme.colorScheme.primary
     )
 }
@@ -203,8 +195,7 @@ private fun ReleaseDate(
     Text(
         modifier = modifier,
         text = info,
-        style = MaterialTheme.typography.labelMedium,
-        fontWeight = FontWeight.Bold
+        style = MaterialTheme.typography.labelMediumEmphasized
     )
 }
 
@@ -245,7 +236,52 @@ private fun GitHubButton(
     ) {
         Icon(
             painter = painterResource(id = R.drawable.github_logo),
-            contentDescription = "GitHub"
+            contentDescription = stringResource(R.string.github)
         )
     }
+}
+
+@Preview
+@Composable
+private fun PreviewReleasesUi(isDark: Boolean = false) {
+    WalletTheme(if (isDark) Theme.DARK else Theme.LIGHT) {
+        NavigationRoot(navigation = Navigation()) {
+            ReleasesUi(
+                uiState = ReleasesState.Success(
+                    releasesInfo = persistentListOf(
+                        ReleaseInfo(
+                            releaseName = "v2026.10.22",
+                            releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.22",
+                            releaseDate = "2026-10-22",
+                            releaseCommits = persistentListOf(
+                                "Target Android 16 (API 36) for Google Play",
+                                "Bump reactivecircus/android-emulator-runner",
+                            ),
+                        ),
+                        ReleaseInfo(
+                            releaseName = "v2026.10.15",
+                            releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.15",
+                            releaseDate = "2026-10-15",
+                            releaseCommits = persistentListOf(
+                                "Fix crash when opening the budgets screen",
+                            ),
+                        ),
+                        ReleaseInfo(
+                            releaseName = "v2026.10.08",
+                            releaseUrl = "https://github.com/Ivy-Apps/ivy-wallet/releases/tag/v2026.10.08",
+                            releaseDate = "2026-10-08",
+                            releaseCommits = persistentListOf(),
+                        ),
+                    )
+                ),
+                onEvent = {}
+            )
+        }
+    }
+}
+
+/** For screenshot testing */
+@Composable
+fun ReleasesUiTest(isDark: Boolean) {
+    PreviewReleasesUi(isDark)
 }

@@ -25,4 +25,18 @@ class CategoriesTabPaparazziTest(
             CategoriesTabCompactUiTest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotCategoriesEmpty() {
+        snapshot(theme) {
+            CategoriesTabEmptyUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
+
+    @Test
+    fun snapshotCategoriesHugeAmount() {
+        snapshot(theme) {
+            CategoriesTabHugeAmountUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

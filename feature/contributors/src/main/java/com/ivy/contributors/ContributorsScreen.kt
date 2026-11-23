@@ -9,23 +9,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ForkRight
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
@@ -37,16 +36,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.ivy.navigation.IvyPreview
+import com.ivy.base.legacy.Theme
 import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
+import com.ivy.ui.component.BackButton
+import com.ivy.ui.fabClearance
+import com.ivy.ui.theme.WalletTheme
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
@@ -89,7 +91,7 @@ private fun ContributorsUi(
                     )
                 },
                 navigationIcon = {
-                    BackButton(nav = nav)
+                    BackButton(onClick = nav::back)
                 }
             )
         },
@@ -120,18 +122,6 @@ private fun TopAppBarTitle(title: String) {
 }
 
 @Composable
-private fun BackButton(nav: Navigation) {
-    IconButton(onClick = {
-        nav.back()
-    }) {
-        Icon(
-            imageVector = Icons.Filled.ArrowBack,
-            contentDescription = "Back"
-        )
-    }
-}
-
-@Composable
 private fun ScreenContent(
     paddingValues: PaddingValues,
     contributorsState: ContributorsState,
@@ -143,7 +133,7 @@ private fun ScreenContent(
         contentPadding = PaddingValues(
             start = 16.dp,
             end = 16.dp,
-            bottom = 8.dp
+            bottom = fabClearance()
         ),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -206,8 +196,8 @@ private fun ProjectInfoRow(
             icon = {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    painter = painterResource(id = R.drawable.ic_vue_dev_hierarchy),
-                    contentDescription = "Forks"
+                    imageVector = Icons.Filled.ForkRight,
+                    contentDescription = stringResource(R.string.forks)
                 )
             },
             info = "${projectRepositoryInfo.projectInfo.forks} forks",
@@ -223,7 +213,7 @@ private fun ProjectInfoRow(
                 Icon(
                     modifier = Modifier.size(24.dp),
                     imageVector = Icons.Filled.Star,
-                    contentDescription = "Stars"
+                    contentDescription = stringResource(R.string.stars)
                 )
             },
             info = "${projectRepositoryInfo.projectInfo.stars} stars",
@@ -247,7 +237,7 @@ private fun ProjectInfoButton(
     ) {
         icon()
 
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))
 
         Text(info)
     }
@@ -292,7 +282,6 @@ private fun ContributorCard(contributor: Contributor) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
         onClick = {
             if (contributor.githubProfileUrl.isNotBlank()) {
                 browser.openUri(contributor.githubProfileUrl)
@@ -310,21 +299,20 @@ private fun ContributorCard(contributor: Contributor) {
                             width = 0.5.dp,
                             color = MaterialTheme.colorScheme.outlineVariant
                         ),
-                        shape = RoundedCornerShape(topStart = 12.dp, bottomStart = 12.dp)
+                        shape = MaterialTheme.shapes.medium.copy(topEnd = ZeroCornerSize, bottomEnd = ZeroCornerSize)
                     ),
                 model = contributor.photoUrl,
                 contentDescription = null
             )
 
             Column(
-                modifier = Modifier.padding(horizontal = 12.dp)
+                modifier = Modifier.padding(horizontal = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
                     text = contributor.name,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.W600,
+                    style = MaterialTheme.typography.bodyLargeEmphasized,
                 )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = when (contributor.contributionsCount.toInt()) {
                         1 -> stringResource(R.string.one_contribution)
@@ -353,7 +341,7 @@ private fun GitHubButton(
     ) {
         Icon(
             painter = painterResource(id = R.drawable.github_logo),
-            contentDescription = "GitHub"
+            contentDescription = stringResource(R.string.github)
         )
     }
 }
@@ -361,57 +349,63 @@ private fun GitHubButton(
 @Preview
 @Composable
 private fun PreviewSuccess(isDark: Boolean = false) {
-    IvyPreview(isDark) {
-        ContributorsUi(
-            uiState = ContributorsState(
-                projectResponse = ProjectResponse.Success(
-                    projectInfo = ProjectRepositoryInfo(
-                        forks = "259",
-                        stars = "1524",
-                        url = ""
-                    )
-                ),
-                contributorsResponse = ContributorsResponse.Success(
-                    contributors = persistentListOf(
-                        Contributor(
-                            name = "Iliyan",
-                            photoUrl = "",
-                            contributionsCount = "567",
-                            githubProfileUrl = ""
+    WalletTheme(if (isDark) Theme.DARK else Theme.LIGHT) {
+        NavigationRoot(navigation = Navigation()) {
+            ContributorsUi(
+                uiState = ContributorsState(
+                    projectResponse = ProjectResponse.Success(
+                        projectInfo = ProjectRepositoryInfo(
+                            forks = "259",
+                            stars = "1524",
+                            url = ""
+                        )
+                    ),
+                    contributorsResponse = ContributorsResponse.Success(
+                        contributors = persistentListOf(
+                            Contributor(
+                                name = "Iliyan",
+                                photoUrl = "",
+                                contributionsCount = "567",
+                                githubProfileUrl = ""
+                            )
                         )
                     )
-                )
-            ),
-            onEvent = {}
-        )
+                ),
+                onEvent = {}
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 private fun PreviewError() {
-    IvyPreview {
-        ContributorsUi(
-            uiState = ContributorsState(
-                projectResponse = ProjectResponse.Error,
-                contributorsResponse = ContributorsResponse.Error(stringResource(R.string.error))
-            ),
-            onEvent = {}
-        )
+    WalletTheme(Theme.LIGHT) {
+        NavigationRoot(navigation = Navigation()) {
+            ContributorsUi(
+                uiState = ContributorsState(
+                    projectResponse = ProjectResponse.Error,
+                    contributorsResponse = ContributorsResponse.Error(stringResource(R.string.error))
+                ),
+                onEvent = {}
+            )
+        }
     }
 }
 
 @Preview
 @Composable
 private fun PreviewLoading() {
-    IvyPreview {
-        ContributorsUi(
-            uiState = ContributorsState(
-                projectResponse = ProjectResponse.Loading,
-                contributorsResponse = ContributorsResponse.Loading
-            ),
-            onEvent = {}
-        )
+    WalletTheme(Theme.LIGHT) {
+        NavigationRoot(navigation = Navigation()) {
+            ContributorsUi(
+                uiState = ContributorsState(
+                    projectResponse = ProjectResponse.Loading,
+                    contributorsResponse = ContributorsResponse.Loading
+                ),
+                onEvent = {}
+            )
+        }
     }
 }
 

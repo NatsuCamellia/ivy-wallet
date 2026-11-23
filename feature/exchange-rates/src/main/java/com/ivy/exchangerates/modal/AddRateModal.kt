@@ -1,9 +1,17 @@
 package com.ivy.exchangerates.modal
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -11,84 +19,86 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ivy.design.l0_system.Orange
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.design.l1_buildingBlocks.SpacerVer
+import com.ivy.base.legacy.Theme
 import com.ivy.exchangerates.RatesEvent
 import com.ivy.exchangerates.data.RateUi
-import com.ivy.legacy.IvyWalletPreview
+import com.ivy.legacy.ui.WalletPreview
+import com.ivy.legacy.ui.sheet.ActionSheet
+import com.ivy.legacy.ui.sheet.AmountModal
 import com.ivy.legacy.utils.selectEndTextFieldValue
-import com.ivy.wallet.ui.theme.components.IvyNameTextField
-import com.ivy.wallet.ui.theme.modal.IvyModal
-import com.ivy.wallet.ui.theme.modal.ModalAdd
-import com.ivy.wallet.ui.theme.modal.ModalTitle
-import com.ivy.wallet.ui.theme.modal.edit.AmountModal
+import com.ivy.ui.R
 import java.util.UUID
 
+@SuppressLint("ComposeModifierMissing")
 @Composable
-fun BoxWithConstraintsScope.AddRateModal(
+fun AddRateModal(
     visible: Boolean,
     baseCurrency: String,
     dismiss: () -> Unit,
     onAdd: (RatesEvent.AddRate) -> Unit,
 ) {
+    if (!visible) return
+
     var toCurrency by remember { mutableStateOf(selectEndTextFieldValue("")) }
     var amountModalVisible by remember { mutableStateOf(false) }
     var rate by remember { mutableStateOf<Double?>(null) }
 
-    IvyModal(
-        id = null,
-        visible = visible,
-        dismiss = dismiss,
-        PrimaryAction = {
-            ModalAdd {
-                val to = toCurrency
-                val finalRate = rate
-                onAdd(
-                    RatesEvent.AddRate(
-                        RateUi(
-                            from = baseCurrency,
-                            to = to.text,
-                            rate = finalRate ?: 0.0,
+    ActionSheet(
+        onDismiss = dismiss,
+        title = stringResource(R.string.add_manual_exchange_rate),
+        actions = { dismissSheet ->
+            Spacer(Modifier.weight(1f))
+
+            Button(
+                onClick = {
+                    onAdd(
+                        RatesEvent.AddRate(
+                            RateUi(
+                                from = baseCurrency,
+                                to = toCurrency.text,
+                                rate = rate ?: 0.0,
+                            )
                         )
                     )
-                )
-                dismiss()
+                    dismissSheet()
+                },
+            ) {
+                Text(stringResource(R.string.add))
             }
         }
     ) {
-        SpacerVer(height = 16.dp)
-        ModalTitle(text = "Add rate")
-        SpacerVer(height = 24.dp)
-
-        IvyNameTextField(
-            modifier = Modifier.padding(horizontal = 32.dp),
-            underlineModifier = Modifier.padding(horizontal = 24.dp),
-            value = toCurrency,
-            hint = "Currency"
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            toCurrency = it
-        }
-
-        SpacerVer(height = 12.dp)
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable {
-                    amountModalVisible = true
-                }
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            text = "$baseCurrency-${toCurrency.text} = ${rate ?: "???"}",
-            style = UI.typo.nH2.style(
-                color = Orange,
-                textAlign = TextAlign.Center,
+            OutlinedTextField(
+                value = toCurrency,
+                onValueChange = { toCurrency = it },
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(stringResource(R.string.currency_code)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(
+                    capitalization = KeyboardCapitalization.Characters,
+                    imeAction = ImeAction.Done,
+                ),
             )
-        )
-        SpacerVer(height = 24.dp)
+
+            SegmentedListItem(
+                onClick = { amountModalVisible = true },
+                shapes = ListItemDefaults.segmentedShapes(index = 0, count = 1),
+                overlineContent = { Text(stringResource(R.string.exchange_rate)) },
+            ) {
+                Text(
+                    text = "$baseCurrency-${toCurrency.text} = ${rate ?: "???"}",
+                    style = MaterialTheme.typography.headlineSmallEmphasized,
+                )
+            }
+        }
     }
 
     AmountModal(
@@ -106,8 +116,8 @@ fun BoxWithConstraintsScope.AddRateModal(
 
 @Preview
 @Composable
-private fun Preview() {
-    IvyWalletPreview {
+private fun Preview(theme: Theme = Theme.LIGHT) {
+    WalletPreview(theme) {
         AddRateModal(
             visible = true,
             baseCurrency = "USD",
@@ -115,4 +125,10 @@ private fun Preview() {
             onAdd = {},
         )
     }
+}
+
+/** For screenshot testing */
+@Composable
+fun AddRateModalUiTest(isDark: Boolean) {
+    Preview(if (isDark) Theme.DARK else Theme.LIGHT)
 }

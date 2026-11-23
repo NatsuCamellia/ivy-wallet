@@ -1,57 +1,34 @@
 package com.ivy.importdata.csvimport.flow.instructions
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import com.ivy.legacy.rootScreen
+import com.ivy.domain.RootScreen
 import com.ivy.ui.R
 
-@Composable
-fun MoneyManagerPraseSteps(
-    onUploadClick: () -> Unit
-) {
-    Spacer(Modifier.height(12.dp))
+private const val ConverterUrl = "https://www.zamzar.com/converters/document/xls-to-csv/"
 
-    StepTitle(
+@Composable
+internal fun MoneyManagerPraseSteps() {
+    val context = LocalContext.current
+
+    InstructionStep(
         number = 1,
         title = stringResource(R.string.export_excel_file),
     )
-
-    Spacer(Modifier.height(12.dp))
-
-    VideoArticleRow(
-        videoUrl = null,
-        articleUrl = null
-    )
-
-    Spacer(Modifier.height(24.dp))
-
-    StepTitle(
+    InstructionStep(
         number = 2,
         title = stringResource(R.string.convert_xls_to_csv),
-        description = stringResource(R.string.convert_xls_to_csv_description)
-    )
-
-    Spacer(Modifier.height(12.dp))
-
-    val rootScreen = com.ivy.legacy.rootScreen()
-    InstructionButton(
-        modifier = Modifier.padding(horizontal = 16.dp),
-        icon = null,
-        caption = stringResource(R.string.online_csv_converter_free),
-        text = "https://www.zamzar.com/converters/document/xls-to-csv/"
+        description = stringResource(R.string.convert_xls_to_csv_description),
     ) {
-        rootScreen.openUrlInBrowser("https://www.zamzar.com/converters/document/xls-to-csv/")
+        InstructionButton(
+            caption = stringResource(R.string.online_csv_converter_free),
+            text = ConverterUrl,
+            onClick = { (context as RootScreen).openUrlInBrowser(ConverterUrl) },
+            modifier = Modifier.fillMaxWidth(),
+        )
     }
-
-    Spacer(Modifier.height(24.dp))
-
-    UploadFileStep(
-        stepNumber = 3,
-        onUploadClick = onUploadClick
-    )
+    UploadFileStep(stepNumber = 3)
 }

@@ -5,8 +5,6 @@
     <string name="month_income">ДОХОДЫ ЗА МЕСЯЦ</string>
     <string name="month_expenses">РАСХОДЫ ЗА МЕСЯЦ</string>
     <string name="excluded">(исключенный)</string>
-    <string name="income_uppercase">ДОХОДЫ</string>
-    <string name="expenses_uppercase">РАСХОДЫ</string>
     <string name="app_locked">Приложение заблокировано</string>
     <string name="authenticate_text">Авторизуйтесь, чтобы зайти в приложение</string>
     <string name="unlock">Разблокировать</string>
@@ -103,7 +101,6 @@
     <string name="light_mode">Светлая\nтема</string>
     <string name="dark_mode">Тёмная\nтема</string>
     <string name="auto_mode">Системная\nтема</string>
-    <string name="planned_payments">Запланированные платежи</string>
     <string name="share_ivy">Поделись Ivy</string>
     <string name="reports">Отчёты</string>
     <string name="loans">Кредиты</string>
@@ -115,8 +112,6 @@
     <string name="no_loans_description">У вас нет ни одного кредита.\nЧтобы добавить, нажмите \"+ Добавить кредит\"</string>
     <string name="loan_confirm_deletion_description">Примечание: Удаление этого кредита приведёт к его полному удалению, включая все записи, связанные с этим кредитом</string>
     <string name="confirm_account_loan_change">Пожалуйста, подождите. Идет пересчитывание всех записей по кредиту</string>
-    <string name="paid">Оплачено</string>
-    <string name="left_to_pay">%1$s %2$s осталось</string>
     <string name="loan_interest">Проценты по кредиту</string>
     <string name="interest_paid">%1$s %2$s оплачено</string>
     <string name="add_record">Добавить запись</string>
@@ -135,23 +130,12 @@
     <string name="transactions">транзакции</string>
     <string name="home">Главная</string>
     <string name="add_planned_payment">Добавить запланированный платёж</string>
-    <string name="add_income_uppercase">ДОБАВИТЬ ДОХОД</string>
-    <string name="add_expense_uppercase">ДОБАВИТЬ РАСХОД</string>
-    <string name="account_transfer">ПЕРЕВОД</string>
     <string name="skip">Пропустить</string>
     <string name="add_new">Добавить новое</string>
     <string name="from_date">От %1$s</string>
     <string name="to_date">До %1$s</string>
     <string name="range">Диапазон</string>
-    <string name="privacy_and_data_collection">Конфиденциальность и\nсбор данных</string>
-    <string name="swipe_to_agree_terms_conditions">Смахните, чтобы согласиться с нашими условиями</string>
-    <string name="agreed_terms_conditions">Согласен с условиями</string>
-    <string name="swipe_to_agree_privacy_policy">Смахните, чтобы согласиться с наший политикой конфиденциальности</string>
-    <string name="agreed_privacy_policy">Согласен с политикой конфиденциальности</string>
-    <string name="terms_and_conditions">Условия</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
-    <string name="wallet_description">Отслеживайте ваши доходы, расходы и бюджет с Ivy.\n\nИнтуитивно понятный интерфейс, регулярные и запланированные платежи, управляй несколькими счетами, организуй транзакции по категориям, используй полезную статистику, экспортируй в CSV и многое другое.</string>
-    <string name="enter_your_name">Для персонализации вашего кошелька введите своё имя</string>
     <string name="what_is_your_name">Как вас зовут?</string>
     <string name="enter">Ввести</string>
     <string name="add_accounts">Добавить счета</string>
@@ -181,12 +165,8 @@
     <string name="planned_payment_confirm_deletion_description">Удаление запланированного платежа приведёт к удалению всех предстоящих неоплаченных и просроченных транзакций, связанных с этим платежём.</string>
     <string name="set_payment_type">Установить тип платежа</string>
     <string name="planned_start_at">Запланирован старт на</string>
-    <string name="repeats_every">ПОВТОРЯЕТСЯ КАЖДЫЕ %1$d %2$s</string>
     <string name="deleted">удалено</string>
-    <string name="planned_for_uppercase">"ЗАПЛАНИРОВАН НА "</string>
     <string name="null_text">null</string>
-    <string name="starts_date">"НАЧИНАЕТСЯ С %1$s "</string>
-    <string name="add_payment">Добавить платёж</string>
     <string name="one_time_payments">Одноразовые платежи</string>
     <string name="recurring_payments">Повторяющиеся платежи</string>
     <string name="no_planned_payments">Нет запланированных платежей</string>
@@ -198,8 +178,6 @@
     <string name="due_on">Выполнить к %1$s</string>
     <string name="upcoming">Предстоящие</string>
     <string name="overdue">Просроченные</string>
-    <string name="expenses_lowercase">расходы</string>
-    <string name="income_lowercase">доходы</string>
     <string name="edit_account">Редактировать счёт</string>
     <string name="new_account">Новый счёт</string>
     <string name="account_name">Название счёта</string>
@@ -226,9 +204,7 @@
     <string name="select_all">Выбрать всё</string>
     <string name="amount_optional">Количество (опционально)</string>
     <string name="keywords_optional">Ключевые слова (опционально)</string>
-    <string name="includes_uppercase">ВКЛЮЧАЕТ</string>
     <string name="add_keyword">Добавьте ключевое слово</string>
-    <string name="excludes_uppercase">НЕ ВКЛЮЧАЕТ</string>
     <string name="no_transactions_for_your_filter">У вас нет ни одной транзакции по этому фильтру.</string>
     <string name="no_filter">Нет фильтров</string>
     <string name="invalid_filter_warning">Чтобы сгенерировать отчёт, сначала установите фильтр.</string>
@@ -264,7 +240,6 @@
     <string name="request_a_feature">Запроcить новую функциональность</string>
     <string name="contact_support">Связь со службой поддержки</string>
     <string name="project_contributors">Участники проекта</string>
-    <string name="account_uppercase">УЧЁТНАЯ ЗАПИСЬ</string>
     <string name="logout">Выйти</string>
     <string name="login">Войти</string>
     <string name="syncing">Синхронизация…</string>
@@ -301,7 +276,6 @@
     <string name="unselect_all_time">Отменить \"За всё время\"</string>
     <string name="select_all_time">Выбрать \"За всё время\"</string>
     <string name="choose_start_date_of_month">Выберите начальную дату месяца</string>
-    <string name="supports_crypto">поддерживает криптовалюты</string>
     <string name="delete">Удалить</string>
     <string name="save">Сохранить</string>
     <string name="add">Добавить</string>
@@ -433,8 +407,6 @@
     <string name="confirm_skip_all">Подтвердить пропуск всех</string>
     <string name="confirm_skip_all_description">Вы уверены, что хотите пропустить все просроченные запланированные операции?</string>
     <string name="switch_to_offline_mode">Switch to offline mode</string>
-    <string name="delete_all_user_cloud_data_warning">WARNING! This action will delete all your cloud-stored data for %1$s PERMANENTLY, the offline data stored in your local app will remain.</string>
-    <string name="delete_all_cloud_data_question">Delete all cloud-stored data?</string>
     <string name="experimental">Experimental</string>
     <string name="experimental_settings">Experimental Settings</string>
     <string name="wallet_balance">Wallet balance</string>

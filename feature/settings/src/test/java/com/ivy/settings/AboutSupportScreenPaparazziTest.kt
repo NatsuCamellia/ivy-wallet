@@ -4,6 +4,7 @@ import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import com.ivy.ui.testing.PaparazziScreenshotTest
 import com.ivy.ui.testing.PaparazziTheme
+import com.ivy.ui.testing.WithFakeRootScreen
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -15,7 +16,9 @@ class AboutSupportScreenPaparazziTest(
     @Test
     fun `snapshot About & Support screen`() {
         snapshot(theme) {
-            AboutSupportUiTest(isDark = theme == PaparazziTheme.Dark)
+            WithFakeRootScreen {
+                AboutSupportUiTest(isDark = theme == PaparazziTheme.Dark)
+            }
         }
     }
 }

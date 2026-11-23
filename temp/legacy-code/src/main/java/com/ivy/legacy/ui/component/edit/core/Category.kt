@@ -1,66 +1,43 @@
 package com.ivy.wallet.ui.edit.core
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.ivy.data.model.Category
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
+import com.ivy.legacy.ui.component.IconBadge
 import com.ivy.ui.R
-import com.ivy.wallet.ui.theme.Gradient
-import com.ivy.wallet.ui.theme.components.IvyBorderButton
-import com.ivy.wallet.ui.theme.components.IvyButton
-import com.ivy.wallet.ui.theme.components.getCustomIconIdS
-import com.ivy.wallet.ui.theme.findContrastTextColor
-import com.ivy.wallet.ui.theme.toComposeColor
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
 @Composable
 fun Category(
     category: Category?,
-    onChooseCategory: () -> Unit
+    onChooseCategory: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    if (category != null) {
-        CategoryButton(category = category) {
-            onChooseCategory()
-        }
-    } else {
-        IvyBorderButton(
-            modifier = Modifier.padding(start = 24.dp),
-            iconStart = R.drawable.ic_plus,
-            iconTint = UI.colors.pureInverse,
-            text = stringResource(R.string.add_category)
+    Card(onClick = onChooseCategory, modifier = modifier.fillMaxWidth()) {
+        ListItem(
+            leadingContent = {
+                if (category != null) {
+                    IconBadge(
+                        color = Color(category.color.value),
+                        iconName = category.icon?.id,
+                        defaultIcon = R.drawable.ic_custom_category_m,
+                    )
+                } else {
+                    Icon(Icons.Default.Add, contentDescription = null)
+                }
+            },
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         ) {
-            onChooseCategory()
+            Text(category?.name?.value ?: stringResource(R.string.add_category))
         }
     }
-}
-
-@Composable
-private fun CategoryButton(
-    category: Category,
-    onClick: () -> Unit,
-) {
-    val contrastColor = findContrastTextColor(category.color.value.toComposeColor())
-    IvyButton(
-        modifier = Modifier.padding(start = 24.dp),
-        text = category.name.value,
-        iconStart = getCustomIconIdS(
-            iconName = category.icon?.id,
-            defaultIcon = R.drawable.ic_custom_category_s
-        ),
-        backgroundGradient = Gradient.from(category.color.value, category.color.value),
-        textStyle = UI.typo.b2.style(
-            color = contrastColor,
-            fontWeight = FontWeight.Bold
-        ),
-        iconTint = contrastColor,
-        hasGlow = false,
-        iconEnd = R.drawable.ic_onboarding_next_arrow,
-        wrapContentMode = true,
-        onClick = onClick
-    )
 }

@@ -126,6 +126,7 @@ class HomeTransactionMapper(
                 accountName,
             ).joinToString(" · ").ifBlank { null }
         }
+        val time = if (dueKind == null) trn.dateTime?.let(::formatTransactionTime) else null
 
         val amountKind = dueKind ?: when (trn.type) {
             TransactionType.INCOME -> TransactionAmountKind.Income
@@ -139,11 +140,10 @@ class HomeTransactionMapper(
         }
         val amountText = "$amountSign${formatAmount(trn.amount.toDouble(), currency)}"
 
-        val secondaryText = when {
-            dueKind != null -> null
-            isTransfer && toCurrency != currency ->
-                formatAmount(trn.toAmount.toDouble(), toCurrency)
-            else -> trn.dateTime?.let(::formatTransactionTime)
+        val secondaryText = if (dueKind == null && isTransfer && toCurrency != currency) {
+            formatAmount(trn.toAmount.toDouble(), toCurrency)
+        } else {
+            null
         }
 
         val dueText = if (dueKind != null && trn.dueDate != null) {
@@ -157,6 +157,7 @@ class HomeTransactionMapper(
                 id = trn.id.toString(),
                 title = title,
                 supportingText = supporting,
+                time = time,
                 categoryColor = categoryColor(category?.color?.value, account, isTransfer),
                 amountText = amountText,
                 amountKind = amountKind,

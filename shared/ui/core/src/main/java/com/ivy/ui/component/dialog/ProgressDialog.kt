@@ -6,10 +6,9 @@ import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.DialogProperties
-import com.ivy.design.system.IvyMaterial3Theme
 
+/** A dialog that blocks the screen while work runs: it cannot be dismissed and has no buttons. */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ProgressDialog(
@@ -18,23 +17,15 @@ fun ProgressDialog(
     modifier: Modifier = Modifier,
 ) {
     AlertDialog(
-        modifier = modifier,
         onDismissRequest = {},
+        confirmButton = {},
+        modifier = modifier,
+        icon = { LoadingIndicator() },
+        title = { Text(text = title) },
+        text = { Text(text = description) },
         properties = DialogProperties(
             dismissOnBackPress = false,
             dismissOnClickOutside = false,
         ),
-        icon = { LoadingIndicator() },
-        title = { Text(text = title) },
-        text = { Text(text = description) },
-        confirmButton = {},
     )
-}
-
-@Preview
-@Composable
-private fun ProgressDialogPreview() {
-    IvyMaterial3Theme(isTrueBlack = false) {
-        ProgressDialog(title = "Exporting data", description = "Please wait…")
-    }
 }

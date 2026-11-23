@@ -18,4 +18,11 @@ class ExchangeRatesScreenPaparazziTest(
             ExchangeRatesScreenUiTest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotExchangeRatesNoResult() {
+        snapshot(theme) {
+            ExchangeRatesNoResultUiTest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

@@ -1,11 +1,10 @@
 package com.ivy.poll.impl.ui.composables
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -30,14 +29,13 @@ fun PollContent(
     modifier = modifier
       .fillMaxSize()
       .verticalScroll(rememberScrollState())
-      .padding(horizontal = 16.dp)
+      .padding(16.dp),
+    verticalArrangement = Arrangement.spacedBy(24.dp)
   ) {
-    Spacer(Modifier.height(48.dp))
     Text(
       text = uiState.poll.description,
       style = MaterialTheme.typography.bodyLarge,
     )
-    Spacer(Modifier.height(48.dp))
     VoteCard(
       poll = uiState.poll,
       selectedIndex = uiState.selectedIndex,
@@ -45,7 +43,6 @@ fun PollContent(
         onEvent(PollUiEvent.SelectOption(index = it))
       }
     )
-    Spacer(Modifier.height(24.dp))
     VoteButton(
       enabled = uiState.voteEnabled,
       loading = uiState.voteLoading,
@@ -53,7 +50,6 @@ fun PollContent(
         onEvent(PollUiEvent.VoteClick)
       }
     )
-    Spacer(Modifier.height(24.dp))
   }
 }
 

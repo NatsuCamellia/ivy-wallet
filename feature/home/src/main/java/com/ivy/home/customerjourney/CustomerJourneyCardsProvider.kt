@@ -1,17 +1,18 @@
 package com.ivy.home.customerjourney
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.EventRepeat
+import androidx.compose.material.icons.filled.HowToVote
+import androidx.compose.material.icons.filled.PieChart
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Widgets
 import com.ivy.base.legacy.SharedPrefs
 import com.ivy.base.legacy.stringRes
 import com.ivy.base.model.TransactionType
 import com.ivy.base.time.TimeProvider
 import com.ivy.data.db.dao.read.PlannedPaymentRuleDao
 import com.ivy.data.repository.TransactionRepository
-import com.ivy.design.l0_system.Gradient
-import com.ivy.design.l0_system.Green
-import com.ivy.design.l0_system.GreenLight
-import com.ivy.design.l0_system.Ivy
-import com.ivy.design.l0_system.Orange
-import com.ivy.design.l0_system.Red
 import com.ivy.legacy.IvyWalletCtx
 import com.ivy.legacy.data.model.MainTab
 import com.ivy.navigation.EditPlannedScreen
@@ -83,8 +84,7 @@ class CustomerJourneyCardsProvider @Inject constructor(
       title = stringRes(R.string.adjust_initial_balance),
       description = stringRes(R.string.adjust_initial_balance_description),
       cta = stringRes(R.string.to_accounts),
-      ctaIcon = R.drawable.ic_custom_account_s,
-      background = Gradient.solid(Ivy),
+      ctaIcon = Icons.Default.AccountBalanceWallet,
       hasDismiss = false,
       onAction = { _, ivyContext, _ ->
         ivyContext.selectMainTab(MainTab.ACCOUNTS)
@@ -99,8 +99,7 @@ class CustomerJourneyCardsProvider @Inject constructor(
       title = stringRes(R.string.create_first_planned_payment),
       description = stringRes(R.string.create_first_planned_payment_description),
       cta = stringRes(R.string.add_planned_payment),
-      ctaIcon = R.drawable.ic_planned_payments,
-      background = Gradient.solid(Orange),
+      ctaIcon = Icons.Default.EventRepeat,
       hasDismiss = true,
       onAction = { navigation, _, _ ->
         navigation.navigateTo(
@@ -120,8 +119,7 @@ class CustomerJourneyCardsProvider @Inject constructor(
       title = stringRes(R.string.did_you_know),
       description = stringRes(R.string.widget_description),
       cta = stringRes(R.string.add_widget),
-      ctaIcon = R.drawable.ic_custom_atom_s,
-      background = Gradient.solid(GreenLight),
+      ctaIcon = Icons.Default.Widgets,
       hasDismiss = true,
       onAction = { _, _, ivyActivity ->
         ivyActivity.pinWidget(AddTransactionWidgetCompact::class.java)
@@ -136,8 +134,7 @@ class CustomerJourneyCardsProvider @Inject constructor(
       title = stringRes(R.string.did_you_know),
       description = stringRes(R.string.you_can_see_a_piechart),
       cta = stringRes(R.string.expenses_piechart),
-      ctaIcon = R.drawable.ic_custom_bills_s,
-      background = Gradient.solid(Red),
+      ctaIcon = Icons.Default.PieChart,
       hasDismiss = true,
       onAction = { navigation, _, _ ->
         navigation.navigateTo(PieChartStatisticScreen(type = TransactionType.EXPENSE))
@@ -152,15 +149,14 @@ class CustomerJourneyCardsProvider @Inject constructor(
       title = stringRes(R.string.review_ivy_wallet),
       description = stringRes(R.string.review_ivy_wallet_description),
       cta = stringRes(R.string.rate_us_on_google_play),
-      ctaIcon = R.drawable.ic_custom_star_s,
-      background = Gradient.solid(Green),
+      ctaIcon = Icons.Default.Star,
       hasDismiss = true,
       onAction = { _, _, ivyActivity ->
         ivyActivity.reviewIvyWallet(dismissReviewCard = true)
       }
     )
 
-    @Suppress("MaxLineLength", "NoImplicitFunctionReturnType")
+    @Suppress("MaxLineLength", "NoImplicitFunctionReturnType", "MagicNumber")
     private fun voteCard() = CustomerJourneyCardModel(
       id = "vote_card",
       // to users that haven't voted
@@ -174,9 +170,8 @@ class CustomerJourneyCardsProvider @Inject constructor(
       title = "How much are you willing to pay for Ivy Wallet?",
       description = "Google Play requires us to update Ivy Wallet to target API level 35 (Android 15). We'd like to know if you will be interested to pay on a subscription basis so we can maintain the app.",
       cta = "Vote",
-      ctaIcon = R.drawable.ic_telegram_24dp,
+      ctaIcon = Icons.Default.HowToVote,
       hasDismiss = false,
-      background = Gradient.solid(Ivy),
       // navigate to PollScreen
       onAction = { navigation: Navigation, _, _ ->
         navigation.navigateTo(PollScreen)

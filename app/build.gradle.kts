@@ -16,7 +16,7 @@ android {
     defaultConfig {
         applicationId = "net.natsucamellia.ivywallet"
         minSdk = libs.versions.min.sdk.get().toInt()
-        targetSdk = libs.versions.compile.sdk.get().toInt()
+        targetSdk = libs.versions.target.sdk.get().toInt()
         versionName = libs.versions.version.name.get()
         versionCode = libs.versions.version.code.get().toInt()
     }
@@ -54,8 +54,6 @@ android {
             isDefault = false
 
             signingConfig = signingConfigs.getByName("release")
-
-            resValue("string", "app_name", "Ivy Wallet")
         }
 
         debug {
@@ -68,7 +66,6 @@ android {
             signingConfig = signingConfigs.getByName("debug")
 
             applicationIdSuffix = ".debug"
-            resValue("string", "app_name", "Ivy Wallet Debug")
         }
 
         create("demo") {
@@ -85,13 +82,10 @@ android {
             isDefault = false
 
             signingConfig = signingConfigs.getByName("debug")
-
-            resValue("string", "app_name", "Ivy Wallet")
         }
     }
 
     val javaVersion = libs.versions.jvm.target.get()
-
     compileOptions {
         sourceCompatibility = JavaVersion.valueOf("VERSION_$javaVersion")
         targetCompatibility = JavaVersion.valueOf("VERSION_$javaVersion")
@@ -100,15 +94,10 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
-        resValues = true
     }
 
     lint {
         disable += "ComposeViewModelInjection"
-        // Slack's ParameterOrderDetector throws a NullPointerException under this toolchain
-        // (getText(...) must not be null); crashes lintAnalyzeRelease outright rather than
-        // reporting findings. See github.com/slackhq/compose-lint-rules.
-        disable += "ComposeParameterOrder"
         checkDependencies = true
         abortOnError = false
         checkReleaseBuilds = false
@@ -151,7 +140,6 @@ dependencies {
     implementation(projects.shared.ui.core)
     implementation(projects.shared.ui.navigation)
     implementation(projects.temp.legacyCode)
-    implementation(projects.temp.oldDesign)
     implementation(projects.widget.addTransaction)
     implementation(projects.widget.balance)
 
@@ -159,7 +147,6 @@ dependencies {
     implementation(libs.bundles.kotlin.android)
     implementation(libs.bundles.ktor)
     implementation(libs.bundles.arrow)
-    implementation(platform(libs.compose.bom.alpha))
     implementation(libs.bundles.compose)
     implementation(libs.bundles.activity)
     implementation(libs.bundles.google)

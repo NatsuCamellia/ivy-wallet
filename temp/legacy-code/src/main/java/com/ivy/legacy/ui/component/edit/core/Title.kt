@@ -1,152 +1,114 @@
 package com.ivy.wallet.ui.edit.core
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ivy.base.legacy.Theme
 import com.ivy.base.model.TransactionType
-import com.ivy.design.l0_system.UI
-import com.ivy.design.l0_system.style
-import com.ivy.legacy.IvyWalletComponentPreview
-import com.ivy.legacy.utils.keyboardVisibleState
+import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.utils.selectEndTextFieldValue
 import com.ivy.ui.R
 import com.ivy.wallet.domain.deprecated.logic.SUGGESTIONS_LIMIT
-import com.ivy.wallet.ui.theme.components.IvyTitleTextField
 import kotlinx.coroutines.launch
-import java.util.UUID
 
-@Deprecated("Old design system. Use `:ivy-design` and Material3")
-@Suppress("ParameterNaming")
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ColumnScope.Title(
+fun Title(
     type: TransactionType,
     titleFocus: FocusRequester,
-    initialTransactionId: UUID?,
     titleTextFieldValue: TextFieldValue,
     setTitleTextFieldValue: (TextFieldValue) -> Unit,
     suggestions: Set<String>,
-    onTitleChanged: (String?) -> Unit,
+    onTitleChange: (String?) -> Unit,
+    modifier: Modifier = Modifier,
     scrollState: ScrollState? = null,
     onNext: () -> Unit,
 ) {
-    IvyTitleTextField(
-        modifier = Modifier
-            .padding(horizontal = 32.dp)
-            .focusRequester(titleFocus),
-        dividerModifier = Modifier
-            .padding(horizontal = 24.dp),
-        value = titleTextFieldValue,
-        hint = when (type) {
-            TransactionType.INCOME -> stringResource(R.string.income_title)
-            TransactionType.EXPENSE -> stringResource(R.string.expense_title)
-            TransactionType.TRANSFER -> stringResource(R.string.transfer_title)
-        },
-        keyboardOptions = KeyboardOptions(
-            autoCorrect = true,
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Next,
-            capitalization = KeyboardCapitalization.Sentences
-        ),
-        keyboardActions = KeyboardActions(
-            onNext = {
-                onNext()
-            }
-        )
-    ) {
-        setTitleTextFieldValue(it)
-        onTitleChanged(it.text)
-    }
-
     val coroutineScope = rememberCoroutineScope()
-    Suggestions(
-        suggestions = suggestions,
-    ) { suggestion ->
-        setTitleTextFieldValue(selectEndTextFieldValue(suggestion))
-        onTitleChanged(suggestion)
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        OutlinedTextField(
+            value = titleTextFieldValue,
+            onValueChange = {
+                setTitleTextFieldValue(it)
+                onTitleChange(it.text)
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(titleFocus)
+                .testTag("input_field"),
+            label = {
+                Text(
+                    when (type) {
+                        TransactionType.INCOME -> stringResource(R.string.income_title)
+                        TransactionType.EXPENSE -> stringResource(R.string.expense_title)
+                        TransactionType.TRANSFER -> stringResource(R.string.transfer_title)
+                    }
+                )
+            },
+            keyboardOptions = KeyboardOptions(
+                autoCorrectEnabled = true,
+                keyboardType = KeyboardType.Text,
+                imeAction = ImeAction.Next,
+                capitalization = KeyboardCapitalization.Sentences
+            ),
+            keyboardActions = KeyboardActions(onNext = { onNext() }),
+        )
 
-        coroutineScope.launch {
-            // scroll to top for better UX
-            scrollState?.animateScrollTo(0)
-        }
-    }
-}
-
-@Composable
-private fun Suggestions(
-    suggestions: Set<String>,
-    onClick: (String) -> Unit
-) {
-    val keyboardVisible by keyboardVisibleState()
-    if (keyboardVisible) {
-        if (suggestions.isNotEmpty()) {
-            for (suggestion in suggestions.take(SUGGESTIONS_LIMIT)) {
-                Suggestion(suggestion = suggestion) {
-                    onClick(suggestion)
+        if (WindowInsets.isImeVisible && suggestions.isNotEmpty()) {
+            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                for (suggestion in suggestions.take(SUGGESTIONS_LIMIT)) {
+                    SuggestionChip(
+                        onClick = {
+                            setTitleTextFieldValue(selectEndTextFieldValue(suggestion))
+                            onTitleChange(suggestion)
+                            coroutineScope.launch {
+                                // scroll to top for better UX
+                                scrollState?.animateScrollTo(0)
+                            }
+                        },
+                        label = { Text(suggestion) },
+                    )
                 }
             }
         }
     }
 }
 
-@Composable
-private fun Suggestion(
-    suggestion: String,
-    onClick: () -> Unit
-) {
-    Text(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable {
-                onClick()
-            }
-            .padding(horizontal = 24.dp)
-            .padding(vertical = 12.dp),
-        text = suggestion,
-        style = UI.typo.b2.style(
-            fontWeight = FontWeight.Medium
-        )
-    )
-}
-
 @Preview
 @Composable
 private fun PreviewTitleWithSuggestions() {
-    IvyWalletComponentPreview {
-        Column {
-            Title(
-                type = TransactionType.EXPENSE,
-                titleFocus = FocusRequester(),
-                initialTransactionId = null,
-                titleTextFieldValue = selectEndTextFieldValue(""),
-                setTitleTextFieldValue = {},
-                suggestions = setOf(
-                    "Tabu",
-                    "Harem",
-                    "Club 35"
-                ),
-                onTitleChanged = {}
-            ) {
-            }
+    WalletPreview(Theme.LIGHT) {
+        Title(
+            type = TransactionType.EXPENSE,
+            titleFocus = FocusRequester(),
+            titleTextFieldValue = selectEndTextFieldValue(""),
+            setTitleTextFieldValue = {},
+            suggestions = setOf("Tabu", "Harem", "Club 35"),
+            onTitleChange = {}
+        ) {
         }
     }
 }

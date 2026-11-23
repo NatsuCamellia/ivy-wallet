@@ -5,8 +5,6 @@
     <string name="month_income">PENDAPATAN BULAN INI</string>
     <string name="month_expenses">PENGELUARAN BULAN INI</string>
     <string name="excluded">(tidak termasuk)</string>
-    <string name="income_uppercase">PENDAPATAN</string>
-    <string name="expenses_uppercase">PENGELUARAN</string>
     <string name="app_locked">APLIKASI TERKUNCI</string>
     <string name="authenticate_text">Autentikasi untuk masuk ke aplikasi</string>
     <string name="unlock">Buka kunci</string>
@@ -103,7 +101,6 @@
     <string name="light_mode">Mode Terang</string>
     <string name="dark_mode">Mode Gelap</string>
     <string name="auto_mode">Mode Otomatis</string>
-    <string name="planned_payments">Pembayaran\nTerencana</string>
     <string name="share_ivy">Bagikan Ivy</string>
     <string name="reports">Laporan</string>
     <string name="loans">Pinjaman</string>
@@ -115,8 +112,6 @@
     <string name="no_loans_description">Anda tidak memiliki pinjaman apa pun.\nKetuk "+ Tambahkan pinjaman" untuk menambahkan satu.</string>
     <string name="loan_confirm_deletion_description">Catatan: Menghapus pinjaman ini akan menghapusnya secara permanen dan menghapus semua catatan pinjaman yang terkait dengannya.</string>
     <string name="confirm_account_loan_change">Harap tunggu, menghitung ulang semua catatan pinjaman</string>
-    <string name="paid">Dibayar</string>
-    <string name="left_to_pay">%1$s %2$s tersisa</string>
     <string name="loan_interest">Bunga Pinjaman</string>
     <string name="interest_paid">%1$s %2$s dibayar</string>
     <string name="add_record">Tambahkan catatan</string>
@@ -136,23 +131,12 @@
     <string name="transactions">transaksi</string>
     <string name="home">Beranda</string>
     <string name="add_planned_payment">Tambahkan pembayaran terencana</string>
-    <string name="add_income_uppercase">TAMBAHKAN PENDAPATAN</string>
-    <string name="add_expense_uppercase">TAMBAHKAN PENGELUARAN</string>
-    <string name="account_transfer">TRANSFER AKUN</string>
     <string name="skip">Lewati</string>
     <string name="add_new">Tambahkan baru</string>
     <string name="from_date">Dari %1$s</string>
     <string name="to_date">Ke %1$s</string>
     <string name="range">Rentang</string>
-    <string name="privacy_and_data_collection">Privasi dan\npengumpulan data</string>
-    <string name="swipe_to_agree_terms_conditions">Geser untuk menyetujui Syarat dan Ketentuan kami</string>
-    <string name="agreed_terms_conditions">Setuju dengan Syarat dan Ketentuan kami</string>
-    <string name="swipe_to_agree_privacy_policy">Geser untuk menyetujui Kebijakan Privasi kami</string>
-    <string name="agreed_privacy_policy">Setuju dengan Kebijakan Privasi kami</string>
-    <string name="terms_and_conditions">Syarat dan Ketentuan</string>
     <string name="privacy_policy">Kebijakan Privasi</string>
-    <string name="wallet_description">Lacak pendapatan, pengeluaran, dan anggaran Anda dengan Ivy.\n\nAntarmuka pengguna intuitif, pembayaran berulang dan terencana, kelola beberapa akun, atur transaksi dalam kategori, statistik bermakna, ekspor ke CSV, dan banyak lagi.</string>
-    <string name="enter_your_name">Masukkan nama anda\nuntuk personalisasi\ndompet Anda</string>
     <string name="what_is_your_name">Apa nama Anda?</string>
     <string name="enter">Masukkan</string>
     <string name="add_accounts">Tambahkan akun</string>
@@ -182,12 +166,8 @@
     <string name="planned_payment_confirm_deletion_description">Menghapus pembayaran terencana ini akan menghapus semua transaksi yang akan datang atau terlambat yang belum dibayar yang terkait dengannya.</string>
     <string name="set_payment_type">Atur jenis pembayaran</string>
     <string name="planned_start_at">Rencanakan dimulai pada</string>
-    <string name="repeats_every">MENGULANG SETIAP %1$d %2$s</string>
     <string name="deleted">dihapus</string>
-    <string name="planned_for_uppercase">"RENCANAKAN UNTUK "</string>
     <string name="null_text">null</string>
-    <string name="starts_date">"DIMULAI %1$s "</string>
-    <string name="add_payment">Tambahkan pembayaran</string>
     <string name="one_time_payments">Pembayaran sekali waktu</string>
     <string name="recurring_payments">Pembayaran berulang</string>
     <string name="no_planned_payments">Tidak ada pembayaran terencana</string>
@@ -199,8 +179,6 @@
     <string name="due_on">Jatuh tempo pada %1$s</string>
     <string name="upcoming">Akan datang</string>
     <string name="overdue">Terlambat</string>
-    <string name="expenses_lowercase">pengeluaran</string>
-    <string name="income_lowercase">pendapatan</string>
     <string name="edit_account">Edit akun</string>
     <string name="new_account">Akun baru</string>
     <string name="account_name">Nama akun</string>
@@ -227,9 +205,7 @@
     <string name="select_all">Pilih Semua</string>
     <string name="amount_optional">Jumlah (opsional)</string>
     <string name="keywords_optional">Kata Kunci (opsional)</string>
-    <string name="includes_uppercase">MENYERTAKAN</string>
     <string name="add_keyword">Tambahkan kata kunci</string>
-    <string name="excludes_uppercase">MENGECUALIKAN</string>
     <string name="no_transactions_for_your_filter">Anda tidak memiliki transaksi untuk filter Anda.</string>
     <string name="no_filter">Tanpa Filter</string>
     <string name="invalid_filter_warning">Untuk menghasilkan laporan, Anda harus mengatur filter yang valid terlebih dahulu.</string>
@@ -267,7 +243,6 @@
     <string name="request_a_feature">Minta Fitur</string>
     <string name="contact_support">Hubungi dukungan</string>
     <string name="project_contributors">Kontributor</string>
-    <string name="account_uppercase">AKUN</string>
     <string name="logout">Keluar</string>
     <string name="login">Masuk</string>
     <string name="syncing">Menyinkronkan…</string>
@@ -304,7 +279,6 @@
     <string name="unselect_all_time">Batalkan Pilih Semua Waktu</string>
     <string name="select_all_time">Pilih Semua Waktu</string>
     <string name="choose_start_date_of_month">Pilih tanggal mulai bulan</string>
-    <string name="supports_crypto">mendukung kripto</string>
     <string name="delete">Hapus</string>
     <string name="save">Simpan</string>
     <string name="add">Tambahkan</string>
@@ -436,8 +410,6 @@
     <string name="confirm_skip_all">Konfirmasi lewati semua</string>
     <string name="confirm_skip_all_description">Apakah Anda yakin ingin melewati semua pembayaran yang tertunda?</string>
     <string name="switch_to_offline_mode">Beralih ke mode offline</string>
-    <string name="delete_all_user_cloud_data_warning">PERINGATAN! Tindakan ini akan menghapus semua data yang disimpan di cloud untuk %1$s SECARA PERMANEN, data offline yang disimpan di aplikasi lokal Anda akan tetap ada.</string>
-    <string name="delete_all_cloud_data_question">Hapus semua data yang disimpan di cloud?</string>
     <string name="experimental">Eksperimental</string>
     <string name="experimental_settings">Pengaturan Eksperimental</string>
     <string name="wallet_balance">Saldo dompet</string>

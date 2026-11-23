@@ -1,6 +1,5 @@
 package com.ivy.main
 
-import androidx.compose.foundation.layout.BoxWithConstraints
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import com.ivy.legacy.data.model.MainTab
@@ -17,51 +16,21 @@ class MainBottomBarPaparazziTest(
     @Test
     fun `snapshot bottom bar - home tab`() {
         snapshot(theme) {
-            BoxWithConstraints {
-                BottomBar(
-                    tab = MainTab.HOME,
-                    selectTab = {},
-                    onAddIncome = {},
-                    onAddExpense = {},
-                    onAddTransfer = {},
-                    onAddPlannedPayment = {},
-                    onFabClick = {},
-                )
-            }
+            MainUiTest(theme == PaparazziTheme.Dark, MainTab.HOME)
         }
     }
 
     @Test
     fun `snapshot bottom bar - accounts tab`() {
         snapshot(theme) {
-            BoxWithConstraints {
-                BottomBar(
-                    tab = MainTab.ACCOUNTS,
-                    selectTab = {},
-                    onAddIncome = {},
-                    onAddExpense = {},
-                    onAddTransfer = {},
-                    onAddPlannedPayment = {},
-                    onFabClick = {},
-                )
-            }
+            MainUiTest(theme == PaparazziTheme.Dark, MainTab.ACCOUNTS)
         }
     }
 
     @Test
     fun `snapshot bottom bar - categories tab`() {
         snapshot(theme) {
-            BoxWithConstraints {
-                BottomBar(
-                    tab = MainTab.CATEGORIES,
-                    selectTab = {},
-                    onAddIncome = {},
-                    onAddExpense = {},
-                    onAddTransfer = {},
-                    onAddPlannedPayment = {},
-                    onFabClick = {},
-                )
-            }
+            MainUiTest(theme == PaparazziTheme.Dark, MainTab.CATEGORIES)
         }
     }
 }

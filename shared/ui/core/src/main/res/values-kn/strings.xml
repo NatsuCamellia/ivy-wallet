@@ -5,8 +5,6 @@
     <string name="month_income">ಈ ತಿಂಗಳ ಆದಾಯ</string>
     <string name="month_expenses">ಈ ತಿಂಗಳ ಖರ್ಚು</string>
     <string name="excluded">(ಹೊರತುಪಡಿಸಿ)</string>
-    <string name="income_uppercase">ಆದಾಯ</string>
-    <string name="expenses_uppercase">ಖರ್ಚು</string>
     <string name="app_locked">ಅಪ್ಲಿಕೇಶನ್ ಲಾಕ್ ಆಗಿದೆ</string>
     <string name="authenticate_text">ಅಪ್ಲಿಕೇಶನ್ ಬಳಸಲು ಪ್ರಮಾಣೀಕರಿಸಿ</string>
     <string name="unlock">ತೆಗೆ</string>
@@ -103,7 +101,6 @@
     <string name="light_mode">ಲೈಟ್ ಮೋಡ್</string>
     <string name="dark_mode">ಡಾರ್ಕ್ ಮೋಡ್</string>
     <string name="auto_mode">ಆಟೋ ಮೋಡ್</string>
-    <string name="planned_payments">ಯೋಜಿತ\nಪಾವತಿಗಳು</string>
     <string name="share_ivy">Ivy ಯನ್ನು ಶೇರ್ ಮಾಡಿ</string>
     <string name="reports">ವರದಿಗಳು</string>
     <string name="loans">ಸಾಲಗಳು</string>
@@ -115,8 +112,6 @@
     <string name="no_loans_description">ನೀವು ಯಾವುದೇ ಸಾಲವನ್ನು ಹೊಂದಿಲ್ಲ.\nಸೇರಿಸಲು \"+\" ಅನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ.</string>
     <string name="loan_confirm_deletion_description">ಗಮನಿಸಿ: ಈ ಸಾಲವನ್ನು ಅಳಿಸುವುದರಿಂದ ಅದನ್ನು ಶಾಶ್ವತವಾಗಿ ತೆಗೆದುಹಾಕಲಾಗುತ್ತದೆ ಮತ್ತು ಅದರೊಂದಿಗೆ ಸಂಬಂಧಿಸಿದ ಎಲ್ಲಾ ಸಾಲದ ದಾಖಲೆಗಳನ್ನು ಅಳಿಸಲಾಗುತ್ತದೆ.</string>
     <string name="confirm_account_loan_change">ದಯವಿಟ್ಟು ನಿರೀಕ್ಷಿಸಿ, ಎಲ್ಲಾ ಸಾಲದ ದಾಖಲೆಗಳನ್ನು ಮರು ಲೆಕ್ಕಾಚಾರ ಮಾಡಲಾಗುತ್ತಿದೆ</string>
-    <string name="paid">ಪಾವತಿಸಲಾಗಿದೆ</string>
-    <string name="left_to_pay">%1$s %2$s ಉಳಿಧಿಧೆ</string>
     <string name="loan_interest">ಸಾಲದ ಬಡ್ಡಿ</string>
     <string name="interest_paid">%1$s %2$s ಪಾವತಿಸಲಾಗಿದೆ</string>
     <string name="add_record">ದಾಖಲೆ ಸೇರಿಸಿ</string>
@@ -135,23 +130,12 @@
     <string name="transactions">ವಹಿವಾಟುಗಳು</string>
     <string name="home">ಹೋಮ್</string>
     <string name="add_planned_payment">ಯೋಜಿತ ಪಾವತಿಯನ್ನು ಸೇರಿಸಿ</string>
-    <string name="add_income_uppercase">ಆದಾಯವನ್ನು ಸೇರಿಸಿ</string>
-    <string name="add_expense_uppercase">ಖರ್ಚನ್ನು ಸೇರಿಸಿ</string>
-    <string name="account_transfer">ಖಾತೆ ವರ್ಗಾವಣೆ</string>
     <string name="skip">ಬಿಟ್ಟುಬಿಡಿ</string>
     <string name="add_new">ಹೊಸದನ್ನು ಸೇರಿಸಿ</string>
     <string name="from_date">ಈ ದಿನಾಂಕದಿಂದ %1$s</string>
     <string name="to_date">ಈ ದಿನಾಂಕದವರೆಗೆ %1$s</string>
     <string name="range">ವ್ಯಾಪ್ತಿ</string>
-    <string name="privacy_and_data_collection">ಪ್ರೈವಸಿ ಮತ್ತು\nಡೇಟಾ ಸಂಗ್ರಹಣೆ</string>
-    <string name="swipe_to_agree_terms_conditions">ನಮ್ಮ ನಿಯಮಗಳು ಮತ್ತು ಷರತ್ತುಗಳನ್ನು ಒಪ್ಪಿಕೊಳ್ಳಲು ಸ್ವೈಪ್ ಮಾಡಿ</string>
-    <string name="agreed_terms_conditions">ನಮ್ಮ ನಿಯಮಗಳು ಮತ್ತು ಷರತ್ತುಗಳೊಂದಿಗೆ ಸಮ್ಮತಿಸಲಾಗಿದೆ</string>
-    <string name="swipe_to_agree_privacy_policy">ನಮ್ಮ ಪ್ರೈವಸಿ ನೀತಿಯನ್ನು ಒಪ್ಪಿಕೊಳ್ಳಲು ಸ್ವೈಪ್ ಮಾಡಿ</string>
-    <string name="agreed_privacy_policy">ನಮ್ಮ ಪ್ರೈವಸಿ ನೀತಿಗೆ ಸಮ್ಮತಿಸಲಾಗಿದೆ</string>
-    <string name="terms_and_conditions">ನಿಯಮಗಳು ಮತ್ತು ಷರತ್ತುಗಳು</string>
     <string name="privacy_policy">ಪ್ರೈವಸಿ ನೀತಿ</string>
-    <string name="wallet_description">ಐವಿಯೊಂದಿಗೆ ನಿಮ್ಮ ಆದಾಯ, ಖರ್ಚು ಮತ್ತು ಬಜೆಟ್ ಅನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ.\n\nಅರ್ಥಗರ್ಭಿತ UI, ಮರುಕಳಿಸುವ ಮತ್ತು ಯೋಜಿತ ಪಾವತಿಗಳು, ಅನೇಕ ಖಾತೆಗಳನ್ನು ನಿರ್ವಹಿಸಿ, ವರ್ಗಗಳಲ್ಲಿ ವಹಿವಾಟುಗಳನ್ನು ಆಯೋಜಿಸಿ, ಅರ್ಥಪೂರ್ಣ ಅಂಕಿಅಂಶಗಳು, CSV ಗೆ ರಫ್ತು ಮತ್ತು ಇನ್ನೂ ಹೆಚ್ಚು</string>
-    <string name="enter_your_name">ನಿಮ್ಮ ವ್ಯಾಲೆಟ್ ಅನ್ನು ವೈಯಕ್ತೀಕರಿಸಲು\nನಿಮ್ಮ ಹೆಸರನ್ನು ನಮೂದಿಸಿ</string>
     <string name="what_is_your_name">ನಿಮ್ಮ ಹೆಸರೇನು?</string>
     <string name="enter">ನಮೂದಿಸಿ</string>
     <string name="add_accounts">ಖಾತೆಗಳನ್ನು ಸೇರಿಸಿ</string>
@@ -181,12 +165,8 @@
     <string name="planned_payment_confirm_deletion_description">ಈ ಯೋಜಿತ ಪಾವತಿಯನ್ನು ಅಳಿಸುವುದರಿಂದ ಅದಕ್ಕೆ ಸಂಬಂಧಿಸಿದ ಎಲ್ಲಾ ಪಾವತಿಸದ ಮುಂಬರುವ ಅಥವಾ ಮಿತಿಮೀರಿದ ವಹಿವಾಟುಗಳನ್ನು ಅಳಿಸಲಾಗುತ್ತದೆ.</string>
     <string name="set_payment_type">ಪಾವತಿ ಪ್ರಕಾರವನ್ನು ಹೊಂದಿಸಿ</string>
     <string name="planned_start_at">ನಲ್ಲಿ ಪ್ರಾರಂಭಿಸಲು ಯೋಜಿಸಲಾಗಿದೆ</string>
-    <string name="repeats_every">ಪ್ರತಿ ಪುನರಾವರ್ತಿಸುತ್ತದೆ %1$d %2$s</string>
     <string name="deleted">ಅಳಿಸಲಾಗಿದೆ</string>
-    <string name="planned_for_uppercase">"ಗಾಗಿ ಯೋಜಿಸಲಾಗಿದೆ "</string>
     <string name="null_text">ಊರ್ಜಿತವಾಗದ</string>
-    <string name="starts_date">"ಪ್ರಾರಂಭ ದಿನಾಂಕ %1$s "</string>
-    <string name="add_payment">ಪಾವತಿಯನ್ನು ಸೇರಿಸಿ</string>
     <string name="one_time_payments">ಒಂದು ಬಾರಿಮಾಡುವ ಪಾವತಿಗಳು</string>
     <string name="recurring_payments">ಮರುಕಳಿಸುವ ಪಾವತಿಗಳು</string>
     <string name="no_planned_payments">ಯಾವುದೇ ಯೋಜಿತ ಪಾವತಿಗಳಿಲ್ಲ</string>
@@ -198,8 +178,6 @@
     <string name="due_on">ಈ ದಿನಾಂಕದಂದು ಬಾಕಿಯಿದೆ %1$s</string>
     <string name="upcoming">ಮುಂಬರುವ</string>
     <string name="overdue">ಅವಧಿ ಮೀರಿದೆ</string>
-    <string name="expenses_lowercase">ಖರ್ಚು</string>
-    <string name="income_lowercase">ಆದಾಯ</string>
     <string name="edit_account">ಖಾತೆಯನ್ನು ಎಡಿಟ್ ಮಾಡಿ</string>
     <string name="new_account">ಹೊಸ ಖಾತೆ</string>
     <string name="account_name">ಖಾತೆಯ ಹೆಸರು</string>
@@ -226,9 +204,7 @@
     <string name="select_all">ಎಲ್ಲವನ್ನೂ ಆಯ್ಕೆಮಾಡಿ</string>
     <string name="amount_optional">ಮೊತ್ತ (ಕಡಾಯವಲ್ಲದ)</string>
     <string name="keywords_optional">ಕೀವರ್ಡ್‌ಗಳು (ಕಡಾಯವಲ್ಲದ)</string>
-    <string name="includes_uppercase">ಒಳಗೊಂಡಿದೆ</string>
     <string name="add_keyword">ಕೀವರ್ಡ್ ಸೇರಿಸಿ</string>
-    <string name="excludes_uppercase">ಹೊರತುಪಡಿಸಿ</string>
     <string name="no_transactions_for_your_filter">ನಿಮ್ಮ ಫಿಲ್ಟರ್‌ಗಾಗಿ ನೀವು ಯಾವುದೇ ವಹಿವಾಟುಗಳನ್ನು ಹೊಂದಿಲ್ಲ.</string>
     <string name="no_filter">ಯಾವುದೇ ಫಿಲ್ಟರ್ ಇಲ್ಲ</string>
     <string name="invalid_filter_warning">ವರದಿಯನ್ನು ರಚಿಸಲು ನೀವು ಮೊದಲು ಮಾನ್ಯವಾದ ಫಿಲ್ಟರ್ ಅನ್ನು ಹೊಂದಿಸಬೇಕು.</string>
@@ -264,7 +240,6 @@
     <string name="request_a_feature">ವೈಶಿಷ್ಟ್ಯಕ್ಕಾಗಿ ವಿನಂತಿಸಿ</string>
     <string name="contact_support">ಬೆಂಬಲಕ್ಕಾಗಿ ಸಂಪರ್ಕಿಸಿ</string>
     <string name="project_contributors">ಯೋಜನೆಯ ಕೊಡುಗೆದಾರರು</string>
-    <string name="account_uppercase">ಖಾತೆ</string>
     <string name="logout">ಲಾಗ್ಔಟ್</string>
     <string name="login">ಲಾಗಿನ್</string>
     <string name="syncing">ಸಿಂಕ್ ಮಾಡಲಾಗುತ್ತಿದೆ…</string>
@@ -301,7 +276,6 @@
     <string name="unselect_all_time">ಸಾರ್ವಕಾಲಿಕ ಆಯ್ಕೆಯನ್ನು ತೆಗೆದುಹಾಕಿ</string>
     <string name="select_all_time">ಸಾರ್ವಕಾಲಿಕ ಆಯ್ಕೆಮಾಡಿ</string>
     <string name="choose_start_date_of_month">ತಿಂಗಳ ಪ್ರಾರಂಭ ದಿನಾಂಕವನ್ನು ಆಯ್ಕೆಮಾಡಿ</string>
-    <string name="supports_crypto">ಕ್ರಿಪ್ಟೋವನ್ನು ಬೆಂಬಲಿಸುತ್ತದೆ</string>
     <string name="delete">ಅಳಿಸಿ</string>
     <string name="save">ಉಳಿಸಿ</string>
     <string name="add">ಸೇರಿಸಿ</string>
@@ -433,8 +407,6 @@
     <string name="confirm_skip_all">ಎಲ್ಲವನ್ನೂ ಬಿಟ್ಟುಬಿಡಿ ಎಂಬುದನ್ನು ದೃಢೀಕರಿಸಿ</string>
     <string name="confirm_skip_all_description">ಎಲ್ಲಾ ಮಿತಿಮೀರಿದ ಯೋಜಿತ ಪಾವತಿಗಳನ್ನು ಬಿಟ್ಟುಬಿಡಲು ನೀವು ಖಚಿತವಾಗಿ ಬಯಸುವಿರಾ?</string>
     <string name="switch_to_offline_mode">ಆಫ್‌ಲೈನ್ ಮೋಡ್‌ಗೆ ಬದಲಿಸಿ</string>
-    <string name="delete_all_user_cloud_data_warning">ಎಚ್ಚರಿಕೆ! ಈ ಕ್ರಿಯೆಯು ನಿಮ್ಮ ಎಲ್ಲಾ ಕ್ಲೌಡ್-ಸಂಗ್ರಹಿಸಿದ ಡೇಟಾವನ್ನು %1$s ಗಾಗಿ ಶಾಶ್ವತವಾಗಿ ಅಳಿಸುತ್ತದೆ, ನಿಮ್ಮ ಸ್ಥಳೀಯ ಅಪ್ಲಿಕೇಶನ್‌ನಲ್ಲಿ ಸಂಗ್ರಹಿಸಲಾದ ಆಫ್‌ಲೈನ್ ಡೇಟಾ ಉಳಿಯುತ್ತದೆ.</string>
-    <string name="delete_all_cloud_data_question">ಎಲ್ಲಾ ಕ್ಲೌಡ್-ಸಂಗ್ರಹಿಸಿದ ಡೇಟಾವನ್ನು ಅಳಿಸುವುದೇ?</string>
     <string name="experimental">ಪ್ರಯೋಗಾತ್ಮಕ</string>
     <string name="experimental_settings">ಪ್ರಯೋಗಾತ್ಮಕ ಸೆಟ್ಟಿಂಗ್‌ಗಳು</string>
     <string name="wallet_balance">Wallet balance</string>

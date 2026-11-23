@@ -1,20 +1,16 @@
 package com.ivy.attributions
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,11 +22,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ivy.navigation.IvyPreview
+import com.ivy.base.legacy.Theme
 import com.ivy.navigation.Navigation
+import com.ivy.navigation.NavigationRoot
 import com.ivy.navigation.navigation
 import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
+import com.ivy.ui.component.BackButton
+import com.ivy.ui.theme.WalletTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -57,7 +56,7 @@ private fun AttributionsUI(
                     TopAppBarTitle(title = stringResource(R.string.attributions))
                 },
                 navigationIcon = {
-                    BackButton(nav = nav)
+                    BackButton(onClick = nav::back)
                 }
             )
         },
@@ -74,18 +73,6 @@ private fun TopAppBarTitle(title: String) {
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
-}
-
-@Composable
-private fun BackButton(nav: Navigation) {
-    IconButton(onClick = {
-        nav.back()
-    }) {
-        Icon(
-            imageVector = Icons.Filled.ArrowBack,
-            contentDescription = "Back"
-        )
-    }
 }
 
 @Composable
@@ -130,15 +117,13 @@ private fun AttributionCard(attribution: AttributionItem.Attribution) {
     Card(
         onClick = {
             browser.openUri(attribution.link)
-        }
+        },
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
-        ) {
-            Text(
-                text = attribution.name
-            )
-        }
+        Text(
+            text = attribution.name,
+            modifier = Modifier.padding(16.dp),
+        )
     }
 }
 
@@ -183,8 +168,10 @@ private fun AttributionsUIPreview(isDark: Boolean = false) {
         )
     )
 
-    IvyPreview(isDark) {
-        AttributionsUI(uiState = AttributionsState(attributionItems))
+    WalletTheme(if (isDark) Theme.DARK else Theme.LIGHT) {
+        NavigationRoot(navigation = Navigation()) {
+            AttributionsUI(uiState = AttributionsState(attributionItems))
+        }
     }
 }
 

@@ -3,6 +3,8 @@ package com.ivy.ui.component.transaction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Icon
@@ -21,6 +23,8 @@ import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import com.ivy.ui.PaparazziScreenshotTest
 import com.ivy.ui.PaparazziTheme
 import com.ivy.ui.R
+import com.ivy.ui.component.FlatListItem
+import com.ivy.ui.component.StickyListHeader
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -152,7 +156,6 @@ class TransactionComponentsPaparazziTest(
         snapshot(theme) {
             Surface(color = MaterialTheme.colorScheme.surface) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    TransactionDayHeader(title = "Today", netText = "-83.26 USD")
                     TransactionSectionHeader(
                         title = "Upcoming",
                         titleColor = MaterialTheme.colorScheme.secondary,
@@ -172,6 +175,61 @@ class TransactionComponentsPaparazziTest(
                     )
                 }
             }
+        }
+    }
+
+    @Test
+    fun `snapshot flat transaction rows`() {
+        snapshot(theme) {
+            Surface(color = MaterialTheme.colorScheme.surface) {
+                Column {
+                    StickyListHeader(title = "Today", subtotal = "-83.26 USD")
+                    FlatTransactionItem(ui = expense, onClick = {}) { Badge(Color(0xFFFF9235)) }
+                    FlatTransactionItem(
+                        ui = expense.copy(
+                            id = "2",
+                            title = "Salary — July",
+                            supportingText = "Salary · DSK Bank",
+                            amountText = "+8,049.70 USD",
+                            amountKind = TransactionAmountKind.Income,
+                        ),
+                        onClick = {},
+                    ) { Badge(Color(0xFFFF9235)) }
+                    FlatTransactionItem(
+                        ui = expense.copy(
+                            id = "3",
+                            title = "Top-up Revolut",
+                            supportingText = "Cash → Revolut",
+                            categoryColor = null,
+                            amountText = "40.00 USD",
+                            amountKind = TransactionAmountKind.Transfer,
+                        ),
+                        onClick = {},
+                    ) { Badge(MaterialTheme.colorScheme.primaryContainer) }
+                    FlatTransactionItem(
+                        ui = expense.copy(
+                            id = "4",
+                            title = "A very long transaction title that has to be cut off at the end of the line",
+                            supportingText = "Groceries and household supplies · Joint savings account at the bank",
+                            amountText = "-40,000.00 USD",
+                        ),
+                        onClick = {},
+                    ) { Badge(Color(0xFFFF9235)) }
+                    StickyListHeader(title = "Yesterday, Jul 22", subtotal = "+8,049.70 USD")
+                    FlatListItem(title = "Without numbers", onClick = {}, supportingText = "Just text")
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun Badge(color: Color) {
+        Surface(modifier = Modifier.size(40.dp), shape = CircleShape, color = color) {
+            Icon(
+                painter = painterResource(R.drawable.ic_custom_category_m),
+                contentDescription = null,
+                modifier = Modifier.padding(4.dp),
+            )
         }
     }
 

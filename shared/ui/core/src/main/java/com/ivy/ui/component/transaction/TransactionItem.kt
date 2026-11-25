@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -131,13 +130,4 @@ private fun TransactionItemPosition.toShapes(): ListItemShapes = when (this) {
     TransactionItemPosition.First -> ListItemDefaults.segmentedShapes(index = 0, count = 2)
     TransactionItemPosition.Middle -> ListItemDefaults.segmentedShapes(index = 1, count = 3)
     TransactionItemPosition.Last -> ListItemDefaults.segmentedShapes(index = 1, count = 2)
-}
-
-@Composable
-private fun TransactionAmountKind.amountColor(): Color = when (this) {
-    TransactionAmountKind.Expense -> MaterialTheme.colorScheme.error
-    TransactionAmountKind.Income -> MaterialTheme.colorScheme.tertiary
-    TransactionAmountKind.Transfer -> MaterialTheme.colorScheme.primary
-    TransactionAmountKind.Upcoming -> MaterialTheme.colorScheme.secondary
-    TransactionAmountKind.Overdue -> MaterialTheme.colorScheme.error
 }

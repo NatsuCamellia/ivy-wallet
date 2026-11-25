@@ -48,6 +48,7 @@ import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
+import com.ivy.home.transactionlist.HomeTypeFilter
 import com.ivy.home.transactionlist.homeTransactionsList
 import com.ivy.home.transactionlist.rememberHomeTransactionMapper
 import com.ivy.legacy.ui.sheet.BufferModal
@@ -161,6 +162,9 @@ fun HomeUi(
 
             stats = uiState.stats,
             history = uiState.history,
+            historyEmpty = uiState.historyEmpty,
+            typeFilter = uiState.typeFilter,
+            onTypeFilterChange = { onEvent(HomeEvent.SetTypeFilter(it)) },
 
             customerJourneyCards = uiState.customerJourneyCards,
 
@@ -268,6 +272,9 @@ fun HomeLazyColumn(
     balance: BigDecimal,
     stats: IncomeExpensePair,
     history: ImmutableList<TransactionHistoryItem>,
+    historyEmpty: Boolean,
+    typeFilter: HomeTypeFilter,
+    onTypeFilterChange: (HomeTypeFilter) -> Unit,
 
     customerJourneyCards: ImmutableList<CustomerJourneyCardModel>,
 
@@ -343,6 +350,9 @@ fun HomeLazyColumn(
 
         homeTransactionsList(
             historyItems = historyItems,
+            historyEmpty = historyEmpty,
+            typeFilter = typeFilter,
+            onTypeFilterChange = onTypeFilterChange,
             upcoming = upcoming,
             upcomingRows = upcomingRows,
             upcomingSubtitle = upcomingSubtitle,
@@ -409,6 +419,8 @@ private fun emptyHomeState(): HomeState = HomeState(
     ),
     customerJourneyCards = persistentListOf(),
     history = persistentListOf(),
+    historyEmpty = true,
+    typeFilter = HomeTypeFilter.All,
     stats = IncomeExpensePair.zero(),
     upcoming = LegacyDueSection(
         trns = persistentListOf(),
@@ -468,6 +480,7 @@ private fun populatedHomeState(): HomeState {
             bufferDiff = BigDecimal.valueOf(1415.7),
         ),
         history = history,
+        historyEmpty = false,
         stats = IncomeExpensePair(BigDecimal.valueOf(2500), BigDecimal.valueOf(84.3)),
     )
 }

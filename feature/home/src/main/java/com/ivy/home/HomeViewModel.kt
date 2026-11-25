@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
@@ -21,6 +22,10 @@ import com.ivy.frp.then
 import com.ivy.frp.thenInvokeAfter
 import com.ivy.home.customerjourney.CustomerJourneyCardModel
 import com.ivy.home.customerjourney.CustomerJourneyCardsProvider
+import com.ivy.home.transactionlist.HomeTypeFilter
+import com.ivy.home.transactionlist.mapHomeHistory
+import com.ivy.home.transactionlist.toDayGroups
+import com.ivy.home.transactionlist.toHistoryItems
 import com.ivy.legacy.IvyWalletCtx
 import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.data.BufferInfo
@@ -103,6 +108,7 @@ class HomeViewModel @Inject constructor(
         )
     )
     private var history by mutableStateOf<ImmutableList<TransactionHistoryItem>>(persistentListOf())
+    private var typeFilter by mutableStateOf(HomeTypeFilter.All)
     private var stats by mutableStateOf(IncomeExpensePair.zero())
     private var balance by mutableStateOf(BigDecimal.ZERO)
     private var buffer by mutableStateOf(
@@ -137,12 +143,23 @@ class HomeViewModel @Inject constructor(
             start()
         }
 
+        val rawHistory = getHistory()
+        val filter = typeFilter
+        val filteredHistory = remember(rawHistory, filter) {
+            mapHomeHistory(rawHistory.toDayGroups(), filter)
+        }
+        val historyItems = remember(filteredHistory) {
+            filteredHistory.days.toHistoryItems().toImmutableList()
+        }
+
         return HomeState(
             theme = getTheme(),
             name = getName(),
             period = getPeriod(),
             baseData = getBaseData(),
-            history = getHistory(),
+            history = historyItems,
+            historyEmpty = filteredHistory.isEmpty,
+            typeFilter = typeFilter,
             stats = getStats(),
             balance = getBalance(),
             buffer = getBuffer(),
@@ -244,6 +261,7 @@ class HomeViewModel @Inject constructor(
                 HomeEvent.SwitchTheme -> switchTheme()
                 is HomeEvent.DismissCustomerJourneyCard -> dismissCustomerJourneyCard(event.card)
                 is HomeEvent.SetExpanded -> setExpanded(event.expanded)
+                is HomeEvent.SetTypeFilter -> typeFilter = event.filter
             }
         }
     }

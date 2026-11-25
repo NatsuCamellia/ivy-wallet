@@ -1,5 +1,6 @@
 package com.ivy.home.transactionlist
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
@@ -12,6 +13,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import com.ivy.base.legacy.Transaction
@@ -22,6 +24,8 @@ import com.ivy.legacy.ui.component.IconBadge
 import com.ivy.legacy.ui.component.transaction.EmptyState
 import com.ivy.ui.R
 import com.ivy.ui.component.StickyListHeader
+import com.ivy.ui.component.TypeFilterChips
+import com.ivy.ui.component.TypeFilterOption
 import com.ivy.ui.component.transaction.FlatTransactionItem
 import com.ivy.ui.component.transaction.TransactionItem
 import com.ivy.ui.component.transaction.TransactionSectionHeader
@@ -55,6 +59,9 @@ fun rememberHomeTransactionMapper(baseData: AppBaseData): HomeTransactionMapper 
 @Suppress("LongParameterList", "LongMethod")
 fun LazyListScope.homeTransactionsList(
     historyItems: ImmutableList<HomeTrnListItem>,
+    historyEmpty: Boolean,
+    typeFilter: HomeTypeFilter,
+    onTypeFilterChange: (HomeTypeFilter) -> Unit,
     upcoming: LegacyDueSection?,
     upcomingRows: ImmutableList<HomeTrnListItem.Trn>,
     upcomingSubtitle: String?,
@@ -107,6 +114,21 @@ fun LazyListScope.homeTransactionsList(
         }
     }
 
+    if (!historyEmpty || typeFilter != HomeTypeFilter.All) {
+        item(key = "type_filter", contentType = "type_filter") {
+            TypeFilterChips(
+                modifier = Modifier.padding(vertical = 8.dp),
+                options = listOf(
+                    TypeFilterOption(HomeTypeFilter.All, stringResource(R.string.type_filter_all)),
+                    TypeFilterOption(HomeTypeFilter.Expense, stringResource(R.string.expense)),
+                    TypeFilterOption(HomeTypeFilter.Income, stringResource(R.string.income)),
+                ),
+                selected = typeFilter,
+                onSelect = onTypeFilterChange,
+            )
+        }
+    }
+
     historyItems.forEach { item ->
         when (item) {
             is HomeTrnListItem.DayHeader -> stickyHeader(key = item.key, contentType = "day_header") {
@@ -121,7 +143,17 @@ fun LazyListScope.homeTransactionsList(
         }
     }
 
-    if (historyItems.isEmpty() && upcoming.isEmpty() && overdue.isEmpty()) {
+    if (historyEmpty && typeFilter != HomeTypeFilter.All) {
+        item(key = "type_filter_empty") {
+            Text(
+                text = stringResource(R.string.no_transactions_for_your_filter),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 32.dp),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+            )
+        }
+    } else if (historyItems.isEmpty() && upcoming.isEmpty() && overdue.isEmpty()) {
         item {
             EmptyState(
                 emptyStateTitle = emptyStateTitle,

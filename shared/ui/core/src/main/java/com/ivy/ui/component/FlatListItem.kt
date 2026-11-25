@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,8 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
-private val RippleShape = RoundedCornerShape(20.dp)
-
 /**
  * A flat list row that sits directly on the background: a [leading] icon, a [title] with one line of
  * [supportingText] under it and on the right a [primaryText] stacked over a [secondaryText]. Only the
@@ -26,6 +24,7 @@ private val RippleShape = RoundedCornerShape(20.dp)
  * is inset by 8dp on each side for the ripple and by 8dp more for its content, so it lines up with a
  * 16dp margin when used full width.
  */
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun FlatListItem(
     title: String,
@@ -41,7 +40,7 @@ fun FlatListItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
-            .clip(RippleShape)
+            .clip(MaterialTheme.shapes.largeIncreased)
             .clickable(onClick = onClick)
             .padding(horizontal = 8.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),

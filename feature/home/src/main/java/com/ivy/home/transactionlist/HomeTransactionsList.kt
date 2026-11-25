@@ -24,6 +24,7 @@ import com.ivy.legacy.ui.component.IconBadge
 import com.ivy.legacy.ui.component.transaction.EmptyState
 import com.ivy.ui.R
 import com.ivy.ui.component.StickyListHeader
+import com.ivy.ui.component.screenMargin
 import com.ivy.ui.component.TypeFilterChips
 import com.ivy.ui.component.TypeFilterOption
 import com.ivy.ui.component.transaction.FlatTransactionItem
@@ -81,7 +82,7 @@ fun LazyListScope.homeTransactionsList(
     if (upcoming != null && upcoming.trns.isNotEmpty()) {
         item(key = "upcoming_section") {
             TransactionSectionHeader(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.screenMargin(),
                 title = stringResource(R.string.upcoming),
                 titleColor = MaterialTheme.colorScheme.secondary,
                 subtitle = upcomingSubtitle,
@@ -97,7 +98,7 @@ fun LazyListScope.homeTransactionsList(
     if (overdue != null && overdue.trns.isNotEmpty()) {
         item(key = "overdue_section") {
             TransactionSectionHeader(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.screenMargin(),
                 title = stringResource(R.string.overdue),
                 titleColor = MaterialTheme.colorScheme.error,
                 subtitle = overdueSubtitle,
@@ -158,7 +159,7 @@ fun LazyListScope.homeTransactionsList(
             EmptyState(
                 emptyStateTitle = emptyStateTitle,
                 emptyStateText = emptyStateText,
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.screenMargin(),
             )
         }
     }
@@ -174,7 +175,7 @@ private fun LazyListScope.dueRows(
 ) {
     items(items = rows, key = { it.ui.id }) { item ->
         TrnRow(
-            modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = ListItemDefaults.SegmentedGap),
+            modifier = Modifier.screenMargin().padding(bottom = ListItemDefaults.SegmentedGap),
             item = item,
             onClick = { onTransactionClick(item.trn) },
             onSkip = { onSkipTransaction(item.trn) },

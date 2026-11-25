@@ -44,6 +44,7 @@ To add a flow: write `flow_xxx()` in the script and add it to `ALL_FLOWS`.
 | `AVD` | `m3` | AVD to boot (`m3-31` and `ivy_test` also exist) |
 | `PKG` | `net.natsucamellia.ivywallet.debug` | App id to drive |
 | `FLOWS` | all | Space separated flow names, same as the `flows` arguments |
+| `GRADLE_WORKERS` | `2` | Gradle `--max-workers` of the build the script runs |
 
 Keep the emulator and skip rebuilds when taking several screenshots:
 `KEEP_EMULATOR=1 scripts/smoke.sh shot home`, then `KEEP_EMULATOR=1 SKIP_INSTALL=1 scripts/smoke.sh shot accounts`.

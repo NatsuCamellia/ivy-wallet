@@ -11,6 +11,7 @@
 # Env: OUT (output dir, default build/smoke), SKIP_INSTALL=1 (skip :app:installDebug), KEEP_EMULATOR=1 (never
 # kill the emulator), AVD (default m3), PKG (default net.natsucamellia.ivywallet.debug; the demo build is
 # installed by hand, then use SKIP_INSTALL=1), FLOWS (space separated flow names, same as `flows`),
+# GRADLE_WORKERS (Gradle --max-workers of the build, default 2).
 # To add a flow: write `flow_xxx()` (return non-zero on failure) and add it to ALL_FLOWS at the bottom.
 # To add a screen: add a case to `open_screen` and to ALL_SCREENS.
 set -u
@@ -23,7 +24,7 @@ case "${1:-}" in
   shot) MODE=shot; SCREEN="${2:-}"; shift 2 2>/dev/null || shift $# ;;
   flows) shift ;;
   list) MODE=list; shift ;;
-  -h | --help) sed -n '2,16p' "$0"; exit 0 ;;
+  -h | --help) sed -n '2,17p' "$0"; exit 0 ;;
 esac
 FLOW_ARGS=("$@")
 
@@ -893,11 +894,21 @@ flow_add_expense() {
   return 0
 }
 
+# ensure_seed: the flows that read the smokecoffee expense of flow_add_expense call this first; it runs that flow when
+# Home does not list the expense yet, so they also pass on their own from a fresh install
+ensure_seed() {
+  go_home || return 1
+  wait_for text exact "smokecoffee" 4 && return 0
+  log "seeding the smokecoffee expense"
+  flow_add_expense || return 1
+  go_home
+}
+
 # Accounts -> Cash -> the Expenses card opens the pie chart: title, back, add, period buttons and the seeded Groceries
 # row; Previous shows the empty state and Next brings the row back; the row opens the category transactions; back twice
-# returns to the account. Needs flow_add_expense to have run (it seeds the Groceries expense).
+# returns to the account. Seeds the Groceries expense through flow_add_expense when Home lacks it.
 flow_piechart() {
-  go_home || return 1
+  ensure_seed || return 1
   tap_tab Accounts || return 1
   wait_for text exact "Counted in total" || return 1
   tap_node text exact "Cash" || return 1
@@ -1030,9 +1041,9 @@ flow_account_detail() {
 }
 
 # Home top bar -> Search transactions: type the title of the seeded expense (flow_add_expense), its row is listed under the
-# search field, Clear search empties the field, back leaves the screen. Needs flow_add_expense to have run.
+# search field, Clear search empties the field, back leaves the screen. Seeds its expense through flow_add_expense when needed.
 flow_search() {
-  go_home || return 1
+  ensure_seed || return 1
   tap_node desc exact "Search transactions" || return 1
   wait_for class exact android.widget.EditText || return 1
   adb shell input text smokecoffee
@@ -1119,6 +1130,8 @@ flow_planned_payments() {
   has text exact "smokeplanned" || { log "saved planned payment missing from the list"; return 1; }
   has text exact "-30.00 USD" || { log "amount missing in the list"; return 1; }
   shot planned-4-list-item
+  # leave nothing behind: a planned payment that is due would fill the top of Home for the flows after this one
+  delete_planned_payment smokeplanned || return 1
   back
   wait_for text exact "Quick access" || { log "back from the list should return to the open More sheet"; return 1; }
   crashed && return 1
@@ -1146,9 +1159,20 @@ add_planned_payment() {
   wait_for text exact "Recurring payments" || { log "recurring section missing after adding $1"; return 1; }
 }
 
+# delete_planned_payment <title>: from the open planned payments list, opens the item, Delete, confirms, and waits
+# until it is gone from the list
+delete_planned_payment() {
+  tap_node text exact "$1" || return 1
+  wait_for text exact "Edit planned payment" || return 1
+  tap_node desc exact "Delete" || return 1
+  wait_for text exact "Confirm deletion" || return 1
+  tap_node text exact "Delete" || return 1
+  wait_gone text exact "$1" 10 || { log "planned payment '$1' still listed after deleting it"; return 1; }
+}
+
 # Home Due section: four planned payments are due, so Home shows the Due header and only the first 3 rows with
-# "Show all (N)"; Show all lists every row and turns into "Show less", which collapses again. Leaves its planned
-# payments behind (Recurring payments) that fill the top of Home, so it runs last in ALL_FLOWS.
+# "Show all (N)"; Show all lists every row and turns into "Show less", which collapses again. Deletes its planned
+# payments again at the end.
 flow_due_section() {
   go_home || return 1
   tap_node desc exact "More" || return 1
@@ -1181,15 +1205,28 @@ PY
   shot due-2-expanded
   tap_node text exact "Show less" || return 1
   wait_for text sub "Show all (" || { log "Show all (N) missing after collapsing"; return 1; }
+  # clean up so the flows after this one see the same Home as without it
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Planned payments" || return 1
+  wait_for desc exact "Add planned payment" || return 1
+  local t
+  for t in duealpha duebeta duegamma duedelta; do
+    delete_planned_payment $t || return 1
+  done
+  back
+  wait_for text exact "Quick access" || return 1
+  back
+  wait_gone text exact "Quick access" || return 1
   crashed && return 1
   return 0
 }
 
 # Home More -> Reports: empty state with Set Filter, the filter sheet (Apply stays disabled until the filter is valid),
 # pick the Expenses type, the Cash account, the Groceries category and the default period, Apply: the seeded
-# smokecoffee expense is listed; back returns to the open More sheet. Seeded by flow_add_expense.
+# smokecoffee expense is listed; back returns to the open More sheet. Seeded on demand by flow_add_expense.
 flow_reports() {
-  go_home || return 1
+  ensure_seed || return 1
   tap_node desc exact "More" || return 1
   wait_for text exact "Quick access" || return 1
   tap_node text exact "Reports" || return 1
@@ -1223,9 +1260,9 @@ flow_reports() {
 }
 
 # Home Type filter chips: Expense keeps the seeded smokecoffee expense, Income matches nothing and shows the empty
-# message, All brings the row back. Needs flow_add_expense to have run (it seeds the smokecoffee expense).
+# message, All brings the row back. Seeds the smokecoffee expense through flow_add_expense when needed.
 flow_type_filter() {
-  go_home || return 1
+  ensure_seed || return 1
   wait_for text exact "smokecoffee" || { log "run flow_add_expense first"; return 1; }
   has text exact "All" || { log "All chip missing"; return 1; }
   # The Balance banner has an "Income" figure label above the chip row (it opens the pie chart): the chip is the second match.
@@ -1245,9 +1282,9 @@ flow_type_filter() {
 }
 
 # The large app bar keeps its collapsed state (and the list its position) across tabs and back navigation, and a
-# screen opened again starts expanded. Needs flow_add_expense (the seeded smokecoffee row) and the Cash account.
+# screen opened again starts expanded. Seeds the smokecoffee row through flow_add_expense when needed; needs the Cash account.
 flow_appbar_state() {
-  go_home || return 1
+  ensure_seed || return 1
   wait_for text exact "smokecoffee" || { log "run flow_add_expense first"; return 1; }
   check_bar expanded "$(home_title)" "More" "Home at start" || return 1
   collapse_bar
@@ -1295,7 +1332,7 @@ flow_appbar_state() {
 # and closes; the reorder sheet opens and Done closes it; back from the tab returns to Home. Needs the Groceries
 # category with an expense this month.
 flow_categories() {
-  go_home || return 1
+  ensure_seed || return 1
   tap_tab Categories || return 1
   wait_for desc exact "Add category" || return 1
   has desc exact "Sort by" && has desc exact "Reorder" || { log "categories top bar buttons missing"; return 1; }
@@ -1510,11 +1547,11 @@ flow_exchange_rates() {
   return 0
 }
 
-# Home (needs the seeded smokecoffee expense of flow_add_expense): the balance opens the Balance screen with the back
+# Home (seeds the smokecoffee expense of flow_add_expense when needed): the balance opens the Balance screen with the back
 # button, the period row and the current / planned / after-planned amounts; Next and Previous change the period, back
 # returns to Home.
 flow_balance() {
-  go_home || return 1
+  ensure_seed || return 1
   dump || return 1
   has text exact "Cashflow" || has any sub "Cashflow" || { log "home balance missing"; return 1; }
   tap_node text sub " USD" 0 || return 1
@@ -1789,7 +1826,7 @@ done
 # build before booting the emulator: both together can exhaust memory and kill the Gradle daemon
 if [ -z "${SKIP_INSTALL:-}" ]; then
   log "building debug build"
-  ./gradlew --console=plain --max-workers=3 :app:assembleDebug >"$OUT/install.log" 2>&1 || { log "assembleDebug failed, see $OUT/install.log"; exit 2; }
+  ./gradlew --console=plain --max-workers="${GRADLE_WORKERS:-2}" :app:assembleDebug >"$OUT/install.log" 2>&1 || { log "assembleDebug failed, see $OUT/install.log"; exit 2; }
 fi
 ensure_device || exit 2
 if [ -z "${SKIP_INSTALL:-}" ]; then

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accounts">帳戶</string>
+    <string name="accounts_counted_in_total">計入總額</string>
+    <string name="accounts_not_counted_in_total">未計入總額</string>
+    <string name="account_no_activity_this_month">本月沒有交易</string>
+    <string name="total_including_excluded">含未計入總額的帳戶：%1$s</string>
     <string name="total">總計: %1$s %2$s</string>
     <string name="month_income">本月收入</string>
     <string name="month_expenses">本月支出</string>

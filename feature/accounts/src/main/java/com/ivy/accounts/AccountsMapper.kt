@@ -54,7 +54,7 @@ fun mapAccounts(
     )
 }
 
-private fun toRow(data: AccountData, baseCurrency: String) = AccountRow(
+private fun toRow(data: AccountData, baseCurrency: String): AccountRow = AccountRow(
     account = data.account,
     balance = data.balance,
     baseCurrencyEquivalent = data.balanceBaseCurrency.takeIf { data.account.asset.code != baseCurrency },

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="accounts">Accounts</string>
+    <string name="accounts_counted_in_total">Counted in total</string>
+    <string name="accounts_not_counted_in_total">Not counted in total</string>
+    <string name="account_no_activity_this_month">No activity this month</string>
+    <string name="total_including_excluded">Including excluded accounts: %1$s</string>
     <string name="total">Total: %1$s %2$s</string>
     <string name="month_income">Income this month</string>
     <string name="month_expenses">Expenses this month</string>

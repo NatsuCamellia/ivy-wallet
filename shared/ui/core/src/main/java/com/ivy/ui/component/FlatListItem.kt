@@ -36,6 +36,7 @@ fun FlatListItem(
     primaryText: String? = null,
     primaryColor: Color = MaterialTheme.colorScheme.onSurface,
     secondaryText: String? = null,
+    secondaryColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     leading: (@Composable () -> Unit)? = null,
     overlineText: String? = null,
     overlineColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -100,7 +101,7 @@ fun FlatListItem(
                     Text(
                         text = secondaryText,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = secondaryColor,
                         maxLines = 1,
                     )
                 }

@@ -1,12 +1,12 @@
 package com.ivy.accounts
 
-import android.annotation.SuppressLint
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.ivy.base.legacy.SharedPrefs
@@ -19,15 +19,12 @@ import com.ivy.domain.features.Features
 import com.ivy.legacy.IvyWalletCtx
 import com.ivy.legacy.data.model.AccountData
 import com.ivy.legacy.data.model.toCloseTimeRange
-import com.ivy.legacy.utils.format
 import com.ivy.legacy.utils.ioThread
 import com.ivy.ui.ComposeViewModel
-import com.ivy.ui.R
 import com.ivy.wallet.domain.action.settings.BaseCurrencyAct
 import com.ivy.wallet.domain.action.viewmodel.account.AccountDataAct
 import com.ivy.wallet.domain.action.wallet.CalcWalletBalanceAct
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
@@ -38,11 +35,8 @@ import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 @Stable
-@SuppressLint("StaticFieldLeak")
 @HiltViewModel
 class AccountsViewModel @Inject constructor(
-    @ApplicationContext
-    private val context: Context,
     private val ivyContext: IvyWalletCtx,
     private val sharedPrefs: SharedPrefs,
     private val calcWalletBalanceAct: CalcWalletBalanceAct,
@@ -56,10 +50,8 @@ class AccountsViewModel @Inject constructor(
 ) : ComposeViewModel<AccountsState, AccountsEvent>() {
     private var baseCurrency by mutableStateOf("")
     private var accountsData by mutableStateOf(listOf<AccountData>())
-    private var totalBalanceWithExcluded by mutableStateOf("")
-    private var totalBalanceWithExcludedText by mutableStateOf("")
-    private var totalBalanceWithoutExcluded by mutableStateOf("")
-    private var totalBalanceWithoutExcludedText by mutableStateOf("")
+    private var totalBalanceWithExcluded by mutableDoubleStateOf(0.0)
+    private var totalBalanceWithoutExcluded by mutableDoubleStateOf(0.0)
     private var reorderVisible by mutableStateOf(false)
 
     // every saved account posts an event that starts a reload; unordered reloads let one that read the
@@ -88,15 +80,21 @@ class AccountsViewModel @Inject constructor(
             onStart()
         }
 
+        val baseCurrency = getBaseCurrency()
+        val accountsData = getAccountsData()
+        val content = remember(accountsData, baseCurrency, totalBalanceWithoutExcluded, totalBalanceWithExcluded) {
+            mapAccounts(
+                accounts = accountsData,
+                baseCurrency = baseCurrency,
+                totalBalance = totalBalanceWithoutExcluded,
+                totalBalanceWithExcluded = totalBalanceWithExcluded,
+            )
+        }
         return AccountsState(
-            baseCurrency = getBaseCurrency(),
-            accountsData = getAccountsData(),
-            totalBalanceWithExcluded = getTotalBalanceWithExcluded(),
-            totalBalanceWithExcludedText = getTotalBalanceWithExcludedText(),
-            totalBalanceWithoutExcluded = getTotalBalanceWithoutExcluded(),
-            totalBalanceWithoutExcludedText = getTotalBalanceWithoutExcludedText(),
+            baseCurrency = baseCurrency,
+            accountsData = accountsData,
+            content = content,
             reorderVisible = getReorderVisible(),
-            compactAccountsModeEnabled = getCompactAccountsMode(),
             hideTotalBalance = getHideTotalBalance()
         )
     }
@@ -117,33 +115,8 @@ class AccountsViewModel @Inject constructor(
     }
 
     @Composable
-    private fun getTotalBalanceWithExcluded(): String {
-        return totalBalanceWithExcluded
-    }
-
-    @Composable
-    private fun getTotalBalanceWithExcludedText(): String {
-        return totalBalanceWithExcludedText
-    }
-
-    @Composable
-    private fun getTotalBalanceWithoutExcluded(): String {
-        return totalBalanceWithoutExcluded
-    }
-
-    @Composable
-    private fun getTotalBalanceWithoutExcludedText(): String {
-        return totalBalanceWithoutExcludedText
-    }
-
-    @Composable
     private fun getReorderVisible(): Boolean {
         return reorderVisible
-    }
-
-    @Composable
-    private fun getCompactAccountsMode(): Boolean {
-        return features.compactAccountsMode.asEnabledState()
     }
 
     override fun onEvent(event: AccountsEvent) {
@@ -207,22 +180,8 @@ class AccountsViewModel @Inject constructor(
 
         baseCurrency = baseCurrencyCode
         accountsData = accountsDataList
-        totalBalanceWithExcluded = totalBalanceWithExcludedAccounts.toString()
-        totalBalanceWithExcludedText = context.getString(
-            R.string.total,
-            baseCurrencyCode,
-            totalBalanceWithExcludedAccounts.format(
-                baseCurrencyCode
-            )
-        )
-        totalBalanceWithoutExcluded = totalBalanceWithoutExcludedAccounts.toString()
-        totalBalanceWithoutExcludedText = context.getString(
-            R.string.total_exclusive,
-            baseCurrencyCode,
-            totalBalanceWithoutExcludedAccounts.format(
-                baseCurrencyCode
-            )
-        )
+        totalBalanceWithExcluded = totalBalanceWithExcludedAccounts
+        totalBalanceWithoutExcluded = totalBalanceWithoutExcludedAccounts
     }
 
     private fun reorderModalVisible(visible: Boolean) {

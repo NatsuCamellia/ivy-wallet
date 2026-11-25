@@ -12,8 +12,8 @@ data class AccountData(
     val monthlyExpenses: Double,
     val monthlyIncome: Double,
     /** Monthly figures in the base currency; null for an account already in it or without an exchange rate. */
-    val monthlyExpensesBaseCurrency: Double? = null,
-    val monthlyIncomeBaseCurrency: Double? = null,
+    val monthlyExpensesBaseCurrency: Double?,
+    val monthlyIncomeBaseCurrency: Double?,
 ) : Reorderable {
     override fun getItemOrderNum() = account.orderNum
 

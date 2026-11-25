@@ -1,22 +1,17 @@
 package com.ivy.accounts
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.outlined.AccountBalanceWallet
 import androidx.compose.material3.Icon
@@ -27,7 +22,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,11 +29,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
-import com.ivy.base.model.TransactionType
 import com.ivy.data.model.Account
 import com.ivy.data.model.AccountId
 import com.ivy.data.model.primitive.AssetCode
@@ -49,13 +41,8 @@ import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.legacy.data.model.AccountData
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
-import com.ivy.legacy.ui.component.AmountText
 import com.ivy.legacy.ui.component.IconBadge
-import com.ivy.legacy.ui.component.OverviewAmount
-import com.ivy.legacy.ui.component.OverviewCard
-import com.ivy.legacy.ui.component.TonalSummaryCard
-import com.ivy.legacy.ui.component.color
-import com.ivy.legacy.ui.component.signedAmount
+import com.ivy.legacy.ui.component.amountLabel
 import com.ivy.legacy.ui.component.transaction.EmptyState
 import com.ivy.legacy.ui.sheet.ReorderModalSingleType
 import com.ivy.navigation.Navigation
@@ -66,10 +53,18 @@ import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.GreenLight
+import com.ivy.ui.component.BalanceBanner
+import com.ivy.ui.component.BalanceBannerColumn
+import com.ivy.ui.component.FlatListItem
+import com.ivy.ui.component.StickyListHeader
+import com.ivy.ui.component.screenMargin
+import com.ivy.ui.component.transaction.TransactionAmountKind
+import com.ivy.ui.component.transaction.amountColor
 import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.ui.withFabClearance
 import kotlinx.collections.immutable.persistentListOf
 import java.util.UUID
+import kotlin.math.absoluteValue
 
 @Composable
 fun AccountsTab() {
@@ -123,7 +118,6 @@ private fun AccountsUi(
             state = state,
             listState = listState,
             contentPadding = innerPadding.withFabClearance(),
-            modifier = Modifier.padding(horizontal = 16.dp)
         )
     }
 
@@ -155,132 +149,126 @@ private fun AccountsList(
     modifier: Modifier = Modifier,
 ) {
     val nav = navigation()
+    val content = state.content
+    val onAccountClick = { row: AccountRow ->
+        nav.navigateTo(TransactionsScreen(accountId = row.account.id.value, categoryId = null))
+    }
     LazyColumn(
         modifier = modifier.fillMaxSize(),
         state = listState,
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         if (state.accountsData.isEmpty()) {
             item {
                 EmptyState(
                     emptyStateTitle = stringResource(R.string.no_accounts),
                     emptyStateText = stringResource(R.string.no_accounts_description),
+                    modifier = Modifier.screenMargin(),
                     icon = Icons.Outlined.AccountBalanceWallet,
                 )
             }
         } else if (!state.hideTotalBalance) {
             item {
-                TotalBalanceCards(state)
+                AccountsBanner(
+                    summary = content.summary,
+                    currency = state.baseCurrency,
+                    modifier = Modifier.screenMargin().padding(bottom = 8.dp),
+                )
             }
         }
-        items(state.accountsData, key = { it.account.id.value }) {
-            AccountCard(
-                baseCurrency = state.baseCurrency,
-                accountData = it,
-                compactModeEnabled = state.compactAccountsModeEnabled,
-                onClick = {
-                    nav.navigateTo(
-                        TransactionsScreen(
-                            accountId = it.account.id.value,
-                            categoryId = null
-                        )
-                    )
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun TotalBalanceCards(state: AccountsState, modifier: Modifier = Modifier) {
-    Row(
-        modifier = modifier.height(IntrinsicSize.Min),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        TonalSummaryCard(
-            label = stringResource(R.string.total_balance),
-            amount = state.totalBalanceWithoutExcluded.toDoubleOrNull() ?: 0.0,
-            currency = state.baseCurrency,
-            icon = Icons.Default.AccountBalanceWallet,
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            modifier = Modifier.weight(1f).fillMaxHeight(),
+        accountsSection(
+            title = R.string.accounts_counted_in_total,
+            rows = content.counted,
+            baseCurrency = state.baseCurrency,
+            onClick = onAccountClick,
         )
-        TonalSummaryCard(
-            label = stringResource(R.string.total_balance_excluded),
-            amount = state.totalBalanceWithExcluded.toDoubleOrNull() ?: 0.0,
-            currency = state.baseCurrency,
-            icon = Icons.Default.AccountBalance,
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            modifier = Modifier.weight(1f).fillMaxHeight(),
+        accountsSection(
+            title = R.string.accounts_not_counted_in_total,
+            rows = content.notCounted,
+            baseCurrency = state.baseCurrency,
+            onClick = onAccountClick,
         )
     }
 }
 
-@Composable
-private fun AccountCard(
+/** A sticky header with the account count and its rows; nothing for an empty section. */
+private fun LazyListScope.accountsSection(
+    @StringRes title: Int,
+    rows: List<AccountRow>,
     baseCurrency: String,
-    accountData: AccountData,
-    compactModeEnabled: Boolean,
+    onClick: (AccountRow) -> Unit,
+) {
+    if (rows.isEmpty()) return
+    stickyHeader(key = "header_$title", contentType = "accounts_header") {
+        StickyListHeader(title = stringResource(title), subtotal = rows.size.toString())
+    }
+    items(rows, key = { it.account.id.value }, contentType = { "account_row" }) { row ->
+        AccountItem(row = row, baseCurrency = baseCurrency, onClick = { onClick(row) })
+    }
+}
+
+/** The Balance banner: Total balance, the total with Excluded accounts and this month's Income and Expense. */
+@Composable
+private fun AccountsBanner(summary: AccountsSummary, currency: String, modifier: Modifier = Modifier) {
+    BalanceBanner(
+        label = stringResource(R.string.total_balance),
+        value = amountLabel(summary.totalBalance, currency),
+        columns = persistentListOf(
+            BalanceBannerColumn(
+                label = stringResource(R.string.month_income),
+                value = amountLabel(summary.monthlyIncome, currency, showPlusSign = true, shortenBigNumbers = true),
+                onClick = null,
+                testTag = "accounts_income",
+            ),
+            BalanceBannerColumn(
+                label = stringResource(R.string.month_expenses),
+                value = amountLabel(0.0 - summary.monthlyExpense.absoluteValue, currency, shortenBigNumbers = true),
+                onClick = null,
+                testTag = "accounts_expense",
+            ),
+        ),
+        modifier = modifier,
+        supportingText = stringResource(
+            R.string.total_including_excluded,
+            amountLabel(summary.totalBalanceWithExcluded, currency),
+        ),
+        valueTestTag = "accounts_balance",
+    )
+}
+
+@Composable
+private fun AccountItem(
+    row: AccountRow,
+    baseCurrency: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val account = accountData.account
+    val account = row.account
     val currency = account.asset.code
-    val baseBalance = accountData.balanceBaseCurrency
-
-    val incomeLabel = stringResource(R.string.month_income)
-    val expenseLabel = stringResource(R.string.month_expenses)
-    val incomeColor = TransactionType.INCOME.color()
-    val expenseColor = TransactionType.EXPENSE.color()
-    val footer = remember(accountData, compactModeEnabled, incomeLabel, expenseLabel, incomeColor, expenseColor) {
-        if (compactModeEnabled) {
-            persistentListOf()
-        } else {
-            persistentListOf(
-                OverviewAmount(
-                    label = incomeLabel,
-                    amount = accountData.monthlyIncome,
-                    color = incomeColor,
-                    showPlusSign = true,
-                ),
-                OverviewAmount(
-                    label = expenseLabel,
-                    amount = signedAmount(TransactionType.EXPENSE, accountData.monthlyExpenses),
-                    color = expenseColor,
-                ),
-            )
-        }
-    }
-
-    OverviewCard(
-        name = account.name.value,
-        badge = { AccountBadge(account) },
-        balance = accountData.balance,
-        currency = currency,
+    FlatListItem(
+        title = account.name.value,
         onClick = onClick,
-        modifier = modifier,
-        supportingText = if (account.includeInBalance) null else stringResource(R.string.excluded),
-        balanceSupporting = if (currency != baseCurrency && baseBalance != null) {
-            {
-                Box(modifier = Modifier.fillMaxWidth().testTag("baseCurrencyEquivalent")) {
-                    AmountText(
-                        amount = baseBalance,
-                        currency = baseCurrency,
-                        modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        textAlign = TextAlign.Center,
-                    )
-                }
-            }
+        modifier = modifier.testTag("account_item"),
+        supportingText = row.baseCurrencyEquivalent
+            ?.let { amountLabel(it, baseCurrency) }
+            ?: currency,
+        primaryText = amountLabel(row.balance, currency),
+        secondaryText = if (row.hasActivityThisMonth) {
+            amountLabel(row.monthlyCashflow, currency, showPlusSign = true)
         } else {
-            null
+            stringResource(R.string.account_no_activity_this_month)
         },
-        footer = footer,
+        secondaryColor = if (row.hasActivityThisMonth) {
+            cashflowKind(row.monthlyCashflow).amountColor()
+        } else {
+            MaterialTheme.colorScheme.onSurfaceVariant
+        },
+        leading = { AccountBadge(account) },
     )
 }
+
+private fun cashflowKind(cashflow: Double): TransactionAmountKind =
+    if (cashflow > 0) TransactionAmountKind.Income else TransactionAmountKind.Expense
 
 @Composable
 private fun AccountBadge(account: Account) {
@@ -295,19 +283,18 @@ private fun AccountBadge(account: Account) {
 @Composable
 private fun PreviewAccountsTab(
     theme: Theme = Theme.LIGHT,
-    compact: Boolean = false,
     empty: Boolean = false,
     hugeAmountOnly: Boolean = false,
 ) {
     WalletPreview(theme) {
         NavigationRoot(navigation = Navigation()) {
-            AccountsUi(state = previewState(compact = compact, empty = empty, hugeAmountOnly = hugeAmountOnly))
+            AccountsUi(state = previewState(empty = empty, hugeAmountOnly = hugeAmountOnly))
         }
     }
 }
 
 @Suppress("MagicNumber", "LongMethod")
-private fun previewState(compact: Boolean, empty: Boolean, hugeAmountOnly: Boolean): AccountsState {
+private fun previewState(empty: Boolean, hugeAmountOnly: Boolean): AccountsState {
     fun account(name: String, color: Color, currency: String = "BGN", icon: String? = null, included: Boolean = true) =
         Account(
             id = AccountId(UUID.randomUUID()),
@@ -324,7 +311,9 @@ private fun previewState(compact: Boolean, empty: Boolean, hugeAmountOnly: Boole
         balance = 123456789012.34,
         balanceBaseCurrency = null,
         monthlyExpenses = 98765432.1,
-        monthlyIncome = 123456789.01
+        monthlyIncome = 123456789.01,
+        monthlyExpensesBaseCurrency = null,
+        monthlyIncomeBaseCurrency = null,
     )
     val accounts = if (empty) {
         persistentListOf()
@@ -332,36 +321,39 @@ private fun previewState(compact: Boolean, empty: Boolean, hugeAmountOnly: Boole
         persistentListOf(hugeAmount)
     } else {
         persistentListOf(
-            AccountData(account("Phyre", Green), 2125.0, null, 920.0, 3045.0),
-            AccountData(account("DSK", GreenLight, included = false), 12125.21, null, 1350.50, 8000.48),
-            AccountData(account("Revolut", Color(0xFFFFF59D), "USD", "revolut"), 1200.0, 1979.64, 750.0, 1000.30),
-            AccountData(account("Cash", Color(0xFF212121), icon = "cash"), 820.0, null, 340.0, 400.0),
+            AccountData(account("Phyre", Green), 2125.0, null, 920.0, 3045.0, null, null),
+            AccountData(account("DSK", GreenLight, included = false), 12125.21, null, 1350.50, 8000.48, null, null),
+            AccountData(
+                account("Revolut", Color(0xFFFFF59D), "USD", "revolut"),
+                balance = 1200.0,
+                balanceBaseCurrency = 1979.64,
+                monthlyExpenses = 750.0,
+                monthlyIncome = 1000.30,
+                monthlyExpensesBaseCurrency = 1237.5,
+                monthlyIncomeBaseCurrency = 1650.5,
+            ),
+            AccountData(account("Cash", Color(0xFF212121), icon = "cash"), 820.0, null, 0.0, 0.0, null, null),
             hugeAmount,
         )
     }
     return AccountsState(
         baseCurrency = "BGN",
         accountsData = accounts,
-        totalBalanceWithExcluded = if (empty) "0.0" else "123470000000.0",
-        totalBalanceWithExcludedText = "",
-        totalBalanceWithoutExcluded = if (empty) "0.0" else "123457000000.0",
-        totalBalanceWithoutExcludedText = "",
+        content = mapAccounts(
+            accounts = accounts,
+            baseCurrency = "BGN",
+            totalBalance = if (empty) 0.0 else 123457000000.0,
+            totalBalanceWithExcluded = if (empty) 0.0 else 123470000000.0,
+        ),
         reorderVisible = false,
-        compactAccountsModeEnabled = compact,
         hideTotalBalance = hugeAmountOnly
     )
 }
 
 /** For screen shot testing **/
 @Composable
-fun AccountsTabNonCompactUITest(dark: Boolean) {
-    PreviewAccountsTab(theme = dark.theme(), compact = false)
-}
-
-/** For screen shot testing **/
-@Composable
-fun AccountsTabCompactUITest(dark: Boolean) {
-    PreviewAccountsTab(theme = dark.theme(), compact = true)
+fun AccountsTabUITest(dark: Boolean) {
+    PreviewAccountsTab(theme = dark.theme())
 }
 
 /** For screen shot testing **/

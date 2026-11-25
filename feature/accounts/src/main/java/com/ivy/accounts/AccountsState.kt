@@ -7,12 +7,9 @@ import kotlinx.collections.immutable.ImmutableList
 @Immutable
 data class AccountsState(
     val baseCurrency: String,
+    /** The accounts in their saved order, for the reorder sheet. */
     val accountsData: ImmutableList<AccountData>,
-    val totalBalanceWithExcluded: String,
-    val totalBalanceWithExcludedText: String,
-    val totalBalanceWithoutExcluded: String,
-    val totalBalanceWithoutExcludedText: String,
+    val content: AccountsContent,
     val reorderVisible: Boolean,
-    val compactAccountsModeEnabled: Boolean,
     val hideTotalBalance: Boolean,
 )

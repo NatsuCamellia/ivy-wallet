@@ -54,14 +54,15 @@ fun BalanceBanner(
         contentColor = colors.onPrimaryFixed,
     ) {
         Column(
-            modifier = Modifier.padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Column(
                 modifier = Modifier
                     .clip(MaterialTheme.shapes.medium)
                     .clickableIf(onClick, onClickLabel)
-                    .then(if (valueTestTag != null) Modifier.testTag(valueTestTag) else Modifier),
+                    .then(if (valueTestTag != null) Modifier.testTag(valueTestTag) else Modifier)
+                    .padding(8.dp),
             ) {
                 Text(
                     text = label,
@@ -80,14 +81,15 @@ fun BalanceBanner(
                     )
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row {
                 columns.forEach { column ->
                     Column(
                         modifier = Modifier
                             .weight(1f)
                             .clip(MaterialTheme.shapes.medium)
                             .clickableIf(column.onClick, null)
-                            .then(if (column.testTag != null) Modifier.testTag(column.testTag) else Modifier),
+                            .then(if (column.testTag != null) Modifier.testTag(column.testTag) else Modifier)
+                            .padding(8.dp),
                     ) {
                         Text(
                             text = column.label,

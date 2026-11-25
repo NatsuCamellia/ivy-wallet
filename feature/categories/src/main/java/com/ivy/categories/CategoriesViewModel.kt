@@ -4,13 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewModelScope
 import com.ivy.base.legacy.SharedPrefs
 import com.ivy.base.legacy.Transaction
 import com.ivy.base.time.TimeConverter
 import com.ivy.base.time.TimeProvider
 import com.ivy.data.repository.CategoryRepository
-import com.ivy.domain.features.Features
 import com.ivy.frp.action.thenMap
 import com.ivy.frp.thenInvokeAfter
 import com.ivy.legacy.data.model.TimePeriod
@@ -47,7 +47,6 @@ class CategoriesViewModel @Inject constructor(
     private val accountsAct: AccountsAct,
     private val trnsWithRangeAndAccFiltersAct: TrnsWithRangeAndAccFiltersAct,
     private val categoryIncomeWithAccountFiltersAct: LegacyCategoryIncomeWithAccountFiltersAct,
-    private val features: Features,
     private val timeProvider: TimeProvider,
     private val timeConverter: TimeConverter,
 ) : ComposeViewModel<CategoriesScreenState, CategoriesScreenEvent>() {
@@ -60,6 +59,9 @@ class CategoriesViewModel @Inject constructor(
     private val sortModalVisible = mutableStateOf(false)
     private val sortOrder = mutableStateOf(SortOrder.DEFAULT)
 
+    // not persisted: the tab opens on Expense each time
+    private val type = mutableStateOf(CategoryType.Expense)
+
     @Composable
     override fun uiState(): CategoriesScreenState {
         LaunchedEffect(Unit) {
@@ -67,23 +69,28 @@ class CategoriesViewModel @Inject constructor(
         }
 
         val categories = getCategories()
+        val type = getType()
+        val sortOrder = getSortOrder()
+        val content = remember(categories, type, sortOrder) { mapCategories(categories, type, sortOrder) }
+
+        val period = remember { TimePeriod.currentMonth(startDayOfMonth = ivyContext.startDayOfMonth) }
 
         return CategoriesScreenState(
+            period = period,
             baseCurrency = getBaseCurrency(),
             categories = categories,
             reorderModalVisible = getReorderModalVisible(),
             categoryModalData = getCategoryModalData(),
-            sortOrder = getSortOrder(),
+            sortOrder = sortOrder,
             sortModalVisible = getSortModalVisible(),
-            compactCategoriesModeEnabled = getCompactCategoriesMode(),
-            totalMonthlyExpenses = categories.sumOf { it.monthlyExpenses },
-            totalMonthlyIncome = categories.sumOf { it.monthlyIncome }
+            type = type,
+            content = content,
         )
     }
 
     @Composable
-    private fun getCompactCategoriesMode(): Boolean {
-        return features.compactCategoriesMode.asEnabledState()
+    private fun getType(): CategoryType {
+        return type.value
     }
 
     @Composable
@@ -178,7 +185,7 @@ class CategoriesViewModel @Inject constructor(
                 )
             }
 
-            val sortedList = sortList(categories, sortOrder.value).toImmutableList()
+            val sortedList = sortCategories(categories, sortOrder.value).toImmutableList()
             this.categories.value = sortedList
         }
     }
@@ -187,7 +194,7 @@ class CategoriesViewModel @Inject constructor(
         newOrder: List<CategoryData>,
         sortOrder: SortOrder = SortOrder.DEFAULT
     ) {
-        val sortedList = sortList(newOrder, sortOrder).toImmutableList()
+        val sortedList = sortCategories(newOrder, sortOrder).toImmutableList()
 
         if (sortOrder == SortOrder.DEFAULT) {
             ioThread {
@@ -205,30 +212,6 @@ class CategoriesViewModel @Inject constructor(
         this.sortOrder.value = sortOrder
     }
 
-    private fun sortList(
-        categoryData: List<CategoryData>,
-        sortOrder: SortOrder
-    ): List<CategoryData> {
-        return when (sortOrder) {
-            SortOrder.DEFAULT -> categoryData.sortedBy {
-                it.category.orderNum
-            }
-
-            SortOrder.BALANCE_AMOUNT -> categoryData.sortedByDescending {
-                it.monthlyBalance
-            }.partition { it.monthlyBalance.toInt() != 0 } // Partition into non-zero and zero lists
-                .let { (nonZero, zero) -> nonZero + zero }
-
-            SortOrder.ALPHABETICAL -> categoryData.sortedBy {
-                it.category.name.value
-            }
-
-            SortOrder.EXPENSES -> categoryData.sortedByDescending {
-                it.monthlyExpenses
-            }
-        }
-    }
-
     private suspend fun createCategory(data: CreateCategoryData) {
         categoryCreator.createCategory(data) {
             loadCategories()
@@ -239,6 +222,7 @@ class CategoriesViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Default) {
             when (event) {
                 is CategoriesScreenEvent.OnReorder -> reorder(event.newOrder, event.sortOrder)
+                is CategoriesScreenEvent.OnTypeSelected -> type.value = event.type
                 is CategoriesScreenEvent.OnCreateCategory -> createCategory(event.createCategoryData)
                 is CategoriesScreenEvent.OnReorderModalVisible -> {
                     reorderModalVisible.value = event.visible

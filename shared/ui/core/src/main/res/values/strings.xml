@@ -8,6 +8,7 @@
     <string name="total">Total: %1$s %2$s</string>
     <string name="month_income">Income this month</string>
     <string name="month_expenses">Expenses this month</string>
+    <string name="categories_no_records_this_month">No records this month</string>
     <string name="excluded">(excluded)</string>
     <string name="app_locked">APP LOCKED</string>
     <string name="authenticate_text">Authenticate to enter the app</string>

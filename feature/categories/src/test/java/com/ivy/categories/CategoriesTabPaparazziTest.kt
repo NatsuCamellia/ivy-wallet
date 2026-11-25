@@ -13,16 +13,16 @@ class CategoriesTabPaparazziTest(
     private val theme: PaparazziTheme,
 ) : PaparazziScreenshotTest() {
     @Test
-    fun `snapshot Categories nonCompact Screen`() {
+    fun `snapshot Categories expense`() {
         snapshot(theme) {
             CategoriesTabUiTest(theme == PaparazziTheme.Dark)
         }
     }
 
     @Test
-    fun `snapshot Categories compact Screen`() {
+    fun `snapshot Categories income`() {
         snapshot(theme) {
-            CategoriesTabCompactUiTest(theme == PaparazziTheme.Dark)
+            CategoriesTabIncomeUiTest(theme == PaparazziTheme.Dark)
         }
     }
 

@@ -10,6 +10,8 @@ sealed interface CategoriesScreenEvent {
         val sortOrder: SortOrder = SortOrder.DEFAULT
     ) : CategoriesScreenEvent
 
+    data class OnTypeSelected(val type: CategoryType) : CategoriesScreenEvent
+
     data class OnCreateCategory(val createCategoryData: CreateCategoryData) :
         CategoriesScreenEvent
 

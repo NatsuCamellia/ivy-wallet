@@ -22,13 +22,15 @@ private val FontWeights = listOf(
 @OptIn(ExperimentalTextApi::class)
 private fun googleSansFlex(rond: Float?): FontFamily = FontFamily(
     FontWeights.map { weight ->
+        val weightSetting = FontVariation.weight(weight.weight)
         Font(
             resId = R.font.google_sans_flex,
             weight = weight,
-            variationSettings = FontVariation.Settings(
-                FontVariation.weight(weight.weight),
-                *listOfNotNull(rond?.let { FontVariation.Setting("ROND", it) }).toTypedArray(),
-            ),
+            variationSettings = if (rond != null) {
+                FontVariation.Settings(weightSetting, FontVariation.Setting("ROND", rond))
+            } else {
+                FontVariation.Settings(weightSetting)
+            },
         )
     }
 )

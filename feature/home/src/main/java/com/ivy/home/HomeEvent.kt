@@ -6,8 +6,7 @@ import com.ivy.home.transactionlist.HomeTypeFilter
 import com.ivy.legacy.data.model.TimePeriod
 
 sealed interface HomeEvent {
-    data class SetUpcomingExpanded(val expanded: Boolean) : HomeEvent
-    data class SetOverdueExpanded(val expanded: Boolean) : HomeEvent
+    data class SetDueExpanded(val expanded: Boolean) : HomeEvent
 
     data object BalanceClick : HomeEvent
     data object HiddenBalanceClick : HomeEvent

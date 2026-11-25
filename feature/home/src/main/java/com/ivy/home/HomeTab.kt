@@ -49,6 +49,7 @@ import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.home.transactionlist.HomeTypeFilter
+import com.ivy.home.transactionlist.mapHomeDue
 import com.ivy.home.transactionlist.homeTransactionsList
 import com.ivy.home.transactionlist.rememberHomeTransactionMapper
 import com.ivy.legacy.ui.sheet.BufferModal
@@ -160,6 +161,7 @@ fun HomeUi(
 
             upcoming = uiState.upcoming,
             overdue = uiState.overdue,
+            dueExpanded = uiState.dueExpanded,
 
             stats = uiState.stats,
             history = uiState.history,
@@ -178,11 +180,8 @@ fun HomeUi(
             onSkipTransaction = forward<Transaction>() then2 {
                 HomeEvent.SkipPlanned(it)
             } then2 onEvent,
-            setUpcomingExpanded = forward<Boolean>() then2 {
-                HomeEvent.SetUpcomingExpanded(it)
-            } then2 onEvent,
-            setOverdueExpanded = forward<Boolean>() then2 {
-                HomeEvent.SetOverdueExpanded(it)
+            setDueExpanded = forward<Boolean>() then2 {
+                HomeEvent.SetDueExpanded(it)
             } then2 onEvent,
             onSkipAllTransactions = {
                 skipAllModalVisible = true
@@ -270,6 +269,7 @@ fun HomeLazyColumn(
 
     upcoming: LegacyDueSection,
     overdue: LegacyDueSection,
+    dueExpanded: Boolean,
     balance: BigDecimal,
     stats: IncomeExpensePair,
     history: ImmutableList<TransactionHistoryItem>,
@@ -279,8 +279,7 @@ fun HomeLazyColumn(
 
     customerJourneyCards: ImmutableList<CustomerJourneyCardModel>,
 
-    setUpcomingExpanded: (Boolean) -> Unit,
-    setOverdueExpanded: (Boolean) -> Unit,
+    setDueExpanded: (Boolean) -> Unit,
 
     onBalanceClick: () -> Unit,
 
@@ -289,7 +288,7 @@ fun HomeLazyColumn(
     onHiddenBalanceClick: () -> Unit,
     onHiddenIncomeClick: () -> Unit,
     onSkipTransaction: (Transaction) -> Unit,
-    onSkipAllTransactions: (List<Transaction>) -> Unit,
+    onSkipAllTransactions: () -> Unit,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
 ) {
@@ -301,14 +300,10 @@ fun HomeLazyColumn(
 
     val mapper = rememberHomeTransactionMapper(baseData)
     val historyItems = remember(mapper, history) { mapper.mapHistory(history) }
-    val upcomingRows = remember(mapper, upcoming) { mapper.mapDueSection(upcoming.trns, overdue = false) }
-    val overdueRows = remember(mapper, overdue) { mapper.mapDueSection(overdue.trns, overdue = true) }
-    val upcomingSubtitle = remember(mapper, upcoming) {
-        mapper.sectionSubtitle(upcoming.stats, baseData.baseCurrency)
+    val due = remember(overdue, upcoming, dueExpanded) {
+        mapHomeDue(overdue = overdue.trns, upcoming = upcoming.trns, expanded = dueExpanded)
     }
-    val overdueSubtitle = remember(mapper, overdue) {
-        mapper.sectionSubtitle(overdue.stats, baseData.baseCurrency)
-    }
+    val dueRows = remember(mapper, due) { mapper.mapDueRows(due.rows) }
     val nav = navigation()
 
     LazyColumn(
@@ -354,12 +349,9 @@ fun HomeLazyColumn(
             historyEmpty = historyEmpty,
             typeFilter = typeFilter,
             onTypeFilterChange = onTypeFilterChange,
-            upcoming = upcoming,
-            upcomingRows = upcomingRows,
-            upcomingSubtitle = upcomingSubtitle,
-            overdue = overdue,
-            overdueRows = overdueRows,
-            overdueSubtitle = overdueSubtitle,
+            due = due,
+            dueRows = dueRows,
+            dueExpanded = dueExpanded,
             emptyStateTitle = stringRes(R.string.no_transactions),
             emptyStateText = stringRes(
                 R.string.no_transactions_description,
@@ -376,8 +368,7 @@ fun HomeLazyColumn(
             onPayOrGet = onPayOrGet,
             onSkipTransaction = onSkipTransaction,
             onSkipAllTransactions = onSkipAllTransactions,
-            setUpcomingExpanded = setUpcomingExpanded,
-            setOverdueExpanded = setOverdueExpanded,
+            setDueExpanded = setDueExpanded,
         )
     }
 }
@@ -388,7 +379,7 @@ private fun PreviewHomeTab(
     theme: Theme = Theme.LIGHT,
     moreMenuExpanded: Boolean = false,
     empty: Boolean = false,
-    planned: Boolean = false,
+    due: HomeDuePreview = HomeDuePreview.None,
 ) {
     WalletPreview(theme) {
         NavigationRoot(navigation = Navigation()) {
@@ -396,7 +387,7 @@ private fun PreviewHomeTab(
             HomeUi(
                 uiState = when {
                     empty -> emptyHomeState()
-                    planned -> plannedHomeState()
+                    due != HomeDuePreview.None -> plannedHomeState(due)
                     else -> populatedHomeState()
                 },
                 onEvent = {}
@@ -437,6 +428,7 @@ private fun emptyHomeState(): HomeState = HomeState(
     hideBalance = false,
     hideIncome = false,
     expanded = false,
+    dueExpanded = false,
 )
 
 @Suppress("MagicNumber")
@@ -486,8 +478,11 @@ private fun populatedHomeState(): HomeState {
     )
 }
 
+/** Which Due section a screenshot of Home shows. */
+enum class HomeDuePreview { None, OverdueAndUpcoming, UpcomingOnly, CollapsedWithMore }
+
 @Suppress("MagicNumber")
-private fun plannedHomeState(): HomeState {
+private fun plannedHomeState(scenario: HomeDuePreview): HomeState {
     val state = populatedHomeState()
     val account = state.baseData.accounts.first()
     val due = Instant.parse("2023-01-20T12:00:00Z")
@@ -501,19 +496,26 @@ private fun plannedHomeState(): HomeState {
 
     val rent = planned(TransactionType.EXPENSE, "Rent", 500, due)
     val freelance = planned(TransactionType.INCOME, "Freelance", 120, due)
+    val gym = planned(TransactionType.EXPENSE, "Gym", 30, due.plus(Duration.ofDays(3)))
     val phone = planned(TransactionType.EXPENSE, "Phone", 40, due.minus(Duration.ofDays(30)))
-    return state.copy(
-        upcoming = LegacyDueSection(
-            trns = persistentListOf(rent, freelance),
-            stats = IncomeExpensePair(BigDecimal.valueOf(120), BigDecimal.valueOf(500)),
-            expanded = true,
-        ),
-        overdue = LegacyDueSection(
-            trns = persistentListOf(phone),
-            stats = IncomeExpensePair(BigDecimal.ZERO, BigDecimal.valueOf(40)),
-            expanded = true,
-        ),
+    val internet = planned(TransactionType.EXPENSE, "Internet", 25, due.minus(Duration.ofDays(10)))
+    fun section(vararg trns: Transaction) = LegacyDueSection(
+        trns = persistentListOf(*trns),
+        stats = IncomeExpensePair.zero(),
+        expanded = false,
     )
+    return when (scenario) {
+        HomeDuePreview.None -> state
+        HomeDuePreview.OverdueAndUpcoming -> state.copy(
+            upcoming = section(rent, freelance),
+            overdue = section(phone),
+        )
+        HomeDuePreview.UpcomingOnly -> state.copy(upcoming = section(rent, freelance))
+        HomeDuePreview.CollapsedWithMore -> state.copy(
+            upcoming = section(rent, freelance, gym),
+            overdue = section(phone, internet),
+        )
+    }
 }
 
 /** For screenshot testing */
@@ -522,11 +524,11 @@ fun HomeUiTest(
     isDark: Boolean,
     moreMenuExpanded: Boolean = false,
     empty: Boolean = false,
-    planned: Boolean = false,
+    due: HomeDuePreview = HomeDuePreview.None,
 ) {
     val theme = when (isDark) {
         true -> Theme.DARK
         false -> Theme.LIGHT
     }
-    PreviewHomeTab(theme, moreMenuExpanded, empty, planned)
+    PreviewHomeTab(theme, moreMenuExpanded, empty, due)
 }

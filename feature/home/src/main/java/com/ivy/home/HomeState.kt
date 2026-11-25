@@ -33,6 +33,8 @@ data class HomeState(
 
     val upcoming: LegacyDueSection,
     val overdue: LegacyDueSection,
+    /** Whether Due shows every row instead of the first few. Memory only. */
+    val dueExpanded: Boolean,
 
     val customerJourneyCards: ImmutableList<CustomerJourneyCardModel>,
     val hideBalance: Boolean,

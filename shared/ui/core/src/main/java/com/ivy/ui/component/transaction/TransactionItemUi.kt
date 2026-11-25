@@ -15,8 +15,7 @@ data class TransactionItemUi(
     val amountKind: TransactionAmountKind,
     val secondaryText: String?,
     val dueText: String?,
+    val dueOverdue: Boolean,
 )
 
-enum class TransactionAmountKind { Expense, Income, Transfer, Upcoming, Overdue }
-
-enum class TransactionItemPosition { Single, First, Middle, Last }
+enum class TransactionAmountKind { Expense, Income, Transfer }

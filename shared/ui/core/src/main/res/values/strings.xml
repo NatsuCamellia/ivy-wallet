@@ -554,4 +554,7 @@
     <string name="no_exchange_rates_for_search">No currency matches your search.</string>
     <string name="balance_title">Balance</string>
     <string name="type_filter_all">All</string>
+    <string name="due_title">Due</string>
+    <string name="due_show_all">Show all (%1$d)</string>
+    <string name="due_show_less">Show less</string>
 </resources>

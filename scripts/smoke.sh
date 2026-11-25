@@ -388,7 +388,7 @@ PY
 open_account_edit_sheet() {
   go_home || return 1
   tap_tab Accounts || return 1
-  wait_for text exact "Total Balance" || return 1
+  wait_for text exact "Counted in total" || return 1
   tap_node text exact "Cash" || return 1
   wait_for desc exact "Edit" || return 1
   tap_node desc exact "Edit" || return 1
@@ -600,7 +600,7 @@ text_y() { find_node text exact "$1" | awk '{print $2}'; }
 open_reorder_sheet() {
   go_home || return 1
   tap_tab Accounts || return 1
-  wait_for text exact "Total Balance" || return 1
+  wait_for text exact "Counted in total" || return 1
   tap_node desc exact "Reorder" || return 1
   wait_for text exact "Done" || return 1
 }
@@ -837,11 +837,11 @@ flow_fab_menu() {
   # returns to the Home tab); it must not be swallowed by a stale menu, and Home must show the menu collapsed.
   open_fab_menu || return 1
   tap_tab Accounts || return 1
-  wait_for text exact "Total Balance" || return 1
+  wait_for text exact "Counted in total" || return 1
   has desc exact "Add" && { log "Home FAB shown on Accounts"; return 1; }
   back
   dump || return 1
-  has text exact "Total Balance" && { log "Back was swallowed on Accounts (stale menu state)"; return 1; }
+  has text exact "Counted in total" && { log "Back was swallowed on Accounts (stale menu state)"; return 1; }
   has desc exact "Add" && ! has text exact "Add expense" || { log "Home should show the collapsed menu"; return 1; }
   shot fab-5-home-after-accounts
   tap_tab Categories || return 1
@@ -899,7 +899,7 @@ flow_add_expense() {
 flow_piechart() {
   go_home || return 1
   tap_tab Accounts || return 1
-  wait_for text exact "Total Balance" || return 1
+  wait_for text exact "Counted in total" || return 1
   tap_node text exact "Cash" || return 1
   wait_for desc exact "Edit" || return 1
   tap_node text exact "Expenses" || return 1
@@ -998,7 +998,7 @@ PY
 flow_account_detail() {
   go_home || return 1
   tap_tab Accounts || return 1
-  wait_for text exact "Total Balance" || return 1
+  wait_for text exact "Counted in total" || return 1
   tap_node text exact "Cash" || return 1
   wait_for desc exact "Edit" || return 1
   has desc exact "Delete" && has text exact "Add income" && has text exact "Add expense" || { log "detail actions missing"; return 1; }
@@ -1024,7 +1024,7 @@ flow_account_detail() {
   wait_gone text exact "Edit account" || return 1
   has desc exact "Edit" && has text exact "Cash" || { log "expected the account screen after Close"; return 1; }
   back
-  wait_for text exact "Total Balance" || { log "back did not return to Accounts"; return 1; }
+  wait_for text exact "Counted in total" || { log "back did not return to Accounts"; return 1; }
   crashed && return 1
   return 0
 }
@@ -1256,7 +1256,7 @@ flow_appbar_state() {
   y_home=$(node_cy smokecoffee) || { log "row missing after collapse"; return 1; }
   shot appbar-1-home-collapsed
   tap_tab Accounts || return 1
-  wait_for text exact "Total Balance" || return 1
+  wait_for text exact "Counted in total" || return 1
   check_bar expanded "Accounts" "Reorder" "Accounts at start" || return 1
   collapse_bar
   check_bar collapsed "Accounts" "Reorder" "Accounts scrolled" || return 1
@@ -1267,7 +1267,7 @@ flow_appbar_state() {
   [ "$(node_cy smokecoffee)" = "$y_home" ] || { log "Home list moved: $(node_cy smokecoffee) vs $y_home"; return 1; }
   shot appbar-3-home-back
   tap_tab Accounts || return 1
-  wait_for text exact "Total Balance" || return 1
+  wait_for text exact "Counted in total" || return 1
   check_bar collapsed "Accounts" "Reorder" "Accounts after tab switch" || return 1
   tap_node text exact "Cash" || return 1
   wait_for desc exact "Edit" || return 1
@@ -1276,7 +1276,7 @@ flow_appbar_state() {
   check_bar collapsed "Cash" "Edit" "account scrolled" || return 1
   shot appbar-4-account-collapsed
   back
-  wait_for text exact "Total Balance" || { log "back did not return to Accounts"; return 1; }
+  wait_for text exact "Counted in total" || { log "back did not return to Accounts"; return 1; }
   check_bar collapsed "Accounts" "Reorder" "Accounts after back" || return 1
   shot appbar-5-accounts-back
   tap_node text exact "Cash" || return 1
@@ -1284,7 +1284,7 @@ flow_appbar_state() {
   check_bar expanded "Cash" "Edit" "account reopened" || return 1
   shot appbar-6-account-reopened
   back
-  wait_for text exact "Total Balance" || return 1
+  wait_for text exact "Counted in total" || return 1
   crashed && return 1
   return 0
 }
@@ -1751,7 +1751,7 @@ open_screen() {
   go_home || return 1
   case "$1" in
     home) ;;
-    accounts) tap_tab Accounts && wait_for text exact "Total Balance" ;;
+    accounts) tap_tab Accounts && wait_for text exact "Counted in total" ;;
     categories) open_more_item "Categories" "Add category" ;;
     budgets) open_more_item "Budgets" "Add budget" ;;
     loans) open_more_item "Loans" "Add loan" ;;

@@ -2,6 +2,7 @@ package com.ivy.home
 
 import com.ivy.base.legacy.Transaction
 import com.ivy.home.customerjourney.CustomerJourneyCardModel
+import com.ivy.home.transactionlist.HomeTypeFilter
 import com.ivy.legacy.data.model.TimePeriod
 
 sealed interface HomeEvent {
@@ -12,6 +13,8 @@ sealed interface HomeEvent {
     data object HiddenBalanceClick : HomeEvent
     data object HiddenIncomeClick : HomeEvent
     data class SetExpanded(val expanded: Boolean) : HomeEvent
+
+    data class SetTypeFilter(val filter: HomeTypeFilter) : HomeEvent
 
     data object SwitchTheme : HomeEvent
 

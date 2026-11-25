@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.ivy.base.legacy.Theme
 import com.ivy.base.legacy.TransactionHistoryItem
 import com.ivy.home.customerjourney.CustomerJourneyCardModel
+import com.ivy.home.transactionlist.HomeTypeFilter
 import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.data.BufferInfo
 import com.ivy.legacy.data.LegacyDueSection
@@ -20,7 +21,10 @@ data class HomeState(
     val period: TimePeriod,
     val baseData: AppBaseData,
 
+    /** The period's history with [typeFilter] already applied. */
     val history: ImmutableList<TransactionHistoryItem>,
+    val historyEmpty: Boolean,
+    val typeFilter: HomeTypeFilter,
     val stats: IncomeExpensePair,
 
     val balance: BigDecimal,

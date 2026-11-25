@@ -1289,29 +1289,32 @@ flow_appbar_state() {
   return 0
 }
 
-# Home More -> Categories selects the Categories tab: the top bar has sort and reorder (no back), the add button is a
-# FAB; add a category through the Create category sheet, it is listed and opens its transactions, back returns to the
-# list; Sort by opens and closes; the reorder sheet opens and Done closes it; back from the tab returns to Home.
-# Needs the Groceries category.
+# The Categories tab: the top bar has sort and reorder (no back), the add button is a FAB; the Expense / Income chips
+# carry the month total and Income hides the expense-only Groceries row; add a category through the Create category
+# sheet, it is listed (under No records this month) and opens its transactions, back returns to the list; Sort by opens
+# and closes; the reorder sheet opens and Done closes it; back from the tab returns to Home. Needs the Groceries
+# category with an expense this month.
 flow_categories() {
   go_home || return 1
-  tap_node desc exact "More" || return 1
-  wait_for text exact "Quick access" || return 1
-  tap_node text exact "Categories" || return 1
+  tap_tab Categories || return 1
   wait_for desc exact "Add category" || return 1
   has desc exact "Sort by" && has desc exact "Reorder" || { log "categories top bar buttons missing"; return 1; }
   has desc exact "Back" && { log "Categories is a tab and must not show a back button"; return 1; }
-  # the cards are tall: scroll until the seeded category is on screen
   local w h i
   w=$(screen_width); h=$(screen_height)
-  for i in 1 2 3 4 5 6; do
-    has text exact "Groceries" && break
-    adb shell input swipe $((w / 2)) $((h * 70 / 100)) $((w / 2)) $((h * 30 / 100)) 300 </dev/null
-    sleep 1
-    dump || return 1
-  done
-  has text exact "Groceries" || { log "seeded category missing"; return 1; }
+  has text sub "Expense " && has text sub "Income " || { log "type chips missing"; return 1; }
+  has text exact "Groceries" || { log "seeded category missing from the Expense list"; return 1; }
   shot categories-1-list
+  tap_node text sub "Income " || return 1
+  sleep 1
+  dump || return 1
+  has text exact "No records this month" || { log "No records this month section missing under Income"; return 1; }
+  [ "$(text_y Groceries)" -gt "$(text_y "No records this month")" ] || { log "Groceries has no income and must sit under No records this month"; return 1; }
+  shot categories-1b-income
+  tap_node text sub "Expense " || return 1
+  sleep 1
+  dump || return 1
+  has text exact "Groceries" || { log "Groceries missing after switching back to Expense"; return 1; }
   tap_node desc exact "Add category" || return 1
   wait_for text exact "Create category" || { log "category sheet did not open"; return 1; }
   tap_node class exact android.widget.EditText || return 1
@@ -1733,7 +1736,7 @@ run_flow() {
 }
 
 ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section"
-# Screens reachable by `shot`: home and accounts are tabs, the others are rows of the More sheet.
+# Screens reachable by `shot`: home, accounts and categories are tabs, the others are rows of the More sheet.
 ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
 
 # ---------- screens ----------
@@ -1752,7 +1755,7 @@ open_screen() {
   case "$1" in
     home) ;;
     accounts) tap_tab Accounts && wait_for text exact "Counted in total" ;;
-    categories) open_more_item "Categories" "Add category" ;;
+    categories) tap_tab Categories && wait_for desc exact "Add category" ;;
     budgets) open_more_item "Budgets" "Add budget" ;;
     loans) open_more_item "Loans" "Add loan" ;;
     planned-payments) open_more_item "Planned payments" "Planned" ;;

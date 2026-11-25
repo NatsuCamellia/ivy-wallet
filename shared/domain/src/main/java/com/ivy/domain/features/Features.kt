@@ -2,8 +2,6 @@ package com.ivy.domain.features
 
 interface Features {
     val sortCategoriesAscending: BoolFeature
-    val compactAccountsMode: BoolFeature
-    val compactCategoriesMode: BoolFeature
     val showTitleSuggestions: BoolFeature
     val hideTotalBalance: BoolFeature
     val showDecimalNumber: BoolFeature

@@ -60,7 +60,8 @@ read-only**; do not edit them.
 | Unit testing                                 | [`docs/guidelines/Unit-Testing.md`](docs/guidelines/Unit-Testing.md)   |
 | CI checks and how to run them locally        | [`docs/CI-Troubleshooting.md`](docs/CI-Troubleshooting.md)             |
 
-The fork's own UI redesign specs and plans live in `docs/superpowers/specs/` and `docs/superpowers/plans/`.
+Earlier UI redesign specs and plans are archived in `docs/superpowers/`. New specs and tickets are GitHub issues
+(see **Agent skills** below).
 
 ## Commits and PRs
 
@@ -68,3 +69,17 @@ The fork's own UI redesign specs and plans live in `docs/superpowers/specs/` and
   Types: `feat`, `fix`, `refactor`, `style`, `docs`, `test`, `build`, `ci`, `chore`.
 - Keep the message as concise as possible. The body is optional and must not exceed two short paragraphs.
 - Do not append session links (e.g. `Claude-Session: ...`) to commit messages or PR descriptions.
+
+## Agent skills
+
+### Issue tracker
+
+Specs and tickets are GitHub issues on NatsuCamellia/ivy-wallet, managed with `gh`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+The five default triage roles, each label named after its role. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: `GLOSSARY.md` and `docs/adr/` at the repo root. See `docs/agents/domain.md`.

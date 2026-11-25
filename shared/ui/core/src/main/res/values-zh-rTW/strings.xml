@@ -262,7 +262,7 @@
     <string name="budget_exceeded_by">超出預算</string>
     <string name="buffer_exceeded_by">低於目標</string>
     <string name="set_transaction_type">設定交易類型</string>
-    <string name="transfer">傳輸</string>
+    <string name="transfer">轉帳</string>
     <string name="selected_text">已選擇</string>
     <string name="search_currency">搜尋 (美元、歐元、英鎊、比特幣等)</string>
     <string name="pre_selected">預選</string>
@@ -427,7 +427,7 @@
     <string name="loan_record_type">記錄類型</string>
     <string name="increase_loan">增加</string>
     <string name="decrease_loan">減少</string>
-    <string name="msg_select_account_to_transfer">選擇傳輸目的地</string>
+    <string name="msg_select_account_to_transfer">選擇轉帳目的地</string>
     <string name="msg_source_account_destination_account_same_for_transfer">選擇不同的目標帳戶進行轉移</string>
     <string name="tags_optional">標籤 (可選)</string>
     <string name="tags">標籤</string>

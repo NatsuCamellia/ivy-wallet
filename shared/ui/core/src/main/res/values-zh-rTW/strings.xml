@@ -4,7 +4,7 @@
     <string name="total">總計: %1$s %2$s</string>
     <string name="month_income">本月收入</string>
     <string name="month_expenses">本月支出</string>
-    <string name="excluded">(排除)</string>
+    <string name="excluded">(未計入總額)</string>
     <string name="app_locked">應用程式已鎖定</string>
     <string name="authenticate_text">驗證進入應用程式</string>
     <string name="unlock">解鎖</string>
@@ -421,9 +421,9 @@
     <string name="experimental">實驗</string>
     <string name="experimental_settings">實驗設定</string>
     <string name="wallet_balance">錢包餘額</string>
-    <string name="total_exclusive">總計 (不含): %1$s %2$s</string>
+    <string name="total_exclusive">總計 (僅計入總額的帳戶): %1$s %2$s</string>
     <string name="total_balance">總餘額</string>
-    <string name="total_balance_excluded">總餘額 (不含)</string>
+    <string name="total_balance_excluded">總餘額 (含未計入總額的帳戶)</string>
     <string name="initial_loan_record">起始記錄</string>
     <string name="loan_record_type">記錄類型</string>
     <string name="increase_loan">增加</string>

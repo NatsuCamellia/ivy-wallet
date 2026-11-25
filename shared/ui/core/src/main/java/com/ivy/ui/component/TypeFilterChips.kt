@@ -15,29 +15,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.unit.dp
+import kotlinx.collections.immutable.ImmutableList
 
-/** One chip of [TypeFilterChips]: its [label] and an optional [number] shown after it, e.g. a total. */
+/** One chip of [TypeFilterChips]: its [label] and a [number] (or null) shown after it, e.g. a total. */
 @Immutable
 data class TypeFilterOption<T>(
     val value: T,
     val label: String,
-    val number: String? = null,
+    val number: String?,
 )
 
 /**
  * A single-select row of filter chips. The chip of [selected] is highlighted; tapping a chip calls
- * [onSelect] with its value. It pads its own 16dp screen margin.
+ * [onSelect] with its value. It pads its own 16dp screen margin and 8dp above and below.
  */
 @Composable
 fun <T> TypeFilterChips(
-    options: List<TypeFilterOption<T>>,
+    options: ImmutableList<TypeFilterOption<T>>,
     selected: T,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyRow(
         modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 16.dp),
+        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(options, key = { it.label }) { option ->

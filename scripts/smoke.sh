@@ -1,29 +1,48 @@
 #!/usr/bin/env bash
-# Usage: scripts/m3-smoke.sh [screenshot-dir]   (run from the repo root)
-# Emulator smoke test for the M3 migration: boots the `m3` AVD if no device is attached, installs the
-# debug build, drives flows with `adb shell input` + `uiautomator dump` (nodes found by text or
-# content-desc), screenshots into the given directory, fails on FATAL EXCEPTION in logcat.
-# Env: SKIP_INSTALL=1 skips :app:installDebug, KEEP_EMULATOR=1 never kills the emulator, PKG=net.natsucamellia.ivywallet
-# targets the demo build (installed by hand with SKIP_INSTALL=1).
-# To add a flow: write `flow_xxx()` (return non-zero on failure) and register it at the bottom.
+# Emulator smoke tests and screenshots (run from anywhere inside the repo).
+#
+#   scripts/smoke.sh                      run every flow
+#   scripts/smoke.sh flows [name...]      run the named flows (with or without the flow_ prefix), or all
+#   scripts/smoke.sh list                 list flow names and screen names
+#   scripts/smoke.sh shot <screen>        build, install, open <screen>, save build/smoke/screens/<screen>.png
+#
+# Boots the `m3` AVD headless if no device is attached, installs the debug build, drives the app with
+# `adb shell input` + `uiautomator dump` (nodes found by text or content-desc), fails on FATAL EXCEPTION.
+# Env: OUT (output dir, default build/smoke), SKIP_INSTALL=1 (skip :app:installDebug), KEEP_EMULATOR=1 (never
+# kill the emulator), AVD (default m3), PKG (default net.natsucamellia.ivywallet.debug; the demo build is
+# installed by hand, then use SKIP_INSTALL=1), FLOWS (space separated flow names, same as `flows`),
+# To add a flow: write `flow_xxx()` (return non-zero on failure) and add it to ALL_FLOWS at the bottom.
+# To add a screen: add a case to `open_screen` and to ALL_SCREENS.
 set -u
 
-OUT="${1:-.superpowers/sdd/2026-11-07-m3-expressive/smoke}"
+REPO_ROOT="$(git rev-parse --show-toplevel)" || exit 2
+cd "$REPO_ROOT" || exit 2
+MODE=flows
+SCREEN=""
+case "${1:-}" in
+  shot) MODE=shot; SCREEN="${2:-}"; shift 2 2>/dev/null || shift $# ;;
+  flows) shift ;;
+  list) MODE=list; shift ;;
+  -h | --help) sed -n '2,16p' "$0"; exit 0 ;;
+esac
+FLOW_ARGS=("$@")
+
+OUT="${OUT:-build/smoke}"
 PKG="${PKG:-net.natsucamellia.ivywallet.debug}"
+AVD="${AVD:-m3}"
 ACTIVITY=$PKG/com.ivy.wallet.RootActivity
 export ANDROID_AVD_HOME="${ANDROID_AVD_HOME:-$HOME/.config/.android/avd}"
 SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}}"
 export PATH="$PATH:$SDK/platform-tools:$SDK/emulator"
-XML="${TMPDIR:-/tmp}/m3-smoke-ui.$$.xml"
+XML="${TMPDIR:-/tmp}/smoke-ui.$$.xml"
 EMU_PID=""
 NIGHT_PREV=""
 RESULTS=()
 FAILED=0
 
-cd "$(git rev-parse --show-toplevel)" || exit 2
 mkdir -p "$OUT"
 
-log() { echo "[m3-smoke] $*" >&2; }
+log() { echo "[smoke] $*" >&2; }
 
 cleanup() {
   adb shell settings put global animator_duration_scale 1 >/dev/null 2>&1
@@ -43,8 +62,8 @@ ensure_device() {
     log "using attached device"
     return 0
   fi
-  log "booting AVD m3"
-  emulator -avd m3 -no-window -no-audio -no-snapshot -no-boot-anim -gpu swangle_indirect \
+  log "booting AVD $AVD"
+  emulator -avd "$AVD" -no-window -no-audio -no-snapshot -no-boot-anim -gpu swangle_indirect \
     >"$OUT/emulator.log" 2>&1 &
   EMU_PID=$!
   local i
@@ -65,9 +84,9 @@ dump() {
   local attempt
   rm -f "$XML"
   for attempt in 1 2 3; do
-    adb shell rm -f /sdcard/m3-ui.xml >/dev/null 2>&1
-    if adb shell uiautomator dump /sdcard/m3-ui.xml >/dev/null 2>&1 \
-      && adb pull /sdcard/m3-ui.xml "$XML" >/dev/null 2>&1 && [ -s "$XML" ]; then
+    adb shell rm -f /sdcard/smoke-ui.xml >/dev/null 2>&1
+    if adb shell uiautomator dump /sdcard/smoke-ui.xml >/dev/null 2>&1 \
+      && adb pull /sdcard/smoke-ui.xml "$XML" >/dev/null 2>&1 && [ -s "$XML" ]; then
       return 0
     fi
     sleep 1
@@ -1628,10 +1647,68 @@ run_flow() {
   fi
 }
 
+ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data"
+# Screens reachable by `shot`: home and accounts are tabs, the others are rows of the More sheet.
+ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
+
+# ---------- screens ----------
+
+# open_more_item <row text> <text that proves the screen is open>
+open_more_item() {
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "$1" || return 1
+  wait_for any sub "$2" 15
+}
+
+# open_screen <name>: leaves the named screen open, starting from a fresh launch
+open_screen() {
+  go_home || return 1
+  case "$1" in
+    home) ;;
+    accounts) tap_tab Accounts && wait_for text exact "Total Balance" ;;
+    categories) open_more_item "Categories" "Add category" ;;
+    budgets) open_more_item "Budgets" "Add budget" ;;
+    loans) open_more_item "Loans" "Add loan" ;;
+    planned-payments) open_more_item "Planned payments" "Planned" ;;
+    reports) open_more_item "Reports" "Reports" ;;
+    settings) open_more_item "Settings" "About & Support" ;;
+    *) log "unknown screen '$1', known: $ALL_SCREENS"; return 2 ;;
+  esac
+  local rc=$?
+  sleep 1
+  return $rc
+}
+
+if [ "$MODE" = list ]; then
+  echo "flows:   ${ALL_FLOWS//flow_/}"
+  echo "screens: $ALL_SCREENS"
+  exit 0
+fi
+
+if [ "$MODE" = shot ]; then
+  case " $ALL_SCREENS " in *" $SCREEN "*) ;; *) log "usage: scripts/smoke.sh shot <screen>; screens: $ALL_SCREENS"; exit 2 ;; esac
+fi
+FLOW_LIST=()
+if [ ${#FLOW_ARGS[@]} -gt 0 ]; then
+  for f in "${FLOW_ARGS[@]}"; do FLOW_LIST+=("flow_${f#flow_}"); done
+else
+  FLOW_LIST=(${FLOWS:-$ALL_FLOWS})
+fi
+for flow in "${FLOW_LIST[@]}"; do
+  declare -F "$flow" >/dev/null || { log "unknown flow '$flow', see: scripts/smoke.sh list"; exit 2; }
+done
+# build before booting the emulator: both together can exhaust memory and kill the Gradle daemon
+if [ -z "${SKIP_INSTALL:-}" ]; then
+  log "building debug build"
+  ./gradlew --console=plain --max-workers=3 :app:assembleDebug >"$OUT/install.log" 2>&1 || { log "assembleDebug failed, see $OUT/install.log"; exit 2; }
+fi
 ensure_device || exit 2
 if [ -z "${SKIP_INSTALL:-}" ]; then
-  log "installing debug build"
-  ./gradlew --console=plain --max-workers=3 :app:installDebug >"$OUT/install.log" 2>&1 || { log "installDebug failed, see $OUT/install.log"; exit 2; }
+  # adb instead of :app:installDebug: a Gradle daemon next to a booting emulator tends to get killed
+  APK=$(ls -t app/build/outputs/apk/debug/*.apk 2>/dev/null | head -1)
+  log "installing $APK"
+  adb install -r -t "$APK" >>"$OUT/install.log" 2>&1 || { log "adb install failed, see $OUT/install.log"; exit 2; }
 fi
 # a run must not depend on what an earlier one left behind: no accessibility services (TalkBack
 # raises a notification-permission dialog over Home after a fresh boot), default font scale
@@ -1644,7 +1721,28 @@ case "$NIGHT_PREV" in yes | no | auto) ;; *) NIGHT_PREV="" ;; esac
 adb shell cmd uimode night no >/dev/null 2>&1
 adb logcat -c
 
-for flow in ${FLOWS:-flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data}; do
+
+if [ "$MODE" = shot ]; then
+  fresh_start
+  for _ in $(seq 1 20); do
+    dump
+    has text exact "Home" && break
+    has text exact "I accept and agree" && { flow_onboarding || { log "onboarding failed"; exit 1; }; break; }
+    sleep 1
+  done
+  mkdir -p "$OUT/screens"
+  if ! open_screen "$SCREEN"; then
+    OUT="$OUT/screens" shot "FAIL-$SCREEN"
+    log "could not open '$SCREEN', see $OUT/screens/FAIL-$SCREEN.png"
+    exit 1
+  fi
+  OUT="$OUT/screens" shot "$SCREEN"
+  crashed && { log "FATAL EXCEPTION in logcat"; exit 1; }
+  echo "$OUT/screens/$SCREEN.png"
+  exit 0
+fi
+
+for flow in "${FLOW_LIST[@]}"; do
   run_flow "$flow"
 done
 

@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -22,7 +23,8 @@ import androidx.compose.ui.unit.dp
  * [supportingText] under it and on the right a [primaryText] stacked over a [secondaryText]. Only the
  * press shows a rounded ripple. Whoever places the row decides the horizontal screen margin: the row
  * is inset by 8dp on each side for the ripple and by 8dp more for its content, so it lines up with a
- * 16dp margin when used full width.
+ * 16dp margin when used full width. An [overlineText] sits above the title and [actions] (buttons)
+ * under the supporting text.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -35,6 +37,9 @@ fun FlatListItem(
     primaryColor: Color = MaterialTheme.colorScheme.onSurface,
     secondaryText: String? = null,
     leading: (@Composable () -> Unit)? = null,
+    overlineText: String? = null,
+    overlineColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    actions: (@Composable RowScope.() -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -48,6 +53,15 @@ fun FlatListItem(
     ) {
         leading?.invoke()
         Column(modifier = Modifier.weight(1f)) {
+            if (overlineText != null) {
+                Text(
+                    text = overlineText,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = overlineColor,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodyLarge,
@@ -62,6 +76,13 @@ fun FlatListItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                )
+            }
+            if (actions != null) {
+                Row(
+                    modifier = Modifier.padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    content = actions,
                 )
             }
         }

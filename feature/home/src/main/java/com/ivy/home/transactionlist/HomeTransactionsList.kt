@@ -1,17 +1,19 @@
 package com.ivy.home.transactionlist
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -19,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import com.ivy.base.legacy.Transaction
 import com.ivy.base.model.TransactionType
 import com.ivy.legacy.data.AppBaseData
-import com.ivy.legacy.data.LegacyDueSection
 import com.ivy.legacy.ui.component.IconBadge
 import com.ivy.legacy.ui.component.transaction.EmptyState
 import com.ivy.ui.R
@@ -28,8 +29,6 @@ import com.ivy.ui.component.screenMargin
 import com.ivy.ui.component.TypeFilterChips
 import com.ivy.ui.component.TypeFilterOption
 import com.ivy.ui.component.transaction.FlatTransactionItem
-import com.ivy.ui.component.transaction.TransactionItem
-import com.ivy.ui.component.transaction.TransactionSectionHeader
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
 import kotlinx.collections.immutable.ImmutableList
@@ -64,55 +63,49 @@ fun LazyListScope.homeTransactionsList(
     historyEmpty: Boolean,
     typeFilter: HomeTypeFilter,
     onTypeFilterChange: (HomeTypeFilter) -> Unit,
-    upcoming: LegacyDueSection?,
-    upcomingRows: ImmutableList<HomeTrnListItem.Trn>,
-    upcomingSubtitle: String?,
-    overdue: LegacyDueSection?,
-    overdueRows: ImmutableList<HomeTrnListItem.Trn>,
-    overdueSubtitle: String?,
+    due: HomeDue,
+    dueRows: ImmutableList<HomeTrnListItem.Trn>,
+    dueExpanded: Boolean,
     emptyStateTitle: String,
     emptyStateText: String,
     onTransactionClick: (Transaction) -> Unit,
     onPayOrGet: (Transaction) -> Unit,
     onSkipTransaction: (Transaction) -> Unit,
-    onSkipAllTransactions: (List<Transaction>) -> Unit,
-    setUpcomingExpanded: (Boolean) -> Unit,
-    setOverdueExpanded: (Boolean) -> Unit,
+    onSkipAllTransactions: () -> Unit,
+    setDueExpanded: (Boolean) -> Unit,
 ) {
-    if (upcoming != null && upcoming.trns.isNotEmpty()) {
-        item(key = "upcoming_section") {
-            TransactionSectionHeader(
-                modifier = Modifier.screenMargin(),
-                title = stringResource(R.string.upcoming),
-                titleColor = MaterialTheme.colorScheme.secondary,
-                subtitle = upcomingSubtitle,
-                expanded = upcoming.expanded,
-                onExpandedChange = setUpcomingExpanded,
-            )
+    if (due.rows.isNotEmpty()) {
+        item(key = "due_header", contentType = "due_header") {
+            DueHeader(showSkipAll = due.showSkipAll, onSkipAll = onSkipAllTransactions)
         }
-        if (upcoming.expanded) {
-            dueRows(upcomingRows, onTransactionClick, onPayOrGet, onSkipTransaction)
+        items(items = dueRows, key = { it.ui.id }, contentType = { "due_trn" }) { item ->
+            FlatTransactionItem(
+                ui = item.ui,
+                onClick = { onTransactionClick(item.trn) },
+                onSkip = { onSkipTransaction(item.trn) },
+                onPayOrGet = { onPayOrGet(item.trn) },
+                payOrGetText = stringResource(
+                    if (item.trn.type == TransactionType.EXPENSE) R.string.pay else R.string.get,
+                ),
+            ) {
+                TrnBadge(item)
+            }
         }
-    }
-
-    if (overdue != null && overdue.trns.isNotEmpty()) {
-        item(key = "overdue_section") {
-            TransactionSectionHeader(
-                modifier = Modifier.screenMargin(),
-                title = stringResource(R.string.overdue),
-                titleColor = MaterialTheme.colorScheme.error,
-                subtitle = overdueSubtitle,
-                expanded = overdue.expanded,
-                onExpandedChange = setOverdueExpanded,
-                trailing = {
-                    TextButton(onClick = { onSkipAllTransactions(overdue.trns) }) {
-                        Text(text = stringResource(R.string.skip_all))
-                    }
-                },
-            )
-        }
-        if (overdue.expanded) {
-            dueRows(overdueRows, onTransactionClick, onPayOrGet, onSkipTransaction)
+        if (due.showAllCount != null) {
+            item(key = "due_toggle", contentType = "due_toggle") {
+                TextButton(
+                    onClick = { setDueExpanded(!dueExpanded) },
+                    modifier = Modifier.screenMargin(),
+                ) {
+                    Text(
+                        text = if (dueExpanded) {
+                            stringResource(R.string.due_show_less)
+                        } else {
+                            stringResource(R.string.due_show_all, due.showAllCount)
+                        },
+                    )
+                }
+            }
         }
     }
 
@@ -154,7 +147,7 @@ fun LazyListScope.homeTransactionsList(
                 textAlign = TextAlign.Center,
             )
         }
-    } else if (historyItems.isEmpty() && upcoming.isEmpty() && overdue.isEmpty()) {
+    } else if (historyItems.isEmpty() && due.rows.isEmpty()) {
         item {
             EmptyState(
                 emptyStateTitle = emptyStateTitle,
@@ -165,45 +158,23 @@ fun LazyListScope.homeTransactionsList(
     }
 }
 
-private fun LegacyDueSection?.isEmpty(): Boolean = this == null || trns.isEmpty()
-
-private fun LazyListScope.dueRows(
-    rows: ImmutableList<HomeTrnListItem.Trn>,
-    onTransactionClick: (Transaction) -> Unit,
-    onPayOrGet: (Transaction) -> Unit,
-    onSkipTransaction: (Transaction) -> Unit,
-) {
-    items(items = rows, key = { it.ui.id }) { item ->
-        TrnRow(
-            modifier = Modifier.screenMargin().padding(bottom = ListItemDefaults.SegmentedGap),
-            item = item,
-            onClick = { onTransactionClick(item.trn) },
-            onSkip = { onSkipTransaction(item.trn) },
-            onPayOrGet = { onPayOrGet(item.trn) },
-            payOrGetText = stringResource(if (item.trn.type == TransactionType.EXPENSE) R.string.pay else R.string.get),
-        )
-    }
-}
-
 @Composable
-private fun TrnRow(
-    item: HomeTrnListItem.Trn,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    onSkip: (() -> Unit)? = null,
-    onPayOrGet: (() -> Unit)? = null,
-    payOrGetText: String? = null,
-) {
-    TransactionItem(
-        ui = item.ui,
-        position = item.position,
-        modifier = modifier,
-        onClick = onClick,
-        onSkip = onSkip,
-        onPayOrGet = onPayOrGet,
-        payOrGetText = payOrGetText,
+private fun DueHeader(showSkipAll: Boolean, onSkipAll: () -> Unit) {
+    Row(
+        modifier = Modifier.screenMargin().padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        TrnBadge(item)
+        Text(
+            text = stringResource(R.string.due_title),
+            modifier = Modifier.weight(1f),
+            style = MaterialTheme.typography.titleMedium,
+        )
+        if (showSkipAll) {
+            TextButton(onClick = onSkipAll) {
+                Text(text = stringResource(R.string.skip_all))
+            }
+        }
     }
 }
 

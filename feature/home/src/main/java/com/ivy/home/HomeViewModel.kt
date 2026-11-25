@@ -131,6 +131,7 @@ class HomeViewModel @Inject constructor(
             expanded = false,
         )
     )
+    private var dueExpanded by mutableStateOf(false)
     private var customerJourneyCards by
     mutableStateOf<ImmutableList<CustomerJourneyCardModel>>(persistentListOf())
     private var hideBalance by mutableStateOf(false)
@@ -165,6 +166,7 @@ class HomeViewModel @Inject constructor(
             buffer = getBuffer(),
             upcoming = getUpcoming(),
             overdue = getOverdue(),
+            dueExpanded = dueExpanded,
             customerJourneyCards = getCustomerJourneyCards(),
             hideBalance = getHideBalance(),
             expanded = getExpanded(),
@@ -254,8 +256,7 @@ class HomeViewModel @Inject constructor(
                 is HomeEvent.SetPeriod -> setPeriod(event.period)
                 HomeEvent.SelectNextMonth -> onSelectNextMonth()
                 HomeEvent.SelectPreviousMonth -> onSelectPreviousMonth()
-                is HomeEvent.SetUpcomingExpanded -> setUpcomingExpanded(event.expanded)
-                is HomeEvent.SetOverdueExpanded -> setOverdueExpanded(event.expanded)
+                is HomeEvent.SetDueExpanded -> dueExpanded = event.expanded
                 is HomeEvent.SetBuffer -> setBuffer(event.buffer)
                 is HomeEvent.SetCurrency -> setCurrency(event.currency).fixUnit()
                 HomeEvent.SwitchTheme -> switchTheme()
@@ -415,14 +416,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 // -----------------------------------------------------------------
-
-    private fun setUpcomingExpanded(expanded: Boolean) {
-        upcoming = upcoming.copy(expanded = expanded)
-    }
-
-    private fun setOverdueExpanded(expanded: Boolean) {
-        overdue = overdue.copy(expanded = expanded)
-    }
 
     private suspend fun onBalanceClick() {
         val hasTransactions = hasTrnsAct(Unit)

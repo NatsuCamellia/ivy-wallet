@@ -9,12 +9,9 @@ import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.utils.format
 import com.ivy.ui.component.transaction.TransactionAmountKind
-import com.ivy.ui.component.transaction.TransactionItemPosition
 import com.ivy.ui.component.transaction.TransactionItemUi
 import com.ivy.ui.time.TimeFormatter
 import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
-import com.ivy.wallet.domain.pure.data.IncomeExpensePair
-import java.math.BigDecimal
 import java.time.Instant
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -34,51 +31,18 @@ class HomeTransactionMapper(
 ) {
     fun mapHistory(history: List<TransactionHistoryItem>): ImmutableList<HomeTrnListItem> {
         val result = mutableListOf<HomeTrnListItem>()
-        val run = mutableListOf<Transaction>()
-
-        fun flushRun() {
-            run.forEachIndexed { index, trn ->
-                result += mapTransaction(trn, position(index, run.size), dueKind = null)
-            }
-            run.clear()
-        }
 
         for (item in history) {
             when (item) {
-                is TransactionHistoryDateDivider -> {
-                    flushRun()
-                    result += mapDayHeader(item)
-                }
-
-                is Transaction -> run += item
+                is TransactionHistoryDateDivider -> result += mapDayHeader(item)
+                is Transaction -> result += mapTransaction(item, due = null)
             }
         }
-        flushRun()
         return result.toImmutableList()
     }
 
-    fun mapDueSection(
-        trns: List<Transaction>,
-        overdue: Boolean,
-    ): ImmutableList<HomeTrnListItem.Trn> = trns.mapIndexed { index, trn ->
-        mapTransaction(
-            trn = trn,
-            position = position(index, trns.size),
-            dueKind = if (overdue) TransactionAmountKind.Overdue else TransactionAmountKind.Upcoming,
-        )
-    }.toImmutableList()
-
-    fun sectionSubtitle(stats: IncomeExpensePair, currency: String): String? {
-        val parts = buildList {
-            if (stats.income > BigDecimal.ZERO) {
-                add("+${formatAmount(stats.income.toDouble(), currency)}")
-            }
-            if (stats.expense > BigDecimal.ZERO) {
-                add("-${formatAmount(stats.expense.abs().toDouble(), currency)}")
-            }
-        }
-        return parts.takeIf { it.isNotEmpty() }?.joinToString(" · ")
-    }
+    fun mapDueRows(rows: List<HomeDueRow>): ImmutableList<HomeTrnListItem.Trn> =
+        rows.map { mapTransaction(trn = it.transaction, due = it) }.toImmutableList()
 
     private fun mapDayHeader(divider: TransactionHistoryDateDivider): HomeTrnListItem.DayHeader {
         val net = divider.income - divider.expenses
@@ -97,8 +61,7 @@ class HomeTransactionMapper(
     @Suppress("CyclomaticComplexMethod")
     private fun mapTransaction(
         trn: Transaction,
-        position: TransactionItemPosition,
-        dueKind: TransactionAmountKind?,
+        due: HomeDueRow?,
     ): HomeTrnListItem.Trn {
         val account = baseData.accounts.find { it.id == trn.accountId }
         val toAccount = baseData.accounts.find { it.id == trn.toAccountId }
@@ -126,9 +89,9 @@ class HomeTransactionMapper(
                 accountName,
             ).joinToString(" · ").ifBlank { null }
         }
-        val time = if (dueKind == null) trn.dateTime?.let(::formatTransactionTime) else null
+        val time = if (due == null) trn.dateTime?.let(::formatTransactionTime) else null
 
-        val amountKind = dueKind ?: when (trn.type) {
+        val amountKind = when (trn.type) {
             TransactionType.INCOME -> TransactionAmountKind.Income
             TransactionType.EXPENSE -> TransactionAmountKind.Expense
             TransactionType.TRANSFER -> TransactionAmountKind.Transfer
@@ -140,13 +103,13 @@ class HomeTransactionMapper(
         }
         val amountText = "$amountSign${formatAmount(trn.amount.toDouble(), currency)}"
 
-        val secondaryText = if (dueKind == null && isTransfer && toCurrency != currency) {
+        val secondaryText = if (due == null && isTransfer && toCurrency != currency) {
             formatAmount(trn.toAmount.toDouble(), toCurrency)
         } else {
             null
         }
 
-        val dueText = if (dueKind != null && trn.dueDate != null) {
+        val dueText = if (due != null && trn.dueDate != null) {
             String.format(dueOnFormat, formatDueDate(trn.dueDate!!))
         } else {
             null
@@ -163,8 +126,8 @@ class HomeTransactionMapper(
                 amountKind = amountKind,
                 secondaryText = secondaryText,
                 dueText = dueText,
+                dueOverdue = due?.overdue == true,
             ),
-            position = position,
             iconAsset = category?.icon?.id ?: if (isTransfer) null else account?.icon,
             trn = trn,
         )
@@ -184,11 +147,4 @@ class HomeTransactionMapper(
             isTransfer -> null
             else -> account?.color?.let(::Color)
         }
-
-    private fun position(index: Int, size: Int): TransactionItemPosition = when {
-        size == 1 -> TransactionItemPosition.Single
-        index == 0 -> TransactionItemPosition.First
-        index == size - 1 -> TransactionItemPosition.Last
-        else -> TransactionItemPosition.Middle
-    }
 }

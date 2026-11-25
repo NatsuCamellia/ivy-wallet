@@ -40,7 +40,21 @@ class HomePaparazziTest(
     @Test
     fun snapshotHomePlannedPayments() {
         snapshot(theme) {
-            HomeUiTest(theme == PaparazziTheme.Dark, planned = true)
+            HomeUiTest(theme == PaparazziTheme.Dark, due = HomeDuePreview.OverdueAndUpcoming)
+        }
+    }
+
+    @Test
+    fun snapshotHomeDueUpcomingOnly() {
+        snapshot(theme) {
+            HomeUiTest(theme == PaparazziTheme.Dark, due = HomeDuePreview.UpcomingOnly)
+        }
+    }
+
+    @Test
+    fun snapshotHomeDueCollapsedWithMore() {
+        snapshot(theme) {
+            HomeUiTest(theme == PaparazziTheme.Dark, due = HomeDuePreview.CollapsedWithMore)
         }
     }
 

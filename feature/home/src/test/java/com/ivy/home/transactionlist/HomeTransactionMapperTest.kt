@@ -11,10 +11,8 @@ import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.datamodel.Account
 import com.ivy.ui.component.transaction.TransactionAmountKind
-import com.ivy.ui.component.transaction.TransactionItemPosition
 import com.ivy.ui.time.TimeFormatter
 import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
-import com.ivy.wallet.domain.pure.data.IncomeExpensePair
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldEndWith
 import io.kotest.matchers.string.shouldStartWith
@@ -95,34 +93,6 @@ class HomeTransactionMapperTest {
     }
 
     @Test
-    fun `assigns First Middle Last positions within a day`() {
-        // Given
-        val history = listOf(
-            divider(income = 0.0, expenses = 43.26),
-            expenseTrn("a"),
-            expenseTrn("b"),
-            expenseTrn("c"),
-        )
-
-        // When
-        val items = mapper().mapHistory(history)
-
-        // Then
-        items.filterIsInstance<HomeTrnListItem.Trn>().map { it.position } shouldBe listOf(
-            TransactionItemPosition.First,
-            TransactionItemPosition.Middle,
-            TransactionItemPosition.Last,
-        )
-    }
-
-    @Test
-    fun `a lone transaction in a day is Single`() {
-        val items = mapper().mapHistory(listOf(divider(0.0, 10.0), expenseTrn("a")))
-
-        (items[1] as HomeTrnListItem.Trn).position shouldBe TransactionItemPosition.Single
-    }
-
-    @Test
     fun `day header carries formatted date and signed net total`() {
         val items = mapper().mapHistory(listOf(divider(income = 100.0, expenses = 40.0)))
 
@@ -179,31 +149,28 @@ class HomeTransactionMapperTest {
     }
 
     @Test
-    fun `due section rows carry due chip text and upcoming or overdue kind`() {
+    fun `due rows carry the due date text and flag only overdue ones`() {
         val due = expenseTrn("a").copy(dateTime = null, dueDate = Instant.EPOCH)
 
-        val upcoming = mapper().mapDueSection(listOf(due), overdue = false).first()
-        val overdue = mapper().mapDueSection(listOf(due), overdue = true).first()
+        val rows = mapper().mapDueRows(listOf(HomeDueRow(due, overdue = true), HomeDueRow(due, overdue = false)))
 
-        upcoming.ui.dueText shouldBe "Due on Fri, Jul 24"
-        upcoming.ui.amountKind shouldBe TransactionAmountKind.Upcoming
-        upcoming.ui.secondaryText shouldBe null
-        upcoming.ui.time shouldBe null
-        upcoming.position shouldBe TransactionItemPosition.Single
-        overdue.ui.amountKind shouldBe TransactionAmountKind.Overdue
+        rows.map { it.ui.dueText } shouldBe listOf("Due on Fri, Jul 24", "Due on Fri, Jul 24")
+        rows.map { it.ui.dueOverdue } shouldBe listOf(true, false)
+        rows.forEach {
+            it.ui.amountKind shouldBe TransactionAmountKind.Expense
+            it.ui.secondaryText shouldBe null
+            it.ui.time shouldBe null
+        }
     }
 
     @Test
-    fun `due section rows for income transactions carry a plus sign and upcoming or overdue kind`() {
+    fun `due rows for income carry a plus sign and the income kind`() {
         val due = incomeTrn("a").copy(dateTime = null, dueDate = Instant.EPOCH)
 
-        val upcoming = mapper().mapDueSection(listOf(due), overdue = false).first()
-        val overdue = mapper().mapDueSection(listOf(due), overdue = true).first()
+        val row = mapper().mapDueRows(listOf(HomeDueRow(due, overdue = false))).first()
 
-        upcoming.ui.amountText shouldStartWith "+"
-        upcoming.ui.amountKind shouldBe TransactionAmountKind.Upcoming
-        overdue.ui.amountText shouldStartWith "+"
-        overdue.ui.amountKind shouldBe TransactionAmountKind.Overdue
+        row.ui.amountText shouldStartWith "+"
+        row.ui.amountKind shouldBe TransactionAmountKind.Income
     }
 
     @Test
@@ -213,17 +180,6 @@ class HomeTransactionMapperTest {
         val item = mapper().mapHistory(listOf(divider(0.0, 10.0), trn))[1] as HomeTrnListItem.Trn
 
         item.ui.supportingText shouldBe "Food · deleted"
-    }
-
-    @Test
-    fun `section subtitle joins non-zero income and expenses and is null when both are zero`() {
-        val m = mapper()
-
-        m.sectionSubtitle(IncomeExpensePair(BigDecimal("120.0"), BigDecimal("500.0")), "USD") shouldBe
-            "+120.0 USD · -500.0 USD"
-        m.sectionSubtitle(IncomeExpensePair(BigDecimal.ZERO, BigDecimal("5.99")), "USD") shouldBe
-            "-5.99 USD"
-        m.sectionSubtitle(IncomeExpensePair.zero(), "USD") shouldBe null
     }
 
     companion object {

@@ -1125,6 +1125,66 @@ flow_planned_payments() {
   return 0
 }
 
+# add_planned_payment <title> <digit>: from the open planned payments list, adds an expense of <digit>0 (amount
+# sheet, Groceries, recurring rule sheet, title, Set) and waits for the list again.
+add_planned_payment() {
+  tap_node desc exact "Add planned payment" || return 1
+  wait_for text exact "Choose payment type" || return 1
+  tap_node text exact "Expense" || return 1
+  wait_for text exact "Enter" || return 1
+  tap_node text exact "$2" || return 1
+  tap_node text exact "0" || return 1
+  tap_node text exact "Enter" || return 1
+  wait_for text exact "Choose category" || return 1
+  tap_node text exact "Groceries" || return 1
+  wait_for text exact "Plan for" || return 1
+  tap_node text exact "Set" || return 1
+  wait_gone text exact "Plan for" || return 1
+  adb shell input text "$1"
+  sleep 1
+  tap_node text exact "Set" || return 1
+  wait_for text exact "Recurring payments" || { log "recurring section missing after adding $1"; return 1; }
+}
+
+# Home Due section: four planned payments are due, so Home shows the Due header and only the first 3 rows with
+# "Show all (N)"; Show all lists every row and turns into "Show less", which collapses again. Leaves its planned
+# payments behind (Recurring payments) that fill the top of Home, so it runs last in ALL_FLOWS.
+flow_due_section() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Planned payments" || return 1
+  wait_for desc exact "Add planned payment" || return 1
+  add_planned_payment duealpha 1 || return 1
+  add_planned_payment duebeta 2 || return 1
+  add_planned_payment duegamma 3 || return 1
+  add_planned_payment duedelta 4 || return 1
+  go_home || return 1
+  wait_for text exact "Due" || { log "Due header missing on Home"; return 1; }
+  local w h i
+  w=$(screen_width); h=$(screen_height)
+  for i in 1 2 3; do
+    dump
+    has text sub "Show all (" && break
+    adb shell input swipe $((w / 2)) $((h * 75 / 100)) $((w / 2)) $((h * 45 / 100)) 250 </dev/null
+    sleep 1
+  done
+  has text sub "Show all (" || { log "Show all (N) missing with four due payments"; return 1; }
+  shot due-1-collapsed
+  [ "$(python3 -I - "$XML" <<'PY'
+import sys, xml.etree.ElementTree as ET
+print(sum(1 for n in ET.parse(sys.argv[1]).iter('node') if n.get('text') == 'Skip'))
+PY
+)" -le 3 ] || { log "collapsed Due shows more than 3 rows"; return 1; }
+  tap_node text sub "Show all (" || return 1
+  wait_for text exact "Show less" || { log "Show less missing after expanding"; return 1; }
+  shot due-2-expanded
+  tap_node text exact "Show less" || return 1
+  wait_for text sub "Show all (" || { log "Show all (N) missing after collapsing"; return 1; }
+  crashed && return 1
+  return 0
+}
+
 # Home More -> Reports: empty state with Set Filter, the filter sheet (Apply stays disabled until the filter is valid),
 # pick the Expenses type, the Cash account, the Groceries category and the default period, Apply: the seeded
 # smokecoffee expense is listed; back returns to the open More sheet. Seeded by flow_add_expense.
@@ -1672,7 +1732,7 @@ run_flow() {
   fi
 }
 
-ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data"
+ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section"
 # Screens reachable by `shot`: home and accounts are tabs, the others are rows of the More sheet.
 ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
 

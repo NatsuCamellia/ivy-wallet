@@ -324,6 +324,9 @@ check_bar() {
   [ "$got" = "$1" ] || { log "$4: app bar is $got, expected $1"; return 1; }
 }
 
+# home_title: the Period shown as the Home title (the bar title), from a fresh dump
+home_title() { dump >/dev/null && home_period_label; }
+
 # node_cy <text> -> y of the node's centre
 node_cy() { find_node text exact "$1" | cut -d' ' -f2; }
 
@@ -1186,9 +1189,9 @@ flow_type_filter() {
 flow_appbar_state() {
   go_home || return 1
   wait_for text exact "smokecoffee" || { log "run flow_add_expense first"; return 1; }
-  check_bar expanded "Hi" "More" "Home at start" || return 1
+  check_bar expanded "$(home_title)" "More" "Home at start" || return 1
   collapse_bar
-  check_bar collapsed "Hi" "More" "Home scrolled" || return 1
+  check_bar collapsed "$(home_title)" "More" "Home scrolled" || return 1
   local y_home
   y_home=$(node_cy smokecoffee) || { log "row missing after collapse"; return 1; }
   shot appbar-1-home-collapsed
@@ -1200,7 +1203,7 @@ flow_appbar_state() {
   shot appbar-2-accounts-collapsed
   tap_tab Home || return 1
   wait_for text exact "smokecoffee" || return 1
-  check_bar collapsed "Hi" "More" "Home after tab switch" || return 1
+  check_bar collapsed "$(home_title)" "More" "Home after tab switch" || return 1
   [ "$(node_cy smokecoffee)" = "$y_home" ] || { log "Home list moved: $(node_cy smokecoffee) vs $y_home"; return 1; }
   shot appbar-3-home-back
   tap_tab Accounts || return 1

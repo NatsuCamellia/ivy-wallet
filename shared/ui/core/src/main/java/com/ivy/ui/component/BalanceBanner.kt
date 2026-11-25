@@ -25,8 +25,8 @@ import kotlinx.collections.immutable.ImmutableList
 data class BalanceBannerColumn(
     val label: String,
     val value: String,
-    val onClick: (() -> Unit)? = null,
-    val testTag: String? = null,
+    val onClick: (() -> Unit)?,
+    val testTag: String?,
 )
 
 /**

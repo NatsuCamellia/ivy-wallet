@@ -29,9 +29,9 @@ class BalanceBannerPaparazziTest(
                         label = "Total Balance",
                         value = "2,415.70 USD",
                         columns = persistentListOf(
-                            BalanceBannerColumn("Income", "+2,500.00 USD", onClick = {}),
-                            BalanceBannerColumn("Expenses", "-84.30 USD", onClick = {}),
-                            BalanceBannerColumn("Cashflow", "-1,284.30 USD"),
+                            BalanceBannerColumn("Income", "+2,500.00 USD", onClick = {}, testTag = null),
+                            BalanceBannerColumn("Expenses", "-84.30 USD", onClick = {}, testTag = null),
+                            BalanceBannerColumn("Cashflow", "-1,284.30 USD", null, null),
                         ),
                         onClick = {},
                     )
@@ -41,8 +41,8 @@ class BalanceBannerPaparazziTest(
                         value = "12,415.70 USD",
                         supportingText = "Including excluded accounts: 15,000.00 USD",
                         columns = persistentListOf(
-                            BalanceBannerColumn("Income", "+2,500.00 USD"),
-                            BalanceBannerColumn("Expenses", "-84.30 USD"),
+                            BalanceBannerColumn("Income", "+2,500.00 USD", null, null),
+                            BalanceBannerColumn("Expenses", "-84.30 USD", null, null),
                         ),
                     )
                 }

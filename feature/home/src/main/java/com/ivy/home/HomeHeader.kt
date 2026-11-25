@@ -149,6 +149,7 @@ fun HomeBalanceBanner(
             } else {
                 amountLabel(cashflow, currency, showPlusSign = true, shortenBigNumbers = true)
             },
+            onClick = null,
             testTag = "home_cashflow",
         ),
     )

@@ -175,10 +175,10 @@ private fun PreviewFeaturesUi(isDark: Boolean = false) {
                             description = "Use the standard 1-2-3 numeric keypad layout.",
                         ),
                         FeatureItemViewState.FeatureToggleViewState(
-                            key = "compact_mode",
-                            name = "Compact mode",
+                            key = "account_colors",
+                            name = "Colorful account labels",
                             enabled = false,
-                            description = "Show more items on the screen.",
+                            description = "Display account-specific colors in transactions.",
                         ),
                         FeatureItemViewState.FeatureHeaderViewState(name = "Debug"),
                         FeatureItemViewState.FeatureToggleViewState(

@@ -14,22 +14,6 @@ class IvyFeatures @Inject constructor() : Features {
         defaultValue = false
     )
 
-    override val compactAccountsMode = BoolFeature(
-        key = "compact_account_ui",
-        group = FeatureGroup.Account,
-        name = "Compact account cards",
-        description = "Make the Accounts tab UI more compact and dense",
-        defaultValue = false
-    )
-
-    override val compactCategoriesMode = BoolFeature(
-        key = "compact_category_ui",
-        group = FeatureGroup.Category,
-        name = "Compact category cards",
-        description = "Simplified design of the Categories screen",
-        defaultValue = false
-    )
-
     override val showTitleSuggestions = BoolFeature(
         key = "show_title_suggestions",
         group = FeatureGroup.Other,
@@ -73,8 +57,6 @@ class IvyFeatures @Inject constructor() : Features {
     override val allFeatures: List<BoolFeature>
         get() = listOf(
             sortCategoriesAscending,
-            compactAccountsMode,
-            compactCategoriesMode,
             showTitleSuggestions,
             hideTotalBalance,
             standardKeypadLayout,

@@ -80,7 +80,7 @@
     <string name="add_account">新增帳戶</string>
     <string name="income_title">收入標題</string>
     <string name="expense_title">支出標題</string>
-    <string name="transfer_title">轉移標題</string>
+    <string name="transfer_title">轉帳標題</string>
     <string name="expense">支出</string>
     <string name="add_planned_date_payment">新增經常交易日期</string>
     <string name="pay">支付</string>
@@ -128,7 +128,7 @@
     <string name="add_expense">新增支出</string>
     <string name="unspecified">未指定</string>
     <string name="percent">%1$s\%%</string>
-    <string name="account_transfers">帳戶轉移</string>
+    <string name="account_transfers">帳戶轉帳</string>
     <string name="no_transactions_for_period">您沒有 %1$s 的任何交易。\n您可以透過向下捲動並點擊頂部的 "新增收入" 或 "新增支出" 按鈕來新增一項。</string>
     <string name="account_confirm_deletion_description">注意: 刪除此帳戶將永久刪除所有關聯的交易。</string>
     <string name="category_confirm_deletion_description">注意: 刪除此類別將永久刪除它。</string>
@@ -408,8 +408,8 @@
     <string name="month">月</string>
     <string name="years">年</string>
     <string name="year">年</string>
-    <string name="transfers_as_income_expense"><![CDATA[轉移作為收入和支出]]></string>
-    <string name="transfers_as_income_expense_description">在帳戶畫面中將帳戶轉移視為收入或支出</string>
+    <string name="transfers_as_income_expense"><![CDATA[轉帳作為收入和支出]]></string>
+    <string name="transfers_as_income_expense_description">在帳戶畫面中將帳戶轉帳視為收入或支出</string>
     <string name="home_category">首頁</string>
     <string name="generating_report">正在產生報表…</string>
     <string name="sort_by">排序方式</string>
@@ -428,7 +428,7 @@
     <string name="increase_loan">增加</string>
     <string name="decrease_loan">減少</string>
     <string name="msg_select_account_to_transfer">選擇轉帳目的地</string>
-    <string name="msg_source_account_destination_account_same_for_transfer">選擇不同的目標帳戶進行轉移</string>
+    <string name="msg_source_account_destination_account_same_for_transfer">選擇不同的目標帳戶進行轉帳</string>
     <string name="tags_optional">標籤 (可選)</string>
     <string name="tags">標籤</string>
     <string name="search_tags">搜尋標籤</string>

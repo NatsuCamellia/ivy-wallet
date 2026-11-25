@@ -94,7 +94,8 @@
     <string name="created_on">創建於</string>
     <string name="hi">你好</string>
     <string name="hi_name">你好 %1$s</string>
-    <string name="cashflow">現金流: %1$s%2$s %3$s</string>
+    <string name="cashflow">淨額: %1$s%2$s %3$s</string>
+    <string name="cashflow_label">淨額</string>
     <string name="search_transactions">搜尋交易</string>
     <string name="ivy_wallet_open_source">Ivy wallet 是開源的</string>
     <string name="savings_goal">儲蓄目標</string>

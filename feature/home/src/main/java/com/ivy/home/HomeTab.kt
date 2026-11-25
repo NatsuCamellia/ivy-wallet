@@ -325,7 +325,7 @@ fun HomeLazyColumn(
                     .padding(bottom = ListItemDefaults.SegmentedGap),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                CashFlowInfo(
+                HomeBalanceBanner(
                     currency = baseData.baseCurrency,
                     balance = balance.toDouble(),
 

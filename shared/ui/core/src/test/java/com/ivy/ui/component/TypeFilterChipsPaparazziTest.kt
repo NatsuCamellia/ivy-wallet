@@ -10,6 +10,7 @@ import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import com.ivy.ui.PaparazziScreenshotTest
 import com.ivy.ui.PaparazziTheme
+import kotlinx.collections.immutable.persistentListOf
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -25,17 +26,17 @@ class TypeFilterChipsPaparazziTest(
             Surface(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 TypeFilterChips(
-                    options = listOf(
-                        TypeFilterOption("all", "All"),
-                        TypeFilterOption("expense", "Expense"),
-                        TypeFilterOption("income", "Income"),
+                    options = persistentListOf(
+                        TypeFilterOption("all", "All", null),
+                        TypeFilterOption("expense", "Expense", null),
+                        TypeFilterOption("income", "Income", null),
                     ),
                     selected = "all",
                     onSelect = {},
                 )
                 TypeFilterChips(
                     modifier = Modifier.padding(top = 16.dp),
-                    options = listOf(
+                    options = persistentListOf(
                         TypeFilterOption("expense", "Expense", "-1,234.50"),
                         TypeFilterOption("income", "Income", "+2,000.00"),
                     ),

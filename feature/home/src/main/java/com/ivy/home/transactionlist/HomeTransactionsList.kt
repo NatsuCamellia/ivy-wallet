@@ -32,6 +32,7 @@ import com.ivy.ui.component.transaction.TransactionSectionHeader
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun rememberHomeTransactionMapper(baseData: AppBaseData): HomeTransactionMapper {
@@ -117,11 +118,10 @@ fun LazyListScope.homeTransactionsList(
     if (!historyEmpty || typeFilter != HomeTypeFilter.All) {
         item(key = "type_filter", contentType = "type_filter") {
             TypeFilterChips(
-                modifier = Modifier.padding(vertical = 8.dp),
-                options = listOf(
-                    TypeFilterOption(HomeTypeFilter.All, stringResource(R.string.type_filter_all)),
-                    TypeFilterOption(HomeTypeFilter.Expense, stringResource(R.string.expense)),
-                    TypeFilterOption(HomeTypeFilter.Income, stringResource(R.string.income)),
+                options = persistentListOf(
+                    TypeFilterOption(HomeTypeFilter.All, stringResource(R.string.type_filter_all), null),
+                    TypeFilterOption(HomeTypeFilter.Expense, stringResource(R.string.expense), null),
+                    TypeFilterOption(HomeTypeFilter.Income, stringResource(R.string.income), null),
                 ),
                 selected = typeFilter,
                 onSelect = onTypeFilterChange,
@@ -147,7 +147,7 @@ fun LazyListScope.homeTransactionsList(
         item(key = "type_filter_empty") {
             Text(
                 text = stringResource(R.string.no_transactions_for_your_filter),
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 32.dp),
+                modifier = Modifier.fillMaxWidth().padding(24.dp),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,

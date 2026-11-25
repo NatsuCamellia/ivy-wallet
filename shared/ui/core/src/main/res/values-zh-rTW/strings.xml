@@ -489,4 +489,5 @@
     <string name="appearance_settings_desc">主題、語言</string>
     <string name="search">搜尋</string>
     <string name="fiat_currencies">法定貨幣</string>
+    <string name="type_filter_all">全部</string>
 </resources>

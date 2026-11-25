@@ -552,4 +552,5 @@
     <string name="no_exchange_rates_match">No matches</string>
     <string name="no_exchange_rates_for_search">No currency matches your search.</string>
     <string name="balance_title">Balance</string>
+    <string name="type_filter_all">All</string>
 </resources>

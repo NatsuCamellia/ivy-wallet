@@ -28,6 +28,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.ShortNavigationBar
@@ -196,7 +197,7 @@ private fun MainShell(
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets
             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom),
         bottomBar = {
-            ShortNavigationBar {
+            ShortNavigationBar(containerColor = MaterialTheme.colorScheme.surface) {
                 ShortNavigationBarItem(
                     selected = tab == MainTab.HOME,
                     onClick = { selectTab(MainTab.HOME) },

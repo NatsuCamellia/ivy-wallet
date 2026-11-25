@@ -306,14 +306,17 @@ fun HomeLazyColumn(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
             .testTag("home_lazy_column"),
         state = listState,
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap),
     ) {
         item {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = ListItemDefaults.SegmentedGap),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
                 CashFlowInfo(
                     currency = baseData.baseCurrency,
                     balance = balance.toDouble(),

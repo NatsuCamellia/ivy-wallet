@@ -1159,6 +1159,28 @@ flow_reports() {
   return 0
 }
 
+# Home Type filter chips: Expense keeps the seeded smokecoffee expense, Income matches nothing and shows the empty
+# message, All brings the row back. Needs flow_add_expense to have run (it seeds the smokecoffee expense).
+flow_type_filter() {
+  go_home || return 1
+  wait_for text exact "smokecoffee" || { log "run flow_add_expense first"; return 1; }
+  has text exact "All" || { log "All chip missing"; return 1; }
+  # The Balance banner has an "Income" figure label above the chip row (it opens the pie chart): the chip is the second match.
+  has text exact "Income" 1 || { log "Income chip missing"; return 1; }
+  tap_node text exact "Income" 1 || return 1
+  wait_for text exact "No matching transactions for the selected filter." || { log "empty message missing under Income"; return 1; }
+  has text exact "smokecoffee" && { log "expense still listed under Income"; return 1; }
+  shot type-filter-1-income
+  tap_node text exact "Expense" || return 1
+  wait_for text exact "smokecoffee" || { log "expense missing under Expense"; return 1; }
+  has text exact "No matching transactions for the selected filter." && { log "empty message under Expense"; return 1; }
+  shot type-filter-2-expense
+  tap_node text exact "All" || return 1
+  wait_for text exact "smokecoffee" || { log "row missing under All"; return 1; }
+  crashed && return 1
+  return 0
+}
+
 # The large app bar keeps its collapsed state (and the list its position) across tabs and back navigation, and a
 # screen opened again starts expanded. Needs flow_add_expense (the seeded smokecoffee row) and the Cash account.
 flow_appbar_state() {
@@ -1647,7 +1669,7 @@ run_flow() {
   fi
 }
 
-ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data"
+ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data"
 # Screens reachable by `shot`: home and accounts are tabs, the others are rows of the More sheet.
 ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
 

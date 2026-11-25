@@ -12,6 +12,7 @@ import com.ivy.wallet.domain.pure.data.ClosedTimeRange
 import com.ivy.wallet.domain.pure.exchange.ExchangeData
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
+import java.math.BigDecimal
 import javax.inject.Inject
 
 class AccountDataAct @Inject constructor(
@@ -29,19 +30,23 @@ class AccountDataAct @Inject constructor(
             )
         ).balance
 
-        val balanceBaseCurrency = if (acc.asset.code != baseCurrency) {
-            exchangeAct(
-                ExchangeAct.Input(
-                    data = ExchangeData(
-                        baseCurrency = baseCurrency,
-                        fromCurrency = acc.asset.code.toOption()
-                    ),
-                    amount = balance
-                )
-            ).orNull()
-        } else {
-            null
+        val isForeign = acc.asset.code != baseCurrency
+        val toBaseCurrency: suspend (BigDecimal) -> BigDecimal? = { amount ->
+            if (isForeign) {
+                exchangeAct(
+                    ExchangeAct.Input(
+                        data = ExchangeData(
+                            baseCurrency = baseCurrency,
+                            fromCurrency = acc.asset.code.toOption()
+                        ),
+                        amount = amount
+                    )
+                ).orNull()
+            } else {
+                null
+            }
         }
+        val balanceBaseCurrency = toBaseCurrency(balance)
 
         val incomeExpensePair = calcAccIncomeExpenseAct(
             CalcAccIncomeExpenseAct.Input(
@@ -57,6 +62,8 @@ class AccountDataAct @Inject constructor(
             balanceBaseCurrency = balanceBaseCurrency?.toDouble(),
             monthlyIncome = incomeExpensePair.income.toDouble(),
             monthlyExpenses = incomeExpensePair.expense.toDouble(),
+            monthlyExpensesBaseCurrency = toBaseCurrency(incomeExpensePair.expense)?.toDouble(),
+            monthlyIncomeBaseCurrency = toBaseCurrency(incomeExpensePair.income)?.toDouble(),
         )
     } then {
         it.toImmutableList()

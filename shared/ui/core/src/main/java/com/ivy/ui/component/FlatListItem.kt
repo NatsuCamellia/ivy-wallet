@@ -24,7 +24,8 @@ import androidx.compose.ui.unit.dp
  * press shows a rounded ripple. Whoever places the row decides the horizontal screen margin: the row
  * is inset by 8dp on each side for the ripple and by 8dp more for its content, so it lines up with a
  * 16dp margin when used full width. An [overlineText] sits above the title and [actions] (buttons)
- * under the supporting text.
+ * under the supporting text. A [supportingContent] slot, e.g. a share bar, sits between the two and
+ * spans the full width under the text and the trailing amounts.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -41,6 +42,7 @@ fun FlatListItem(
     overlineText: String? = null,
     overlineColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     actions: (@Composable RowScope.() -> Unit)? = null,
+    supportingContent: (@Composable () -> Unit)? = null,
 ) {
     Row(
         modifier = modifier
@@ -53,58 +55,101 @@ fun FlatListItem(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         leading?.invoke()
-        Column(modifier = Modifier.weight(1f)) {
-            if (overlineText != null) {
-                Text(
-                    text = overlineText,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = overlineColor,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+        if (supportingContent == null) {
+            Column(modifier = Modifier.weight(1f)) {
+                TextLines(title, supportingText, overlineText, overlineColor)
+                ActionsRow(actions)
             }
+            Trailing(primaryText, primaryColor, secondaryText, secondaryColor)
+        } else {
+            // the content spans the full width, under the text and the trailing amounts
+            Column(modifier = Modifier.weight(1f)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextLines(title, supportingText, overlineText, overlineColor, Modifier.weight(1f))
+                    Trailing(primaryText, primaryColor, secondaryText, secondaryColor)
+                }
+                supportingContent()
+                ActionsRow(actions)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TextLines(
+    title: String,
+    supportingText: String?,
+    overlineText: String?,
+    overlineColor: Color,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        if (overlineText != null) {
             Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+                text = overlineText,
+                style = MaterialTheme.typography.labelMedium,
+                color = overlineColor,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            if (supportingText != null) {
-                Text(
-                    text = supportingText,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-            if (actions != null) {
-                Row(
-                    modifier = Modifier.padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    content = actions,
-                )
-            }
         }
-        if (primaryText != null || secondaryText != null) {
-            Column(horizontalAlignment = Alignment.End) {
-                if (primaryText != null) {
-                    Text(
-                        text = primaryText,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = primaryColor,
-                        maxLines = 1,
-                    )
-                }
-                if (secondaryText != null) {
-                    Text(
-                        text = secondaryText,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = secondaryColor,
-                        maxLines = 1,
-                    )
-                }
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        if (supportingText != null) {
+            Text(
+                text = supportingText,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ActionsRow(actions: (@Composable RowScope.() -> Unit)?) {
+    if (actions != null) {
+        Row(
+            modifier = Modifier.padding(top = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            content = actions,
+        )
+    }
+}
+
+@Composable
+private fun Trailing(
+    primaryText: String?,
+    primaryColor: Color,
+    secondaryText: String?,
+    secondaryColor: Color,
+) {
+    if (primaryText != null || secondaryText != null) {
+        Column(horizontalAlignment = Alignment.End) {
+            if (primaryText != null) {
+                Text(
+                    text = primaryText,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = primaryColor,
+                    maxLines = 1,
+                )
+            }
+            if (secondaryText != null) {
+                Text(
+                    text = secondaryText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = secondaryColor,
+                    maxLines = 1,
+                )
             }
         }
     }

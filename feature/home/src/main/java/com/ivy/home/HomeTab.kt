@@ -64,6 +64,7 @@ import com.ivy.navigation.screenScopedViewModel
 import com.ivy.ui.R
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.Purple
+import com.ivy.ui.component.screenMargin
 import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
@@ -320,7 +321,7 @@ fun HomeLazyColumn(
         item {
             Column(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
+                    .screenMargin()
                     .padding(bottom = ListItemDefaults.SegmentedGap),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {

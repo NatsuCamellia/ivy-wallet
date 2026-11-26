@@ -205,8 +205,8 @@ data class TimePeriod(
     ): String {
         val year = year
         return if (year != null && timeProvider.localNow().year != year) {
-            // not this year
-            "${month.name.substring(0, MonthNameAbbreviationLength)}, $year"
+            // not this year; take(), not substring(): names can be shorter than 3 chars (zh, ja)
+            "${month.name.take(MonthNameAbbreviationLength)}, $year"
         } else {
             // this year
             month.name

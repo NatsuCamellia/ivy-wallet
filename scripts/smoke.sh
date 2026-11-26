@@ -718,6 +718,49 @@ flow_choose_period() {
   return 0
 }
 
+# Regression for the crash StringIndexOutOfBoundsException (begin 0, end 3) on Home: a month of another year is titled with the
+# first three characters of its name, and zh-TW names are two characters ("一月"). Switches the app language to zh-TW, picks
+# January of next year (a chip that exists all year) in the Choose month sheet, Set: Home must show "一月, <year>" and not
+# crash. The language is restored afterwards, and the picked period is forgotten with the next fresh start.
+flow_period_other_year() {
+  local rc=0
+  adb shell cmd locale set-app-locales $PKG --user 0 --locales zh-TW >/dev/null 2>&1 || { log "could not set the app language"; return 1; }
+  period_other_year_body || rc=$?
+  adb shell am force-stop $PKG
+  adb shell cmd locale set-app-locales $PKG --user 0 --locales en-US >/dev/null 2>&1
+  return $rc
+}
+
+period_other_year_body() {
+  fresh_start
+  wait_for text exact "首頁" 20 || { log "Home not shown in zh-TW"; return 1; }
+  local months=(一月 二月 三月 四月 五月 六月 七月 八月 九月 十月 十一月 十二月) year month chip i w h
+  year=$(adb shell date +%Y | tr -d '\r')
+  month=$(adb shell date +%-m | tr -d '\r')
+  chip="一月, $((year + 1))"
+  tap_node text exact "${months[month - 1]}" || return 1
+  wait_for text exact "選擇月份" || return 1
+  w=$(screen_width); h=$(screen_height)
+  for i in $(seq 1 6); do
+    has text exact "$chip" && break
+    adb shell input swipe $((w * 85 / 100)) $((h * 35 / 100)) $((w * 15 / 100)) $((h * 35 / 100)) 300 </dev/null
+    sleep 1
+    dump || return 1
+  done
+  has text exact "$chip" || { log "chip '$chip' not found in the sheet"; return 1; }
+  shot period-other-year-1-open
+  tap_node text exact "$chip" || return 1
+  sleep 1
+  tap_node text exact "設定" || return 1
+  wait_gone text exact "選擇月份" || return 1
+  sleep 1
+  crashed && { log "crash after choosing '$chip'"; return 1; }
+  dump || return 1
+  has text exact "$chip" || { log "Home period is not '$chip'"; return 1; }
+  shot period-other-year-2-home
+  return 0
+}
+
 # created_date_label: the "Mon D" text of the Created on row, from the current dump
 created_date_label() {
   python3 -I - "$XML" <<'PY'
@@ -1857,7 +1900,7 @@ run_flow() {
   fi
 }
 
-ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section"
+ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section"
 # Screens reachable by `shot`: home, accounts and categories are tabs, the others are rows of the More sheet.
 ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
 

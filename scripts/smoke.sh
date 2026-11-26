@@ -1040,6 +1040,91 @@ flow_account_detail() {
   return 0
 }
 
+# db_edit seed|clear: edits the app database of the debuggable build through run-as while the app is stopped. `seed` adds
+# 30 "Scroll row" transactions per day of the current month to the account Cash (every third one a transfer to Bank, some
+# with a description), `clear` removes them again. Needs the app to have an offline account with Cash and Bank.
+db_edit() {
+  local mode=$1 tmp f now tz
+  tmp=$(mktemp -d) || return 1
+  now=$(adb shell date +%s | tr -d '\r')
+  tz=$(adb shell date +%z | tr -d '\r')
+  adb shell am force-stop $PKG
+  for f in ivywallet.db ivywallet.db-wal ivywallet.db-shm; do
+    adb exec-out run-as $PKG cat databases/$f >"$tmp/$f" 2>/dev/null
+    [ -s "$tmp/$f" ] || rm -f "$tmp/$f"
+  done
+  [ -f "$tmp/ivywallet.db" ] || { log "db_edit: no database, is $PKG a debuggable build?"; rm -rf "$tmp"; return 1; }
+  python3 -I - "$tmp/ivywallet.db" "$mode" "$now" "$tz" <<'PY' || { rm -rf "$tmp"; return 1; }
+import datetime, sqlite3, sys, uuid
+path, mode, now, tz = sys.argv[1], sys.argv[2], int(sys.argv[3]), sys.argv[4]
+offset = datetime.timedelta(hours=int(tz[:3]), minutes=int(tz[0] + tz[3:5]))
+db = sqlite3.connect(path)
+if mode == "clear":
+    db.execute("DELETE FROM transactions WHERE title = 'Scroll row'")
+else:
+    ids = dict(db.execute("SELECT name, id FROM accounts WHERE name IN ('Cash', 'Bank')").fetchall())
+    local_now = datetime.datetime.fromtimestamp(now, datetime.timezone(offset))
+    rows = []
+    for day in range(1, local_now.day + 1):
+        midnight = local_now.replace(day=day, hour=0, minute=0, second=0, microsecond=0)
+        span = (local_now - midnight).total_seconds() if day == local_now.day else 86399
+        for i in range(30):
+            millis = int((midnight.timestamp() + span * i / 30) * 1000)
+            transfer = i % 3 == 2
+            rows.append((
+                ids["Cash"], "TRANSFER" if transfer else "EXPENSE", float(i + 1), ids["Bank"] if transfer else None,
+                "Scroll row", "A longer description that wraps onto a second line of the row" if i % 2 else None,
+                millis, 0, 0, str(uuid.uuid4()),
+            ))
+    db.executemany(
+        "INSERT INTO transactions (accountId, type, amount, toAccountId, title, description, dateTime, isSynced, isDeleted, id)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+db.commit()
+db.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+db.close()
+PY
+  adb shell "run-as $PKG sh -c 'rm -f databases/ivywallet.db-wal databases/ivywallet.db-shm; cat > databases/ivywallet.db'" <"$tmp/ivywallet.db"
+  local rc=$?
+  rm -rf "$tmp"
+  return $rc
+}
+
+# Regression for the crash "LayoutNode not found in RectList" (Compose 1.12) when an account's long transaction list scrolls:
+# M3 SegmentedListItem read baselines of the chips in its rows while measuring. Seeds a month of transactions into Cash, opens
+# Accounts -> Cash, flings the list down and up, and fails when the app dies. Removes the seeded transactions afterwards.
+flow_account_scroll() {
+  db_edit seed || return 1
+  local rc=0
+  account_scroll_body || rc=$?
+  db_edit clear || rc=1
+  return $rc
+}
+
+account_scroll_body() {
+  go_home || return 1
+  tap_tab Accounts || return 1
+  wait_for text exact "Counted in total" || return 1
+  tap_node text exact "Cash" || return 1
+  wait_for text sub "Scroll row" 20 || { log "seeded rows missing on the account screen"; return 1; }
+  local w h i
+  w=$(screen_width); h=$(screen_height)
+  for i in $(seq 1 16); do
+    if [ $((i % 4)) = 0 ]; then
+      adb shell input swipe $((w / 2)) $((h * 25 / 100)) $((w / 2)) $((h * 80 / 100)) 120 </dev/null
+    else
+      adb shell input swipe $((w / 2)) $((h * 80 / 100)) $((w / 2)) $((h * 25 / 100)) 120 </dev/null
+    fi
+    sleep 0.6
+    crashed && { log "crash while scrolling (swipe $i)"; return 1; }
+  done
+  shot account-scroll
+  dump || return 1
+  has desc exact "Delete" && has text sub "Scroll row" || { log "account screen not on screen after scrolling"; return 1; }
+  back
+  wait_for text exact "Counted in total" || { log "back did not return to Accounts"; return 1; }
+  return 0
+}
+
 # Home top bar -> Search transactions: type the title of the seeded expense (flow_add_expense), its row is listed under the
 # search field, Clear search empties the field, back leaves the screen. Seeds its expense through flow_add_expense when needed.
 flow_search() {
@@ -1772,7 +1857,7 @@ run_flow() {
   fi
 }
 
-ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section"
+ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section"
 # Screens reachable by `shot`: home, accounts and categories are tabs, the others are rows of the More sheet.
 ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
 

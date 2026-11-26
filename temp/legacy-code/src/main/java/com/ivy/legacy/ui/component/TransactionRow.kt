@@ -1,10 +1,14 @@
 package com.ivy.legacy.ui.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
@@ -14,16 +18,21 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -81,10 +90,9 @@ fun TransactionRow(
         with(LocalTimeFormatter.current) { localTime.format() }
     }
 
-    SegmentedListItem(
+    RowContainer(
         onClick = { if (account != null) onClick(transaction) },
-        shapes = ListItemDefaults.segmentedShapes(index = index, count = count),
-        colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        shape = ListItemDefaults.segmentedShapes(index = index, count = count).shape,
         modifier = modifier.testTag("transaction_card"),
         leadingContent = { TransactionBadge(category, transaction.type) },
         overlineContent = transaction.dueDate?.let { dueDate -> { DueOverline(dueDate, dueState(transaction)) } },
@@ -111,13 +119,59 @@ fun TransactionRow(
                 }
             }
         },
+        headlineContent = {
+            Headline(
+                headline = headline,
+                transaction = transaction,
+                currency = account?.currency ?: baseData.baseCurrency,
+                toCurrency = toAccount?.currency ?: baseData.baseCurrency,
+            )
+        },
+    )
+}
+
+/**
+ * The look of a segmented list item built from a plain Row and Column. M3's SegmentedListItem aligns its text
+ * slots by reading their baselines while it measures, which with the chips in [supportingContent] crashes
+ * Compose 1.12 ("LayoutNode not found in RectList") when the list scrolls. This does not read any baseline.
+ */
+@Composable
+private fun RowContainer(
+    onClick: () -> Unit,
+    shape: Shape,
+    leadingContent: @Composable () -> Unit,
+    overlineContent: (@Composable () -> Unit)?,
+    supportingContent: @Composable () -> Unit,
+    headlineContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.Top,
     ) {
-        Headline(
-            headline = headline,
-            transaction = transaction,
-            currency = account?.currency ?: baseData.baseCurrency,
-            toCurrency = toAccount?.currency ?: baseData.baseCurrency,
-        )
+        leadingContent()
+        Column(modifier = Modifier.weight(1f)) {
+            val colors = MaterialTheme.colorScheme
+            val typography = MaterialTheme.typography
+            if (overlineContent != null) {
+                TextSlot(typography.labelSmall, colors.onSurfaceVariant, overlineContent)
+            }
+            TextSlot(typography.bodyLarge, colors.onSurface, headlineContent)
+            TextSlot(typography.bodyMedium, colors.onSurfaceVariant, supportingContent)
+        }
+    }
+}
+
+@Composable
+private fun TextSlot(style: TextStyle, color: Color, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalContentColor provides color) {
+        ProvideTextStyle(style, content)
     }
 }
 

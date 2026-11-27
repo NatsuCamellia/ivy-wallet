@@ -1085,7 +1085,7 @@ flow_account_detail() {
 
 # db_edit seed|clear|pay_upcoming|pay_clear|planned_seed|planned_clear: edits the app database of the debuggable build through run-as while the app is stopped. `seed` adds
 # 30 "Scroll row" transactions per day of the current month to the account Cash (every third one a transfer to Bank, some
-# with a description), `clear` removes them again; `pay_upcoming` and `pay_clear` belong to flow_pay_planned, `planned_seed` and `planned_clear` to flow_planned_scroll. Needs the app to have an offline account with Cash and Bank.
+# with a description), `clear` removes them again; `pay_upcoming` and `pay_clear` belong to flow_pay_planned, `planned_seed` and `planned_clear` to flow_planned_scroll, `flat_clear` to flow_flat_rows. Needs the app to have an offline account with Cash and Bank.
 db_edit() {
   local mode=$1 tmp f now tz
   tmp=$(mktemp -d) || return 1
@@ -1113,7 +1113,7 @@ elif mode == "pay_upcoming":
     db.execute("UPDATE transactions SET dueDate = ? WHERE title LIKE 'payup%' AND dueDate IS NOT NULL AND dueDate <= ?",
                ((now + 3600) * 1000, now * 1000))
 elif mode == "planned_seed":
-    # 100 recurring and 100 one-time planned payments with a category and an account chip, for flow_planned_scroll
+    # 100 recurring and 100 one-time planned payments with a category and an account, for flow_planned_scroll
     ids = dict(db.execute("SELECT name, id FROM accounts WHERE name IN ('Cash', 'Bank')").fetchall())
     cat = str(uuid.uuid4())
     db.execute("INSERT INTO categories (name, color, icon, orderNum, isSynced, isDeleted, id) VALUES ('Plan seed', -16711936, NULL, 99.0, 0, 0, ?)", (cat,))
@@ -1132,6 +1132,9 @@ elif mode == "planned_seed":
 elif mode == "planned_clear":
     db.execute("DELETE FROM planned_payment_rules WHERE title LIKE 'Planned row %'")
     db.execute("DELETE FROM categories WHERE name = 'Plan seed'")
+elif mode == "flat_clear":
+    db.execute("DELETE FROM transactions WHERE title LIKE '%flat'")
+    db.execute("DELETE FROM planned_payment_rules WHERE title LIKE '%flat'")
 elif mode == "pay_clear":
     db.execute("DELETE FROM transactions WHERE title LIKE 'payup%' OR title LIKE 'payover%'")
 else:
@@ -1162,9 +1165,10 @@ PY
   return $rc
 }
 
-# Regression for the crash "LayoutNode not found in RectList" (Compose 1.12) when an account's long transaction list scrolls:
-# M3 SegmentedListItem read baselines of the chips in its rows while measuring. Seeds a month of transactions into Cash, opens
-# Accounts -> Cash, flings the list down and up, and fails when the app dies. Removes the seeded transactions afterwards.
+# Regression for the crash "LayoutNode not found in RectList" (Compose 1.12) when an account's long transaction list scrolls
+# (it came from M3 SegmentedListItem reading the baselines of the chips in its rows while measuring; the rows are flat text
+# now). Seeds a month of transactions into Cash, opens Accounts -> Cash, flings the list down and up, and fails when the app
+# dies. Removes the seeded transactions afterwards.
 flow_account_scroll() {
   db_edit seed || return 1
   local rc=0
@@ -1198,9 +1202,8 @@ account_scroll_body() {
   return 0
 }
 
-# Regression for the same crash as flow_account_scroll ("LayoutNode not found in RectList") on the Planned payments list,
-# whose rows put category and account chips in a SegmentedListItem. Seeds 200 planned payments (Cash and Bank), opens
-# More -> Planned payments, flings the list down and up, and fails when the app dies. Removes the seeded rows afterwards.
+# Same scroll regression as flow_account_scroll on the Planned payments list. Seeds 200 planned payments (Cash and Bank),
+# opens More -> Planned payments, flings the list down and up, and fails when the app dies. Removes the seeded rows afterwards.
 flow_planned_scroll() {
   db_edit planned_seed || return 1
   local rc=0
@@ -1519,6 +1522,66 @@ pay_planned_body() {
   fi
   delete_planned_payment payoverrec || return 1
   delete_planned_payment payuprec || return 1
+  back
+  wait_for text exact "Quick access" || return 1
+  crashed && return 1
+  return 0
+}
+
+# The flat transaction rows (category and account as one line of text, Skip and Pay buttons on due rows) on the account screen
+# and the flat planned payment rows: two planned payments (Cash, Groceries) are made due, Accounts -> Cash
+# lists them as flat rows with Skip and Pay and no category chip, and so does More -> Planned payments. Screenshots go to
+# $OUT/flat-rows/. Deletes its planned payments again at the end.
+flow_flat_rows() {
+  db_edit flat_clear || return 1
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Planned payments" || return 1
+  wait_for desc exact "Add planned payment" || return 1
+  # the recurring one first: add_planned_payment waits for the Recurring payments section
+  add_planned_payment payupflat 2 || return 1
+  add_planned_payment payoverflat 1 one_time || return 1
+  adb shell am force-stop $PKG
+  db_edit pay_upcoming || return 1
+  mkdir -p "$OUT/flat-rows"
+  local rc=0
+  flat_rows_body || rc=$?
+  adb shell am force-stop $PKG
+  db_edit flat_clear || rc=1
+  return $rc
+}
+
+flat_rows_body() {
+  local mode
+  for mode in light; do
+    go_home || return 1
+    tap_tab Accounts || return 1
+    wait_for text exact "Counted in total" || return 1
+    tap_node text exact "Cash" || return 1
+    wait_for text exact "Upcoming" 20 || return 1
+    tap_xy $(( $(screen_width) - 100 )) "$(node_cy Upcoming)" || return 1
+    wait_for text exact "payupflat" || { log "upcoming planned payment missing on the account screen"; return 1; }
+    has text exact "Skip" && has text exact "Pay" || { log "Skip and Pay buttons missing on the due rows"; return 1; }
+    has text exact "Groceries · Cash" || { log "category and account text missing on the due row"; return 1; }
+    has text exact "Groceries" && { log "a bare category chip is still shown on the due row"; return 1; }
+    shot flat-rows/account-$mode
+    go_home || return 1
+    tap_node desc exact "More" || return 1
+    wait_for text exact "Quick access" || return 1
+    tap_node text exact "Planned payments" || return 1
+    wait_for text exact "payoverflat" 20 || { log "planned payment missing from the list"; return 1; }
+    has text exact "Groceries · Cash" || { log "category and account text missing in the planned payments list"; return 1; }
+    has text exact "Groceries" && { log "a bare category chip is still shown in the planned payments list"; return 1; }
+    shot flat-rows/planned-$mode
+  done
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Planned payments" || return 1
+  wait_for desc exact "Add planned payment" || return 1
+  delete_planned_payment payoverflat || return 1
+  delete_planned_payment payupflat || return 1
   back
   wait_for text exact "Quick access" || return 1
   crashed && return 1
@@ -2075,7 +2138,7 @@ run_flow() {
   fi
 }
 
-ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section flow_pay_planned flow_planned_scroll"
+ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section flow_pay_planned flow_planned_scroll flow_flat_rows"
 # Screens reachable by `shot`: home, accounts and categories are tabs, the others are rows of the More sheet.
 ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
 

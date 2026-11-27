@@ -2,13 +2,10 @@
 # Usage: scripts/check-hilt-keys.sh [variant]   (default: release, the variant the demo build uses)
 # Fails when a module of an @HiltViewModel has no generated Hilt classes for it in its build directory. An APK
 # built from such a tree starts, but the screen of that ViewModel crashes with "Cannot create an instance of
-# class ..." because Hilt cannot find the ViewModel. An incremental build can end up like that: KSP (Hilt's
-# processor) dropped the generated sources of the release variant of a module after a dependency it injects
-# changed (Features in 53db97734 did that to :feature:accounts and :feature:edit-transaction).
-# Run it after assembling and before installing a demo build. If it fails, run `./gradlew clean`, then
-# `./gradlew :app:assembleDemo` as a second command, and check again. Do not put `clean` and the build in one
-# Gradle command: with the configuration cache the tasks of different modules run in parallel, so a module's
-# `clean` can delete the sources its KSP task has just generated.
+# class ..." because Hilt cannot find the ViewModel. Two KSP tasks that ran in parallel did that (see
+# KspSerialLock); a task that ended that way is up to date afterwards, so it stays broken across `./gradlew clean`.
+# Run this after assembling and before installing a build. If it fails, run
+# `./gradlew :<module>:kspReleaseKotlin --rerun` for the module it names and assemble again.
 set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel)"

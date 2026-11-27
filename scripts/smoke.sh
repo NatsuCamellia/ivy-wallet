@@ -2334,6 +2334,7 @@ done
 if [ -z "${SKIP_INSTALL:-}" ]; then
   log "building debug build"
   ./gradlew --console=plain --max-workers="${GRADLE_WORKERS:-2}" :app:assembleDebug >"$OUT/install.log" 2>&1 || { log "assembleDebug failed, see $OUT/install.log"; exit 2; }
+  scripts/check-hilt-keys.sh debug >>"$OUT/install.log" 2>&1 || { log "the debug build lacks generated Hilt classes, see $OUT/install.log"; exit 2; }
 fi
 ensure_device || exit 2
 if [ -z "${SKIP_INSTALL:-}" ]; then

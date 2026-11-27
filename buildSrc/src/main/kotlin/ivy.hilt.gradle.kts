@@ -4,6 +4,15 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+val kspSerialLock = gradle.sharedServices.registerIfAbsent("kspSerialLock", KspSerialLock::class) {
+    maxParallelUsages.set(1)
+}
+tasks.configureEach {
+    if (name.startsWith("ksp") && name.endsWith("Kotlin")) {
+        usesService(kspSerialLock)
+    }
+}
+
 dependencies {
     implementation(libs.bundles.hilt)
     ksp(catalog.library("hilt-compiler"))

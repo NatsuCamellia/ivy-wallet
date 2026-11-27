@@ -1085,7 +1085,7 @@ flow_account_detail() {
 
 # db_edit seed|clear|pay_upcoming|pay_clear|planned_seed|planned_clear: edits the app database of the debuggable build through run-as while the app is stopped. `seed` adds
 # 30 "Scroll row" transactions per day of the current month to the account Cash (every third one a transfer to Bank, some
-# with a description), `clear` removes them again; `pay_upcoming` and `pay_clear` belong to flow_pay_planned, `planned_seed` and `planned_clear` to flow_planned_scroll, `flat_clear` to flow_flat_rows. Needs the app to have an offline account with Cash and Bank.
+# with a description), `clear` removes them again; `pay_upcoming` and `pay_clear` belong to flow_pay_planned, `planned_seed` and `planned_clear` to flow_planned_scroll, `flat_clear` to flow_flat_rows, `desc_seed` and `desc_clear` to flow_desc_tags. Needs the app to have an offline account with Cash and Bank.
 db_edit() {
   local mode=$1 tmp f now tz
   tmp=$(mktemp -d) || return 1
@@ -1135,6 +1135,19 @@ elif mode == "planned_clear":
 elif mode == "flat_clear":
     db.execute("DELETE FROM transactions WHERE title LIKE '%flat'")
     db.execute("DELETE FROM planned_payment_rules WHERE title LIKE '%flat'")
+elif mode == "desc_seed":
+    # one expense in Cash with a description and the tag smoketag, for flow_desc_tags
+    ids = dict(db.execute("SELECT name, id FROM accounts WHERE name IN ('Cash')").fetchall())
+    trn, tag = str(uuid.uuid4()), str(uuid.uuid4())
+    db.execute("INSERT INTO transactions (accountId, type, amount, title, description, dateTime, isSynced, isDeleted, id)"
+               " VALUES (?, 'EXPENSE', 7.0, 'smokedesc', 'Smoke description note', ?, 0, 0, ?)", (ids["Cash"], now * 1000, trn))
+    db.execute("INSERT INTO tags (id, name, description, color, icon, orderNum, dateTime, isDeleted, lastSyncedTime)"
+               " VALUES (?, 'smoketag', NULL, -16711936, NULL, 99.0, ?, 0, 0)", (tag, now * 1000))
+    db.execute("INSERT INTO tags_association (tagId, associatedId, lastSyncedTime, isDeleted) VALUES (?, ?, 0, 0)", (tag, trn))
+elif mode == "desc_clear":
+    db.execute("DELETE FROM tags_association WHERE tagId IN (SELECT id FROM tags WHERE name = 'smoketag')")
+    db.execute("DELETE FROM tags WHERE name = 'smoketag'")
+    db.execute("DELETE FROM transactions WHERE title = 'smokedesc'")
 elif mode == "pay_clear":
     db.execute("DELETE FROM transactions WHERE title LIKE 'payup%' OR title LIKE 'payover%'")
 else:
@@ -1584,6 +1597,52 @@ flat_rows_body() {
   delete_planned_payment payupflat || return 1
   back
   wait_for text exact "Quick access" || return 1
+  crashed && return 1
+  return 0
+}
+
+# Seeds an expense with a description and a tag into Cash (db_edit desc_seed): Home and the Cash account screen show the
+# description and "#smoketag" as plain text under the row's Cash line, and Search finds it. Removes the seed afterwards.
+# Screenshots go to $OUT/desc-tags/.
+flow_desc_tags() {
+  db_edit desc_clear || return 1
+  db_edit desc_seed || return 1
+  mkdir -p "$OUT/desc-tags"
+  local rc=0
+  desc_tags_body || rc=$?
+  adb shell am force-stop $PKG
+  db_edit desc_clear || rc=1
+  return $rc
+}
+
+desc_tags_body() {
+  go_home || return 1
+  wait_for text exact "smokedesc" 20 || { log "seeded row missing on Home"; return 1; }
+  has text exact "Smoke description note" || { log "description missing on the Home row"; return 1; }
+  has text exact "#smoketag" || { log "tags missing on the Home row"; return 1; }
+  shot desc-tags/home
+  tap_tab Accounts || return 1
+  wait_for text exact "Counted in total" || return 1
+  tap_node text exact "Cash" || return 1
+  wait_for text exact "smokedesc" 20 || { log "seeded row missing on the account screen"; return 1; }
+  has text exact "Smoke description note" || { log "description missing on the account screen row"; return 1; }
+  has text exact "#smoketag" || { log "tags missing on the account screen row"; return 1; }
+  shot desc-tags/account
+  back
+  wait_for text exact "Counted in total" || { log "back did not return to Accounts"; return 1; }
+  go_home || return 1
+  tap_node desc exact "Search transactions" || return 1
+  wait_for class exact android.widget.EditText || return 1
+  adb shell input text smokedesc
+  wait_for text exact "Smoke description note" 10 || { log "description missing on the Search row"; return 1; }
+  has text exact "#smoketag" || { log "tags missing on the Search row"; return 1; }
+  shot desc-tags/search
+  local i
+  for i in 1 2 3; do
+    back
+    dump || return 1
+    has class exact android.widget.EditText || break
+  done
   crashed && return 1
   return 0
 }
@@ -2220,7 +2279,7 @@ run_flow() {
   fi
 }
 
-ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section flow_pay_planned flow_planned_scroll flow_flat_rows flow_hide_balance"
+ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section flow_pay_planned flow_planned_scroll flow_flat_rows flow_desc_tags flow_hide_balance"
 # Screens reachable by `shot`: home, accounts and categories are tabs, the others are rows of the More sheet.
 ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
 

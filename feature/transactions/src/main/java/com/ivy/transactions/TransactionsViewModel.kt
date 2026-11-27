@@ -687,7 +687,7 @@ class TransactionsViewModel @Inject constructor(
         hideBalance.value = false
 
         // Showing the balance for 5s, like Home
-        delay(5000)
+        delay(RevealMillis)
 
         hideBalance.value = true
     }
@@ -696,7 +696,7 @@ class TransactionsViewModel @Inject constructor(
         incomeRevealed.value = true
 
         // Showing the income for 5s, like Home
-        delay(5000)
+        delay(RevealMillis)
 
         incomeRevealed.value = false
     }
@@ -922,3 +922,6 @@ class TransactionsViewModel @Inject constructor(
         }
     }
 }
+
+/** How long a tapped hidden amount stays revealed, like Home. */
+private const val RevealMillis = 5000L

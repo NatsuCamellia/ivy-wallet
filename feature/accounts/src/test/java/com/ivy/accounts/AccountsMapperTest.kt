@@ -181,7 +181,8 @@ class AccountsMapperTest {
         row.cashflowText shouldBe amountLabel(200.0, "USD", showPlusSign = true)
         result.summary.totalBalanceText shouldBe amountLabel(900.0, BASE)
         result.summary.totalBalanceWithExcludedText shouldBe amountLabel(1400.0, BASE)
-        result.summary.monthlyIncomeText shouldBe amountLabel(270.0, BASE, showPlusSign = true, shortenBigNumbers = true)
+        result.summary.monthlyIncomeText shouldBe
+            amountLabel(270.0, BASE, showPlusSign = true, shortenBigNumbers = true)
         result.summary.monthlyExpenseText shouldBe amountLabel(-90.0, BASE, shortenBigNumbers = true)
     }
 

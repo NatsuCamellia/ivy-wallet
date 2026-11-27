@@ -249,11 +249,11 @@ private fun TransactionsUi(
     onPayOrGet: (Transaction) -> Unit = {},
     onSkipTransaction: (Transaction) -> Unit = {},
     onSkipAllTransactions: (List<Transaction>) -> Unit = {},
-    onChoosePeriodModal: (ChoosePeriodModalData?) -> Unit,
     hideBalance: Boolean = false,
     hideIncome: Boolean = false,
     onHiddenBalanceClick: () -> Unit = {},
     onHiddenIncomeClick: () -> Unit = {},
+    onChoosePeriodModal: (ChoosePeriodModalData?) -> Unit,
 ) {
     val ivyContext = ivyWalletCtx()
     val nav = navigation()
@@ -328,15 +328,17 @@ private fun TransactionsUi(
                             hidden = balanceHidden,
                             onClick = if (balanceHidden) {
                                 onHiddenBalanceClick
-                            } else account?.let {
-                                {
-                                    accountModalData = AccountModalData(
-                                        account = it,
-                                        baseCurrency = currency,
-                                        balance = balance,
-                                        adjustBalanceMode = true,
-                                        autoFocusKeyboard = false
-                                    )
+                            } else {
+                                account?.let {
+                                    {
+                                        accountModalData = AccountModalData(
+                                            account = it,
+                                            baseCurrency = currency,
+                                            balance = balance,
+                                            adjustBalanceMode = true,
+                                            autoFocusKeyboard = false
+                                        )
+                                    }
                                 }
                             },
                         )

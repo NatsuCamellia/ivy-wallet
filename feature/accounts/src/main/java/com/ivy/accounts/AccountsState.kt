@@ -13,5 +13,5 @@ data class AccountsState(
     val reorderVisible: Boolean,
     val hideTotalBalance: Boolean,
     /** Settings: Hide balance; the amounts of the banner and rows read as a placeholder. */
-    val hideBalance: Boolean = false,
+    val hideBalance: Boolean,
 )

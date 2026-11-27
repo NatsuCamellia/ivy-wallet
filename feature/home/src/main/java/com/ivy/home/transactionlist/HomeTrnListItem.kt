@@ -1,8 +1,7 @@
 package com.ivy.home.transactionlist
 
 import androidx.compose.runtime.Immutable
-import com.ivy.base.legacy.Transaction
-import com.ivy.ui.component.transaction.TransactionItemUi
+import com.ivy.legacy.ui.component.transaction.TransactionRowItem
 
 @Immutable
 sealed interface HomeTrnListItem {
@@ -14,9 +13,5 @@ sealed interface HomeTrnListItem {
     ) : HomeTrnListItem
 
     @Immutable
-    data class Trn(
-        val ui: TransactionItemUi,
-        val iconAsset: String?,
-        val trn: Transaction,
-    ) : HomeTrnListItem
+    data class Trn(val item: TransactionRowItem) : HomeTrnListItem
 }

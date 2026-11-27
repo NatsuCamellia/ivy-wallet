@@ -50,6 +50,19 @@ Keep the emulator and skip rebuilds when taking several screenshots:
 `KEEP_EMULATOR=1 scripts/smoke.sh shot home`, then `KEEP_EMULATOR=1 SKIP_INSTALL=1 scripts/smoke.sh shot accounts`.
 Kill the emulator yourself afterwards with `adb emu kill`.
 
+## Check a demo build before installing it
+
+```sh
+./gradlew --max-workers=2 :app:assembleDemo
+scripts/check-hilt-keys.sh      # every @HiltViewModel must have its generated Hilt classes
+```
+
+KSP sometimes writes no sources for a module, with no error. The build succeeds, but the screen of that module's
+ViewModel crashes in the minified build with "Cannot create an instance of class ..." (the Accounts tab did, after
+53db97734). The smoke suite runs the debug build, so it cannot see this. When the check fails, run
+`./gradlew --max-workers=2 :<module>:kspReleaseKotlin --rerun` for the module it names and assemble again. After
+`./gradlew clean`, run the build as a second command.
+
 ## Paparazzi goldens
 
 ```sh

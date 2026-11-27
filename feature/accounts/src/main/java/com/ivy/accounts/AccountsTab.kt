@@ -42,7 +42,6 @@ import com.ivy.legacy.data.model.AccountData
 import com.ivy.legacy.ivyWalletCtx
 import com.ivy.legacy.ui.WalletPreview
 import com.ivy.legacy.ui.component.IconBadge
-import com.ivy.legacy.ui.component.amountLabel
 import com.ivy.legacy.ui.component.transaction.EmptyState
 import com.ivy.legacy.ui.sheet.ReorderModalSingleType
 import com.ivy.navigation.Navigation
@@ -64,7 +63,6 @@ import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.ui.withFabClearance
 import kotlinx.collections.immutable.persistentListOf
 import java.util.UUID
-import kotlin.math.absoluteValue
 
 @Composable
 fun AccountsTab() {
@@ -118,6 +116,7 @@ private fun AccountsUi(
             state = state,
             listState = listState,
             contentPadding = innerPadding.withFabClearance(),
+            onHiddenBalanceClick = { onEvent(AccountsEvent.HiddenBalanceClick) },
         )
     }
 
@@ -146,6 +145,7 @@ private fun AccountsList(
     state: AccountsState,
     listState: LazyListState,
     contentPadding: PaddingValues,
+    onHiddenBalanceClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val nav = navigation()
@@ -171,7 +171,8 @@ private fun AccountsList(
             item {
                 AccountsBanner(
                     summary = content.summary,
-                    currency = state.baseCurrency,
+                    hideBalance = state.hideBalance,
+                    onHiddenBalanceClick = onHiddenBalanceClick,
                     modifier = Modifier.screenMargin().padding(bottom = 8.dp),
                 )
             }
@@ -179,13 +180,11 @@ private fun AccountsList(
         accountsSection(
             title = R.string.accounts_counted_in_total,
             rows = content.counted,
-            baseCurrency = state.baseCurrency,
             onClick = onAccountClick,
         )
         accountsSection(
             title = R.string.accounts_not_counted_in_total,
             rows = content.notCounted,
-            baseCurrency = state.baseCurrency,
             onClick = onAccountClick,
         )
     }
@@ -195,7 +194,6 @@ private fun AccountsList(
 private fun LazyListScope.accountsSection(
     @StringRes title: Int,
     rows: List<AccountRow>,
-    baseCurrency: String,
     onClick: (AccountRow) -> Unit,
 ) {
     if (rows.isEmpty()) return
@@ -203,35 +201,42 @@ private fun LazyListScope.accountsSection(
         StickyListHeader(title = stringResource(title), subtotal = rows.size.toString())
     }
     items(rows, key = { it.account.id.value }, contentType = { "account_row" }) { row ->
-        AccountItem(row = row, baseCurrency = baseCurrency, onClick = { onClick(row) })
+        AccountItem(row = row, onClick = { onClick(row) })
     }
 }
 
-/** The Balance banner: Total balance, the total with Excluded accounts and this month's Income and Expense. */
+/**
+ * The Balance banner: Total balance, the total with Excluded accounts and this month's Income and Expense.
+ * While [hideBalance] the amounts read as a placeholder and a tap on the banner reveals them.
+ */
 @Composable
-private fun AccountsBanner(summary: AccountsSummary, currency: String, modifier: Modifier = Modifier) {
+private fun AccountsBanner(
+    summary: AccountsSummary,
+    hideBalance: Boolean,
+    onHiddenBalanceClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     BalanceBanner(
         label = stringResource(R.string.total_balance),
-        value = amountLabel(summary.totalBalance, currency),
+        value = summary.totalBalanceText,
         columns = persistentListOf(
             BalanceBannerColumn(
                 label = stringResource(R.string.month_income),
-                value = amountLabel(summary.monthlyIncome, currency, showPlusSign = true, shortenBigNumbers = true),
+                value = summary.monthlyIncomeText,
                 onClick = null,
                 testTag = "accounts_income",
             ),
             BalanceBannerColumn(
                 label = stringResource(R.string.month_expenses),
-                value = amountLabel(0.0 - summary.monthlyExpense.absoluteValue, currency, shortenBigNumbers = true),
+                value = summary.monthlyExpenseText,
                 onClick = null,
                 testTag = "accounts_expense",
             ),
         ),
         modifier = modifier,
-        supportingText = stringResource(
-            R.string.total_including_excluded,
-            amountLabel(summary.totalBalanceWithExcluded, currency),
-        ),
+        supportingText = stringResource(R.string.total_including_excluded, summary.totalBalanceWithExcludedText),
+        onClick = if (hideBalance) onHiddenBalanceClick else null,
+        onClickLabel = if (hideBalance) stringResource(R.string.show_balance) else null,
         valueTestTag = "accounts_balance",
     )
 }
@@ -239,25 +244,17 @@ private fun AccountsBanner(summary: AccountsSummary, currency: String, modifier:
 @Composable
 private fun AccountItem(
     row: AccountRow,
-    baseCurrency: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val account = row.account
-    val currency = account.asset.code
     FlatListItem(
         title = account.name.value,
         onClick = onClick,
         modifier = modifier.testTag("account_item"),
-        supportingText = row.baseCurrencyEquivalent
-            ?.let { amountLabel(it, baseCurrency) }
-            ?: currency,
-        primaryText = amountLabel(row.balance, currency),
-        secondaryText = if (row.hasActivityThisMonth) {
-            amountLabel(row.monthlyCashflow, currency, showPlusSign = true)
-        } else {
-            stringResource(R.string.account_no_activity_this_month)
-        },
+        supportingText = row.supportingText,
+        primaryText = row.balanceText,
+        secondaryText = row.cashflowText ?: stringResource(R.string.account_no_activity_this_month),
         secondaryColor = if (row.hasActivityThisMonth) {
             cashflowKind(row.monthlyCashflow).amountColor()
         } else {
@@ -285,16 +282,19 @@ private fun PreviewAccountsTab(
     theme: Theme = Theme.LIGHT,
     empty: Boolean = false,
     hugeAmountOnly: Boolean = false,
+    hideBalance: Boolean = false,
 ) {
     WalletPreview(theme) {
         NavigationRoot(navigation = Navigation()) {
-            AccountsUi(state = previewState(empty = empty, hugeAmountOnly = hugeAmountOnly))
+            AccountsUi(
+                state = previewState(empty = empty, hugeAmountOnly = hugeAmountOnly, hideBalance = hideBalance),
+            )
         }
     }
 }
 
 @Suppress("MagicNumber", "LongMethod")
-private fun previewState(empty: Boolean, hugeAmountOnly: Boolean): AccountsState {
+private fun previewState(empty: Boolean, hugeAmountOnly: Boolean, hideBalance: Boolean): AccountsState {
     fun account(name: String, color: Color, currency: String = "BGN", icon: String? = null, included: Boolean = true) =
         Account(
             id = AccountId(UUID.randomUUID()),
@@ -344,9 +344,11 @@ private fun previewState(empty: Boolean, hugeAmountOnly: Boolean): AccountsState
             baseCurrency = "BGN",
             totalBalance = if (empty) 0.0 else 123457000000.0,
             totalBalanceWithExcluded = if (empty) 0.0 else 123470000000.0,
+            hideAmounts = hideBalance,
         ),
         reorderVisible = false,
-        hideTotalBalance = hugeAmountOnly
+        hideTotalBalance = hugeAmountOnly,
+        hideBalance = hideBalance,
     )
 }
 
@@ -366,6 +368,12 @@ fun AccountsTabEmptyUITest(dark: Boolean) {
 @Composable
 fun AccountsTabHugeAmountUITest(dark: Boolean) {
     PreviewAccountsTab(theme = dark.theme(), hugeAmountOnly = true)
+}
+
+/** For screen shot testing **/
+@Composable
+fun AccountsTabHiddenUITest(dark: Boolean) {
+    PreviewAccountsTab(theme = dark.theme(), hideBalance = true)
 }
 
 private fun Boolean.theme(): Theme = if (this) Theme.DARK else Theme.LIGHT

@@ -6,6 +6,8 @@ import com.ivy.data.model.primitive.AssetCode
 import com.ivy.data.model.primitive.ColorInt
 import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.legacy.data.model.AccountData
+import com.ivy.legacy.ui.component.amountLabel
+import com.ivy.ui.component.HiddenBalance
 import io.kotest.matchers.shouldBe
 import org.junit.Test
 import java.util.UUID
@@ -156,16 +158,91 @@ class AccountsMapperTest {
         result.summary.monthlyExpense shouldBe 0.0
     }
 
+    @Test
+    fun `revealed amounts show the real banner and row figures`() {
+        val result = map(
+            accountData(
+                "Travel",
+                currency = "USD",
+                balance = 1200.0,
+                balanceBaseCurrency = 1100.5,
+                income = 300.0,
+                expenses = 100.0,
+                incomeBaseCurrency = 270.0,
+                expensesBaseCurrency = 90.0,
+            ),
+            totalBalance = 900.0,
+            totalBalanceWithExcluded = 1400.0,
+        )
+
+        val row = result.counted.single()
+        row.balanceText shouldBe amountLabel(1200.0, "USD")
+        row.supportingText shouldBe amountLabel(1100.5, BASE)
+        row.cashflowText shouldBe amountLabel(200.0, "USD", showPlusSign = true)
+        result.summary.totalBalanceText shouldBe amountLabel(900.0, BASE)
+        result.summary.totalBalanceWithExcludedText shouldBe amountLabel(1400.0, BASE)
+        result.summary.monthlyIncomeText shouldBe amountLabel(270.0, BASE, showPlusSign = true, shortenBigNumbers = true)
+        result.summary.monthlyExpenseText shouldBe amountLabel(-90.0, BASE, shortenBigNumbers = true)
+    }
+
+    @Test
+    fun `hidden amounts replace every banner figure with the placeholder`() {
+        val summary = map(
+            accountData("Cash", balance = 50.0, income = 100.0, expenses = 40.0),
+            totalBalance = 900.0,
+            totalBalanceWithExcluded = 1400.0,
+            hideAmounts = true,
+        ).summary
+
+        summary.totalBalanceText shouldBe HiddenBalance
+        summary.totalBalanceWithExcludedText shouldBe HiddenBalance
+        summary.monthlyIncomeText shouldBe HiddenBalance
+        summary.monthlyExpenseText shouldBe HiddenBalance
+    }
+
+    @Test
+    fun `hidden amounts replace every row figure with the placeholder`() {
+        val result = map(
+            accountData("Cash", balance = 500.0, income = 100.0, expenses = 40.0),
+            accountData("Travel", currency = "USD", balance = 1200.0, balanceBaseCurrency = 1100.5, income = 5.0),
+            accountData("Old bank", included = false, balance = 9.0, expenses = 3.0),
+            hideAmounts = true,
+        )
+
+        (result.counted + result.notCounted).forEach { row ->
+            row.balanceText shouldBe HiddenBalance
+            row.cashflowText shouldBe HiddenBalance
+        }
+        result.counted[0].supportingText shouldBe "EUR"
+        result.counted[1].supportingText shouldBe HiddenBalance
+    }
+
+    @Test
+    fun `hiding amounts keeps the raw values and what is not an amount`() {
+        val row = map(
+            accountData("Cash", balance = 500.0),
+            accountData("Card", balance = 20.0, income = 10.0),
+            hideAmounts = true,
+        ).counted
+
+        row[0].balance shouldBe 500.0
+        row[0].cashflowText shouldBe null
+        row[0].supportingText shouldBe BASE
+        row[1].monthlyCashflow shouldBe 10.0
+    }
+
     private fun map(
         vararg accounts: AccountData,
         baseCurrency: String = BASE,
         totalBalance: Double = 0.0,
         totalBalanceWithExcluded: Double = 0.0,
+        hideAmounts: Boolean = false,
     ) = mapAccounts(
         accounts = accounts.toList(),
         baseCurrency = baseCurrency,
         totalBalance = totalBalance,
         totalBalanceWithExcluded = totalBalanceWithExcluded,
+        hideAmounts = hideAmounts,
     )
 
     private fun accountData(

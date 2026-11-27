@@ -1083,9 +1083,9 @@ flow_account_detail() {
   return 0
 }
 
-# db_edit seed|clear|pay_upcoming|pay_clear: edits the app database of the debuggable build through run-as while the app is stopped. `seed` adds
+# db_edit seed|clear|pay_upcoming|pay_clear|planned_seed|planned_clear: edits the app database of the debuggable build through run-as while the app is stopped. `seed` adds
 # 30 "Scroll row" transactions per day of the current month to the account Cash (every third one a transfer to Bank, some
-# with a description), `clear` removes them again; `pay_upcoming` and `pay_clear` belong to flow_pay_planned. Needs the app to have an offline account with Cash and Bank.
+# with a description), `clear` removes them again; `pay_upcoming` and `pay_clear` belong to flow_pay_planned, `planned_seed` and `planned_clear` to flow_planned_scroll. Needs the app to have an offline account with Cash and Bank.
 db_edit() {
   local mode=$1 tmp f now tz
   tmp=$(mktemp -d) || return 1
@@ -1112,6 +1112,26 @@ elif mode == "pay_upcoming":
                ((now - 2 * 86400) * 1000, now * 1000))
     db.execute("UPDATE transactions SET dueDate = ? WHERE title LIKE 'payup%' AND dueDate IS NOT NULL AND dueDate <= ?",
                ((now + 3600) * 1000, now * 1000))
+elif mode == "planned_seed":
+    # 100 recurring and 100 one-time planned payments with a category and an account chip, for flow_planned_scroll
+    ids = dict(db.execute("SELECT name, id FROM accounts WHERE name IN ('Cash', 'Bank')").fetchall())
+    cat = str(uuid.uuid4())
+    db.execute("INSERT INTO categories (name, color, icon, orderNum, isSynced, isDeleted, id) VALUES ('Plan seed', -16711936, NULL, 99.0, 0, 0, ?)", (cat,))
+    start = (now + 3 * 86400) * 1000
+    rows = []
+    for i in range(200):
+        one_time = i % 2
+        rows.append((
+            start + i * 3600000, None if one_time else 1, None if one_time else "MONTH", one_time, "EXPENSE" if i % 3 else "INCOME",
+            ids["Cash"] if i % 4 else ids["Bank"], float(i + 1), cat, "Planned row %d" % i,
+            "A longer description" if i % 5 == 0 else None, 0, 0, str(uuid.uuid4()),
+        ))
+    db.executemany(
+        "INSERT INTO planned_payment_rules (startDate, intervalN, intervalType, oneTime, type, accountId, amount, categoryId, title,"
+        " description, isSynced, isDeleted, id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", rows)
+elif mode == "planned_clear":
+    db.execute("DELETE FROM planned_payment_rules WHERE title LIKE 'Planned row %'")
+    db.execute("DELETE FROM categories WHERE name = 'Plan seed'")
 elif mode == "pay_clear":
     db.execute("DELETE FROM transactions WHERE title LIKE 'payup%' OR title LIKE 'payover%'")
 else:
@@ -1175,6 +1195,41 @@ account_scroll_body() {
   has desc exact "Delete" && has text sub "Scroll row" || { log "account screen not on screen after scrolling"; return 1; }
   back
   wait_for text exact "Counted in total" || { log "back did not return to Accounts"; return 1; }
+  return 0
+}
+
+# Regression for the same crash as flow_account_scroll ("LayoutNode not found in RectList") on the Planned payments list,
+# whose rows put category and account chips in a SegmentedListItem. Seeds 200 planned payments (Cash and Bank), opens
+# More -> Planned payments, flings the list down and up, and fails when the app dies. Removes the seeded rows afterwards.
+flow_planned_scroll() {
+  db_edit planned_seed || return 1
+  local rc=0
+  planned_scroll_body || rc=$?
+  adb shell am force-stop $PKG
+  db_edit planned_clear || rc=1
+  return $rc
+}
+
+planned_scroll_body() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Planned payments" || return 1
+  wait_for text sub "Planned row" 20 || { log "seeded planned payments missing from the list"; return 1; }
+  local w h i
+  w=$(screen_width); h=$(screen_height)
+  for i in $(seq 1 40); do
+    if [ $((i % 4)) = 0 ]; then
+      adb shell input swipe $((w / 2)) $((h * 25 / 100)) $((w / 2)) $((h * 80 / 100)) 90 </dev/null
+    else
+      adb shell input swipe $((w / 2)) $((h * 80 / 100)) $((w / 2)) $((h * 25 / 100)) 90 </dev/null
+    fi
+    sleep 0.6
+    crashed && { log "crash while scrolling the planned payments (swipe $i)"; return 1; }
+  done
+  shot planned-scroll
+  dump || return 1
+  has text sub "Planned row" || { log "planned payments not on screen after scrolling"; return 1; }
   return 0
 }
 
@@ -2020,7 +2075,7 @@ run_flow() {
   fi
 }
 
-ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section flow_pay_planned"
+ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section flow_pay_planned flow_planned_scroll"
 # Screens reachable by `shot`: home, accounts and categories are tabs, the others are rows of the More sheet.
 ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
 

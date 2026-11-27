@@ -156,8 +156,7 @@ private fun SearchUi(
                 history = uiState.transactions,
                 onPayOrGet = { },
                 emptyStateTitle = emptyStateTitle,
-                emptyStateText = emptyStateText,
-                shouldShowAccountSpecificColorInTransactions = uiState.shouldShowAccountSpecificColorInTransactions
+                emptyStateText = emptyStateText
             )
         }
     }
@@ -211,8 +210,7 @@ private fun SearchPreview(
                     transactions = transactions,
                     baseCurrency = "BGN",
                     accounts = persistentListOf(previewAccount),
-                    categories = persistentListOf(previewCategory),
-                    shouldShowAccountSpecificColorInTransactions = false
+                    categories = persistentListOf(previewCategory)
                 ),
                 onEvent = {}
             )

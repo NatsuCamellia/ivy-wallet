@@ -122,7 +122,6 @@ fun TransactionsScreen(screen: TransactionsScreen) {
         treatTransfersAsIncomeExpense = uiState.treatTransfersAsIncomeExpense,
 
         history = uiState.history,
-        shouldShowAccountSpecificColorInTransactions = uiState.showAccountColorsInTransactions,
 
         upcoming = uiState.upcoming,
         upcomingExpanded = uiState.upcomingExpanded,
@@ -217,7 +216,6 @@ private fun TransactionsUi(
     choosePeriodModal: ChoosePeriodModalData?,
 
     history: ImmutableList<TransactionHistoryItem>,
-    shouldShowAccountSpecificColorInTransactions: Boolean,
 
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
@@ -413,8 +411,7 @@ private fun TransactionsUi(
                         timeConverter = timeConverter,
                         timeFormatter = timeFormatter,
                     )
-                ),
-                shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions
+                )
             )
         }
     }
@@ -830,8 +827,7 @@ private fun TransactionsPreview(theme: Theme, data: PreviewData) {
                 skipAllModalVisible = false,
                 onSkipAllModalVisible = {},
                 onChoosePeriodModal = {},
-                choosePeriodModal = null,
-                shouldShowAccountSpecificColorInTransactions = false
+                choosePeriodModal = null
             )
         }
     }

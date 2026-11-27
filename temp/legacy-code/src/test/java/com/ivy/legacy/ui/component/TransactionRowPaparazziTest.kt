@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.dp
 import app.cash.paparazzi.DeviceConfig
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
-import com.ivy.base.legacy.LegacyTag
 import com.ivy.base.legacy.Theme
 import com.ivy.base.legacy.Transaction
 import com.ivy.base.model.TransactionType
@@ -25,8 +24,9 @@ import com.ivy.data.model.primitive.NotBlankTrimmedString
 import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.ui.WalletPreview
-import com.ivy.navigation.Navigation
-import com.ivy.navigation.NavigationRoot
+import com.ivy.legacy.ui.component.transaction.TransactionDue
+import com.ivy.legacy.ui.component.transaction.TransactionItemRow
+import com.ivy.legacy.ui.component.transaction.rememberTransactionItemMapper
 import com.ivy.ui.R
 import com.ivy.ui.testing.PaparazziScreenshotTest
 import com.ivy.ui.testing.PaparazziTheme
@@ -58,11 +58,11 @@ class TransactionRowPaparazziTest(
     }
 
     @Test
-    fun snapshotRowChipsWrap() {
+    fun snapshotRowLongNames() {
         snapshot(theme) {
             Rows(
                 theme,
-                expense(categoryId = LongCategory.id.value, tags = true),
+                expense(categoryId = LongCategory.id.value),
                 income(title = "Salary March"),
                 baseData = LongBaseData,
             )
@@ -108,25 +108,13 @@ class TransactionRowPaparazziTest(
     }
 
     @Test
-    fun snapshotRowAccountColors() {
-        snapshot(theme) {
-            Rows(
-                theme,
-                expense(),
-                transfer(toAmount = 920.0, toCurrency = "EUR"),
-                showAccountColors = true,
-            )
-        }
-    }
-
-    @Test
     fun snapshotRowFallbacks() {
         snapshot(theme) {
             Rows(
                 theme,
-                expense(title = null, description = "Only a description, long enough to need a second line"),
-                expense(title = null, description = null),
-                expense(title = "No category", categoryId = null, tags = true),
+                expense(title = null),
+                expense(title = null, categoryId = null),
+                expense(title = "No category", categoryId = null),
                 expense(title = "Free sample", amount = 0.0),
             )
         }
@@ -186,24 +174,23 @@ private fun IconFamilies(theme: PaparazziTheme) {
 private fun Rows(
     theme: PaparazziTheme,
     vararg transactions: Transaction,
-    showAccountColors: Boolean = false,
     baseData: AppBaseData = BaseData,
 ) {
     WalletPreview(theme.toTheme()) {
-        NavigationRoot(navigation = Navigation()) {
-            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                transactions.forEachIndexed { index, transaction ->
-                    TransactionRow(
-                        baseData = baseData,
-                        transaction = transaction,
-                        shouldShowAccountSpecificColorInTransactions = showAccountColors,
-                        onPayOrGet = {},
-                        onClick = {},
-                        modifier = Modifier.padding(top = 8.dp),
-                        index = index,
-                        count = transactions.size,
-                    )
+        val mapper = rememberTransactionItemMapper(baseData)
+        Column {
+            transactions.forEach { transaction ->
+                val due = when {
+                    transaction.dueDate == null -> null
+                    transaction.dueDate!!.isAfter(NOW) -> TransactionDue.Upcoming
+                    else -> TransactionDue.Overdue
                 }
+                TransactionItemRow(
+                    item = mapper.map(transaction, due),
+                    onClick = {},
+                    onSkip = due?.let { {} },
+                    onPayOrGet = due?.let { {} },
+                )
             }
         }
     }
@@ -292,13 +279,11 @@ private fun transaction(
     type: TransactionType,
     title: String?,
     amount: Double,
-    description: String? = null,
     categoryId: UUID? = null,
     dueDate: Instant? = null,
     dateTime: Instant? = NOW,
     toAccountId: UUID? = null,
     toAmount: Double = amount,
-    tags: Boolean = false,
 ): Transaction = Transaction(
     accountId = Cash.id,
     type = type,
@@ -306,38 +291,25 @@ private fun transaction(
     toAccountId = toAccountId,
     toAmount = toAmount.toBigDecimal(),
     title = title,
-    description = description,
     dateTime = dateTime,
     dueDate = dueDate,
     categoryId = categoryId,
-    tags = if (tags) {
-        persistentListOf(
-            LegacyTag(UUID(0, 1), "holiday"),
-            LegacyTag(UUID(0, 2), "family"),
-        )
-    } else {
-        persistentListOf()
-    },
     id = UUID(0, nextId++),
 )
 
 private fun expense(
     title: String? = "Lidl",
     amount: Double = 250.75,
-    description: String? = null,
     categoryId: UUID? = Food.id.value,
     dueDate: Instant? = null,
     dateTime: Instant? = NOW,
-    tags: Boolean = false,
 ): Transaction = transaction(
     type = TransactionType.EXPENSE,
     title = title,
     amount = amount,
-    description = description,
     categoryId = categoryId,
     dueDate = dueDate,
     dateTime = dateTime,
-    tags = tags,
 )
 
 private fun income(

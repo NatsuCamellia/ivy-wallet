@@ -7,15 +7,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -28,13 +27,11 @@ import com.ivy.base.legacy.TransactionHistoryItem
 import com.ivy.base.legacy.stringRes
 import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.data.LegacyDueSection
-import com.ivy.legacy.ui.component.TransactionRow
 import com.ivy.navigation.EditTransactionScreen
 import com.ivy.navigation.Navigation
 import com.ivy.navigation.navigation
 import com.ivy.ui.R
 import com.ivy.wallet.domain.data.TransactionHistoryDateDivider
-import java.util.UUID
 
 @Deprecated("Legacy code. Don't use it, please.")
 fun LazyListScope.transactions(
@@ -48,7 +45,6 @@ fun LazyListScope.transactions(
     emptyStateText: String,
 
     dateDividerMarginTop: Dp? = null,
-    shouldShowAccountSpecificColorInTransactions: Boolean,
     onPayOrGet: (Transaction) -> Unit,
     setUpcomingExpanded: (Boolean) -> Unit,
     setOverdueExpanded: (Boolean) -> Unit,
@@ -58,7 +54,6 @@ fun LazyListScope.transactions(
     upcomingSection(
         baseData = baseData,
         upcoming = upcoming,
-        shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions,
         onPayOrGet = onPayOrGet,
         onSkipTransaction = onSkipTransaction,
         setExpanded = setUpcomingExpanded
@@ -71,7 +66,6 @@ fun LazyListScope.transactions(
         onPayOrGet = onPayOrGet,
         onSkipTransaction = onSkipTransaction,
         onSkipAllTransactions = onSkipAllTransactions,
-        shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions,
         setExpanded = setOverdueExpanded
     )
 
@@ -79,9 +73,7 @@ fun LazyListScope.transactions(
         baseData = baseData,
 
         history = history,
-        shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions,
         dateDividerMarginTop = dateDividerMarginTop,
-        onPayOrGet = onPayOrGet
     )
 
     if (
@@ -102,7 +94,6 @@ private fun LazyListScope.upcomingSection(
     baseData: AppBaseData,
 
     upcoming: LegacyDueSection?,
-    shouldShowAccountSpecificColorInTransactions: Boolean,
     onPayOrGet: (Transaction) -> Unit,
     onSkipTransaction: (Transaction) -> Unit,
     setExpanded: (Boolean) -> Unit
@@ -129,7 +120,7 @@ private fun LazyListScope.upcomingSection(
                 baseData = baseData,
 
                 transactions = upcoming.trns,
-                shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions,
+                due = TransactionDue.Upcoming,
                 onPayOrGet = onPayOrGet,
                 onSkipTransaction = onSkipTransaction
             )
@@ -141,7 +132,6 @@ private fun LazyListScope.overdueSection(
     baseData: AppBaseData,
 
     overdue: LegacyDueSection?,
-    shouldShowAccountSpecificColorInTransactions: Boolean,
     onPayOrGet: (Transaction) -> Unit,
     onSkipTransaction: (Transaction) -> Unit,
     onSkipAllTransactions: (List<Transaction>) -> Unit,
@@ -176,7 +166,7 @@ private fun LazyListScope.overdueSection(
                 baseData = baseData,
 
                 transactions = overdue.trns,
-                shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions,
+                due = TransactionDue.Overdue,
                 onPayOrGet = onPayOrGet,
                 onSkipTransaction = onSkipTransaction
             )
@@ -188,43 +178,29 @@ private fun LazyListScope.trnItems(
     baseData: AppBaseData,
 
     transactions: List<Transaction>,
-    shouldShowAccountSpecificColorInTransactions: Boolean,
+    due: TransactionDue,
     onPayOrGet: (Transaction) -> Unit,
     onSkipTransaction: (Transaction) -> Unit,
 ) {
-    itemsIndexed(
-        items = transactions,
-        key = { _, trn -> trn.id }
-    ) { index, trn ->
-        val nav = navigation()
-        TransactionRow(
+    // Prefixed so a row never shares its key with the same transaction in the history
+    items(items = transactions, key = { "due_${it.id}" }) { trn ->
+        TransactionListRow(
             baseData = baseData,
             transaction = trn,
-            shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions,
+            due = due,
             onPayOrGet = onPayOrGet,
-            onClick = { onTransactionClick(nav = nav, transaction = it) },
-            modifier = Modifier.rowPadding(),
-            index = index,
-            count = transactions.size,
             onSkipTransaction = onSkipTransaction,
         )
     }
 }
 
-private fun Modifier.rowPadding(): Modifier =
-    padding(horizontal = 16.dp).padding(top = ListItemDefaults.SegmentedGap)
-
 private fun LazyListScope.historySection(
     baseData: AppBaseData,
 
     history: List<TransactionHistoryItem>,
-    shouldShowAccountSpecificColorInTransactions: Boolean,
     dateDividerMarginTop: Dp? = null,
-
-    onPayOrGet: (Transaction) -> Unit
 ) {
     if (history.isNotEmpty()) {
-        val groups = history.transactionGroups()
         items(
             items = history,
             key = {
@@ -236,21 +212,7 @@ private fun LazyListScope.historySection(
             }
         ) {
             when (it) {
-                is Transaction -> {
-                    val nav = navigation()
-                    val (index, count) = groups.getValue(it.id)
-
-                    TransactionRow(
-                        baseData = baseData,
-                        transaction = it,
-                        shouldShowAccountSpecificColorInTransactions = shouldShowAccountSpecificColorInTransactions,
-                        onPayOrGet = onPayOrGet,
-                        onClick = { trn -> onTransactionClick(nav = nav, transaction = trn) },
-                        modifier = Modifier.rowPadding(),
-                        index = index,
-                        count = count,
-                    )
-                }
+                is Transaction -> TransactionListRow(baseData = baseData, transaction = it)
 
                 is TransactionHistoryDateDivider -> {
                     HistoryDateDivider(
@@ -266,17 +228,33 @@ private fun LazyListScope.historySection(
     }
 }
 
-/** Each transaction's position and the size of the run of transactions (between date dividers) it belongs to. */
-internal fun List<TransactionHistoryItem>.transactionGroups(): Map<UUID, Pair<Int, Int>> {
-    val groups = HashMap<UUID, Pair<Int, Int>>()
-    var start = 0
-    while (start < size) {
-        var end = start
-        while (end < size && this[end] is Transaction) end++
-        for (i in start until end) groups[(this[i] as Transaction).id] = (i - start) to (end - start)
-        start = end + 1
-    }
-    return groups
+/** One transaction as a flat row; a [due] planned payment also gets its Skip and Pay (or Get) buttons. */
+@Composable
+private fun TransactionListRow(
+    baseData: AppBaseData,
+    transaction: Transaction,
+    due: TransactionDue? = null,
+    onPayOrGet: (Transaction) -> Unit = {},
+    onSkipTransaction: (Transaction) -> Unit = {},
+) {
+    val nav = navigation()
+    val mapper = rememberTransactionItemMapper(baseData)
+    val item = remember(mapper, transaction, due) { mapper.map(transaction, due) }
+    val accountExists = baseData.accounts.any { it.id == transaction.accountId }
+    TransactionItemRow(
+        item = item,
+        onClick = { if (accountExists) onTransactionClick(nav = nav, transaction = transaction) },
+        onSkip = if (due != null) {
+            { onSkipTransaction(transaction) }
+        } else {
+            null
+        },
+        onPayOrGet = if (due != null) {
+            { onPayOrGet(transaction) }
+        } else {
+            null
+        },
+    )
 }
 
 private fun onTransactionClick(

@@ -174,12 +174,6 @@ private fun PreviewFeaturesUi(isDark: Boolean = false) {
                             enabled = true,
                             description = "Use the standard 1-2-3 numeric keypad layout.",
                         ),
-                        FeatureItemViewState.FeatureToggleViewState(
-                            key = "account_colors",
-                            name = "Colorful account labels",
-                            enabled = false,
-                            description = "Display account-specific colors in transactions.",
-                        ),
                         FeatureItemViewState.FeatureHeaderViewState(name = "Debug"),
                         FeatureItemViewState.FeatureToggleViewState(
                             key = "extra_logging",

@@ -24,8 +24,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.ivy.base.model.TransactionType
 import com.ivy.ui.R
+import com.ivy.ui.component.HiddenBalance
 
-/** Income or expense total with the number of transactions, and an optional add button. */
+/**
+ * Income or expense total with the number of transactions, and an optional add button. With [hideAmount] the
+ * total reads as a placeholder.
+ */
 @Composable
 fun SummaryCard(
     type: TransactionType,
@@ -34,6 +38,7 @@ fun SummaryCard(
     amount: Double,
     count: Int,
     modifier: Modifier = Modifier,
+    hideAmount: Boolean = false,
     onClick: (() -> Unit)? = null,
     addLabel: String? = null,
     onAdd: (() -> Unit)? = null,
@@ -61,7 +66,11 @@ fun SummaryCard(
             }
 
             Text(
-                text = amountLabel(amount, currency, showPlusSign = type == TransactionType.INCOME),
+                text = if (hideAmount) {
+                    HiddenBalance
+                } else {
+                    amountLabel(amount, currency, showPlusSign = type == TransactionType.INCOME)
+                },
                 style = MaterialTheme.typography.titleMediumEmphasized,
                 color = type.color(),
             )

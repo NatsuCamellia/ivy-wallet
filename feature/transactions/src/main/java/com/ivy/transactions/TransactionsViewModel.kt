@@ -34,6 +34,7 @@ import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.data.model.toCloseTimeRange
 import com.ivy.legacy.datamodel.temp.toImmutableLegacyTags
 import com.ivy.legacy.datamodel.temp.toLegacyDomain
+import com.ivy.legacy.domain.action.viewmodel.home.ShouldHideIncomeAct
 import com.ivy.legacy.domain.deprecated.logic.AccountCreator
 import com.ivy.legacy.utils.computationThread
 import com.ivy.legacy.utils.dateNowUTC
@@ -52,6 +53,7 @@ import com.ivy.wallet.domain.action.exchange.ExchangeAct
 import com.ivy.wallet.domain.action.settings.BaseCurrencyAct
 import com.ivy.wallet.domain.action.transaction.LegacyCalcTrnsIncomeExpenseAct
 import com.ivy.wallet.domain.action.transaction.LegacyTrnsWithDateDivsAct
+import com.ivy.wallet.domain.action.viewmodel.home.ShouldHideBalanceAct
 import com.ivy.wallet.domain.deprecated.logic.CategoryCreator
 import com.ivy.wallet.domain.deprecated.logic.PlannedPaymentsLogic
 import com.ivy.wallet.domain.deprecated.logic.WalletAccountLogic
@@ -62,6 +64,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
@@ -85,6 +88,8 @@ class TransactionsViewModel @Inject constructor(
     private val accTrnsAct: AccTrnsAct,
     private val trnsWithDateDivsAct: LegacyTrnsWithDateDivsAct,
     private val baseCurrencyAct: BaseCurrencyAct,
+    private val shouldHideBalanceAct: ShouldHideBalanceAct,
+    private val shouldHideIncomeAct: ShouldHideIncomeAct,
     private val calcAccBalanceAct: CalcAccBalanceAct,
     private val calcAccIncomeExpenseAct: CalcAccIncomeExpenseAct,
     private val calcTrnsIncomeExpenseAct: LegacyCalcTrnsIncomeExpenseAct,
@@ -132,6 +137,9 @@ class TransactionsViewModel @Inject constructor(
     private val skipAllModalVisible = mutableStateOf(false)
     private val deleteModal1Visible = mutableStateOf(false)
     private val choosePeriodModal = mutableStateOf<ChoosePeriodModalData?>(null)
+    private val hideBalance = mutableStateOf(false)
+    private val hideIncomeSetting = mutableStateOf(false)
+    private val incomeRevealed = mutableStateOf(false)
 
     @Composable
     override fun uiState(): TransactionsState {
@@ -161,8 +169,21 @@ class TransactionsViewModel @Inject constructor(
             enableDeletionButton = getEnableDeletionButton(),
             skipAllModalVisible = getSkipAllModalVisible(),
             deleteModal1Visible = getDeleteModal1Visible(),
-            choosePeriodModal = getChoosePeriodModal()
+            choosePeriodModal = getChoosePeriodModal(),
+            hideBalance = getHideBalance(),
+            hideIncome = getHideIncome(),
         )
+    }
+
+    @Composable
+    private fun getHideBalance(): Boolean {
+        return hideBalance.value
+    }
+
+    // income stays hidden under Hide balance too, until a tap on the Income card reveals it
+    @Composable
+    private fun getHideIncome(): Boolean {
+        return (hideIncomeSetting.value || hideBalance.value) && !incomeRevealed.value
     }
 
     @Composable
@@ -324,6 +345,8 @@ class TransactionsViewModel @Inject constructor(
             is TransactionsEvent.SetSkipAllModalVisible -> setSkipAllModalVisible(event.visible)
             is TransactionsEvent.OnDeleteModal1Visible -> setDeleteModal1Visible(event.delete)
             is TransactionsEvent.OnChoosePeriodModalData -> setChoosePeriodModalData(event.data)
+            TransactionsEvent.HiddenBalanceClick -> viewModelScope.launch { onHiddenBalanceClick() }
+            TransactionsEvent.HiddenIncomeClick -> viewModelScope.launch { onHiddenIncomeClick() }
         }
     }
 
@@ -660,6 +683,24 @@ class TransactionsViewModel @Inject constructor(
         ).toImmutableList()
     }
 
+    private suspend fun onHiddenBalanceClick() {
+        hideBalance.value = false
+
+        // Showing the balance for 5s, like Home
+        delay(5000)
+
+        hideBalance.value = true
+    }
+
+    private suspend fun onHiddenIncomeClick() {
+        incomeRevealed.value = true
+
+        // Showing the income for 5s, like Home
+        delay(5000)
+
+        incomeRevealed.value = false
+    }
+
     private fun reset() {
         account.value = null
         category.value = null
@@ -842,6 +883,9 @@ class TransactionsViewModel @Inject constructor(
             initWithTransactions.value = false
             treatTransfersAsIncomeExpense.value =
                 sharedPrefs.getBoolean(SharedPrefs.TRANSFERS_AS_INCOME_EXPENSE, false)
+            hideBalance.value = shouldHideBalanceAct(Unit)
+            hideIncomeSetting.value = shouldHideIncomeAct(Unit)
+            incomeRevealed.value = false
 
             when {
                 screen.accountId != null -> {

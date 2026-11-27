@@ -203,7 +203,7 @@ class AccountsViewModel @Inject constructor(
         hideBalance = false
 
         // Showing the balance for 5s, like Home
-        delay(5000)
+        delay(RevealMillis)
 
         hideBalance = true
     }
@@ -212,3 +212,6 @@ class AccountsViewModel @Inject constructor(
         reorderVisible = visible
     }
 }
+
+/** How long a tapped hidden amount stays revealed, like Home. */
+private const val RevealMillis = 5000L

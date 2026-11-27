@@ -38,7 +38,7 @@ data class TransactionsState(
     val deleteModal1Visible: Boolean,
     val choosePeriodModal: ChoosePeriodModalData?,
     /** Settings: Hide balance; the balance and the Expenses card of an account read as a placeholder. */
-    val hideBalance: Boolean = false,
+    val hideBalance: Boolean,
     /** The Income card of an account reads as a placeholder (Settings: Hide income, or Hide balance). */
-    val hideIncome: Boolean = false,
+    val hideIncome: Boolean,
 )

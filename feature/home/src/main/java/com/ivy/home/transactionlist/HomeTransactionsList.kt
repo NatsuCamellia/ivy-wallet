@@ -78,7 +78,9 @@ fun LazyListScope.homeTransactionsList(
         item(key = "due_header", contentType = "due_header") {
             DueHeader(showSkipAll = due.showSkipAll, onSkipAll = onSkipAllTransactions)
         }
-        items(items = dueRows, key = { it.ui.id }, contentType = { "due_trn" }) { item ->
+        // Prefixed so a row never shares its key with the same transaction in the history below: HomeViewModel
+        // publishes the reloaded history before the reloaded Due rows, so a paid or skipped one is in both for a frame.
+        items(items = dueRows, key = { "due_${it.ui.id}" }, contentType = { "due_trn" }) { item ->
             FlatTransactionItem(
                 ui = item.ui,
                 onClick = { onTransactionClick(item.trn) },

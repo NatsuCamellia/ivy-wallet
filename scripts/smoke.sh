@@ -1083,9 +1083,9 @@ flow_account_detail() {
   return 0
 }
 
-# db_edit seed|clear: edits the app database of the debuggable build through run-as while the app is stopped. `seed` adds
+# db_edit seed|clear|pay_upcoming|pay_clear: edits the app database of the debuggable build through run-as while the app is stopped. `seed` adds
 # 30 "Scroll row" transactions per day of the current month to the account Cash (every third one a transfer to Bank, some
-# with a description), `clear` removes them again. Needs the app to have an offline account with Cash and Bank.
+# with a description), `clear` removes them again; `pay_upcoming` and `pay_clear` belong to flow_pay_planned. Needs the app to have an offline account with Cash and Bank.
 db_edit() {
   local mode=$1 tmp f now tz
   tmp=$(mktemp -d) || return 1
@@ -1104,6 +1104,16 @@ offset = datetime.timedelta(hours=int(tz[:3]), minutes=int(tz[0] + tz[3:5]))
 db = sqlite3.connect(path)
 if mode == "clear":
     db.execute("DELETE FROM transactions WHERE title = 'Scroll row'")
+elif mode == "pay_upcoming":
+    # planned payments are created due now, which is neither Overdue (before today) nor Upcoming (after now): move the
+    # first occurrence of the ones named payover* two days back and of payup* an hour ahead (a recurring rule has later
+    # occurrences as well)
+    db.execute("UPDATE transactions SET dueDate = ? WHERE title LIKE 'payover%' AND dueDate IS NOT NULL AND dueDate <= ?",
+               ((now - 2 * 86400) * 1000, now * 1000))
+    db.execute("UPDATE transactions SET dueDate = ? WHERE title LIKE 'payup%' AND dueDate IS NOT NULL AND dueDate <= ?",
+               ((now + 3600) * 1000, now * 1000))
+elif mode == "pay_clear":
+    db.execute("DELETE FROM transactions WHERE title LIKE 'payup%' OR title LIKE 'payover%'")
 else:
     ids = dict(db.execute("SELECT name, id FROM accounts WHERE name IN ('Cash', 'Bank')").fetchall())
     local_now = datetime.datetime.fromtimestamp(now, datetime.timezone(offset))
@@ -1266,8 +1276,8 @@ flow_planned_payments() {
   return 0
 }
 
-# add_planned_payment <title> <digit>: from the open planned payments list, adds an expense of <digit>0 (amount
-# sheet, Groceries, recurring rule sheet, title, Set) and waits for the list again.
+# add_planned_payment <title> <digit> [one_time]: from the open planned payments list, adds an expense of <digit>0 (amount
+# sheet, Groceries, recurring rule sheet with One time chosen when asked, title, Set) and waits for the list again.
 add_planned_payment() {
   tap_node desc exact "Add planned payment" || return 1
   wait_for text exact "Choose payment type" || return 1
@@ -1279,6 +1289,7 @@ add_planned_payment() {
   wait_for text exact "Choose category" || return 1
   tap_node text exact "Groceries" || return 1
   wait_for text exact "Plan for" || return 1
+  [ "${3:-}" = one_time ] && { tap_node text exact "One time" || return 1; }
   tap_node text exact "Set" || return 1
   wait_gone text exact "Plan for" || return 1
   adb shell input text "$1"
@@ -1346,6 +1357,115 @@ PY
   wait_for text exact "Quick access" || return 1
   back
   wait_gone text exact "Quick access" || return 1
+  crashed && return 1
+  return 0
+}
+
+# tap_pay <title>: taps the Pay (or Get) button of the Due row titled <title>, the nearest button below its title
+tap_pay() {
+  dump || return 1
+  local pos
+  pos=$(python3 -I - "$XML" "$1" <<'PY'
+import re, sys, xml.etree.ElementTree as ET
+path, title = sys.argv[1:3]
+nodes = list(ET.parse(path).iter('node'))
+def box(n):
+    return tuple(map(int, re.findall(r'\d+', n.get('bounds'))))
+titles = [box(n) for n in nodes if n.get('text') == title]
+if not titles:
+    sys.exit(1)
+ty = titles[0][1]
+buttons = [box(n) for n in nodes if n.get('text') in ('Pay', 'Get') and box(n)[1] > ty]
+if not buttons:
+    sys.exit(1)
+x1, y1, x2, y2 = min(buttons, key=lambda b: b[1])
+print((x1 + x2) // 2, (y1 + y2) // 2)
+PY
+) || { shot pay-nobutton; log "no Pay button below '$1'"; return 1; }
+  tap_xy $pos
+}
+
+# pay_row <title>: taps Pay on the row, then fails when the app died or the row still has its Pay button (tap_pay dumps)
+pay_row() {
+  tap_pay "$1" || return 1
+  sleep 2
+  crashed && { log "crash after paying '$1'"; return 1; }
+  tap_pay "$1" 2>/dev/null && { log "'$1' still has a Pay button after paying it"; return 1; }
+  return 0
+}
+
+# Pressing Pay on planned payments, one-time and recurring, Overdue and Upcoming, on the account screen (payupone,
+# payuprec, payoverone) and on Home (payoverrec).
+# Regression for the Home crash 'Key "<id>" was already used' (LazyColumn): the paid transaction was in the history and
+# in the Due rows for a frame. Creates four planned payments, removes them and what they paid again at the end.
+flow_pay_planned() {
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Planned payments" || return 1
+  wait_for desc exact "Add planned payment" || return 1
+  add_planned_payment payoverrec 1 || return 1
+  add_planned_payment payupone 2 one_time || return 1
+  add_planned_payment payuprec 3 || return 1
+  add_planned_payment payoverone 4 one_time || return 1
+  adb shell am force-stop $PKG
+  db_edit pay_upcoming || return 1
+  local rc=0
+  pay_planned_body || rc=$?
+  adb shell am force-stop $PKG
+  db_edit pay_clear || rc=1
+  return $rc
+}
+
+pay_planned_body() {
+  # The account screen lists all four payments (Upcoming, then Overdue). payoverrec is paid last, on Home, where it is the
+  # only Due row left and its history row is on screen below it (the duplicate key only throws for composed rows).
+  go_home || return 1
+  tap_tab Accounts || return 1
+  wait_for text exact "Counted in total" || return 1
+  tap_node text exact "Cash" || return 1
+  # Overdue is open, Upcoming is collapsed until its header is tapped; paying the Upcoming rows brings Overdue up. Two
+  # days back is in the month's period unless it is the 1st or 2nd; then payoverone stays unpaid and is deleted below.
+  local overdue_in_period=1
+  [ "$(date +%-d)" -le 2 ] && overdue_in_period=0
+  if [ $overdue_in_period = 1 ]; then
+    wait_for text exact "payoverone" 20 || { log "overdue payment missing on the account screen"; return 1; }
+  fi
+  wait_for text exact "Upcoming" 20 || return 1
+  # the chevron at the end of the header row opens it
+  tap_xy $(( $(screen_width) - 100 )) "$(node_cy Upcoming)" || return 1
+  wait_for text exact "payupone" || { log "upcoming payment missing after opening Upcoming"; return 1; }
+  shot pay-1-account
+  pay_row payupone || return 1
+  pay_row payuprec || return 1
+  [ $overdue_in_period = 1 ] && { pay_row payoverone || return 1; }
+  shot pay-2-account-paid
+  go_home || return 1
+  wait_for text exact "Due" 20 || { log "Due header missing on Home"; return 1; }
+  local w h
+  w=$(screen_width); h=$(screen_height)
+  # scroll the Due row up (a tip card can fill the screen above it) so the history rows below it are on screen
+  adb shell input swipe $((w / 2)) $((h * 80 / 100)) $((w / 2)) $((h * 30 / 100)) 250 </dev/null
+  sleep 1
+  shot pay-3-home
+  pay_row payoverrec || return 1
+  shot pay-4-home-paid
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Planned payments" || return 1
+  wait_for desc exact "Add planned payment" || return 1
+  dump || return 1
+  has text exact "payoverrec" && has text exact "payuprec" || { log "recurring rules missing from the list"; return 1; }
+  has text exact "payupone" && { log "paid one-time rule payupone still listed"; return 1; }
+  if [ $overdue_in_period = 1 ]; then
+    has text exact "payoverone" && { log "paid one-time rule payoverone still listed"; return 1; }
+  else
+    delete_planned_payment payoverone || return 1
+  fi
+  delete_planned_payment payoverrec || return 1
+  delete_planned_payment payuprec || return 1
+  back
+  wait_for text exact "Quick access" || return 1
   crashed && return 1
   return 0
 }
@@ -1900,7 +2020,7 @@ run_flow() {
   fi
 }
 
-ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section"
+ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section flow_pay_planned"
 # Screens reachable by `shot`: home, accounts and categories are tabs, the others are rows of the More sheet.
 ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
 

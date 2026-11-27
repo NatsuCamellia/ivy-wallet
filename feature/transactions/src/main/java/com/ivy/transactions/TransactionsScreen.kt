@@ -76,6 +76,7 @@ import com.ivy.ui.R
 import com.ivy.ui.color.Green
 import com.ivy.ui.color.Purple
 import com.ivy.ui.component.BackButton
+import com.ivy.ui.component.HiddenBalance
 import com.ivy.ui.rememberScrollPositionListState
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
@@ -186,7 +187,11 @@ fun TransactionsScreen(screen: TransactionsScreen) {
         onChoosePeriodModal = {
             viewModel.onEvent(TransactionsEvent.OnChoosePeriodModalData(it))
         },
-        choosePeriodModal = uiState.choosePeriodModal
+        choosePeriodModal = uiState.choosePeriodModal,
+        hideBalance = uiState.hideBalance,
+        hideIncome = uiState.hideIncome,
+        onHiddenBalanceClick = { viewModel.onEvent(TransactionsEvent.HiddenBalanceClick) },
+        onHiddenIncomeClick = { viewModel.onEvent(TransactionsEvent.HiddenIncomeClick) },
     )
 }
 
@@ -245,6 +250,10 @@ private fun TransactionsUi(
     onSkipTransaction: (Transaction) -> Unit = {},
     onSkipAllTransactions: (List<Transaction>) -> Unit = {},
     onChoosePeriodModal: (ChoosePeriodModalData?) -> Unit,
+    hideBalance: Boolean = false,
+    hideIncome: Boolean = false,
+    onHiddenBalanceClick: () -> Unit = {},
+    onHiddenIncomeClick: () -> Unit = {},
 ) {
     val ivyContext = ivyWalletCtx()
     val nav = navigation()
@@ -271,6 +280,10 @@ private fun TransactionsUi(
             }
         }
     }
+
+    // Hide balance and Hide income apply to an account's figures, not to a category's
+    val balanceHidden = hideBalance && account != null
+    val incomeHidden = hideIncome && account != null
 
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val listState = rememberScrollPositionListState(key = "item_stats_lazy_column")
@@ -312,7 +325,10 @@ private fun TransactionsUi(
                             balance = balance,
                             balanceBaseCurrency = balanceBaseCurrency,
                             showPlusSign = category != null,
-                            onClick = account?.let {
+                            hidden = balanceHidden,
+                            onClick = if (balanceHidden) {
+                                onHiddenBalanceClick
+                            } else account?.let {
                                 {
                                     accountModalData = AccountModalData(
                                         account = it,
@@ -330,6 +346,10 @@ private fun TransactionsUi(
                             currency = currency,
                             income = income,
                             expenses = expenses,
+                            hideIncome = incomeHidden,
+                            hideExpenses = balanceHidden,
+                            onHiddenIncomeClick = onHiddenIncomeClick,
+                            onHiddenExpensesClick = onHiddenBalanceClick,
                             onSummaryClick = { type ->
                                 if (account != null) {
                                     nav.navigateTo(
@@ -539,22 +559,26 @@ private fun Balance(
     balance: Double,
     balanceBaseCurrency: Double?,
     showPlusSign: Boolean,
+    hidden: Boolean,
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
+    val showBalanceLabel = stringResource(R.string.show_balance)
     Column(
         modifier = modifier
-            .thenIf(onClick != null) { clickable(onClick = onClick!!) }
+            .thenIf(onClick != null) {
+                clickable(onClickLabel = if (hidden) showBalanceLabel else null, onClick = onClick!!)
+            }
             .testTag("balance")
     ) {
         Text(
-            text = amountLabel(balance, currency, showPlusSign),
+            text = if (hidden) HiddenBalance else amountLabel(balance, currency, showPlusSign),
             style = MaterialTheme.typography.displaySmallEmphasized,
         )
 
         if (currency != baseCurrency && balanceBaseCurrency != null) {
             Text(
-                text = amountLabel(balanceBaseCurrency, baseCurrency, showPlusSign),
+                text = if (hidden) HiddenBalance else amountLabel(balanceBaseCurrency, baseCurrency, showPlusSign),
                 modifier = Modifier.testTag("balance_base_currency"),
                 style = MaterialTheme.typography.titleMediumEmphasized,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -569,7 +593,11 @@ private fun IncomeExpenses(
     currency: String,
     income: Double,
     expenses: Double,
+    hideIncome: Boolean,
+    hideExpenses: Boolean,
     hasSummaryAction: Boolean,
+    onHiddenIncomeClick: () -> Unit,
+    onHiddenExpensesClick: () -> Unit,
     onSummaryClick: (TransactionType) -> Unit,
     onAdd: (TransactionType) -> Unit,
     modifier: Modifier = Modifier,
@@ -583,7 +611,10 @@ private fun IncomeExpenses(
             amount = income,
             count = trns.count { it.type == TransactionType.INCOME },
             modifier = Modifier.weight(1f),
-            onClick = if (hasSummaryAction) {
+            hideAmount = hideIncome,
+            onClick = if (hideIncome) {
+                onHiddenIncomeClick
+            } else if (hasSummaryAction) {
                 { onSummaryClick(TransactionType.INCOME) }
             } else {
                 null
@@ -599,7 +630,10 @@ private fun IncomeExpenses(
             amount = 0.0 - expenses.absoluteValue,
             count = trns.count { it.type == TransactionType.EXPENSE },
             modifier = Modifier.weight(1f),
-            onClick = if (hasSummaryAction) {
+            hideAmount = hideExpenses,
+            onClick = if (hideExpenses) {
+                onHiddenExpensesClick
+            } else if (hasSummaryAction) {
                 { onSummaryClick(TransactionType.EXPENSE) }
             } else {
                 null

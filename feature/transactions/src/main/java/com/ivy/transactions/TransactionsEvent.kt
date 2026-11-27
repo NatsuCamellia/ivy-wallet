@@ -45,4 +45,10 @@ sealed interface TransactionsEvent {
     data class SetSkipAllModalVisible(val visible: Boolean) : TransactionsEvent
     data class OnDeleteModal1Visible(val delete: Boolean) : TransactionsEvent
     data class OnChoosePeriodModalData(val data: ChoosePeriodModalData?) : TransactionsEvent
+
+    /** A tap on the hidden balance: reveal it for a few seconds, like Home. */
+    data object HiddenBalanceClick : TransactionsEvent
+
+    /** A tap on the hidden income: reveal it for a few seconds, like Home. */
+    data object HiddenIncomeClick : TransactionsEvent
 }

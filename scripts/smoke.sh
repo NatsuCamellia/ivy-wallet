@@ -2087,6 +2087,81 @@ flow_settings() {
   return 0
 }
 
+# set_hide_balance <on|off>: Home More -> Settings -> Privacy, flips the Hide balance row when it is not in the wanted state
+set_hide_balance() {
+  local want=true
+  [ "$1" = on ] || want=false
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Settings" || return 1
+  wait_for text exact "About & Support" || return 1
+  tap_node text exact "Privacy" || return 1
+  wait_for text exact "Hide balance" || return 1
+  if [ "$(row_checked "Hide balance")" != "$want" ]; then
+    tap_node text exact "Hide balance" || return 1
+    sleep 1
+    dump || return 1
+  fi
+  [ "$(row_checked "Hide balance")" = "$want" ] || { log "Hide balance did not turn $1"; return 1; }
+}
+
+# has_amount: a text in the dump that is a formatted amount ("12.50 USD", "+1,200.00 USD")
+has_amount() {
+  python3 -I - "$XML" <<'PY'
+import re, sys, xml.etree.ElementTree as ET
+pattern = re.compile(r'[0-9][0-9,.]*[kmb]? [A-Z]{3}$')
+sys.exit(0 if any(pattern.search(n.get('text') or '') for n in ET.parse(sys.argv[1]).iter('node')) else 1)
+PY
+}
+
+# Settings turns Hide balance on: the Accounts tab shows the placeholder instead of every amount (banner and rows), a tap on
+# the banner reveals them for a few seconds, then they hide again; Hide balance is turned off again, even when the flow fails.
+flow_hide_balance() {
+  mkdir -p "$OUT/hide-balance"
+  local rc=0
+  hide_balance_body || rc=$?
+  set_hide_balance off || rc=1
+  return $rc
+}
+
+hide_balance_body() {
+  go_home || return 1
+  tap_tab Accounts || return 1
+  wait_for text exact "Counted in total" || return 1
+  has_amount || { log "accounts: the amounts should show while Hide balance is off"; return 1; }
+  shot hide-balance/accounts-shown
+  set_hide_balance on || return 1
+  go_home || return 1
+  tap_tab Accounts || return 1
+  wait_for text exact "Counted in total" || return 1
+  wait_for any sub "****" 10 || { log "accounts: the placeholder is missing"; return 1; }
+  has_amount && { log "accounts: an amount shows while Hide balance is on"; return 1; }
+  has any sub "Including excluded accounts: ****" || { log "accounts: the total with excluded accounts is not hidden"; return 1; }
+  shot hide-balance/accounts-hidden
+  tap_node any sub "****" || return 1
+  dump || return 1
+  has_amount || { log "accounts: a tap on the hidden banner did not reveal the amounts"; return 1; }
+  has any sub "****" && { log "accounts: a placeholder is left after the reveal"; return 1; }
+  shot hide-balance/accounts-revealed
+  sleep 6
+  dump || return 1
+  has_amount && { log "accounts: the amounts did not hide again after the reveal"; return 1; }
+  has any sub "****" || { log "accounts: the placeholder did not come back after the reveal"; return 1; }
+  # the account screen hides the balance and the Income and Expenses cards too, a tap on the balance reveals them
+  tap_node text exact "Cash" || return 1
+  wait_for desc exact "Edit" || return 1
+  wait_for any sub "****" 10 || { log "account detail: the placeholder is missing"; return 1; }
+  has_amount && { log "account detail: an amount shows while Hide balance is on"; return 1; }
+  shot hide-balance/account-hidden
+  tap_node any sub "****" || return 1
+  dump || return 1
+  has_amount || { log "account detail: a tap on the hidden balance did not reveal the amounts"; return 1; }
+  shot hide-balance/account-revealed
+  crashed && return 1
+  return 0
+}
+
 # Settings -> Import data: the source list with the manual CSV button, an app source opens its instructions (steps and
 # the pinned upload button, nothing is picked), back returns to the list, the manual CSV screen opens with its upload
 # button and a disabled continue button, back twice returns to Settings.
@@ -2138,7 +2213,7 @@ run_flow() {
   fi
 }
 
-ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section flow_pay_planned flow_planned_scroll flow_flat_rows"
+ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section flow_pay_planned flow_planned_scroll flow_flat_rows flow_hide_balance"
 # Screens reachable by `shot`: home, accounts and categories are tabs, the others are rows of the More sheet.
 ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
 

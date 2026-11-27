@@ -20,6 +20,9 @@ import androidx.compose.ui.unit.dp
 import com.ivy.ui.theme.rounded
 import kotlinx.collections.immutable.ImmutableList
 
+/** What a hidden amount reads as (Settings: Hide balance and Hide income). */
+const val HiddenBalance = "****"
+
 /** One "label over number" column at the bottom of a [BalanceBanner]. Clickable only when [onClick] is set. */
 @Immutable
 data class BalanceBannerColumn(

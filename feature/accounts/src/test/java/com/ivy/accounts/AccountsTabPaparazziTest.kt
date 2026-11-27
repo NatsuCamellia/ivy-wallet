@@ -32,4 +32,11 @@ class AccountsTabPaparazziTest(
             AccountsTabHugeAmountUITest(theme == PaparazziTheme.Dark)
         }
     }
+
+    @Test
+    fun snapshotAccountsHiddenBalance() {
+        snapshot(theme) {
+            AccountsTabHiddenUITest(theme == PaparazziTheme.Dark)
+        }
+    }
 }

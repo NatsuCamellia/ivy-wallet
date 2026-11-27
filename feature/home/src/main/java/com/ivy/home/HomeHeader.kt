@@ -32,6 +32,7 @@ import com.ivy.navigation.navigation
 import com.ivy.ui.R
 import com.ivy.ui.component.BalanceBanner
 import com.ivy.ui.component.BalanceBannerColumn
+import com.ivy.ui.component.HiddenBalance
 import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
 import com.ivy.ui.time.LocalTimeProvider
@@ -163,5 +164,3 @@ fun HomeBalanceBanner(
         valueTestTag = "home_balance",
     )
 }
-
-private const val HiddenBalance = "****"

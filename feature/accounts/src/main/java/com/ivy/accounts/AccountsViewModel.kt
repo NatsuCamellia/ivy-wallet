@@ -22,12 +22,14 @@ import com.ivy.legacy.data.model.toCloseTimeRange
 import com.ivy.legacy.utils.ioThread
 import com.ivy.ui.ComposeViewModel
 import com.ivy.wallet.domain.action.settings.BaseCurrencyAct
+import com.ivy.wallet.domain.action.viewmodel.home.ShouldHideBalanceAct
 import com.ivy.wallet.domain.action.viewmodel.account.AccountDataAct
 import com.ivy.wallet.domain.action.wallet.CalcWalletBalanceAct
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -41,6 +43,7 @@ class AccountsViewModel @Inject constructor(
     private val sharedPrefs: SharedPrefs,
     private val calcWalletBalanceAct: CalcWalletBalanceAct,
     private val baseCurrencyAct: BaseCurrencyAct,
+    private val shouldHideBalanceAct: ShouldHideBalanceAct,
     private val accountDataAct: AccountDataAct,
     private val accountRepository: AccountRepository,
     private val dataObserver: DataObserver,
@@ -53,6 +56,7 @@ class AccountsViewModel @Inject constructor(
     private var totalBalanceWithExcluded by mutableDoubleStateOf(0.0)
     private var totalBalanceWithoutExcluded by mutableDoubleStateOf(0.0)
     private var reorderVisible by mutableStateOf(false)
+    private var hideBalance by mutableStateOf(false)
 
     // every saved account posts an event that starts a reload; unordered reloads let one that read the
     // database mid-reorder finish last and put the old order back
@@ -82,12 +86,20 @@ class AccountsViewModel @Inject constructor(
 
         val baseCurrency = getBaseCurrency()
         val accountsData = getAccountsData()
-        val content = remember(accountsData, baseCurrency, totalBalanceWithoutExcluded, totalBalanceWithExcluded) {
+        val hideBalance = hideBalance
+        val content = remember(
+            accountsData,
+            baseCurrency,
+            totalBalanceWithoutExcluded,
+            totalBalanceWithExcluded,
+            hideBalance,
+        ) {
             mapAccounts(
                 accounts = accountsData,
                 baseCurrency = baseCurrency,
                 totalBalance = totalBalanceWithoutExcluded,
                 totalBalanceWithExcluded = totalBalanceWithExcluded,
+                hideAmounts = hideBalance,
             )
         }
         return AccountsState(
@@ -95,7 +107,8 @@ class AccountsViewModel @Inject constructor(
             accountsData = accountsData,
             content = content,
             reorderVisible = getReorderVisible(),
-            hideTotalBalance = getHideTotalBalance()
+            hideTotalBalance = getHideTotalBalance(),
+            hideBalance = hideBalance,
         )
     }
 
@@ -124,6 +137,7 @@ class AccountsViewModel @Inject constructor(
             when (event) {
                 is AccountsEvent.OnReorder -> reorder(event.reorderedList)
                 is AccountsEvent.OnReorderModalVisible -> reorderModalVisible(event.reorderVisible)
+                AccountsEvent.HiddenBalanceClick -> onHiddenBalanceClick()
             }
         }
     }
@@ -178,10 +192,20 @@ class AccountsViewModel @Inject constructor(
             )
         ).toDouble()
 
+        hideBalance = shouldHideBalanceAct(Unit)
         baseCurrency = baseCurrencyCode
         accountsData = accountsDataList
         totalBalanceWithExcluded = totalBalanceWithExcludedAccounts
         totalBalanceWithoutExcluded = totalBalanceWithoutExcludedAccounts
+    }
+
+    private suspend fun onHiddenBalanceClick() {
+        hideBalance = false
+
+        // Showing the balance for 5s, like Home
+        delay(5000)
+
+        hideBalance = true
     }
 
     private fun reorderModalVisible(visible: Boolean) {

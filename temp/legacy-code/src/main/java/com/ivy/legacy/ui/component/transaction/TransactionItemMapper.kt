@@ -24,6 +24,22 @@ data class TransactionRowItem(
     val trn: Transaction,
 )
 
+/** The amount followed by its currency code, e.g. "250.75 USD". */
+fun formatAmountWithCurrency(amount: Double, currency: String): String = "${amount.format(currency)} $currency"
+
+/** The sign an amount of this type shows: an expense is negative, an income gets a plus. */
+fun TransactionType.amountSign(): String = when (this) {
+    TransactionType.EXPENSE -> "-"
+    TransactionType.INCOME -> "+"
+    TransactionType.TRANSFER -> ""
+}
+
+fun TransactionType.amountKind(): TransactionAmountKind = when (this) {
+    TransactionType.INCOME -> TransactionAmountKind.Income
+    TransactionType.EXPENSE -> TransactionAmountKind.Expense
+    TransactionType.TRANSFER -> TransactionAmountKind.Transfer
+}
+
 /**
  * Maps a [Transaction] to the [TransactionRowItem] that Home, the account and category screens, the
  * Transactions screen, Reports and Search all show as a flat row.
@@ -37,9 +53,7 @@ class TransactionItemMapper(
     private val expenseFallback: String,
     private val incomeFallback: String,
     private val transferFallback: String,
-    val formatAmount: (Double, String) -> String = { amount, currency ->
-        "${amount.format(currency)} $currency"
-    },
+    val formatAmount: (Double, String) -> String = ::formatAmountWithCurrency,
 ) {
     /** [due] is set for a planned payment in a Due list and `null` for a transaction in the history. */
     @Suppress("CyclomaticComplexMethod")
@@ -72,17 +86,7 @@ class TransactionItemMapper(
         }
         val time = if (due == null) trn.dateTime?.let(::formatTransactionTime) else null
 
-        val amountKind = when (trn.type) {
-            TransactionType.INCOME -> TransactionAmountKind.Income
-            TransactionType.EXPENSE -> TransactionAmountKind.Expense
-            TransactionType.TRANSFER -> TransactionAmountKind.Transfer
-        }
-        val amountSign = when (trn.type) {
-            TransactionType.EXPENSE -> "-"
-            TransactionType.INCOME -> "+"
-            TransactionType.TRANSFER -> ""
-        }
-        val amountText = "$amountSign${formatAmount(trn.amount.toDouble(), currency)}"
+        val amountText = "${trn.type.amountSign()}${formatAmount(trn.amount.toDouble(), currency)}"
 
         val secondaryText = if (due == null && isTransfer && toCurrency != currency) {
             formatAmount(trn.toAmount.toDouble(), toCurrency)
@@ -104,7 +108,7 @@ class TransactionItemMapper(
                 time = time,
                 categoryColor = categoryColor(category?.color?.value, account, isTransfer),
                 amountText = amountText,
-                amountKind = amountKind,
+                amountKind = trn.type.amountKind(),
                 secondaryText = secondaryText,
                 dueText = dueText,
                 dueOverdue = due == TransactionDue.Overdue,

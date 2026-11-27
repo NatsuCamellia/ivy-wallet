@@ -128,7 +128,6 @@ private fun List(
                     overdue = overdue,
                     history = history,
                     emptyStateText = "You don't have any transactions for March.",
-                    shouldShowAccountSpecificColorInTransactions = false,
                     onPayOrGet = {},
                     setUpcomingExpanded = {},
                     setOverdueExpanded = {},

@@ -1,16 +1,14 @@
 package com.ivy.planned.list
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.EventRepeat
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -53,7 +51,6 @@ fun PlannedPaymentsLazyColumn(
         modifier = modifier.fillMaxSize(),
         state = listState,
         contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(ListItemDefaults.SegmentedGap)
     ) {
         plannedPaymentItems(
             nav = nav,
@@ -149,7 +146,7 @@ private fun LazyListScope.plannedPaymentRows(
     accounts: ImmutableList<Account>,
     rules: ImmutableList<PlannedPaymentRule>,
 ) {
-    itemsIndexed(rules, key = { _, rule -> rule.id }) { index, rule ->
+    items(rules, key = { it.id }) { rule ->
         PlannedPaymentCard(
             baseCurrency = currency,
             categories = categories,
@@ -158,8 +155,6 @@ private fun LazyListScope.plannedPaymentRows(
             onClick = {
                 nav.navigateTo(EditPlannedScreen(plannedPaymentRuleId = it.id, type = it.type))
             },
-            index = index,
-            count = rules.size,
         )
     }
 }

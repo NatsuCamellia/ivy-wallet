@@ -1,21 +1,15 @@
 package com.ivy.planned.list
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.ivy.base.legacy.Theme
 import com.ivy.base.model.TransactionType
 import com.ivy.data.model.Category
@@ -27,16 +21,17 @@ import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.datamodel.PlannedPaymentRule
 import com.ivy.legacy.forDisplay
 import com.ivy.legacy.ui.WalletPreview
-import com.ivy.legacy.ui.component.TypeAmount
-import com.ivy.legacy.ui.component.NavigationChips
-import com.ivy.legacy.ui.component.TransactionBadge
 import com.ivy.legacy.ui.component.label
+import com.ivy.legacy.ui.component.transaction.TransactionBadge
+import com.ivy.legacy.ui.component.transaction.amountKind
+import com.ivy.legacy.ui.component.transaction.amountSign
+import com.ivy.legacy.ui.component.transaction.formatAmountWithCurrency
 import com.ivy.legacy.utils.isNotNullOrBlank
-import com.ivy.navigation.Navigation
-import com.ivy.navigation.NavigationRoot
 import com.ivy.ui.R
 import com.ivy.ui.color.Blue
 import com.ivy.ui.color.Green
+import com.ivy.ui.component.FlatListItem
+import com.ivy.ui.component.transaction.amountColor
 import com.ivy.ui.time.LocalTimeFormatter
 import com.ivy.ui.time.TimeFormatter
 import kotlinx.collections.immutable.ImmutableList
@@ -47,8 +42,8 @@ import java.time.ZoneOffset
 import java.util.UUID
 
 /**
- * One planned payment in a list. [index] and [count] place it in its group of rows so the group gets
- * rounded outer corners; the gap between rows is the caller's.
+ * One planned payment in a list as a flat row: its title and the category and account as text, the
+ * amount colored by its type and the recurrence under them.
  */
 @Composable
 fun PlannedPaymentCard(
@@ -58,58 +53,35 @@ fun PlannedPaymentCard(
     plannedPayment: PlannedPaymentRule,
     onClick: (PlannedPaymentRule) -> Unit,
     modifier: Modifier = Modifier,
-    index: Int = 0,
-    count: Int = 1,
 ) {
     val account = accounts.find { it.id == plannedPayment.accountId }
     val category = plannedPayment.categoryId?.let { targetId -> categories.find { it.id.value == targetId } }
     val title = plannedPayment.title.takeIf { it.isNotNullOrBlank() }
     val type = plannedPayment.type
+    val currency = account?.currency ?: baseCurrency
+    val categoryName = category?.name?.value
+    val accountName = account?.name ?: stringResource(R.string.deleted)
 
-    SegmentedListItem(
+    FlatListItem(
+        title = title ?: categoryName ?: type.label(),
         onClick = { if (account != null) onClick(plannedPayment) },
-        shapes = ListItemDefaults.segmentedShapes(index = index, count = count),
-        colors = ListItemDefaults.segmentedColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
         modifier = modifier.testTag("planned_payment_card"),
-        leadingContent = { TransactionBadge(category, type) },
-        supportingContent = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                RuleText(plannedPayment)
-                if (type != TransactionType.TRANSFER) {
-                    NavigationChips(
-                        category = category,
-                        account = account,
-                        toAccount = null,
-                        isTransfer = false,
-                        showAccountColor = true,
-                    )
-                }
-            }
+        supportingText = if (type == TransactionType.TRANSFER) {
+            null
+        } else {
+            listOfNotNull(categoryName.takeIf { title != null }, accountName).joinToString(" \u00B7 ")
         },
-    ) {
-        Headline(
-            headline = title ?: category?.name?.value ?: type.label(),
-            type = type,
-            amount = plannedPayment.amount,
-            currency = account?.currency ?: baseCurrency,
-        )
-    }
-}
-
-@Composable
-private fun Headline(headline: String, type: TransactionType, amount: Double, currency: String) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        Text(
-            text = headline,
-            modifier = Modifier.weight(1f),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-        )
-        TypeAmount(type = type, amount = amount, currency = currency)
-    }
+        primaryText = "${type.amountSign()}${formatAmountWithCurrency(plannedPayment.amount, currency)}",
+        primaryColor = type.amountKind().amountColor(),
+        leading = {
+            TransactionBadge(
+                color = category?.color?.value?.let(::Color),
+                iconAsset = category?.icon?.id,
+                isTransfer = type == TransactionType.TRANSFER,
+            )
+        },
+        supportingContent = { RuleText(plannedPayment) },
+    )
 }
 
 @Composable
@@ -117,26 +89,28 @@ private fun RuleText(rule: PlannedPaymentRule) {
     val startDate = rule.startDate?.formatted() ?: stringResource(R.string.null_text)
     val intervalN = rule.intervalN
     val intervalType = rule.intervalType
-    if (rule.oneTime) {
-        Text(stringResource(R.string.planned_for_date, startDate))
-    } else if (intervalN != null && intervalType != null) {
-        Text(
-            text = stringResource(
-                R.string.planned_starts_repeats_every,
-                startDate,
-                intervalN,
-                intervalType.forDisplay(intervalN)
+    Column {
+        if (rule.oneTime) {
+            RuleLine(stringResource(R.string.planned_for_date, startDate))
+        } else if (intervalN != null && intervalType != null) {
+            RuleLine(
+                stringResource(
+                    R.string.planned_starts_repeats_every,
+                    startDate,
+                    intervalN,
+                    intervalType.forDisplay(intervalN),
+                ),
             )
-        )
-    } else {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(stringResource(R.string.planned_starts_date, startDate))
-            Text(
-                text = stringResource(R.string.invalid_planned_rule),
-                color = MaterialTheme.colorScheme.error,
-            )
+        } else {
+            RuleLine(stringResource(R.string.planned_starts_date, startDate))
+            RuleLine(stringResource(R.string.invalid_planned_rule), MaterialTheme.colorScheme.error)
         }
     }
+}
+
+@Composable
+private fun RuleLine(text: String, color: Color = MaterialTheme.colorScheme.onSurfaceVariant) {
+    Text(text = text, style = MaterialTheme.typography.bodyMedium, color = color)
 }
 
 @Composable
@@ -154,24 +128,22 @@ private fun PreviewCard(
     isDark: Boolean = false,
 ) {
     WalletPreview(if (isDark) Theme.DARK else Theme.LIGHT) {
-        NavigationRoot(navigation = Navigation()) {
-            val cash = Account(name = "Cash", Green.toArgb())
-            val food = Category(
-                name = NotBlankTrimmedString.unsafe("Food"),
-                color = ColorInt(Blue.toArgb()),
-                icon = null,
-                id = CategoryId(UUID(0, 1)),
-                orderNum = 0.0,
-            )
-            PlannedPaymentCard(
-                baseCurrency = "BGN",
-                categories = persistentListOf(food),
-                accounts = persistentListOf(cash),
-                plannedPayment = rule(cash.id, food.id.value),
-                onClick = {},
-                modifier = modifier,
-            )
-        }
+        val cash = Account(name = "Cash", Green.toArgb())
+        val food = Category(
+            name = NotBlankTrimmedString.unsafe("Food"),
+            color = ColorInt(Blue.toArgb()),
+            icon = null,
+            id = CategoryId(UUID(0, 1)),
+            orderNum = 0.0,
+        )
+        PlannedPaymentCard(
+            baseCurrency = "BGN",
+            categories = persistentListOf(food),
+            accounts = persistentListOf(cash),
+            plannedPayment = rule(cash.id, food.id.value),
+            onClick = {},
+            modifier = modifier,
+        )
     }
 }
 

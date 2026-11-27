@@ -25,6 +25,7 @@ fun rememberTransactionItemMapper(baseData: AppBaseData): TransactionItemMapper 
     val expenseFallback = stringResource(R.string.expense)
     val incomeFallback = stringResource(R.string.income)
     val transferFallback = stringResource(R.string.transfer)
+    val billPaidFormat = stringResource(R.string.bill_paid)
     return remember(baseData, timeConverter, timeFormatter) {
         TransactionItemMapper(
             baseData = baseData,
@@ -35,6 +36,7 @@ fun rememberTransactionItemMapper(baseData: AppBaseData): TransactionItemMapper 
             expenseFallback = expenseFallback,
             incomeFallback = incomeFallback,
             transferFallback = transferFallback,
+            billPaidFormat = billPaidFormat,
         )
     }
 }

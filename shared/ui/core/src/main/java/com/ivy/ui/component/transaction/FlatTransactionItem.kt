@@ -33,6 +33,8 @@ fun FlatTransactionItem(
         onClick = onClick,
         modifier = modifier.testTag("transaction_item"),
         supportingText = ui.supportingText,
+        descriptionText = ui.descriptionText,
+        tagsText = ui.tagsText,
         primaryText = ui.amountText,
         primaryColor = ui.amountKind.amountColor(),
         secondaryText = listOfNotNull(ui.secondaryText, ui.time).joinToString(" · ").ifBlank { null },

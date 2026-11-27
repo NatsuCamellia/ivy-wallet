@@ -7,6 +7,7 @@ import com.ivy.base.model.TransactionType
 import com.ivy.base.time.TimeConverter
 import com.ivy.legacy.data.AppBaseData
 import com.ivy.legacy.datamodel.Account
+import com.ivy.legacy.utils.capitalizeLocal
 import com.ivy.legacy.utils.format
 import com.ivy.ui.component.transaction.TransactionAmountKind
 import com.ivy.ui.component.transaction.TransactionItemUi
@@ -53,6 +54,7 @@ class TransactionItemMapper(
     private val expenseFallback: String,
     private val incomeFallback: String,
     private val transferFallback: String,
+    private val billPaidFormat: String,
     val formatAmount: (Double, String) -> String = ::formatAmountWithCurrency,
 ) {
     /** [due] is set for a planned payment in a Due list and `null` for a transaction in the history. */
@@ -105,6 +107,8 @@ class TransactionItemMapper(
                 id = trn.id.toString(),
                 title = title,
                 supportingText = supporting,
+                descriptionText = description(trn),
+                tagsText = tagsText(trn),
                 time = time,
                 categoryColor = categoryColor(category?.color?.value, account, isTransfer),
                 amountText = amountText,
@@ -117,6 +121,34 @@ class TransactionItemMapper(
             trn = trn,
         )
     }
+
+    /**
+     * The description, else for a paid recurring bill the "bill paid" text, like the transaction card
+     * did; `null` when there is neither.
+     */
+    private fun description(trn: Transaction): String? {
+        val paidFor = trn.paidFor
+        return when {
+            !trn.description.isNullOrBlank() -> trn.description
+            trn.recurringRuleId != null && trn.dueDate == null && paidFor != null -> {
+                val paidOn = with(timeConverter) { paidFor.toLocalDateTime() }
+                String.format(
+                    billPaidFormat,
+                    paidOn.month.name.lowercase().capitalizeLocal(),
+                    paidOn.year.toString(),
+                )
+            }
+
+            else -> null
+        }
+    }
+
+    /** The tags as "#groceries #work", sorted by name so the order does not depend on the database. */
+    private fun tagsText(trn: Transaction): String? = trn.tags
+        .map { it.name }
+        .sortedBy { it.lowercase() }
+        .joinToString(" ") { "#$it" }
+        .ifBlank { null }
 
     private fun formatTransactionTime(instant: Instant): String = with(timeFormatter) {
         with(timeConverter) { instant.toLocalTime() }.format()

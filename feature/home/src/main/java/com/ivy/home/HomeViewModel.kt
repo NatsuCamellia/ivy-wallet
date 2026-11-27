@@ -15,6 +15,7 @@ import com.ivy.base.time.TimeConverter
 import com.ivy.base.time.TimeProvider
 import com.ivy.data.model.primitive.AssetCode
 import com.ivy.data.repository.CategoryRepository
+import com.ivy.data.repository.TagRepository
 import com.ivy.data.repository.mapper.TransactionMapper
 import com.ivy.domain.usecase.exchange.SyncExchangeRatesUseCase
 import com.ivy.frp.fixUnit
@@ -36,6 +37,7 @@ import com.ivy.legacy.data.model.toUTCCloseTimeRange
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.datamodel.Settings
 import com.ivy.legacy.datamodel.temp.toLegacyDomain
+import com.ivy.legacy.datamodel.temp.withTags
 import com.ivy.legacy.domain.action.settings.UpdateSettingsAct
 import com.ivy.legacy.domain.action.viewmodel.home.ShouldHideIncomeAct
 import com.ivy.legacy.utils.dateNowUTC
@@ -94,6 +96,7 @@ class HomeViewModel @Inject constructor(
     private val updateCategoriesCacheAct: UpdateCategoriesCacheAct,
     private val syncExchangeRatesUseCase: SyncExchangeRatesUseCase,
     private val transactionMapper: TransactionMapper,
+    private val tagRepository: TagRepository,
     private val timeProvider: TimeProvider,
     private val timeConverter: TimeConverter,
 ) : ComposeViewModel<HomeState, HomeEvent>() {
@@ -391,7 +394,7 @@ class HomeViewModel @Inject constructor(
             trns = with(transactionMapper) {
                 result.upcomingTrns.map {
                     it.toEntity().toLegacyDomain()
-                }.toImmutableList()
+                }.withTags(tagRepository).toImmutableList()
             },
             stats = result.upcoming,
             expanded = upcoming.expanded
@@ -403,7 +406,7 @@ class HomeViewModel @Inject constructor(
             trns = with(transactionMapper) {
                 result.overdueTrns.map {
                     it.toEntity().toLegacyDomain()
-                }.toImmutableList()
+                }.withTags(tagRepository).toImmutableList()
             },
             stats = result.overdue,
             expanded = overdue.expanded

@@ -4,9 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.viewModelScope
 import arrow.core.toOption
+import com.ivy.base.legacy.LegacyTag
 import com.ivy.base.legacy.SharedPrefs
 import com.ivy.base.legacy.Transaction
 import com.ivy.base.legacy.TransactionHistoryItem
@@ -33,7 +36,9 @@ import com.ivy.legacy.IvyWalletCtx
 import com.ivy.legacy.data.model.TimePeriod
 import com.ivy.legacy.data.model.toCloseTimeRange
 import com.ivy.legacy.datamodel.temp.toImmutableLegacyTags
+import com.ivy.legacy.datamodel.temp.findLegacyTagsByTransactionIds
 import com.ivy.legacy.datamodel.temp.toLegacyDomain
+import com.ivy.legacy.datamodel.temp.withTags
 import com.ivy.legacy.domain.action.viewmodel.home.ShouldHideIncomeAct
 import com.ivy.legacy.domain.deprecated.logic.AccountCreator
 import com.ivy.legacy.utils.computationThread
@@ -65,6 +70,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
@@ -140,6 +146,22 @@ class TransactionsViewModel @Inject constructor(
     private val hideBalance = mutableStateOf(false)
     private val hideIncomeSetting = mutableStateOf(false)
     private val incomeRevealed = mutableStateOf(false)
+
+    // The tags of the rows in history, upcoming and overdue. Those lists are set in many places, so the tags
+    // are loaded here for whatever rows they hold, with one query, and put on the rows when they are read.
+    private val tagsByTransactionId =
+        mutableStateOf<Map<UUID, ImmutableList<LegacyTag>>>(emptyMap())
+
+    init {
+        viewModelScope.launch {
+            snapshotFlow { Triple(history.value, upcoming.value, overdue.value) }
+                .collectLatest { (historyItems, upcomingTrns, overdueTrns) ->
+                    val transactions = historyItems.filterIsInstance<Transaction>() + upcomingTrns + overdueTrns
+                    tagsByTransactionId.value =
+                        tagRepository.findLegacyTagsByTransactionIds(transactions.map { it.id })
+                }
+        }
+    }
 
     @Composable
     override fun uiState(): TransactionsState {
@@ -258,7 +280,10 @@ class TransactionsViewModel @Inject constructor(
 
     @Composable
     private fun getUpcoming(): ImmutableList<Transaction> {
-        return upcoming.value
+        val tags = tagsByTransactionId.value
+        return remember(upcoming.value, tags) {
+            upcoming.value.map { it.withTags(tags) }.toImmutableList()
+        }
     }
 
     @Composable
@@ -273,12 +298,18 @@ class TransactionsViewModel @Inject constructor(
 
     @Composable
     private fun getHistory(): ImmutableList<TransactionHistoryItem> {
-        return history.value
+        val tags = tagsByTransactionId.value
+        return remember(history.value, tags) {
+            history.value.map { if (it is Transaction) it.withTags(tags) else it }.toImmutableList()
+        }
     }
 
     @Composable
     private fun getOverdue(): ImmutableList<Transaction> {
-        return overdue.value
+        val tags = tagsByTransactionId.value
+        return remember(overdue.value, tags) {
+            overdue.value.map { it.withTags(tags) }.toImmutableList()
+        }
     }
 
     @Composable

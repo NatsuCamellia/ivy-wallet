@@ -9,6 +9,8 @@ data class TransactionItemUi(
     val id: String,
     val title: String,
     val supportingText: String?,
+    val descriptionText: String?,
+    val tagsText: String?,
     val time: String?,
     val categoryColor: Color?,
     val amountText: String,

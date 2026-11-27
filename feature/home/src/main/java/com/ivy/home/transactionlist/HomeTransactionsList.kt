@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -19,40 +17,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import com.ivy.base.legacy.Transaction
-import com.ivy.base.model.TransactionType
 import com.ivy.legacy.data.AppBaseData
-import com.ivy.legacy.ui.component.IconBadge
 import com.ivy.legacy.ui.component.transaction.EmptyState
+import com.ivy.legacy.ui.component.transaction.TransactionItemRow
+import com.ivy.legacy.ui.component.transaction.rememberTransactionItemMapper
 import com.ivy.ui.R
 import com.ivy.ui.component.StickyListHeader
 import com.ivy.ui.component.screenMargin
 import com.ivy.ui.component.TypeFilterChips
 import com.ivy.ui.component.TypeFilterOption
-import com.ivy.ui.component.transaction.FlatTransactionItem
-import com.ivy.ui.time.LocalTimeConverter
 import com.ivy.ui.time.LocalTimeFormatter
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun rememberHomeTransactionMapper(baseData: AppBaseData): HomeTransactionMapper {
-    val timeConverter = LocalTimeConverter.current
+    val items = rememberTransactionItemMapper(baseData)
     val timeFormatter = LocalTimeFormatter.current
-    val deletedText = stringResource(R.string.deleted)
-    val dueOnFormat = stringResource(R.string.due_on)
-    val expenseFallback = stringResource(R.string.expense)
-    val incomeFallback = stringResource(R.string.income)
-    val transferFallback = stringResource(R.string.transfer)
-    return remember(baseData, timeConverter, timeFormatter) {
+    return remember(items, baseData, timeFormatter) {
         HomeTransactionMapper(
-            baseData = baseData,
-            timeConverter = timeConverter,
+            items = items,
+            baseCurrency = baseData.baseCurrency,
             timeFormatter = timeFormatter,
-            deletedText = deletedText,
-            dueOnFormat = dueOnFormat,
-            expenseFallback = expenseFallback,
-            incomeFallback = incomeFallback,
-            transferFallback = transferFallback,
         )
     }
 }
@@ -80,18 +66,13 @@ fun LazyListScope.homeTransactionsList(
         }
         // Prefixed so a row never shares its key with the same transaction in the history below: HomeViewModel
         // publishes the reloaded history before the reloaded Due rows, so a paid or skipped one is in both for a frame.
-        items(items = dueRows, key = { "due_${it.ui.id}" }, contentType = { "due_trn" }) { item ->
-            FlatTransactionItem(
-                ui = item.ui,
-                onClick = { onTransactionClick(item.trn) },
-                onSkip = { onSkipTransaction(item.trn) },
-                onPayOrGet = { onPayOrGet(item.trn) },
-                payOrGetText = stringResource(
-                    if (item.trn.type == TransactionType.EXPENSE) R.string.pay else R.string.get,
-                ),
-            ) {
-                TrnBadge(item)
-            }
+        items(items = dueRows, key = { "due_${it.item.ui.id}" }, contentType = { "due_trn" }) { row ->
+            TransactionItemRow(
+                item = row.item,
+                onClick = { onTransactionClick(row.item.trn) },
+                onSkip = { onSkipTransaction(row.item.trn) },
+                onPayOrGet = { onPayOrGet(row.item.trn) },
+            )
         }
         if (due.showAllCount != null) {
             item(key = "due_toggle", contentType = "due_toggle") {
@@ -131,10 +112,8 @@ fun LazyListScope.homeTransactionsList(
                 StickyListHeader(title = item.title, subtotal = item.netText)
             }
 
-            is HomeTrnListItem.Trn -> item(key = item.ui.id, contentType = "history_trn") {
-                FlatTransactionItem(ui = item.ui, onClick = { onTransactionClick(item.trn) }) {
-                    TrnBadge(item)
-                }
+            is HomeTrnListItem.Trn -> item(key = item.item.ui.id, contentType = "history_trn") {
+                TransactionItemRow(item = item.item, onClick = { onTransactionClick(item.item.trn) })
             }
         }
     }
@@ -177,30 +156,5 @@ private fun DueHeader(showSkipAll: Boolean, onSkipAll: () -> Unit) {
                 Text(text = stringResource(R.string.skip_all))
             }
         }
-    }
-}
-
-/** The category (or account) colour with its icon, a transfer without one shows the transfer glyph. */
-@Composable
-private fun TrnBadge(item: HomeTrnListItem.Trn) {
-    val color = item.ui.categoryColor
-    val isTransfer = item.trn.type == TransactionType.TRANSFER
-    when {
-        color != null -> IconBadge(
-            color = color,
-            iconName = item.iconAsset,
-            defaultIcon = if (isTransfer) R.drawable.ic_transfer else R.drawable.ic_custom_category_m,
-        )
-
-        isTransfer -> IconBadge(
-            color = MaterialTheme.colorScheme.primaryContainer,
-            icon = Icons.Default.SwapHoriz,
-        )
-
-        else -> IconBadge(
-            color = MaterialTheme.colorScheme.secondaryContainer,
-            iconName = item.iconAsset,
-            defaultIcon = R.drawable.ic_custom_category_m,
-        )
     }
 }

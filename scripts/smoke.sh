@@ -2106,12 +2106,15 @@ set_hide_balance() {
   [ "$(row_checked "Hide balance")" = "$want" ] || { log "Hide balance did not turn $1"; return 1; }
 }
 
-# has_amount: a text in the dump that is a formatted amount ("12.50 USD", "+1,200.00 USD")
+# has_amount [max_y]: a text in the dump that is a formatted amount ("12.50 USD", "+1,200.00 USD"), only above max_y when given
 has_amount() {
-  python3 -I - "$XML" <<'PY'
+  python3 -I - "$XML" "${1:-}" <<'PY'
 import re, sys, xml.etree.ElementTree as ET
 pattern = re.compile(r'[0-9][0-9,.]*[kmb]? [A-Z]{3}$')
-sys.exit(0 if any(pattern.search(n.get('text') or '') for n in ET.parse(sys.argv[1]).iter('node')) else 1)
+limit = int(sys.argv[2]) if sys.argv[2] else None
+def above(n):
+    return limit is None or int(re.findall(r'\d+', n.get('bounds'))[3]) <= limit
+sys.exit(0 if any(pattern.search(n.get('text') or '') and above(n) for n in ET.parse(sys.argv[1]).iter('node')) else 1)
 PY
 }
 
@@ -2152,11 +2155,15 @@ hide_balance_body() {
   tap_node text exact "Cash" || return 1
   wait_for desc exact "Edit" || return 1
   wait_for any sub "****" 10 || { log "account detail: the placeholder is missing"; return 1; }
-  has_amount && { log "account detail: an amount shows while Hide balance is on"; return 1; }
+  # the balance and the two cards sit above the period buttons; the transaction rows below are not hidden
+  local limit
+  limit=$(find_node desc exact "Previous" | cut -d' ' -f4) || { log "account detail: period buttons not found"; return 1; }
+  has_amount "$limit" && { log "account detail: an amount shows while Hide balance is on"; return 1; }
   shot hide-balance/account-hidden
   tap_node any sub "****" || return 1
   dump || return 1
-  has_amount || { log "account detail: a tap on the hidden balance did not reveal the amounts"; return 1; }
+  limit=$(find_node desc exact "Previous" | cut -d' ' -f4) || { log "account detail: period buttons not found"; return 1; }
+  has_amount "$limit" || { log "account detail: a tap on the hidden balance did not reveal the amounts"; return 1; }
   shot hide-balance/account-revealed
   crashed && return 1
   return 0

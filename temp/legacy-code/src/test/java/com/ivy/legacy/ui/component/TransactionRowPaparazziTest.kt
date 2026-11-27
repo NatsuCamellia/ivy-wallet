@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import app.cash.paparazzi.DeviceConfig
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import com.ivy.base.legacy.LegacyTag
 import com.ivy.base.legacy.Theme
 import com.ivy.base.legacy.Transaction
 import com.ivy.base.model.TransactionType
@@ -31,6 +32,7 @@ import com.ivy.ui.R
 import com.ivy.ui.testing.PaparazziScreenshotTest
 import com.ivy.ui.testing.PaparazziTheme
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.time.Instant
@@ -116,6 +118,34 @@ class TransactionRowPaparazziTest(
                 expense(title = null, categoryId = null),
                 expense(title = "No category", categoryId = null),
                 expense(title = "Free sample", amount = 0.0),
+            )
+        }
+    }
+
+    @Test
+    fun snapshotRowDescriptionAndTags() {
+        snapshot(theme) {
+            Rows(
+                theme,
+                expense(description = "Weekly shop", tags = listOf("groceries", "work")),
+                expense(
+                    title = "Birthday dinner",
+                    description = "A long description that goes on and on about what was eaten, who came, " +
+                        "who paid for the drinks, why the bill was so high and what should be done " +
+                        "differently the next time the whole family meets for a dinner like this",
+                    tags = listOf(
+                        "family", "birthday", "restaurant", "dinner", "celebration", "friends", "weekend",
+                        "special", "gifts", "cake", "drinks", "party", "holiday",
+                    ),
+                ),
+                expense(title = null, tags = listOf("coffee")),
+                expense(
+                    title = "Rent",
+                    description = "Monthly rent",
+                    tags = listOf("home"),
+                    dueDate = FAR_PAST,
+                    dateTime = null,
+                ),
             )
         }
     }
@@ -284,6 +314,8 @@ private fun transaction(
     dateTime: Instant? = NOW,
     toAccountId: UUID? = null,
     toAmount: Double = amount,
+    description: String? = null,
+    tags: List<String> = emptyList(),
 ): Transaction = Transaction(
     accountId = Cash.id,
     type = type,
@@ -291,9 +323,11 @@ private fun transaction(
     toAccountId = toAccountId,
     toAmount = toAmount.toBigDecimal(),
     title = title,
+    description = description,
     dateTime = dateTime,
     dueDate = dueDate,
     categoryId = categoryId,
+    tags = tags.map { LegacyTag(UUID(1, nextId++), it) }.toImmutableList(),
     id = UUID(0, nextId++),
 )
 
@@ -303,6 +337,8 @@ private fun expense(
     categoryId: UUID? = Food.id.value,
     dueDate: Instant? = null,
     dateTime: Instant? = NOW,
+    description: String? = null,
+    tags: List<String> = emptyList(),
 ): Transaction = transaction(
     type = TransactionType.EXPENSE,
     title = title,
@@ -310,6 +346,8 @@ private fun expense(
     categoryId = categoryId,
     dueDate = dueDate,
     dateTime = dateTime,
+    description = description,
+    tags = tags,
 )
 
 private fun income(

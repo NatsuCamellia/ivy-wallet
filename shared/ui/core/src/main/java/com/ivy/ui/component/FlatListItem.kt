@@ -23,8 +23,9 @@ import androidx.compose.ui.unit.dp
  * [supportingText] under it and on the right a [primaryText] stacked over a [secondaryText]. Only the
  * press shows a rounded ripple. Whoever places the row decides the horizontal screen margin: the row
  * is inset by 8dp on each side for the ripple and by 8dp more for its content, so it lines up with a
- * 16dp margin when used full width. An [overlineText] sits above the title and [actions] (buttons)
- * under the supporting text. A [supportingContent] slot, e.g. a share bar, sits between the two and
+ * 16dp margin when used full width. An [overlineText] sits above the title, a [descriptionText]
+ * (up to three lines) and a [tagsText] under the supporting text, and [actions] (buttons)
+ * under all of them. A [supportingContent] slot, e.g. a share bar, sits between the two and
  * spans the full width under the text and the trailing amounts.
  */
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -34,6 +35,8 @@ fun FlatListItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     supportingText: String? = null,
+    descriptionText: String? = null,
+    tagsText: String? = null,
     primaryText: String? = null,
     primaryColor: Color = MaterialTheme.colorScheme.onSurface,
     secondaryText: String? = null,
@@ -57,7 +60,7 @@ fun FlatListItem(
         leading?.invoke()
         if (supportingContent == null) {
             Column(modifier = Modifier.weight(1f)) {
-                TextLines(title, supportingText, overlineText, overlineColor)
+                TextLines(title, supportingText, descriptionText, tagsText, overlineText, overlineColor)
                 ActionsRow(actions)
             }
             Trailing(primaryText, primaryColor, secondaryText, secondaryColor)
@@ -68,7 +71,15 @@ fun FlatListItem(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    TextLines(title, supportingText, overlineText, overlineColor, Modifier.weight(1f))
+                    TextLines(
+                        title = title,
+                        supportingText = supportingText,
+                        descriptionText = descriptionText,
+                        tagsText = tagsText,
+                        overlineText = overlineText,
+                        overlineColor = overlineColor,
+                        modifier = Modifier.weight(1f),
+                    )
                     Trailing(primaryText, primaryColor, secondaryText, secondaryColor)
                 }
                 supportingContent()
@@ -82,6 +93,8 @@ fun FlatListItem(
 private fun TextLines(
     title: String,
     supportingText: String?,
+    descriptionText: String?,
+    tagsText: String?,
     overlineText: String?,
     overlineColor: Color,
     modifier: Modifier = Modifier,
@@ -104,16 +117,31 @@ private fun TextLines(
             overflow = TextOverflow.Ellipsis,
         )
         if (supportingText != null) {
-            Text(
-                text = supportingText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
+            SupportingLine(supportingText, maxLines = 1)
+        }
+        if (descriptionText != null) {
+            SupportingLine(descriptionText, maxLines = DescriptionMaxLines)
+        }
+        if (tagsText != null) {
+            SupportingLine(tagsText, maxLines = TagsMaxLines)
         }
     }
 }
+
+@Composable
+private fun SupportingLine(text: String, maxLines: Int) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        maxLines = maxLines,
+        overflow = TextOverflow.Ellipsis,
+    )
+}
+
+/** Like the transaction card of upstream Ivy Wallet, a long description is cut after three lines. */
+private const val DescriptionMaxLines = 3
+private const val TagsMaxLines = 2
 
 @Composable
 private fun ActionsRow(actions: (@Composable RowScope.() -> Unit)?) {

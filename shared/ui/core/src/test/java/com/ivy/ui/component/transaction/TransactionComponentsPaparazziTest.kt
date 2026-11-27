@@ -127,6 +127,8 @@ class TransactionComponentsPaparazziTest(
             id = "1",
             title = "Expense",
             supportingText = "Groceries · Cash",
+            descriptionText = null,
+            tagsText = null,
             time = "14:05",
             categoryColor = Color(0xFFFF9235),
             amountText = "-32.51 USD",

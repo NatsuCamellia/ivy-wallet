@@ -50,6 +50,7 @@ class HomeTransactionMapperTest {
             expenseFallback = "Expense",
             incomeFallback = "Income",
             transferFallback = "Transfer",
+            billPaidFormat = "Bill for %1\$s %2\$s paid",
             formatAmount = { amount, currency -> "$amount $currency" },
         ),
         baseCurrency = "USD",

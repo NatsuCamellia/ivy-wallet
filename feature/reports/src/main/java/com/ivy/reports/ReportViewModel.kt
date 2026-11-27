@@ -38,6 +38,7 @@ import com.ivy.frp.filterSuspend
 import com.ivy.legacy.IvyWalletCtx
 import com.ivy.legacy.datamodel.Account
 import com.ivy.legacy.datamodel.temp.toLegacy
+import com.ivy.legacy.datamodel.temp.withTags
 import com.ivy.legacy.utils.getISOFormattedDateTime
 import com.ivy.legacy.utils.scopedIOThread
 import com.ivy.legacy.utils.timeNowUTC
@@ -315,10 +316,10 @@ class ReportViewModel @Inject constructor(
                 history = historyWithDateDividers.await().toImmutableList(),
                 upcomingTransactions = upcomingTransactionsList.map {
                     it.toLegacy(transactionMapper)
-                }.toImmutableList(),
+                }.withTags(tagRepository).toImmutableList(),
                 overdueTransactions = overdue.map {
                     it.toLegacy(transactionMapper)
-                }.toImmutableList(),
+                }.withTags(tagRepository).toImmutableList(),
                 accounts = tempAccounts.toImmutableList(),
                 reportFilter = reportFilter,
                 accountIdFilters = accountFilterIdList.await().toImmutableList(),

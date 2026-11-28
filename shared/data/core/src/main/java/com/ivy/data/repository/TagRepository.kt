@@ -164,6 +164,9 @@ class TagRepository @Inject constructor(
         writeTagDao.deleteAll()
     }
 
+    /** Drops the memoized tags; call it after the tables were written without this repository. */
+    fun invalidate(): Unit = memo.invalidate()
+
     private fun List<TagId>.toRawValues(): List<UUID> = this.map { it.value }
 
     companion object {

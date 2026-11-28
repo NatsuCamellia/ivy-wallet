@@ -9,6 +9,9 @@
 # ":feature:home", overrides detection).
 set -u
 cd "$(git rev-parse --show-toplevel)" || exit 2
+# The fallback font for glyphs the app font lacks (e.g. "→") depends on the locale, so record and verify
+# in CI's locale.
+export LC_ALL=en_US.UTF-8
 BASE="${BASE:-HEAD}"
 TASK=recordPaparazziDebug
 [ "${1:-}" = "--verify" ] && TASK=verifyPaparazziDebug

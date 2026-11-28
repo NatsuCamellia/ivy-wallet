@@ -1083,7 +1083,7 @@ flow_account_detail() {
   return 0
 }
 
-# db_edit seed|clear|pay_upcoming|pay_clear|planned_seed|planned_clear: edits the app database of the debuggable build through run-as while the app is stopped. `seed` adds
+# db_edit seed|clear|import_clear|pay_upcoming|pay_clear|planned_seed|planned_clear: edits the app database of the debuggable build through run-as while the app is stopped. `seed` adds
 # 30 "Scroll row" transactions per day of the current month to the account Cash (every third one a transfer to Bank, some
 # with a description), `clear` removes them again; `pay_upcoming` and `pay_clear` belong to flow_pay_planned, `planned_seed` and `planned_clear` to flow_planned_scroll, `flat_clear` to flow_flat_rows, `desc_seed` and `desc_clear` to flow_desc_tags. Needs the app to have an offline account with Cash and Bank.
 db_edit() {
@@ -1148,6 +1148,9 @@ elif mode == "desc_clear":
     db.execute("DELETE FROM tags_association WHERE tagId IN (SELECT id FROM tags WHERE name = 'smoketag')")
     db.execute("DELETE FROM tags WHERE name = 'smoketag'")
     db.execute("DELETE FROM transactions WHERE title = 'smokedesc'")
+elif mode == "import_clear":
+    db.execute("DELETE FROM transactions WHERE title = 'smokeimport'")
+    db.execute("DELETE FROM categories WHERE name = 'Smoke import cat'")
 elif mode == "pay_clear":
     db.execute("DELETE FROM transactions WHERE title LIKE 'payup%' OR title LIKE 'payover%'")
 else:
@@ -2263,6 +2266,78 @@ flow_import_data() {
   return 0
 }
 
+# Regression for the stale category list after a backup import (the import wrote categories through the DAOs while
+# CategoryRepository kept the list memoized before it). Opens the Categories tab so the list is memoized, imports a backup
+# zip with one category through Settings -> Import data -> Ivy Wallet, and expects the category on the Categories tab
+# without restarting the app. The backup (accounts Cash and Bank, the settings of onboarding) is built here and pushed to
+# Download; the category is removed again (db_edit import_clear).
+flow_import_backup() {
+  local tmp zip
+  tmp=$(mktemp -d) || return 1
+  zip="smokebackup.zip"
+  python3 -I - "$tmp/$zip" <<'PY' || { rm -rf "$tmp"; return 1; }
+import json, sys, time, uuid, zipfile
+acc = {n: str(uuid.uuid4()) for n in ("Cash", "Bank")}
+cat = str(uuid.uuid4())
+data = {
+    "accounts": [dict(name=n, currency="USD", color=-16711936, orderNum=float(i), id=acc[n]) for i, n in enumerate(acc)],
+    "categories": [dict(name="Smoke import cat", color=-65536, orderNum=99.0, id=cat)],
+    "transactions": [dict(accountId=acc["Cash"], type="EXPENSE", amount=3.0, title="smokeimport", dateTime=int(time.time() * 1000),
+                          categoryId=cat, id=str(uuid.uuid4()))],
+    "settings": [dict(theme="AUTO", currency="USD", bufferAmount=0.0, name="Smoke", id=str(uuid.uuid4()))],
+}
+with zipfile.ZipFile(sys.argv[1], "w") as z:
+    z.writestr("data.json", b"\xfe\xff" + json.dumps(data).encode("utf-16-be"))
+PY
+  adb push "$tmp/$zip" /sdcard/Download/$zip >/dev/null || { rm -rf "$tmp"; return 1; }
+  rm -rf "$tmp"
+  local rc=0
+  import_backup_body "$zip" || rc=1
+  adb shell rm -f /sdcard/Download/$zip
+  db_edit import_clear || rc=1
+  return $rc
+}
+
+import_backup_body() {
+  go_home || return 1
+  tap_tab Categories || return 1
+  wait_for desc exact "Add category" || return 1
+  has text exact "Smoke import cat" && { log "the imported category is there before the import"; return 1; }
+  go_home || return 1
+  tap_node desc exact "More" || return 1
+  wait_for text exact "Quick access" || return 1
+  tap_node text exact "Settings" || return 1
+  wait_for text exact "About & Support" || return 1
+  tap_node text exact "Import & Export" || return 1
+  wait_for text exact "Import data" || return 1
+  tap_node text exact "Import data" || return 1
+  wait_for text exact "Manual CSV import" || return 1
+  tap_node text exact "Ivy Wallet" || return 1
+  wait_for text exact "Upload Backup file" || return 1
+  tap_node text exact "Upload Backup file" || return 1
+  wait_for desc exact "Search" 15 || { log "the file picker did not open"; return 1; }
+  tap_node desc exact "Search" || return 1
+  sleep 1
+  adb shell input text smokebackup
+  wait_for text exact "$1" 15 || { log "the picker does not list $1"; return 1; }
+  tap_node text exact "$1" || return 1
+  wait_for text exact "Success" 30 || { log "the import did not finish"; return 1; }
+  has text sub "1 categories" || has text sub "1 category" || { log "the import result does not count the category"; shot import-4-result; return 1; }
+  shot import-4-result
+  tap_node text exact "Finish" || return 1
+  # without restarting the app: the Categories tab must list the imported category
+  back
+  back
+  dump
+  has text exact "Quick access" && { tap_node desc exact "Close" || return 1; }
+  wait_for desc exact "More" || return 1
+  tap_tab Categories || return 1
+  wait_for text exact "Smoke import cat" 10 || { log "the imported category is missing from the Categories tab"; shot import-5-categories; return 1; }
+  shot import-5-categories
+  crashed && return 1
+  return 0
+}
+
 # ---------- runner ----------
 
 run_flow() {
@@ -2279,7 +2354,7 @@ run_flow() {
   fi
 }
 
-ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section flow_pay_planned flow_planned_scroll flow_flat_rows flow_desc_tags flow_hide_balance"
+ALL_FLOWS="flow_onboarding flow_fab_menu flow_amount_sheet_close flow_nested_back flow_calculator_reopen flow_keyboard_sheet flow_navbar_clearance flow_cancelled_hide flow_reorder flow_choose_period flow_period_other_year flow_date_picker flow_period_date_picker flow_more_menu flow_account_detail flow_account_scroll flow_planned_payments flow_add_expense flow_type_filter flow_piechart flow_search flow_appbar_state flow_reports flow_categories flow_budgets flow_loans flow_exchange_rates flow_balance flow_settings flow_import_data flow_due_section flow_pay_planned flow_planned_scroll flow_flat_rows flow_desc_tags flow_hide_balance flow_import_backup"
 # Screens reachable by `shot`: home, accounts and categories are tabs, the others are rows of the More sheet.
 ALL_SCREENS="home accounts categories budgets loans planned-payments reports settings"
 

@@ -111,6 +111,15 @@ class RepositoryMemo<T : Identifiable<TID>, TID : UniqueId> internal constructor
         }
     }
 
+    /**
+     * Forgets everything memoized, so the next read goes to the database again.
+     * Used after data was written to the database behind the repository's back (a backup import).
+     */
+    fun invalidate() {
+        _memo.clear()
+        findAllMemoized = false
+    }
+
     private fun memoize(items: List<T>) {
         items.forEach(::memoize)
     }

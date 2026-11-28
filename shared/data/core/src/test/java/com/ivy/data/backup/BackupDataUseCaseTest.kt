@@ -13,16 +13,24 @@ import com.ivy.data.db.dao.fake.FakeSettingsDao
 import com.ivy.data.db.dao.fake.FakeTagAssociationDao
 import com.ivy.data.db.dao.fake.FakeTagDao
 import com.ivy.data.db.dao.fake.FakeTransactionDao
+import com.ivy.data.db.entity.TagEntity
 import com.ivy.data.repository.AccountRepository
+import com.ivy.data.repository.CategoryRepository
 import com.ivy.data.repository.CurrencyRepository
+import com.ivy.data.repository.TagRepository
 import com.ivy.data.repository.fake.fakeRepositoryMemoFactory
 import com.ivy.data.repository.mapper.AccountMapper
+import com.ivy.data.repository.mapper.CategoryMapper
+import com.ivy.data.repository.mapper.TagMapper
 import com.ivy.data.testResource
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.encodeToString
 import org.junit.Test
+import java.time.Instant
+import java.util.UUID
 
 class BackupDataUseCaseTest {
     private fun newBackupDataUseCase(
@@ -35,7 +43,9 @@ class BackupDataUseCaseTest {
         loanDao: FakeLoanDao = FakeLoanDao(),
         loanRecordDao: FakeLoanRecordDao = FakeLoanRecordDao(),
         tagDao: FakeTagDao = FakeTagDao(),
-        tagAssociationDao: FakeTagAssociationDao = FakeTagAssociationDao()
+        tagAssociationDao: FakeTagAssociationDao = FakeTagAssociationDao(),
+        categoryRepository: CategoryRepository = newCategoryRepository(categoryDao),
+        tagRepository: TagRepository = newTagRepository(tagDao, tagAssociationDao),
     ): BackupDataUseCase {
         val accountMapper = AccountMapper(
             CurrencyRepository(
@@ -78,9 +88,32 @@ class BackupDataUseCaseTest {
             tagsReader = tagDao,
             tagsWriter = tagDao,
             tagAssociationReader = tagAssociationDao,
-            tagAssociationWriter = tagAssociationDao
+            tagAssociationWriter = tagAssociationDao,
+            categoryRepository = categoryRepository,
+            tagRepository = tagRepository,
         )
     }
+
+    private fun newCategoryRepository(categoryDao: FakeCategoryDao) = CategoryRepository(
+        mapper = CategoryMapper(),
+        writeCategoryDao = categoryDao,
+        categoryDao = categoryDao,
+        dispatchersProvider = TestDispatchersProvider,
+        memoFactory = fakeRepositoryMemoFactory(),
+    )
+
+    private fun newTagRepository(
+        tagDao: FakeTagDao,
+        tagAssociationDao: FakeTagAssociationDao
+    ) = TagRepository(
+        mapper = TagMapper(),
+        tagDao = tagDao,
+        tagAssociationDao = tagAssociationDao,
+        writeTagDao = tagDao,
+        writeTagAssociationDao = tagAssociationDao,
+        dispatchersProvider = TestDispatchersProvider,
+        memoFactory = fakeRepositoryMemoFactory(),
+    )
 
     private suspend fun backupTestCase(backupVersion: String) {
         // given
@@ -114,5 +147,71 @@ class BackupDataUseCaseTest {
     @Test
     fun `backup compatibility with 450 (150)`() = runTest {
         backupTestCase("450-150")
+    }
+
+    @Test
+    fun `categories read before an import are refreshed by it`() = runTest {
+        // given - something (Home, the Categories tab) read the categories before the import
+        val categoryDao = FakeCategoryDao()
+        val categoryRepository = newCategoryRepository(categoryDao)
+        val backupDataUseCase = newBackupDataUseCase(
+            categoryDao = categoryDao,
+            categoryRepository = categoryRepository,
+        )
+        categoryRepository.findAll() shouldBe emptyList()
+        // "Delete all data" clears the memo but leaves it memoized
+        categoryRepository.deleteAll()
+        categoryRepository.findAll() shouldBe emptyList()
+        val backupJsonData = testResource("backups/450-150.json")
+            .readText(Charsets.UTF_16)
+
+        // when
+        val result = backupDataUseCase.importJson(backupJsonData, onProgress = {})
+
+        // then
+        result.categoriesImported shouldBeGreaterThan 0
+        categoryRepository.findAll().size shouldBe result.categoriesImported
+    }
+
+    @Test
+    fun `tags read before an import are refreshed by it`() = runTest {
+        // given
+        val tagDao = FakeTagDao()
+        val tagAssociationDao = FakeTagAssociationDao()
+        val tagRepository = newTagRepository(tagDao, tagAssociationDao)
+        val backupDataUseCase = newBackupDataUseCase(
+            tagDao = tagDao,
+            tagAssociationDao = tagAssociationDao,
+            tagRepository = tagRepository,
+        )
+        tagRepository.findAll() shouldBe emptyList()
+        tagRepository.deleteAll()
+        tagRepository.findAll() shouldBe emptyList()
+        val json = KotlinxSerializationModule.provideJson()
+        val backupJsonData = json.encodeToString(
+            json.decodeFromString<IvyWalletCompleteData>(
+                testResource("backups/450-150.json").readText(Charsets.UTF_16)
+            ).copy(
+                tags = listOf(
+                    TagEntity(
+                        id = UUID.randomUUID(),
+                        name = "trip",
+                        description = null,
+                        color = 0,
+                        icon = null,
+                        orderNum = 0.0,
+                        dateTime = Instant.EPOCH,
+                        isDeleted = false,
+                        lastSyncedTime = Instant.EPOCH,
+                    )
+                )
+            )
+        )
+
+        // when
+        backupDataUseCase.importJson(backupJsonData, onProgress = {})
+
+        // then
+        tagRepository.findAll().map { it.name.value } shouldBe listOf("trip")
     }
 }

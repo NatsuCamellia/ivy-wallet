@@ -14,9 +14,13 @@ import com.ivy.data.DataObserver
 import com.ivy.data.db.IvyRoomDatabase
 import com.ivy.data.file.FileSystem
 import com.ivy.data.repository.AccountRepository
+import com.ivy.data.repository.CategoryRepository
 import com.ivy.data.repository.CurrencyRepository
+import com.ivy.data.repository.TagRepository
 import com.ivy.data.repository.fake.fakeRepositoryMemoFactory
 import com.ivy.data.repository.mapper.AccountMapper
+import com.ivy.data.repository.mapper.CategoryMapper
+import com.ivy.data.repository.mapper.TagMapper
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.ints.shouldBeGreaterThan
 import kotlinx.coroutines.runBlocking
@@ -77,7 +81,23 @@ class BackupDataUseCaseAndroidTest {
             tagsReader = db.tagDao,
             tagAssociationReader = db.tagAssociationDao,
             tagsWriter = db.writeTagDao,
-            tagAssociationWriter = db.writeTagAssociationDao
+            tagAssociationWriter = db.writeTagAssociationDao,
+            categoryRepository = CategoryRepository(
+                mapper = CategoryMapper(),
+                writeCategoryDao = db.writeCategoryDao,
+                categoryDao = db.categoryDao,
+                dispatchersProvider = TestDispatchersProvider,
+                memoFactory = fakeRepositoryMemoFactory(),
+            ),
+            tagRepository = TagRepository(
+                mapper = TagMapper(),
+                tagDao = db.tagDao,
+                tagAssociationDao = db.tagAssociationDao,
+                writeTagDao = db.writeTagDao,
+                writeTagAssociationDao = db.writeTagAssociationDao,
+                dispatchersProvider = TestDispatchersProvider,
+                memoFactory = fakeRepositoryMemoFactory(),
+            ),
         )
     }
 

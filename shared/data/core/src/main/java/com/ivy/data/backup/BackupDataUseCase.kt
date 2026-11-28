@@ -30,6 +30,8 @@ import com.ivy.data.db.dao.write.WriteTagDao
 import com.ivy.data.db.dao.write.WriteTransactionDao
 import com.ivy.data.file.FileSystem
 import com.ivy.data.repository.AccountRepository
+import com.ivy.data.repository.CategoryRepository
+import com.ivy.data.repository.TagRepository
 import com.ivy.data.repository.mapper.AccountMapper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.collections.immutable.persistentListOf
@@ -72,7 +74,9 @@ class BackupDataUseCase @Inject constructor(
     private val tagsReader: TagDao,
     private val tagAssociationReader: TagAssociationDao,
     private val tagsWriter: WriteTagDao,
-    private val tagAssociationWriter: WriteTagAssociationDao
+    private val tagAssociationWriter: WriteTagAssociationDao,
+    private val categoryRepository: CategoryRepository,
+    private val tagRepository: TagRepository,
 ) {
     suspend fun exportToFile(
         zipFileUri: Uri
@@ -211,7 +215,14 @@ class BackupDataUseCase @Inject constructor(
         } ?: error("Failed to parse backup JSON.")
 
         onProgress(0.4)
-        insertDataToDb(completeData = ivyWalletCompleteData, onProgress = onProgress)
+        try {
+            insertDataToDb(completeData = ivyWalletCompleteData, onProgress = onProgress)
+        } finally {
+            // categories and tags are written straight through their DAOs, so what the repositories memoized
+            // before the import (the Categories tab, Home) is stale now
+            categoryRepository.invalidate()
+            tagRepository.invalidate()
+        }
         onProgress(1.0)
 
         if (clearCacheDir) {

@@ -71,4 +71,7 @@ class CategoryRepository @Inject constructor(
     }
 
     suspend fun deleteAll(): Unit = memo.deleteAll(writeCategoryDao::deleteAll)
+
+    /** Drops the memoized categories; call it after the table was written without this repository. */
+    fun invalidate(): Unit = memo.invalidate()
 }
